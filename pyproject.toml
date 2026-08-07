@@ -107,7 +107,7 @@ gemini = ["google-genai>=1.0.0"]
 
 # Model Context Protocol client. Enables MCPServer integration.
 # See src/philharmonica/adk/mcp/.
-mcp = ["mcp>=1.24.0,<2"]
+mcp = ["mcp>=1.24.0,<3"]
 
 # Agent-to-Agent (A2A) protocol — peer client + expose local Agents
 # as A2A servers. The [http-server] extra pulls in starlette and
@@ -291,7 +291,7 @@ dev = [
     # lock, the pre-commit rev, and the CI lint job must all agree or the
     # hygiene gate reports differently per environment. Bump all three
     # together.
-    "ruff==0.15.7",
+    "ruff==0.16.1",
     # Type checkers — mypy is canonical (pydantic.mypy
     # plugin + --warn-unused-ignores); pyright secondary (stricter
     # TypedDict narrowing + IDE/Pylance parity)

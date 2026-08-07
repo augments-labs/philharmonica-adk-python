@@ -65,8 +65,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
+        # --repo is required: this job never checks out, so gh has no git
+        # remote to infer the repository from.
         run: |
-          gh release download "$TAG" --dir dist --pattern '*.whl' --pattern '*.tar.gz'
+          gh release download "$TAG" --repo "${{ github.repository }}" \
+            --dir dist --pattern '*.whl' --pattern '*.tar.gz'
 
       # Guard both paths: publishing an empty or partial dist would create a
       # release on PyPI that can never be corrected, since a version number is

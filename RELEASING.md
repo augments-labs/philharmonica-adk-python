@@ -17,10 +17,29 @@ come from `CHANGELOG.md`. The release workflow builds the wheel and sdist,
 verifies them (twine check, clean-venv install, import + CLI smoke), and
 publishes to PyPI via **OIDC trusted publishing** — no long-lived API token.
 
-The `pypi` GitHub Environment restricts deployment to `release/v*` branches,
-so only a merged release PR can mint the OIDC token. There is no manual
+The `pypi` GitHub Environment restricts deployment to the default branch, so
+only a workflow running on `main` can mint the OIDC token. There is no manual
 approval step: **merging the release PR publishes**, and a version number
 once uploaded to PyPI can never be reused. Merging is the point of no return.
+
+### The trusted publisher
+
+PyPI matches an OIDC token against a publisher registered on the project, and
+that registration names **one workflow file**. The publisher for
+`philharmonica-adk` must therefore be:
+
+| Field | Value |
+| --- | --- |
+| Owner | `augments-labs` |
+| Repository | `philharmonica-adk-python` |
+| Workflow name | `release-publish.yml` |
+| Environment | `pypi` |
+
+If publishing ever moves to a different file, this registration has to move
+with it — otherwise the upload fails with `invalid-publisher: valid token, but
+no corresponding publisher`, which reads like a token problem but is a
+filename mismatch. The failing run prints the claims it sent; compare
+`workflow_ref` against the table above before touching anything else.
 
 ## Choosing the version
 

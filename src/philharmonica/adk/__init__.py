@@ -218,7 +218,7 @@ from philharmonica.adk.tools import DocumentSearchTool, FunctionTool, MemoryTool
 from philharmonica.adk.types.run import RunResult
 from philharmonica.adk.verbose import EventStyle, VerboseConfig
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     # Flow error-trigger route literal (error_policy="route_to_error_handler")

@@ -33,10 +33,10 @@ ENV PYTHONUNBUFFERED=1 \\
 
 WORKDIR /app
 
-# Install dependencies first for layer caching. requirements.txt must make
-# philharmonica-adk[$extras] installable here — a private index
-# (--extra-index-url), a vendored wheel, or a VCS URL — plus your agent's
-# own dependencies.
+# Install dependencies first for layer caching. requirements.txt resolves
+# philharmonica-adk[$extras] from PyPI by default; swap in a pin, a vendored
+# wheel, or a VCS URL there if the build must not reach PyPI. Add your
+# agent's own dependencies to the same file.
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
@@ -81,8 +81,9 @@ build/
 
 REQUIREMENTS_TEMPLATE = Template(
     """\
-# Make philharmonica-adk installable in the image, then add your agent's own
-# dependencies below. Choose one approach for the line below:
+# philharmonica-adk resolves from PyPI. Add your agent's own dependencies
+# below. Replace the line below if the build must not reach PyPI:
+#   pinned:         philharmonica-adk[$extras]==<version>
 #   private index:  add `--extra-index-url https://<your-index>/simple` here
 #   vendored wheel: drop the wheel in the build context and reference its path
 #   VCS install:    philharmonica-adk[$extras] @ git+https://<your-repo>

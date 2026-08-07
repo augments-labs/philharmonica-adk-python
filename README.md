@@ -1,8 +1,6 @@
 # Philharmonica Agent Development Kit (ADK)
 
-**Where language becomes action.**
-
-A lightweight, provider-agnostic Python framework for orchestrating complex
+A provider-agnostic Python framework to orchestrate complex
 systems of agents that perform real-world actions, across 100+ LLMs via litellm.
 
 ## The concept
@@ -176,9 +174,9 @@ philharmonica deploy ecs        --agent my_agent.app:agent --image ACCT.dkr.ecr.
 `ecs`, `app-runner`, and `lambda`. The generated image satisfies the
 universal container contract (binds `0.0.0.0:$PORT`, config from env,
 non-root, `/healthz` + `/readyz` probes), so the same image runs
-everywhere. Because the package is private, the generated
-`requirements.txt` must make `philharmonica-adk` installable in your image
-(private index, vendored wheel, or VCS URL).
+everywhere. The generated `requirements.txt` installs `philharmonica-adk`
+from PyPI; edit it if you need a pin, a vendored wheel, or a VCS URL
+instead.
 
 A single replica works out of the box on the default per-pod SQLite
 stores. For multi-replica (horizontally-scaled) deployments, back A2A

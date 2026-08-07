@@ -109,7 +109,7 @@ jobs:
           fi
       # Hand the exact artifacts that were verified above (twine check +
       # clean-venv smoke) to the publish job — never a rebuild.
-      - uses: actions/upload-artifact@v8
+      - uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/*

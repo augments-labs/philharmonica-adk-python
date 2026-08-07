@@ -1,0 +1,53 @@
+name: Nightly (live-LLM e2e + full type-check)
+
+# Two nightly jobs too heavy or too credential-bound to block PRs:
+#   - e2e: provider tests against real APIs. Keys come from repo secrets; when a
+#     key is absent the matching tests skip, so a missing secret is a no-op.
+#   - pyright: the full type-check. pyright parses the entire litellm
+#     dependency graph (~30 min), so it runs here nightly rather than per-PR;
+#     mypy is the fast per-PR gate (see ci.yml).
+# Scheduled runs fire on the default branch only.
+
+on:
+  schedule:
+    - cron: "0 4 * * *" # daily, 04:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Install exactly what uv.lock pins; never re-resolve silently.
+env:
+  UV_FROZEN: "1"
+
+jobs:
+  e2e:
+    name: Live-LLM e2e
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - run: uv sync --extra dev
+      - name: Provider e2e tests
+        run: uv run pytest tests/integration/llms -v
+
+  pyright:
+    name: Full pyright
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+          python-version: "3.13"
+      # mermaid resolves the one optional import pyright would otherwise flag.
+      - run: uv sync --extra dev --extra mermaid
+      - name: pyright (full package)
+        run: uv run pyright src/philharmonica/adk/

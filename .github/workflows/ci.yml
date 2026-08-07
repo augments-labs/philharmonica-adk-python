@@ -1,0 +1,136 @@
+name: CI
+
+# Lint, type-check, the offline unit suite, an examples structure check, and
+# a package build. Heavier / networked checks live in integration.yml,
+# security.yml, and nightly.yml.
+#
+# Actions are pinned to major-version tags for readability; Dependabot
+# (github-actions, monthly) proposes upgrades. Convert to full-commit-SHA
+# pins if/when this repo adopts a stricter supply-chain policy.
+# (setup-uv is the exception: upstream stopped publishing floating major tags
+# after v7, so it carries an exact version pin.)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# Supersede in-flight runs for the same ref — the biggest cheap cost saver.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# UV_FROZEN makes every `uv sync` / `uv run` fail rather than silently
+# re-resolve, so CI always installs exactly what uv.lock pins.
+env:
+  UV_FROZEN: "1"
+
+jobs:
+  lint:
+    name: Lint & format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      # ruff comes from uv.lock (exact pin in the dev extra), so local hooks,
+      # the hygiene gate, and CI enforce the same rule set. Bump it alongside
+      # the rev in .pre-commit-config.yaml.
+      - run: uv sync --extra dev
+      - run: uv run ruff check src tests examples
+      - run: uv run ruff format --check src tests examples
+
+  typecheck:
+    name: Type check (mypy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - run: uv sync --extra dev
+      # mypy is the canonical, blocking gate: it skips third-party library
+      # internals (ignore_missing_imports) and stays fast. Full pyright parses
+      # the full litellm dependency graph (~30 min), so it runs full nightly
+      # (nightly.yml) rather than blocking every PR.
+      - name: mypy (canonical)
+        run: uv run mypy -p philharmonica.adk
+
+  test:
+    name: Unit tests (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+      - run: uv sync --extra dev
+      # Offline unit suite: LLMs are mocked; fakeredis / moto / embedded
+      # vector stores keep it self-contained. The coverage gate
+      # ([tool.coverage.report] fail_under) applies automatically; raise it
+      # toward the real ~83% as the suite stabilises.
+      - name: Run unit tests
+        # Postgres-backed unit tests need real DB infrastructure and run in
+        # integration.yml under the explicit postgres marker.
+        # --reruns 2 is a stopgap for two known timing-flaky tests pending
+        # root-cause (tracked); it does NOT mask hard failures (those fail every
+        # attempt). Remove once the flakes are fixed.
+        run: >-
+          uv run pytest tests/unit -m "not integration and not postgres"
+          -n auto --dist loadfile --reruns 2
+          --cov=src/philharmonica --cov-report=xml --cov-report=term-missing
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: .coverage/coverage.xml
+          fail_ci_if_error: false
+
+  examples:
+    name: Examples structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      # No extras: the examples must run off a plain runtime install.
+      - run: uv sync
+      # Byte-compile catches syntax errors without importing (no keys needed).
+      - name: Byte-compile examples
+        run: uv run python -m compileall -q examples
+      # --list classifies every example (discovery + prereq check) and makes
+      # zero API calls — confirms the suite is structurally sound with no keys.
+      - name: Classify examples (zero-cost)
+        run: uv run python examples/run_examples.py --list
+
+  build:
+    name: Build package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - run: uv build
+      # Validates long-description + the license/classifier metadata.
+      - run: uvx twine check dist/*
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/*
+          retention-days: 7

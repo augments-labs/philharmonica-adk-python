@@ -1,0 +1,139 @@
+name: Release — tag & publish artifacts
+
+# Step 2 of the release flow (see RELEASING.md). Fires when a release/v* PR
+# merges into main: verify the version, tag it, build the wheel + sdist, and
+# create the GitHub Release with those assets attached. The publish-pypi job
+# then uploads the SAME artifacts to PyPI via OIDC trusted publishing (no
+# long-lived token), gated by the `pypi` GitHub Environment's required
+# reviewer approval — that approval is the point of no return.
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  tag-and-release:
+    name: Tag + GitHub Release
+    # Only for a MERGED release/v* PR.
+    if: >-
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'release/v')
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_COMMIT_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - name: Verify checked-out release commit
+        run: |
+          if [ "$(git rev-parse HEAD)" != "$RELEASE_COMMIT_SHA" ]; then
+            echo "::error::checkout HEAD does not match release merge commit"
+            exit 1
+          fi
+      - name: Resolve + verify version
+        id: ver
+        run: |
+          branch_version="${GITHUB_HEAD_REF#release/v}"
+          file_version="$(uv run --no-project python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")"
+          if [ "$branch_version" != "$file_version" ]; then
+            echo "::error::release branch version ($branch_version) != pyproject version ($file_version)"
+            exit 1
+          fi
+          echo "version=$file_version" >> "$GITHUB_OUTPUT"
+      - name: Build + validate artifacts
+        run: |
+          uv build
+          uvx twine check dist/*
+      - name: Install built wheel smoke test
+        run: |
+          uv venv /tmp/philharmonica-wheel-smoke
+          uv pip install --python /tmp/philharmonica-wheel-smoke/bin/python dist/*.whl
+          /tmp/philharmonica-wheel-smoke/bin/python - <<'PY'
+          import importlib.metadata
+          from pathlib import Path
+
+          import philharmonica.adk
+          from philharmonica.adk import Agent, FunctionTool, Runner
+          from philharmonica.adk.tools import function_tool
+
+          expected_version = "${{ steps.ver.outputs.version }}"
+          dist = importlib.metadata.distribution("philharmonica-adk")
+          assert dist.version == expected_version
+          assert philharmonica.adk.__version__ == expected_version
+          assert Path(dist.locate_file("philharmonica/adk/py.typed")).is_file()
+          assert Agent is not None
+          assert Runner is not None
+          assert FunctionTool is not None
+          assert function_tool is not None
+          PY
+          /tmp/philharmonica-wheel-smoke/bin/philharmonica --help >/dev/null
+      - name: Tag + create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${{ steps.ver.outputs.version }}"
+          tag="v${version}"
+          git fetch --tags --force
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git rev-parse "$tag^{commit}" >/dev/null 2>&1; then
+            existing_sha="$(git rev-parse "$tag^{commit}")"
+            if [ "$existing_sha" != "$RELEASE_COMMIT_SHA" ]; then
+              echo "::error::Tag $tag points at $existing_sha, expected $RELEASE_COMMIT_SHA"
+              exit 1
+            fi
+            echo "Tag $tag already exists at the release commit."
+          else
+            git tag -a "$tag" -m "Release $tag" "$RELEASE_COMMIT_SHA"
+            git push origin "$tag"
+          fi
+          if gh release view "$tag" >/dev/null 2>&1; then
+            asset_count="$(gh release view "$tag" --json assets --jq '.assets | length')"
+            if [ "$asset_count" -lt 2 ]; then
+              gh release upload "$tag" dist/* --clobber
+            fi
+          else
+            gh release create "$tag" dist/* \
+              --title "Philharmonica ADK ${tag}" \
+              --notes "See CHANGELOG.md for details. Build artifacts attached (wheel + sdist)."
+          fi
+      # Hand the exact artifacts that were verified above (twine check +
+      # clean-venv smoke) to the publish job — never a rebuild.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/*
+          retention-days: 1
+
+  publish-pypi:
+    name: Publish to PyPI (OIDC)
+    # Same gate as tag-and-release; `needs` alone would also skip this job
+    # for non-release PR closures, the condition is repeated for clarity.
+    needs: tag-and-release
+    if: >-
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'release/v')
+    runs-on: ubuntu-latest
+    # Trusted publishing: the short-lived OIDC token is minted only inside
+    # the `pypi` environment, whose required-reviewer approval is the human
+    # point of no return (see RELEASING.md).
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

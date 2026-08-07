@@ -52,7 +52,9 @@ class TestNetworkPolicyK8s:
         cr = apply_network_policy_to_k8s_pod(policy, "default", "pod-1")
         assert cr is not None
         annotation = cr["metadata"]["annotations"]["philharmonica.sandbox/allow-hosts"]
-        assert "api.example.com" in annotation
+        # Every host, in order, and nothing else: a containment check would
+        # pass just as well on a truncated or reordered list.
+        assert annotation == "api.example.com,*.foo.com"
 
 
 class TestNetworkPolicyLocal:

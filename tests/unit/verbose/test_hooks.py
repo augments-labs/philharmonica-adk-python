@@ -192,8 +192,8 @@ async def test_on_tool_start_redacts_secret_keys() -> None:
     assert "sk-abc123" not in out
     assert "Bearer xyz" not in out
     assert "[REDACTED]" in out
-    # Non-secret fields survive.
-    assert "example.com" in out
+    # Non-secret fields survive whole, not merely in part.
+    assert "https://example.com" in out
 
 
 @pytest.mark.asyncio

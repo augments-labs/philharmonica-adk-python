@@ -56,15 +56,47 @@ def is_url(source: str) -> bool:
     return parsed.scheme in ("http", "https") and len(parsed.netloc) > 0
 
 
+YOUTUBE_DOMAINS: frozenset[str] = frozenset({"youtube.com", "youtu.be"})
+"""Domains whose URLs route to the YouTube loaders, with their subdomains."""
+
+GITHUB_DOMAINS: frozenset[str] = frozenset({"github.com"})
+"""Domains whose URLs route to the GitHub loader, with their subdomains."""
+
+_CHANNEL_PATH_MARKERS = ("/channel/", "/@", "/c/", "/user/")
+
+
+def _host_in(host: str, domains: frozenset[str]) -> bool:
+    """Return whether ``host`` is one of ``domains`` or a subdomain of one.
+
+    Substring containment would be wrong here in both directions:
+    ``evil-youtube.com.attacker.net`` contains the marker without being
+    served by it, and a bare ``netloc`` also carries userinfo, so
+    ``youtube.com@evil.com`` would match while the origin is ``evil.com``.
+
+    Args:
+        host: A parsed hostname — no userinfo, no port, already lowercased.
+        domains: Registrable domains to accept, along with their subdomains.
+
+    Returns:
+        ``True`` when ``host`` equals or sits under one of ``domains``.
+    """
+    return any(host == domain or host.endswith(f".{domain}") for domain in domains)
+
+
 def _resolve_url_loader(source: str) -> DocumentLoader:
     """Route an http(s) URL to the YouTube, GitHub, or website loader."""
-    host = urlparse(source).netloc.lower()
-    if "youtube.com" in host or "youtu.be" in host:
-        lowered = source.lower()
-        if any(marker in lowered for marker in ("/channel/", "/@", "/c/", "/user/")):
+    parsed = urlparse(source)
+    # `hostname` rather than `netloc`: it drops userinfo and port and
+    # lowercases, so what is compared is the origin that will be fetched.
+    host = parsed.hostname or ""
+    if _host_in(host, YOUTUBE_DOMAINS):
+        # Only the path distinguishes a channel from a video; a query string
+        # can carry a `/@` that says nothing about what the URL addresses.
+        path = parsed.path.lower()
+        if any(marker in path for marker in _CHANNEL_PATH_MARKERS):
             return YoutubeChannelLoader()
         return YoutubeVideoLoader()
-    if "github.com" in host:
+    if _host_in(host, GITHUB_DOMAINS):
         return GithubLoader()
     return WebsiteLoader()
 

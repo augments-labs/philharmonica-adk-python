@@ -159,7 +159,7 @@ def is_premium_user(context: RunContext[Any], data: HandoffInputData) -> bool:
     """Only enable this handoff for premium users."""
     if context.context is None:
         return False
-    return context.context.get("tier") == "premium"
+    return bool(context.context.get("tier") == "premium")
 
 
 priority_triage = Agent(

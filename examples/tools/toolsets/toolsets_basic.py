@@ -83,7 +83,7 @@ db = FunctionToolset(tools=[query]).prefixed("db")
 #    carries an admin role.
 def admin_only(ctx: RunContext, tool) -> bool:  # type: ignore[no-untyped-def]
     """Predicate: keep the tool only for admins."""
-    return ctx.context.get("role") == "admin"
+    return bool(ctx.context.get("role") == "admin")
 
 
 admin_actions = FunctionToolset(tools=[restart]).filtered(admin_only)

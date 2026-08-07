@@ -55,9 +55,11 @@ def delete_record(record_id: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-async def require_in_production(ctx: ToolContext) -> bool:
+async def require_in_production(ctx: ToolContext[dict[str, str]]) -> bool:
     """Only require approval when running in production."""
-    environment = ctx.context.get("environment", "staging")
+    # Scenario 1 below runs with no ``context=``, so ``ctx.context`` is None;
+    # default to the safer non-production branch rather than dereferencing it.
+    environment = (ctx.context or {}).get("environment", "staging")
     return environment == "production"
 
 

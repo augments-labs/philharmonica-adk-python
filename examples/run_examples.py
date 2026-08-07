@@ -586,8 +586,8 @@ def run_all(
 def _rerun_path(args: argparse.Namespace) -> Path:
     """Return the rerun-list path (explicit, or the logs-dir default)."""
     if args.rerun_file is not None:
-        return args.rerun_file
-    return args.logs_dir / "latest_failures.txt"
+        return Path(args.rerun_file)
+    return Path(args.logs_dir) / "latest_failures.txt"
 
 
 def _rel(path: Path) -> str:

@@ -187,8 +187,10 @@ def redact_pii(data: HandoffInputData) -> HandoffInputData:
 
     def redact_item(item: Any) -> Any:
         # Typed items — create new instances with redacted content
-        if isinstance(item, UserItem) and isinstance(item.raw.get("content"), str):
-            return UserItem(raw={"role": "user", "content": email_pattern.sub("[REDACTED_EMAIL]", item.raw["content"])})
+        if isinstance(item, UserItem):
+            content = item.raw.get("content")
+            if isinstance(content, str):
+                return UserItem(raw={"role": "user", "content": email_pattern.sub("[REDACTED_EMAIL]", content)})
         if isinstance(item, SystemItem):
             return SystemItem(
                 raw={

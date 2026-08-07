@@ -59,7 +59,7 @@ def send_email(to: str, subject: str, body: str) -> str:
 
 async def _needs_approval_for_large_amounts(ctx: ToolContext) -> bool:
     """Dynamic approval: only require approval for transfers over $100."""
-    amount = ctx.tool_arguments.get("amount", 0)
+    amount = float(ctx.tool_arguments.get("amount", 0))
     return amount > 100
 
 

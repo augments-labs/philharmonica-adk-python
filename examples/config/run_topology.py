@@ -44,7 +44,9 @@ async def main() -> None:
     entry_agent = topology.agents[topology.entry] if topology.entry is not None else None
     if entry_agent is None:
         raise ValueError("topology has no entry agent")
-    targets = [h.target.name if isinstance(h, Handoff) else h.name for h in (entry_agent.handoffs or [])]
+    # load_topology always wires a plain list; a HandoffRoute is not iterable.
+    handoffs = entry_agent.handoffs if isinstance(entry_agent.handoffs, list) else []
+    targets = [h.target.name if isinstance(h, Handoff) else h.name for h in handoffs]
     logger.info("  %s hands off to: %s", entry_agent.name, targets)
 
     # Spanish input should trigger the triage -> spanish handoff.

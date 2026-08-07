@@ -35,6 +35,7 @@ except ImportError:
 
 import asyncio
 import logging
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -236,7 +237,7 @@ async def _global_audit_fn(data: AgentInputGuardrailData) -> AgentGuardrailFunct
     )
 
 
-global_audit = AgentInputGuardrail(
+global_audit: AgentInputGuardrail[Any] = AgentInputGuardrail(
     guardrail_function=_global_audit_fn,
     name="global_audit",
     run_in_parallel=True,
@@ -262,7 +263,7 @@ async def _compliance_check_fn(data: AgentOutputGuardrailData) -> AgentGuardrail
     return AgentGuardrailFunctionOutput(tripwire_triggered=False)
 
 
-compliance_check = AgentOutputGuardrail(
+compliance_check: AgentOutputGuardrail[Any] = AgentOutputGuardrail(
     guardrail_function=_compliance_check_fn,
     name="compliance_check",
     timeout=3.0,

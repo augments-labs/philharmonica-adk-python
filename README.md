@@ -3,7 +3,7 @@
     <source media="(prefers-color-scheme: dark)"
             srcset="https://raw.githubusercontent.com/augments-labs/philharmonica-adk-python/main/docs/images/logo-dark.png">
     <img src="https://raw.githubusercontent.com/augments-labs/philharmonica-adk-python/main/docs/images/logo-light.png"
-         alt="Philharmonica" width="132" height="132">
+         alt="Philharmonica" width="256">
   </picture>
 </div>
 

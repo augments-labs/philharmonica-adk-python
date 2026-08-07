@@ -136,7 +136,7 @@ def unit_convert(value: float, from_unit: str, to_unit: str) -> str:
 @tool_input_guardrail(name="math_input_sanitizer")
 async def math_sanitizer(data: ToolInputGuardrailData) -> ToolGuardrailFunctionOutput:
     """Block dangerous inputs to math tools."""
-    raw_input = str(data.agent_output)
+    raw_input = str(data.context.tool_arguments)
     dangerous = ["import", "exec", "__", "os.", "sys."]
     for keyword in dangerous:
         if keyword in raw_input.lower():

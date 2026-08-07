@@ -232,6 +232,6 @@ if __name__ == "__main__":
 
         logger.info("\n" + "=" * 60)
         logger.info("All features configured on Agent 'Analyst'")
-        logger.info(f"Tools: {[t.name for t in analyst.tools]}")
+        logger.info(f"Tools: {[getattr(t, 'name', str(t)) for t in analyst.tools]}")
 
     asyncio.run(demo())

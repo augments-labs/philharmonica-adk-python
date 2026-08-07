@@ -25,6 +25,7 @@ except ImportError:
 
 import asyncio
 import logging
+from typing import TypedDict
 
 from philharmonica.adk.agents import Agent
 from philharmonica.adk.llms import LLMConfig
@@ -108,7 +109,16 @@ def check_inventory(product_name: str) -> str:
 # Billing Tools
 # =============================================================================
 
-ACCOUNTS_DB = {
+
+class Account(TypedDict):
+    """One row of the demo account store."""
+
+    name: str
+    balance: float
+    credit: float
+
+
+ACCOUNTS_DB: dict[str, Account] = {
     "ACCT-100": {"name": "Alice", "balance": 150.00, "credit": 25.00},
     "ACCT-200": {"name": "Bob", "balance": 0.00, "credit": 0.00},
 }

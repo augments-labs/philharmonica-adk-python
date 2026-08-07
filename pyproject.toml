@@ -483,8 +483,21 @@ exclude = [
     "dist/",
     "venv/",
     ".venv/",
-    "examples/",
 ]
+
+# Examples are type-checked (a shipped example that raises AttributeError on
+# its first tool call is a real defect), but under one relaxation: the run
+# result exposes `last_agent`, `state`, `deferred_requests`, and the usage
+# token-detail structs as Optional, while documenting them as populated on
+# the paths examples take. Narrowing each access would bury the concept the
+# example exists to teach. Everything else stays on — including union member
+# checks, which is what catches reading `.name` off a hosted tool.
+[[tool.mypy.overrides]]
+module = ["examples.*", "auto_mode", "weather"]
+strict_optional = false
+# Several examples import a sibling module after a runtime sys.path.insert,
+# which mypy cannot follow.
+ignore_missing_imports = true
 
 # Third-party libraries without stubs — silence per-module so we don't
 # mask real ImportError in first-party code.

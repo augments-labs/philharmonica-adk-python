@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Philharmonica">
+  <title>Philharmonica</title>
+  <defs>
+    <linearGradient id="brass" gradientUnits="userSpaceOnUse" x1="0" y1="24" x2="0" y2="488">
+      <stop offset="0" stop-color="#F4D293"/>
+      <stop offset="1" stop-color="#D9A551"/>
+    </linearGradient>
+  </defs>
+
+  <!-- The conductor holding the tempo. -->
+  <g stroke="url(#brass)" fill="none" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="163.0" y="122.0" width="186.0" height="160.0" rx="37.2"/>
+    <line x1="256.0" y1="120.0" x2="256.0" y2="82.0"/>
+    <line x1="222.5" y1="245.2" x2="289.5" y2="245.2" stroke-width="14.4"/>
+  </g>
+  <g fill="url(#brass)">
+    <circle cx="256.0" cy="66.0" r="18"/>
+    <circle cx="213.8" cy="189.2" r="15"/>
+    <circle cx="298.2" cy="189.2" r="15"/>
+  </g>
+
+  <!-- The score, open on the stand. -->
+  <g fill="none" stroke="url(#brass)" stroke-width="7" stroke-linecap="round" opacity="0.75">
+    <path d="M 64 298 Q 256 338 448 298"/>
+    <path d="M 64 329 Q 256 369 448 329"/>
+    <path d="M 64 360 Q 256 400 448 360"/>
+    <path d="M 64 391 Q 256 431 448 391"/>
+    <path d="M 64 422 Q 256 462 448 422"/>
+  </g>
+
+  <!-- The sections: three parts, each knowing its own. -->
+  <g fill="url(#brass)">
+    <circle cx="118" cy="401" r="15"/>
+    <circle cx="160" cy="375" r="15"/>
+    <circle cx="235" cy="364" r="15"/>
+    <circle cx="277" cy="395" r="15"/>
+    <circle cx="352" cy="344" r="15"/>
+    <circle cx="394" cy="308" r="15"/>
+  </g>
+</svg>

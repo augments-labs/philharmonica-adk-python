@@ -40,6 +40,7 @@ from philharmonica.adk.run.tools_executor import maybe_wrap_with_agent_middlewar
 from philharmonica.adk.tools import (
     FunctionTool,
     ToolLoggingMiddleware,
+    ToolMiddlewareNext,
     ToolMiddlewareTermination,
     function_tool,
 )
@@ -83,7 +84,7 @@ class TimingMiddleware:
         ctx: ToolContext,
         tool: FunctionTool,
         args: dict[str, Any],
-        next: Any,
+        next: ToolMiddlewareNext,
     ) -> FunctionToolCallResult:
         start = time.monotonic()
         result = await next(ctx, tool, args)
@@ -120,7 +121,7 @@ class CircuitBreakerMiddleware:
         ctx: ToolContext,
         tool: FunctionTool,
         args: dict[str, Any],
-        next: Any,
+        next: ToolMiddlewareNext,
     ) -> FunctionToolCallResult:
         if tool.name == self.blocked_name:
             raise ToolMiddlewareTermination(
@@ -152,7 +153,7 @@ async def main() -> None:
 
     logger.info("\n--- Calling 'search' (should pass through) ---")
     invoke = maybe_wrap_with_agent_middleware(search, agent.middleware.tools)
-    ctx = ToolContext(
+    ctx: ToolContext[None] = ToolContext(
         tool_name="search",
         tool_call_id="c1",
         tool_arguments={"query": "demo"},
@@ -163,7 +164,7 @@ async def main() -> None:
 
     logger.info("\n--- Calling 'summarise' (should be tripped) ---")
     invoke2 = maybe_wrap_with_agent_middleware(summarise, agent.middleware.tools)
-    ctx2 = ToolContext(
+    ctx2: ToolContext[None] = ToolContext(
         tool_name="summarise",
         tool_call_id="c2",
         tool_arguments={"text": "x" * 50},

@@ -61,6 +61,12 @@ jobs:
       # (nightly.yml) rather than blocking every PR.
       - name: mypy (canonical)
         run: uv run mypy -p philharmonica.adk
+      # Examples ship as the ADK's worked reference, so a broken attribute
+      # access in one is a user-visible defect. They were previously invisible
+      # to every PR gate: excluded from mypy, and the examples job only
+      # byte-compiles without importing.
+      - name: mypy (examples)
+        run: uv run mypy examples
 
   test:
     name: Unit tests (py${{ matrix.python-version }})

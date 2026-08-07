@@ -1,11 +1,11 @@
-"""Tests for :mod:`philharmonica.adk.a2a.task_store`.
+"""Tests for ``philharmonica.adk.a2a.task_store``.
 
 Covers:
-* :class:`TaskStore` protocol — ``InMemoryTaskStore`` and
+* ``TaskStore`` protocol — ``InMemoryTaskStore`` and
   ``SQLiteTaskStore`` both satisfy it at runtime (``isinstance`` check).
-* :class:`InMemoryTaskStore` — get/save/delete/list_by_status, all
+* ``InMemoryTaskStore`` — get/save/delete/list_by_status, all
   CRUD operations, terminal vs non-terminal filtering.
-* :class:`SQLiteTaskStore` — same operations against a real aiosqlite
+* ``SQLiteTaskStore`` — same operations against a real aiosqlite
   in-memory database (no disk I/O, deterministic, no temp files).
 * ``recover_on_startup`` — non-terminal rows become FAILED; terminal
   rows are untouched; count returned is accurate.

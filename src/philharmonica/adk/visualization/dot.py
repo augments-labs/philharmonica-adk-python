@@ -1,4 +1,4 @@
-"""Graphviz DOT emitters for :class:`Flow` and :class:`Graph`.
+"""Graphviz DOT emitters for ``Flow`` and ``Graph``.
 
 Pure functions translating immutable topology data into Graphviz DOT
 strings ready for the ``dot`` CLI or any DOT-aware renderer.
@@ -43,7 +43,7 @@ DotRankdir = Literal["LR", "TB", "RL", "BT"]
 """Layout direction accepted by Graphviz ``rankdir``."""
 
 _VALID_RANKDIRS: frozenset[str] = frozenset({"LR", "TB", "RL", "BT"})
-"""Runtime-validated rankdir values matching :data:`DotRankdir`."""
+"""Runtime-validated rankdir values matching ``DotRankdir``."""
 
 
 def flow_to_dot(flow: Flow, *, rankdir: DotRankdir = "LR") -> str:
@@ -52,7 +52,7 @@ def flow_to_dot(flow: Flow, *, rankdir: DotRankdir = "LR") -> str:
     Pure function: same input → same output, no I/O.
 
     Args:
-        flow: A constructed :class:`Flow` instance. Only the class
+        flow: A constructed ``Flow`` instance. Only the class
             registry is read; no run is triggered.
         rankdir: Graphviz layout direction (``"LR"`` default).
 
@@ -99,19 +99,19 @@ def flow_to_dot(flow: Flow, *, rankdir: DotRankdir = "LR") -> str:
 
 
 def definition_to_dot(defn: FlowDefinition, *, rankdir: DotRankdir = "LR") -> str:
-    """Emit a Graphviz DOT digraph from a :class:`FlowDefinition`.
+    """Emit a Graphviz DOT digraph from a ``FlowDefinition``.
 
-    Produces the same diagram as :func:`flow_to_dot` but accepts a
-    :class:`~philharmonica.adk.flows.definition.FlowDefinition` directly, so
+    Produces the same diagram as ``flow_to_dot`` but accepts a
+    ``FlowDefinition`` directly, so
     visualisation is possible without constructing or running a
-    :class:`~philharmonica.adk.flows.flow.Flow` instance.
+    ``Flow`` instance.
 
     Pure function: no I/O, no side effects.
 
     Args:
-        defn: A frozen :class:`FlowDefinition` produced by
-            :meth:`~philharmonica.adk.flows.flow.Flow.get_definition` or
-            :func:`~philharmonica.adk.flows.definition.build_flow_definition`.
+        defn: A frozen ``FlowDefinition`` produced by
+            ``get_definition`` or
+            ``build_flow_definition``.
         rankdir: Graphviz layout direction (``"LR"`` default).
 
     Returns:
@@ -152,7 +152,7 @@ def _dot_node_decl(name: str, role: str, desc_lookup: dict[str, str | None]) -> 
         name: Step method name (node id).
         role: ``"start"`` / ``"listen"`` / ``"router"``.
         desc_lookup: Mapping from step name to optional description string.
-            Passed to :func:`~philharmonica.adk.visualization.helpers.node_label_from_desc`
+            Passed to ``node_label_from_desc``
             for explicit ``is not None`` label resolution.
 
     Returns:
@@ -168,7 +168,7 @@ def _defn_direct_edges_dot(
     sanitised: dict[str, str],
     inverse: dict[str, str],
 ) -> list[str]:
-    """Emit DOT direct-trigger edges from a :class:`FlowDefinition`.
+    """Emit DOT direct-trigger edges from a ``FlowDefinition``.
 
     Args:
         defn: The compiled flow definition.
@@ -196,7 +196,7 @@ def _defn_router_edges_dot(
     sanitised: dict[str, str],
     inverse: dict[str, str],
 ) -> list[str]:
-    """Emit DOT router-trigger edges from a :class:`FlowDefinition`.
+    """Emit DOT router-trigger edges from a ``FlowDefinition``.
 
     Args:
         defn: The compiled flow definition.
@@ -225,7 +225,7 @@ def _defn_gate_edges_dot(
     sanitised: dict[str, str],
     inverse: dict[str, str],
 ) -> list[str]:
-    """Emit DOT gate nodes and their edges from a :class:`FlowDefinition`.
+    """Emit DOT gate nodes and their edges from a ``FlowDefinition``.
 
     Args:
         defn: The compiled flow definition.
@@ -253,7 +253,7 @@ def _defn_gate_edges_dot(
 def _flow_direct_edges(table: FlowTransitionTable, sanitised: dict[str, str], inverse: dict[str, str]) -> list[str]:
     """Emit DOT edges for direct (non-gated, non-routed) triggers.
 
-    Each trigger and listener id flows through :func:`assert_no_collision`
+    Each trigger and listener id flows through ``assert_no_collision``
     so route labels colliding with step names surface as typed errors.
 
     Args:
@@ -347,7 +347,7 @@ def graph_to_dot(graph: Graph, *, rankdir: DotRankdir = "LR") -> str:
     Pure function: no I/O. Walks ``graph.nodes`` + ``graph.edges``.
 
     Args:
-        graph: A compiled :class:`Graph` instance.
+        graph: A compiled ``Graph`` instance.
         rankdir: Graphviz layout direction (``"LR"`` default).
 
     Returns:
@@ -382,10 +382,10 @@ def graph_to_dot(graph: Graph, *, rankdir: DotRankdir = "LR") -> str:
 
 
 def _render_graph_edge(edge: GraphEdge) -> str:
-    """Format a single :class:`GraphEdge` as a DOT edge declaration.
+    """Format a single ``GraphEdge`` as a DOT edge declaration.
 
     Args:
-        edge: A :class:`GraphEdge` instance.
+        edge: A ``GraphEdge`` instance.
 
     Returns:
         A DOT edge declaration string ending with ``;``.
@@ -426,7 +426,7 @@ def _node_decl(name: str, role: str, lookup: dict[str, FlowStep]) -> str:
     Args:
         name: Step method name (also the node id).
         role: One of ``"start"`` / ``"listen"`` / ``"router"``.
-        lookup: Mapping from name to bound :class:`FlowStep` for
+        lookup: Mapping from name to bound ``FlowStep`` for
             description lookup.
 
     Returns:

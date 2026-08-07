@@ -1,21 +1,21 @@
-"""Task — declarative unit of work for an :class:`Agent`.
+"""Task — declarative unit of work for an ``Agent``.
 
-A :class:`Task` pairs an agent with a description and optional per-call
+A ``Task`` pairs an agent with a description and optional per-call
 overrides (output schema, guardrails, budgets, conditional skip).
 Tasks are configuration objects; execution lives on
-:meth:`Runner.arun_task` / :meth:`Runner.arun_task_pipeline` — agents are
+``Runner.arun_task`` / ``Runner.arun_task_pipeline`` — agents are
 configuration, runners execute.
 
 Deliberately rejected CrewAI patterns:
 
 - No ``expected_output`` field — developers put output expectations
-  inside ``description`` or via :attr:`output_schema`. The framework
+  inside ``description`` or via ``output_schema``. The framework
   NEVER mutates the LLM prompt behind the developer's back.
 - No string-guardrails — guardrails MUST be explicit
-  :class:`AgentInputGuardrail` / :class:`AgentOutputGuardrail`
+  ``AgentInputGuardrail`` / ``AgentOutputGuardrail``
   instances. The framework NEVER silently spawns an LLM guardrail
   agent.
-- :attr:`skip_if` is a single callable on Task; no separate
+- ``skip_if`` is a single callable on Task; no separate
   ``ConditionalTask`` class, no hidden ``get_skipped_task_output()``.
 - Pipelines NEVER transform prompts at runtime. ``Task.description``
   is fed verbatim as the user prompt; if a downstream task needs an
@@ -47,24 +47,24 @@ if TYPE_CHECKING:
 type TaskInputFilter = Callable[[TaskInputData], TaskInputData]
 """Callable shaping one upstream task's contribution to a downstream task.
 
-Receives a :class:`TaskInputData` describing one upstream task's
+Receives a ``TaskInputData`` describing one upstream task's
 completion (``task_id``, ``output``, ``items``), and returns a new
-:class:`TaskInputData` (via :meth:`TaskInputData.clone`) with
-``forwarded`` set to the subset of :class:`RunItem` instances that
+``TaskInputData`` (via ``TaskInputData.clone``) with
+``forwarded`` set to the subset of ``RunItem`` instances that
 should flow into the downstream task's input.
 
 Wire shape: the runner concatenates ``forwarded`` items across all
 upstreams (in ``depends_on`` declaration order), converts each item
-to a Layer-1 ``LLMInputContentItem`` via :meth:`RunItem.to_param`,
+to a Layer-1 ``LLMInputContentItem`` via ``RunItem.to_param``,
 and prepends the resulting message list BEFORE the message(s)
 derived from ``Task.description``. The downstream agent's user
 prompt becomes a single ``list[LLMInputContentItem]`` containing the
 forwarded messages followed by the description messages.
 
-The filter is attached per-upstream via :class:`TaskDependency`. A
+The filter is attached per-upstream via ``TaskDependency``. A
 bare ``Task`` or ``task_id`` string in ``Task.depends_on`` declares
 pure ordering with no forwarding. Wrap an upstream in
-:class:`TaskDependency` when you want a filter; mix bare and wrapped
+``TaskDependency`` when you want a filter; mix bare and wrapped
 entries freely in the same ``depends_on`` list.
 """
 
@@ -73,19 +73,19 @@ entries freely in the same ``depends_on`` list.
 class TaskDependency:
     """One upstream task with optional per-edge forwarding policy.
 
-    Used as an entry in :attr:`Task.depends_on`. A bare :class:`Task`
+    Used as an entry in ``Task.depends_on``. A bare ``Task``
     instance (or ``task_id`` string) entry declares pure ordering —
     wait for the upstream to complete, do not read its output. A
-    :class:`TaskDependency` entry declares ordering AND optional
-    forwarding via :attr:`input_filter` — different upstreams of the
+    ``TaskDependency`` entry declares ordering AND optional
+    forwarding via ``input_filter`` — different upstreams of the
     same downstream task can carry different filters.
 
     Attributes:
-        task: Upstream task reference — :class:`Task` instance or
+        task: Upstream task reference — ``Task`` instance or
             ``task_id`` string. Task instances must have an explicit
             ``task_id`` set so the resolver can name them stably.
-        input_filter: Optional :data:`TaskInputFilter`. When set, the
-            runner builds a :class:`TaskInputData` after the upstream
+        input_filter: Optional ``TaskInputFilter``. When set, the
+            runner builds a ``TaskInputData`` after the upstream
             completes, calls this filter, and concatenates the
             resulting ``forwarded`` items into the downstream task's
             user prompt. When ``None``, this dependency is pure
@@ -104,7 +104,7 @@ class TaskDependency:
 
         The upstream renders as its ``task_id`` when set, else its
         ``name``, else a capped description preview — never the full
-        :class:`Task` repr, which would bury the edge in noise.
+        ``Task`` repr, which would bury the edge in noise.
         """
         parts: list[str] = []
         task = self.task
@@ -127,22 +127,22 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True, kw_only=True)
 class Task[TContext]:
-    """Declarative unit of work for an :class:`Agent`.
+    """Declarative unit of work for an ``Agent``.
 
     Attributes:
         description: Objective fed to the agent as the user prompt
             verbatim. The framework does NOT transform prompts at
             runtime — what you put here is exactly what the agent
-            sees. In a :class:`TaskPipeline`, each task's description
+            sees. In a ``TaskPipeline``, each task's description
             is its own prompt; the pipeline does not chain outputs
             into downstream prompts. To forward an upstream result,
             run the upstream task first and construct the downstream
             task with a description that embeds the prior output.
-        agent: The execution target. May be an :class:`Agent`, a
-            :class:`Swarm` (iterative multi-agent collaboration), or
-            a :class:`Graph` (state-machine orchestration). The
+        agent: The execution target. May be an ``Agent``, a
+            ``Swarm`` (iterative multi-agent collaboration), or
+            a ``Graph`` (state-machine orchestration). The
             Runner dispatches to the matching ``arun_*`` entry point
-            via an :func:`isinstance` chain.
+            via an ``isinstance`` chain.
 
             The field is called ``agent`` because Agents are the
             canonical execution target; Swarm and Graph are unioned
@@ -152,57 +152,57 @@ class Task[TContext]:
 
             Hooks under non-Agent targets:
 
-            * :class:`Swarm` — ``hooks`` propagate normally through
-              :meth:`Runner.arun_swarm`.
-            * :class:`Graph` — user-supplied ``RunHooks`` are NOT
+            * ``Swarm`` — ``hooks`` propagate normally through
+              ``Runner.arun_swarm``.
+            * ``Graph`` — user-supplied ``RunHooks`` are NOT
               propagated into the graph (the graph layer uses
-              :class:`GraphHooks` instead). ``on_task_start`` /
-              ``on_task_end`` still fire from :meth:`Runner.arun_task`,
+              ``GraphHooks`` instead). ``on_task_start`` /
+              ``on_task_end`` still fire from ``Runner.arun_task``,
               but per-node hooks must be attached to the
-              :class:`Graph` directly.
+              ``Graph`` directly.
         name: Optional human-readable display name surfaced in the
             verbose Task panel, ``on_task_start`` / ``on_task_end``
             hooks, and tracing metadata. Defaults to a truncated form
-            of :attr:`description` (≤ 80 chars).
+            of ``description`` (≤ 80 chars).
         task_id: Optional stable identity. When ``None``, the Runner
             generates a full ``str(uuid.uuid4())`` (36-char canonical
             UUID with hyphens) per invocation. Set explicitly to
             correlate spans across retries or replays. The verbose
             Task panel truncates to the first 8 characters for
             display, but the full UUID propagates through hooks,
-            tracing, and :class:`TaskOutput.task_id`. When any task
-            in a :class:`TaskPipeline` declares :attr:`depends_on`,
+            tracing, and ``TaskOutput.task_id``. When any task
+            in a ``TaskPipeline`` declares ``depends_on``,
             every referenced task MUST have an explicit ``task_id``
             so the dependency resolver can name them — the validator
             raises a clear error pointing to any task that's missing
             one.
         depends_on: Optional tuple of upstream task references that
             MUST complete before this task fires. Each entry is a
-            :class:`Task` instance (the framework reads its ``task_id``),
-            a ``task_id`` string, or a :class:`TaskDependency` wrapper
+            ``Task`` instance (the framework reads its ``task_id``),
+            a ``task_id`` string, or a ``TaskDependency`` wrapper
             (ordering plus an optional per-upstream ``input_filter``).
             When non-empty, the
-            owning :class:`TaskPipeline` switches from
+            owning ``TaskPipeline`` switches from
             sequential-by-declaration order to topological DAG
             execution: tasks at the same depth run concurrently via
             ``asyncio.gather`` and downstream tasks wait until all
             their upstream dependencies finish. ``None`` (the default)
             keeps the existing declaration-order semantics —
             cost-conservative, no behaviour change vs. pre-DAG runs.
-            Validation in :meth:`TaskPipeline.__post_init__` rejects
+            Validation in ``TaskPipeline.__post_init__`` rejects
             unknown IDs, duplicate IDs, and cycles.
         output_schema: Optional per-task override for the agent's
             structured-output schema. The Runner constructs a
             transient ``dataclasses.replace(agent, output_schema=…)``
             for this call; the original agent definition is untouched.
-            **Only supported when :attr:`agent` is an :class:`Agent`.**
-            Setting ``output_schema`` together with a :class:`Swarm`
-            or :class:`Graph` target raises :class:`ValueError` at
+            **Only supported when ``agent`` is an ``Agent``.**
+            Setting ``output_schema`` together with a ``Swarm``
+            or ``Graph`` target raises ``ValueError`` at
             Task construction — the override has no meaningful
             target for those types.
-        guardrails: Per-task :class:`AgentGuardrails` config holding
+        guardrails: Per-task ``AgentGuardrails`` config holding
             ``input`` and ``output`` guardrail lists. Mirrors
-            :attr:`Agent.guardrails` exactly so the same authoring
+            ``Agent.guardrails`` exactly so the same authoring
             patterns apply at the task scope. The Runner appends task
             guardrails AFTER any ``RunConfig`` guardrails when building
             the transient run config — run-scope guardrails run first,
@@ -216,22 +216,22 @@ class Task[TContext]:
             the caller's ``RunConfig.usage_limits`` flows through
             unchanged.
         skip_if: Optional predicate for pipeline-conditional execution.
-            Called by :meth:`Runner.arun_task_pipeline` with the immutable
-            tuple of prior :class:`TaskOutput` results (in order;
+            Called by ``Runner.arun_task_pipeline`` with the immutable
+            tuple of prior ``TaskOutput`` results (in order;
             skipped tasks remain in the tuple with ``skipped=True``).
             Returning ``True`` causes the Runner to insert a
             ``TaskOutput(skipped=True, …)`` slot and skip the agent
             call. The predicate MUST be a pure function of its inputs
             — mutable closure state is the caller's responsibility and
             is NOT validated by the framework. Ignored by
-            :meth:`Runner.arun_task` (single-task path).
+            ``Runner.arun_task`` (single-task path).
         metadata: Open-ended developer metadata. Surfaced verbatim on
-            :attr:`TaskOutput.metadata`. Use for request-correlation
+            ``TaskOutput.metadata``. Use for request-correlation
             IDs, tags, custom trace attributes.
 
     Raises:
-        ValueError: When :attr:`description` is empty or whitespace,
-            or when :attr:`max_turns` is non-positive.
+        ValueError: When ``description`` is empty or whitespace,
+            or when ``max_turns`` is non-positive.
 
     Example:
         ::
@@ -253,7 +253,7 @@ class Task[TContext]:
     ``list[LLMInputContentItem]`` for full control over the message
     structure. The ``str`` form is presented to the LLM as a single
     user message. The list form is passed through to
-    :meth:`Runner.arun` verbatim — useful when a :class:`TaskDependency`
+    ``Runner.arun`` verbatim — useful when a ``TaskDependency``
     ``input_filter`` prepends upstream messages, or when the developer
     wants to inject system / assistant priming alongside the user turn.
     """
@@ -272,15 +272,15 @@ class Task[TContext]:
 
     Each entry is one of:
 
-    - A :class:`Task` instance — pure ordering, no forwarding.
+    - A ``Task`` instance — pure ordering, no forwarding.
     - A ``task_id`` string — pure ordering, no forwarding.
-    - A :class:`TaskDependency` wrapper — ordering plus an optional
-      :attr:`TaskDependency.input_filter` shaping that upstream's
+    - A ``TaskDependency`` wrapper — ordering plus an optional
+      ``TaskDependency.input_filter`` shaping that upstream's
       contribution to this task's input.
 
     ``None`` (the default) ⇒ pipeline runs in declaration order. Non-
-    empty ⇒ owning :class:`TaskPipeline` runs in topological order
-    with same-depth tasks concurrent. Any :class:`Sequence` is
+    empty ⇒ owning ``TaskPipeline`` runs in topological order
+    with same-depth tasks concurrent. Any ``Sequence`` is
     accepted (list or tuple); mix bare and wrapped entries freely.
     """
 
@@ -290,8 +290,8 @@ class Task[TContext]:
     guardrails: AgentGuardrails = field(default_factory=AgentGuardrails)
     """Per-task input/output guardrails appended after RunConfig guardrails.
 
-    A single :class:`AgentGuardrails` config holding ``input`` and
-    ``output`` lists — mirrors :attr:`Agent.guardrails` exactly.
+    A single ``AgentGuardrails`` config holding ``input`` and
+    ``output`` lists — mirrors ``Agent.guardrails`` exactly.
     """
 
     max_turns: int | None = None
@@ -307,7 +307,7 @@ class Task[TContext]:
     """Open-ended developer metadata surfaced on TaskOutput."""
 
     def __post_init__(self) -> None:
-        """Validate :class:`Task` construction.
+        """Validate ``Task`` construction.
 
         Raises:
             ValueError: When ``description`` is empty/whitespace, when
@@ -341,7 +341,7 @@ class Task[TContext]:
         what a human checks first: the task ``name`` (or a capped
         description preview when unnamed), the execution target's
         ``name`` (falling back to its class name when the target has
-        none, e.g. an unnamed :class:`Swarm` or a :class:`Graph`), and
+        none, e.g. an unnamed ``Swarm`` or a ``Graph``), and
         the dependency count. ``skip_if`` surfaces only when set.
         """
         parts: list[str] = []

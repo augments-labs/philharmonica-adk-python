@@ -1,9 +1,9 @@
 """RunHooks subclass for agent status recording and quota enforcement.
 
-:class:`StatusTrackingHooks` integrates with ``Runner.arun()`` via the
+``StatusTrackingHooks`` integrates with ``Runner.arun()`` via the
 existing hooks mechanism — no Runner changes needed.  It records per-run
-metrics in an :class:`~philharmonica.adk.status.store.AgentStatusStore` and
-optionally enforces :class:`~philharmonica.adk.status.types.AgentQuota`
+metrics in an ``AgentStatusStore`` and
+optionally enforces ``AgentQuota``
 limits before each run.
 """
 
@@ -34,18 +34,18 @@ class StatusTrackingHooks[TContext](RunHooks[TContext]):
 
     Tracks per-run timing and usage via ``on_agent_start`` /
     ``on_agent_end``, persists records to an
-    :class:`~philharmonica.adk.status.store.AgentStatusStore`, and
+    ``AgentStatusStore``, and
     optionally enforces cumulative quotas before each run.
 
     Args:
-        store: The :class:`AgentStatusStore` to record to and query from.
-        quotas: Optional list of :class:`AgentQuota` to enforce before
+        store: The ``AgentStatusStore`` to record to and query from.
+        quotas: Optional list of ``AgentQuota`` to enforce before
             each run.  Quotas matching the agent name (or ``"*"``) are
             checked in ``on_agent_start``.
         stale_run_seconds: Age after which an unclosed run-start entry is
             evicted (default one day). Entries are normally removed by
-            ``on_agent_end`` or :meth:`record_error`; a run that raised
-            without the caller invoking :meth:`record_error` would
+            ``on_agent_end`` or ``record_error``; a run that raised
+            without the caller invoking ``record_error`` would
             otherwise pin its entry forever on a long-lived hooks
             instance. Evicted entries are logged at warning level.
 
@@ -82,7 +82,7 @@ class StatusTrackingHooks[TContext](RunHooks[TContext]):
         """Drop run-start entries older than ``stale_run_seconds``.
 
         These belong to runs that raised without the caller invoking
-        :meth:`record_error` — the only path that would otherwise free
+        ``record_error`` — the only path that would otherwise free
         them. Keeps ``_run_starts`` bounded on long-lived instances.
         """
         cutoff = now - self._stale_run_seconds
@@ -105,7 +105,7 @@ class StatusTrackingHooks[TContext](RunHooks[TContext]):
     ) -> None:
         """Check quotas and record run start time.
 
-        Raises :class:`~philharmonica.adk.exceptions.QuotaExceeded`
+        Raises ``QuotaExceeded``
         before any LLM call if the agent has exceeded its cumulative
         limits.
 
@@ -145,7 +145,7 @@ class StatusTrackingHooks[TContext](RunHooks[TContext]):
         """Record the completed run to the status store.
 
         Reads timing from the ``on_agent_start`` entry, computes
-        ``duration_ms``, and persists an :class:`AgentRunRecord` with
+        ``duration_ms``, and persists an ``AgentRunRecord`` with
         ``status="success"``.
 
         Args:
@@ -216,7 +216,7 @@ class StatusTrackingHooks[TContext](RunHooks[TContext]):
         Args:
             agent_name: Name of the agent that failed.
             error: Error message or traceback string.
-            context: The run's :class:`RunContext`, if available.  When
+            context: The run's ``RunContext``, if available.  When
                 provided, its identity is used to pop the exact timing entry
                 recorded by ``on_agent_start`` — required to attribute the
                 correct duration when several runs of the same agent and

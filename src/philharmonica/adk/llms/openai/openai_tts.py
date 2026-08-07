@@ -1,6 +1,6 @@
 """Native OpenAI text-to-speech model.
 
-Implements the framework-owned :class:`~philharmonica.adk.voice.tts.TTSModel`
+Implements the framework-owned ``TTSModel``
 ABC against ``openai.AsyncOpenAI().audio.speech`` — the ``openai`` SDK is
 confined to this provider module. Audio streams back as raw 24 kHz PCM
 bytes so it slots straight into the voice pipeline without a decode step.

@@ -195,8 +195,8 @@ class SwarmHooks[TContext]:
 
         Fires once per parked turn, at the moment the swarm loop catches
         the inner ``InterruptException`` (HITL via
-        ``request_human_input``) or lifts an :class:`AgentToolDeferral`
-        to a :class:`NestedAgentInterrupt`. The concrete ``Interrupt``
+        ``request_human_input``) or lifts an ``AgentToolDeferral``
+        to a ``NestedAgentInterrupt``. The concrete ``Interrupt``
         subclass distinguishes the cause.
 
         Args:
@@ -204,16 +204,16 @@ class SwarmHooks[TContext]:
             state: Current swarm state (interrupt already parked on
                 ``state.pending_interrupts[member_name]``).
             member_name: The name of the swarm member whose turn parked.
-            interrupt: The :class:`Interrupt` payload (subclassed for
+            interrupt: The ``Interrupt`` payload (subclassed for
                 nested-agent suspends).
         """
         del context, state, member_name, interrupt
 
 
 class HookRegistry:
-    """Aggregates multiple :class:`SwarmHooks` and fans calls out to all.
+    """Aggregates multiple ``SwarmHooks`` and fans calls out to all.
 
-    Mirrors the graphs :class:`philharmonica.adk.graphs.hooks.HookRegistry`
+    Mirrors the graphs ``philharmonica.adk.graphs.hooks.HookRegistry``
     pattern. The swarm loop fires each ``on_*`` once per event; the
     registry forwards to every attached hook.
 
@@ -228,10 +228,10 @@ class HookRegistry:
         self._hooks: list[SwarmHooks[Any]] = []
 
     def add(self, hooks: SwarmHooks[Any]) -> None:
-        """Attach a :class:`SwarmHooks` instance.
+        """Attach a ``SwarmHooks`` instance.
 
         Args:
-            hooks: The :class:`SwarmHooks` to attach. Its callbacks
+            hooks: The ``SwarmHooks`` to attach. Its callbacks
                 will fire on every subsequent event.
         """
         self._hooks.append(hooks)

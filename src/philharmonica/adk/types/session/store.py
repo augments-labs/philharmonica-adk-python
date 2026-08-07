@@ -67,7 +67,7 @@ class SessionStore(Protocol):
                 ``settings.limit`` when set).
 
         Returns:
-            List of :class:`~philharmonica.adk.session.session_event.SessionEvent`
+            List of ``SessionEvent``
             in chronological order.
         """
         ...

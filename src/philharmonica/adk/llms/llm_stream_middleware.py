@@ -1,6 +1,6 @@
 """Streaming LLM middleware — interceptors around ``LLM.acomplete(stream=True)``.
 
-Sibling Protocol of :class:`~philharmonica.adk.llms.llm_middleware.LLMMiddleware`
+Sibling Protocol of ``LLMMiddleware``
 that wraps the streaming-side ``LLM.acomplete(stream=True)`` call.
 The non-streaming Protocol returns ``LLMResponse``; this one returns
 ``AsyncIterator[LLMStreamEvent]``. Two non-overlapping return types
@@ -49,7 +49,7 @@ A short-circuit middleware can return a pre-built iterator::
 
 ## Pairing with the non-streaming sibling
 
-Use :func:`make_logging_middlewares` to register one shared
+Use ``make_logging_middlewares`` to register one shared
 implementation on both ``Agent.middleware.llms`` and
 ``Agent.middleware.stream_llms``. Two separate classes back the
 shared helper because Protocol satisfaction depends on
@@ -125,14 +125,14 @@ class LLMStreamMiddlewareTermination(PhilharmonicaError):
     without invoking the provider.
 
     Caught at the raising middleware's frame inside
-    :func:`compose_llm_stream_middleware`; outer middleware sees the
+    ``compose_llm_stream_middleware``; outer middleware sees the
     carried iterator as a regular ``await next(…)`` return.
 
     Synthetic-iterator audit note
     -----------------------------
     A pre-built iterator carrying ``LLMStreamEvent`` events with
     ``type="part_start"`` / ``type="part_delta"`` and an
-    :class:`~philharmonica.adk.types.responses.llm_response.LLMResponseFunctionToolCall`
+    ``LLMResponseFunctionToolCall``
     in the ``part`` field — or a terminal ``"done"`` event whose
     ``response`` carries function-call parts — will cause the runner
     to dispatch those tool calls exactly as if the provider had
@@ -141,7 +141,7 @@ class LLMStreamMiddlewareTermination(PhilharmonicaError):
     authority the middleware author is taking on. Treat synthetic-
     iterator middleware (cache, replay) as a security-relevant
     surface, mirroring the non-streaming sibling
-    :class:`~philharmonica.adk.llms.llm_middleware.LLMMiddlewareTermination`.
+    ``LLMMiddlewareTermination``.
     """
 
     def __init__(self, response: AsyncIterator[LLMStreamEvent]) -> None:
@@ -158,7 +158,7 @@ def compose_llm_stream_middleware(
 ) -> LLMStreamMiddlewareNext:
     """Compose a streaming middleware list around a terminal handler.
 
-    Mirrors :func:`~philharmonica.adk.llms.llm_middleware.compose_llm_middleware`
+    Mirrors ``compose_llm_middleware``
     structurally; the only difference is the return type of every
     link is ``AsyncIterator[LLMStreamEvent]`` instead of
     ``LLMResponse``.
@@ -295,7 +295,7 @@ class LLMStreamLoggingMiddleware:
 class LLMStreamMetricsRecorder(Protocol):
     """Protocol for ``LLMStreamMetricsMiddleware``'s metrics sink.
 
-    Two-method shape mirroring :class:`LLMMetricsRecorder` — pluggable
+    Two-method shape mirroring ``LLMMetricsRecorder`` — pluggable
     against StatsD, OpenTelemetry, Prometheus, or an in-memory test
     recorder.
     """
@@ -317,7 +317,7 @@ class LLMStreamMetricsMiddleware:
     ``async for`` in a try/except.
 
     Attributes:
-        recorder: The metrics sink. See :class:`LLMStreamMetricsRecorder`.
+        recorder: The metrics sink. See ``LLMStreamMetricsRecorder``.
     """
 
     recorder: LLMStreamMetricsRecorder
@@ -423,7 +423,7 @@ def make_logging_middlewares(
 class _LoggingViaTarget:
     """Non-streaming logger middleware that writes to a caller-supplied logger.
 
-    Internal helper for :func:`make_logging_middlewares` when a
+    Internal helper for ``make_logging_middlewares`` when a
     caller passes a non-default logger. Public API is the factory.
     """
 
@@ -449,7 +449,7 @@ class _LoggingViaTarget:
 class _StreamingLoggingViaTarget:
     """Streaming logger middleware that writes to a caller-supplied logger.
 
-    Internal helper for :func:`make_logging_middlewares` when a
+    Internal helper for ``make_logging_middlewares`` when a
     caller passes a non-default logger. Public API is the factory.
     """
 

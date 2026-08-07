@@ -39,13 +39,13 @@ class HostedTool:
     sibling of ``FunctionTool`` and the local-execution
     ``BuiltinTool`` subclasses. Each provider's converter dispatches by
     ``isinstance``: when a converter encounters a hosted tool it does
-    not support, it raises :class:`UnsupportedHostedToolError` rather
+    not support, it raises ``UnsupportedHostedToolError`` rather
     than silently dropping the request. Silent drops are forbidden.
 
     Class attributes:
         SUPPORTED_PROVIDERS: A tuple of provider identifiers that ship
             this capability natively. Used by
-            :class:`UnsupportedHostedToolError` to give a helpful
+            ``UnsupportedHostedToolError`` to give a helpful
             message when a converter rejects the tool. Identifiers
             are framework-internal short names (``"anthropic"``,
             ``"openai-responses"``, ``"openai-chatcompletions"``,

@@ -1,4 +1,4 @@
-"""Unit tests for :class:`Or` / :class:`And` combinators.
+"""Unit tests for ``Or`` / ``And`` combinators.
 
 Covers construction validation, the ``__or__`` / ``__and__`` operator
 overloads, and the mixed-type rejection contract.

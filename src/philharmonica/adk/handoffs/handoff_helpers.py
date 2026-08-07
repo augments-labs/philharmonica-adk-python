@@ -32,7 +32,7 @@ async def normalize_handoffs(
     Also rejects duplicate tool names at setup time. Two handoffs that
     resolve to the same ``get_name()`` would otherwise emit two function
     tools with identical names (which most providers reject) and make
-    :func:`find_handoff_target` route to whichever happened to be last.
+    ``find_handoff_target`` route to whichever happened to be last.
     Collisions are easy to hit accidentally because ``get_name()``
     lowercases and snake-cases the target name, so targets differing only
     in case or spacing — or the same agent listed twice — collapse to one
@@ -120,7 +120,7 @@ async def is_handoff_enabled(
 ) -> bool:
     """Check if an LLM-orchestrated Handoff is enabled.
 
-    Thin wrapper around :func:`evaluate_enabled` that supplies the
+    Thin wrapper around ``evaluate_enabled`` that supplies the
     handoff's target ``Agent`` as the second positional argument to
     2-arg callables, so the gate can depend on the destination.
 
@@ -132,7 +132,7 @@ async def is_handoff_enabled(
         True if the handoff is enabled, False otherwise.
 
     Raises:
-        HandoffDefinitionError: see :func:`evaluate_enabled`.
+        HandoffDefinitionError: see ``evaluate_enabled``.
     """
     return await evaluate_enabled(
         handoff.enabled,
@@ -163,7 +163,7 @@ async def evaluate_enabled(
 
     Sync returns are validated directly; coroutine returns are awaited
     first. The return value MUST be a bool — non-bool returns surface
-    as :class:`HandoffDefinitionError` so silent True/False coercions
+    as ``HandoffDefinitionError`` so silent True/False coercions
     don't hide misconfigured gates.
 
     Args:

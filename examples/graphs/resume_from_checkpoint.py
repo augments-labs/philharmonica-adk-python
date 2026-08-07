@@ -1,14 +1,14 @@
 """Checkpoint and resume: a linear graph interrupted mid-flight, then continued.
 
 Demonstrates:
-- :class:`~philharmonica.adk.graphs.checkpointers.sqlite.SQLiteCheckpointer` for
+- ``SQLiteCheckpointer`` for
   durable persistence across process boundaries.
-- :meth:`~philharmonica.adk.run.runner.Runner.arun_graph` with
+- ``arun_graph`` with
   ``GraphConfig(max_supersteps=2)`` — the run halts after nodes ``a`` and
   ``b`` with status ``max_supersteps``.
-- A fresh :class:`SQLiteCheckpointer` on the same database file (simulating
+- A fresh ``SQLiteCheckpointer`` on the same database file (simulating
   a separate process) loading the persisted state.
-- :meth:`~philharmonica.adk.run.runner.Runner.arun_graph_from_checkpoint` picking
+- ``arun_graph_from_checkpoint`` picking
   up where the first run stopped — only node ``c`` fires; ``a`` and ``b``
   are not re-executed (selective re-fire / idempotency).
 
@@ -136,7 +136,7 @@ async def first_run(db_path: str, thread_id: str) -> None:
 async def resume_run(db_path: str, thread_id: str) -> None:
     """Resume from the persisted checkpoint using a fresh checkpointer.
 
-    A new :class:`SQLiteCheckpointer` is constructed on the same database
+    A new ``SQLiteCheckpointer`` is constructed on the same database
     file — simulating a separate process that re-opens durable storage.
     Only node ``c`` should fire; ``a`` and ``b`` are not re-executed.
 

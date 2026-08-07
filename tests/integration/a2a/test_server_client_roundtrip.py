@@ -1,7 +1,7 @@
 """End-to-end A2A round-trip integration test.
 
 Spins up a real A2A server in the same process via uvicorn on a free
-port, then uses :class:`A2AAgent` to call it and asserts the response
+port, then uses ``A2AAgent`` to call it and asserts the response
 flows back. Marked ``@pytest.mark.skipif`` so the standard unit test
 suite ignores it; opt in by setting ``A2A_INTEGRATION_TEST=1``.
 

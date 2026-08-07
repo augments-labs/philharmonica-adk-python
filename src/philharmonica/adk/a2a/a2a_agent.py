@@ -1,7 +1,7 @@
 """``A2AAgent`` — a remote A2A endpoint as a ``BaseAgent`` peer.
 
-``A2AAgent`` is a sibling of :class:`philharmonica.adk.agents.Agent` — both
-extend :class:`philharmonica.adk.agents.BaseAgent`. The split signals to a
+``A2AAgent`` is a sibling of ``philharmonica.adk.agents.Agent`` — both
+extend ``philharmonica.adk.agents.BaseAgent``. The split signals to a
 reader (and to the type system) that an A2A agent is a different kind
 of orchestration entity than a local agent: it is **remote**,
 **non-deterministic**, and **opaque** — no shared context window, no
@@ -9,33 +9,33 @@ shared guardrails, no shared tools. It speaks JSON-RPC over HTTP, has
 its own internal LLM and reasoning, and answers via the A2A protocol.
 
 ``A2AAgent`` is **pure config**. It has no execution methods —
-mirroring how local :class:`Agent`, :class:`Swarm`, and
-:class:`Graph` are also pure configs. Execution against a remote A2A
-peer flows through :class:`philharmonica.adk.a2a.a2a_runner.A2ARunner`, the
-sibling of :class:`philharmonica.adk.run.runner.Runner`. ``A2ARunner``
+mirroring how local ``Agent``, ``Swarm``, and
+``Graph`` are also pure configs. Execution against a remote A2A
+peer flows through ``philharmonica.adk.a2a.a2a_runner.A2ARunner``, the
+sibling of ``philharmonica.adk.run.runner.Runner``. ``A2ARunner``
 accepts ONLY ``A2AAgent`` instances; for local primitives, use
 ``Runner``.
 
 Two developer-facing surfaces on the agent itself:
 
-* :meth:`A2AAgent.as_tool` — wrap the remote agent as a
-  :class:`FunctionTool` so a parent local ``Agent``'s LLM can invoke
+* ``A2AAgent.as_tool`` — wrap the remote agent as a
+  ``FunctionTool`` so a parent local ``Agent``'s LLM can invoke
   it mid-turn as if it were any other tool. Mirrors the
-  :meth:`Agent.as_tool` surface 1:1. The wrapping ``FunctionTool``
+  ``Agent.as_tool`` surface 1:1. The wrapping ``FunctionTool``
   flows through the standard tool execution path (middleware,
   tracing, hooks); the inner call dispatches via
-  :meth:`A2ARunner.arun` and never enters :meth:`Runner.arun`.
-* :meth:`A2AAgent.get_client` — public accessor for the lazily
-  constructed :class:`A2AClient`. Used internally by
-  :class:`A2ARunner`; exposed because some advanced flows (custom
+  ``A2ARunner.arun`` and never enters ``Runner.arun``.
+* ``A2AAgent.get_client`` — public accessor for the lazily
+  constructed ``A2AClient``. Used internally by
+  ``A2ARunner``; exposed because some advanced flows (custom
   interceptor swaps, connection-state inspection) need the client
   directly.
 
-``A2ARunner.arun`` does **not** enter :class:`Runner.arun`. The
+``A2ARunner.arun`` does **not** enter ``Runner.arun``. The
 Runner manages LLM calls, tool execution, context tracking,
 handoffs, and guardrails for a local agent it controls turn-by-turn
 — none of which applies to a remote endpoint. ``A2ARunner.arun``
-makes a direct HTTP call via the underlying :class:`A2AClient`.
+makes a direct HTTP call via the underlying ``A2AClient``.
 """
 
 from __future__ import annotations
@@ -93,7 +93,7 @@ _CLOSING: object = object()
 
 @dataclasses.dataclass(frozen=True)
 class A2ARunResult:
-    """Outcome of a non-streaming :meth:`A2ARunner.arun` call.
+    """Outcome of a non-streaming ``A2ARunner.arun`` call.
 
     Attributes:
         text: The remote agent's final output text.
@@ -114,7 +114,7 @@ class A2ARunResult:
 
 
 class A2AStreamEvent(TypedDict, total=False):
-    """A single event yielded by :meth:`A2ARunner.arun` in streaming mode.
+    """A single event yielded by ``A2ARunner.arun`` in streaming mode.
 
     Discriminator field ``type`` selects which other fields are populated:
 
@@ -124,8 +124,8 @@ class A2AStreamEvent(TypedDict, total=False):
     * ``"completed"`` — terminal success; ``result_text`` carries the
       full accumulated response.
     * ``"failed"`` — terminal failure; ``state`` and ``message`` describe
-      the cause. The non-streaming :meth:`A2ARunner.arun` path raises
-      :class:`A2ATaskError` directly for terminal failures.
+      the cause. The non-streaming ``A2ARunner.arun`` path raises
+      ``A2ATaskError`` directly for terminal failures.
 
     Attributes:
         type: Discriminator — one of ``"text_delta"``, ``"status"``,
@@ -199,33 +199,33 @@ class A2AAgent(BaseAgent[Any]):
     """A remote A2A endpoint treated as a ``BaseAgent`` peer.
 
     Pure config — no execution methods. To dispatch a remote call, use
-    :class:`philharmonica.adk.a2a.a2a_runner.A2ARunner`. To wrap the agent as
+    ``philharmonica.adk.a2a.a2a_runner.A2ARunner``. To wrap the agent as
     a tool callable from a parent local agent's LLM, use
-    :meth:`A2AAgent.as_tool`.
+    ``A2AAgent.as_tool``.
 
     Attributes:
-        name: Agent identifier (inherited from :class:`BaseAgent`).
+        name: Agent identifier (inherited from ``BaseAgent``).
         description: Human-readable description of what the agent does,
-            used by :meth:`as_tool` when no explicit ``tool_description``
-            is supplied (inherited from :class:`BaseAgent`).
-        tools: Inherited from :class:`BaseAgent` but ignored at run
+            used by ``as_tool`` when no explicit ``tool_description``
+            is supplied (inherited from ``BaseAgent``).
+        tools: Inherited from ``BaseAgent`` but ignored at run
             time — it describes the *local* side of the orchestration
             peer relationship and is surfaced only to keep API parity
-            with :class:`Agent`. A remote agent's own tools are
+            with ``Agent``. A remote agent's own tools are
             entirely opaque to this side.
         url: Base URL of the remote A2A endpoint. Required at
             construction time; an empty URL raises ``ValueError``.
-        agent_card: Optional pre-fetched :class:`a2a.types.AgentCard`.
+        agent_card: Optional pre-fetched ``a2a.types.AgentCard``.
             When ``None``, the card is fetched lazily on first call
             via the well-known URL.
         timeout: Per-call HTTP timeout in seconds. Applied to the
             client's auto-constructed ``httpx.AsyncClient`` when no
             ``client_config`` carries an external one.
-        interceptors: List of :class:`a2a.client.ClientCallInterceptor`
+        interceptors: List of ``a2a.client.ClientCallInterceptor``
             instances inserted into every outbound request. The
             standard place to plug in authentication
-            (:class:`a2a.client.AuthInterceptor`).
-        client_config: Optional :class:`a2a.client.ClientConfig` for
+            (``a2a.client.AuthInterceptor``).
+        client_config: Optional ``a2a.client.ClientConfig`` for
             full pass-through to the underlying protocol client. Use
             this for connection-pool sharing (set ``httpx_client`` on
             the config), wire-transport selection (set
@@ -237,9 +237,9 @@ class A2AAgent(BaseAgent[Any]):
             background task — framework-side knob the a2a SDK does not
             surface.
         max_stream_chunks: Maximum streaming chunks before raising
-            :class:`A2AProtocolError` — framework-side volume cap.
+            ``A2AProtocolError`` — framework-side volume cap.
         max_stream_bytes: Maximum total streamed bytes before raising
-            :class:`A2AProtocolError` — framework-side byte cap.
+            ``A2AProtocolError`` — framework-side byte cap.
     """
 
     url: str = ""
@@ -252,10 +252,10 @@ class A2AAgent(BaseAgent[Any]):
     """
 
     agent_card: AgentCard | None = None
-    """Optional pre-fetched :class:`a2a.types.AgentCard`.
+    """Optional pre-fetched ``a2a.types.AgentCard``.
 
     When ``None``, the card is fetched lazily on first call via
-    :class:`a2a.client.A2ACardResolver` against the well-known URL.
+    ``a2a.client.A2ACardResolver`` against the well-known URL.
     Supplying it explicitly skips the discovery round trip and is
     useful when the card is already known to the caller (e.g.
     cached from a registry).
@@ -264,17 +264,17 @@ class A2AAgent(BaseAgent[Any]):
     timeout: float = 30.0
     """Per-call HTTP timeout in seconds.
 
-    Applied via the auto-constructed :class:`httpx.AsyncClient` when
+    Applied via the auto-constructed ``httpx.AsyncClient`` when
     ``client_config`` does not carry one; otherwise the caller's
     ``client_config.httpx_client`` governs and this field is
     ignored.
     """
 
     interceptors: list[ClientCallInterceptor] = dataclasses.field(default_factory=list)
-    """List of :class:`a2a.client.ClientCallInterceptor` instances.
+    """List of ``a2a.client.ClientCallInterceptor`` instances.
 
     Inserted into every outbound A2A request. The standard place
-    to plug in authentication (:class:`a2a.client.AuthInterceptor`).
+    to plug in authentication (``a2a.client.AuthInterceptor``).
     Pure pass-through to the underlying protocol client — no new
     auth surface in this ADK.
     """
@@ -282,7 +282,7 @@ class A2AAgent(BaseAgent[Any]):
     client_config: ClientConfig | None = None
     """Pass-through configuration for the underlying A2A client.
 
-    Set this to a fully-constructed :class:`a2a.client.ClientConfig`
+    Set this to a fully-constructed ``a2a.client.ClientConfig``
     to control low-level knobs not surfaced as flat fields above:
     ``httpx_client`` (connection pool / shared client),
     ``supported_protocol_bindings`` (wire transport — JSON-RPC vs
@@ -310,15 +310,15 @@ class A2AAgent(BaseAgent[Any]):
     poll_interval: float = DEFAULT_POLL_INTERVAL_SECONDS
     """Seconds between polls when waiting on a background task.
 
-    Threaded through to the underlying :class:`A2AClient`; reads
+    Threaded through to the underlying ``A2AClient``; reads
     the value when callers drive their own polling loop via
-    :meth:`A2ARunner.poll_task`. Lower this for tasks expected to
+    ``A2ARunner.poll_task``. Lower this for tasks expected to
     complete quickly; raise it for long-running tasks where
     polling overhead matters.
     """
 
     max_stream_chunks: int = DEFAULT_MAX_STREAM_CHUNKS
-    """Maximum streaming chunks before raising :class:`A2AProtocolError`.
+    """Maximum streaming chunks before raising ``A2AProtocolError``.
 
     Framework-side bound on the per-call streaming hot path. A
     runaway server that streams forever without a terminal state
@@ -327,17 +327,17 @@ class A2AAgent(BaseAgent[Any]):
     """
 
     max_stream_bytes: int = DEFAULT_MAX_STREAM_BYTES
-    """Maximum total streamed bytes before raising :class:`A2AProtocolError`.
+    """Maximum total streamed bytes before raising ``A2AProtocolError``.
 
-    Framework-side bound paired with :attr:`max_stream_chunks`. A
+    Framework-side bound paired with ``max_stream_chunks``. A
     server emitting huge artifacts is cut off at this byte cap.
     """
 
     _client: A2AClient | None = dataclasses.field(default=None, init=False, repr=False)
-    """Lazily-constructed underlying :class:`A2AClient` — internal cache.
+    """Lazily-constructed underlying ``A2AClient`` — internal cache.
 
     External code MUST NOT read or write this slot directly; the
-    public accessor :meth:`get_client` is the only supported entry
+    public accessor ``get_client`` is the only supported entry
     point. The accessor performs the lazy construction step that
     bare attribute access skips — ``self._client`` is ``None`` until
     the first call, so a direct read on a freshly-constructed agent
@@ -375,9 +375,9 @@ class A2AAgent(BaseAgent[Any]):
     # ------------------------------------------------------------------
 
     async def get_client(self) -> A2AClient:
-        """Return the underlying :class:`A2AClient`, constructing on first use.
+        """Return the underlying ``A2AClient``, constructing on first use.
 
-        Public accessor for the private :attr:`_client` lazy-init slot.
+        Public accessor for the private ``_client`` lazy-init slot.
         Internal state (the cached client) is exposed only via this
         method, never as a direct attribute read — that contract lets
         the lazy-init step run on first access and prevents callers
@@ -386,7 +386,7 @@ class A2AAgent(BaseAgent[Any]):
         client across requests go through this accessor.
 
         Returns:
-            The lazily-constructed :class:`A2AClient` for this agent.
+            The lazily-constructed ``A2AClient`` for this agent.
         """
         if self._client is not None and self._client is not _CLOSING:
             return self._client  # type: ignore[return-value]
@@ -408,7 +408,7 @@ class A2AAgent(BaseAgent[Any]):
         """Release the underlying transport.
 
         Safe to call multiple times. Idempotent. Closes the internal
-        :class:`httpx.AsyncClient` only if the agent was constructed
+        ``httpx.AsyncClient`` only if the agent was constructed
         without an externally-supplied one.
         """
         if self._client is None or self._client is _CLOSING:
@@ -425,7 +425,7 @@ class A2AAgent(BaseAgent[Any]):
         return self
 
     async def __aexit__(self, *exc: Any) -> None:
-        """Async context-manager exit — calls :meth:`close`."""
+        """Async context-manager exit — calls ``close``."""
         del exc
         await self.close()
 
@@ -443,10 +443,10 @@ class A2AAgent(BaseAgent[Any]):
         guardrails: ToolGuardrails | None = None,
         enabled: bool | Callable[[RunContext[Any]], Any] = True,
     ) -> FunctionTool:
-        """Wrap this remote agent as a :class:`FunctionTool`.
+        """Wrap this remote agent as a ``FunctionTool``.
 
-        Mirrors :meth:`Agent.as_tool`. Returns a tool whose
-        ``on_invoke`` dispatches via :meth:`A2ARunner.arun`
+        Mirrors ``Agent.as_tool``. Returns a tool whose
+        ``on_invoke`` dispatches via ``A2ARunner.arun``
         (non-streaming) and returns the result text. Drops cleanly
         into any ``Agent.tools`` list and participates in the
         standard middleware / tracing / hooks plumbing.
@@ -459,9 +459,9 @@ class A2AAgent(BaseAgent[Any]):
                 "Delegate a task to..." string).
             max_result_tokens: Per-call result-truncation cap.
             timeout: Per-call timeout in seconds wrapping the remote
-                call in :func:`asyncio.wait_for`. Distinct from
+                call in ``asyncio.wait_for``. Distinct from
                 ``self.timeout`` (the HTTP client's timeout).
-            guardrails: Optional :class:`ToolGuardrails` for the
+            guardrails: Optional ``ToolGuardrails`` for the
                 wrapping tool — applies from the parent agent's
                 perspective; does NOT affect the remote agent's own
                 guardrails.
@@ -469,8 +469,8 @@ class A2AAgent(BaseAgent[Any]):
                 a callable receiving the run context.
 
         Returns:
-            A :class:`FunctionTool` whose ``on_invoke`` dispatches to
-            this remote agent via :meth:`A2ARunner.arun`.
+            A ``FunctionTool`` whose ``on_invoke`` dispatches to
+            this remote agent via ``A2ARunner.arun``.
         """
         # Lazy import: FunctionTool's module pulls a wide tree of
         # framework symbols.
@@ -488,7 +488,7 @@ class A2AAgent(BaseAgent[Any]):
         )
 
     def _resolve_tool_description(self, override: str | None) -> str:
-        """Resolve the tool description for :meth:`as_tool`.
+        """Resolve the tool description for ``as_tool``.
 
         Order: explicit override → ``self.description`` (if
         non-empty) → generic "Delegate a task to..." fallback.
@@ -507,17 +507,17 @@ class A2AAgent(BaseAgent[Any]):
         return f"Delegate a task to the remote A2A agent {self.name!r}."
 
     def _build_tool_on_invoke(self) -> Callable[[ToolContext, str], Awaitable[str]]:
-        """Build the closure that becomes :class:`FunctionTool.on_invoke`.
+        """Build the closure that becomes ``FunctionTool.on_invoke``.
 
         Captures ``self`` so the tool callback can reach the remote
         agent without holding a typed reference on the
-        :class:`FunctionTool` itself. Dispatches via
-        :class:`A2ARunner.arun` (the canonical execution entry
+        ``FunctionTool`` itself. Dispatches via
+        ``A2ARunner.arun`` (the canonical execution entry
         point for ``A2AAgent``).
 
         Returns:
             An async callable ``(ToolContext, str) -> str`` suitable
-            for :class:`FunctionTool.on_invoke`.
+            for ``FunctionTool.on_invoke``.
         """
         # Local import — avoids the import cycle ``a2a_runner``
         # imports ``a2a_agent`` for type narrowing.

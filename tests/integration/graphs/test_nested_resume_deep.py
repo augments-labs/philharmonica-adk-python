@@ -2,24 +2,24 @@
 
 Shape under test:
 
-- An OUTER :class:`Graph` whose single node holds an INNER :class:`Graph`
+- An OUTER ``Graph`` whose single node holds an INNER ``Graph``
   as its executable. The inner graph holds a single
-  :class:`AgentExecutable` whose underlying agent's tool defers.
+  ``AgentExecutable`` whose underlying agent's tool defers.
 
 When the inner agent defers:
 
-1. The inner agent's :class:`AgentToolDeferral` is lifted to a
-   :class:`NestedAgentInterrupt` keyed by the INNER node id by
-   :meth:`AgentExecutable.invoke`'s lift path.
+1. The inner agent's ``AgentToolDeferral`` is lifted to a
+   ``NestedAgentInterrupt`` keyed by the INNER node id by
+   ``AgentExecutable.invoke``'s lift path.
 2. The inner graph's BSP loop parks the interrupt on
-   :attr:`GraphState.pending_interrupts` and the snapshot on
-   :attr:`GraphState.nested_agent_snapshots`, exiting with
+   ``GraphState.pending_interrupts`` and the snapshot on
+   ``GraphState.nested_agent_snapshots``, exiting with
    status=INTERRUPTED.
-3. The outer graph's call to :meth:`Graph.invoke` (the inner graph
+3. The outer graph's call to ``Graph.invoke`` (the inner graph
    wrapped as a node) MUST bubble this interrupt up to the OUTER BSP
    loop, with the ``node_id`` rewritten to the OUTER node id (so the
    caller doesn't need to know the inner graph's structure to compose
-   a :class:`GraphResume`).
+   a ``GraphResume``).
 
 Resume:
 
@@ -27,34 +27,34 @@ Resume:
   NestedAgentReply(decisions=(NestedAgentApproval(tool_call_id=...),))})``.
 - The outer BSP loop must route that reply through the inner graph
   back to the deferring agent, applying the decision on its parked
-  :class:`RunState`. The inner agent then re-enters and returns, the
+  ``RunState``. The inner agent then re-enters and returns, the
   inner graph completes, the outer graph completes.
 
-Pre-existing gap surfaced by this test. :meth:`Graph.invoke` (in
-``src/philharmonica/adk/graphs/graph.py``) calls :func:`run_graph_loop` for the
-inner graph and translates the resulting :class:`GraphRunResult` into a
-:class:`NodeResult` UNCONDITIONALLY — including when
+Pre-existing gap surfaced by this test. ``Graph.invoke`` (in
+``src/philharmonica/adk/graphs/graph.py``) calls ``run_graph_loop`` for the
+inner graph and translates the resulting ``GraphRunResult`` into a
+``NodeResult`` UNCONDITIONALLY — including when
 ``inner_result.status == GraphRunStatus.INTERRUPTED``. The outer loop has
 no signal that the inner graph paused, so a depth-2 deferral silently
 "completes" the outer node with a non-final ``NodeResult`` carrying the
 inner ``GraphRunResult`` as ``output`` and ``"status": "interrupted"`` in
 metadata. Resume cannot work because:
 
-1. No outer :class:`InterruptException` is raised, so no outer
-   :class:`NestedAgentInterrupt` is parked, so the outer caller has no
+1. No outer ``InterruptException`` is raised, so no outer
+   ``NestedAgentInterrupt`` is parked, so the outer caller has no
    ``GraphResume.replies`` key to target.
-2. Even if the lift were added at :meth:`Graph.invoke`, the inner
-   :class:`GraphState` (carrying its own ``nested_agent_snapshots``)
+2. Even if the lift were added at ``Graph.invoke``, the inner
+   ``GraphState`` (carrying its own ``nested_agent_snapshots``)
    would need to be preserved across the outer/inner boundary so the
    resume path can re-enter the inner graph with both the staged
    reply and the saved inner state. The current side-channel under
-   :attr:`GraphState.nested_agent_snapshots` is typed
+   ``GraphState.nested_agent_snapshots`` is typed
    ``dict[str, RunState]`` — it has no slot for a nested
-   :class:`GraphState`. Outer-loop dispatch (`_dispatch_node` /
+   ``GraphState``. Outer-loop dispatch (`_dispatch_node` /
    `_dispatch_nested_resume` in ``src/philharmonica/adk/run/graph_loop.py``)
-   only knows how to call :meth:`AgentExecutable.resume_from_snapshot`.
+   only knows how to call ``AgentExecutable.resume_from_snapshot``.
 
-This test is marked :func:`pytest.mark.xfail(strict=True)` — when the
+This test is marked ``pytest.mark.xfail(strict=True)`` — when the
 bridge gains depth-2 support, the test will start passing and the strict
 xfail surfaces the regression. Until then, the marker is the on-record
 gap.
@@ -88,7 +88,7 @@ from philharmonica.adk.types.tokens.llm_usage import LLMUsage
 
 
 def _deferred_call(call_id: str, tool_name: str = "approve_me") -> DeferredToolCall:
-    """Build a placeholder :class:`DeferredToolCall` used in fake deferrals."""
+    """Build a placeholder ``DeferredToolCall`` used in fake deferrals."""
     return DeferredToolCall(
         tool_call_id=call_id,
         tool_name=tool_name,
@@ -100,8 +100,8 @@ def _deferred_call(call_id: str, tool_name: str = "approve_me") -> DeferredToolC
 class _FakeAgentRef:
     """Stand-in for the ``Agent`` instance referenced by ``RunResult.last_agent``.
 
-    Only ``.name`` is read by :meth:`AgentExecutable.invoke` /
-    :meth:`AgentExecutable.resume_from_snapshot`.
+    Only ``.name`` is read by ``AgentExecutable.invoke`` /
+    ``AgentExecutable.resume_from_snapshot``.
     """
 
     def __init__(self, name: str) -> None:
@@ -116,7 +116,7 @@ class _FakeRunContextRef:
 
 
 class _CompletedRunResult:
-    """Stand-in for a non-deferring :class:`RunResult` from :meth:`Runner.arun`."""
+    """Stand-in for a non-deferring ``RunResult`` from ``Runner.arun``."""
 
     def __init__(self, final_output: Any, agent_name: str = "planner") -> None:
         self.final_output = final_output
@@ -157,7 +157,7 @@ def _outer_wraps_inner_graph(
 ) -> Graph[Any]:
     """Build a one-node outer graph whose node holds ``inner`` as its executable.
 
-    ``Graph`` implements :class:`Executable` directly, so the inner graph
+    ``Graph`` implements ``Executable`` directly, so the inner graph
     is placed as the node's executable without an adapter. This is the
     "graph of graphs" composition the framework already supports for
     non-deferring inner graphs.
@@ -169,10 +169,10 @@ def _install_scripted_arun(
     monkeypatch: pytest.MonkeyPatch,
     script: list[Any],
 ) -> dict[str, list[Any]]:
-    """Install a :meth:`Runner.arun` class-level mock driven by ``script``.
+    """Install a ``Runner.arun`` class-level mock driven by ``script``.
 
-    Each invocation pops the next entry: an :class:`Exception` instance
-    is raised, anything else is returned as the :class:`RunResult` stand-in.
+    Each invocation pops the next entry: an ``Exception`` instance
+    is raised, anything else is returned as the ``RunResult`` stand-in.
     Records call shapes so the test body can assert which leg fired.
     """
     calls: dict[str, list[Any]] = {"agents": [], "prompts": [], "raised": []}
@@ -206,10 +206,10 @@ async def test_depth_2_nested_defer_then_resume_completes(
     """Outer graph wraps an inner graph; the inner agent's tool defers.
 
     The inner agent's deferral becomes a
-    :class:`~philharmonica.adk.graphs.interrupt.NestedAgentInterrupt` at the
+    ``NestedAgentInterrupt`` at the
     inner graph layer, then bubbles to the OUTER graph layer with the
     OUTER node id (not the inner). The caller resumes via
-    :class:`~philharmonica.adk.graphs.interrupt.GraphResume.replies` keyed by
+    ``replies`` keyed by
     the outer node id; the resume routes through both layers and the
     run completes.
 

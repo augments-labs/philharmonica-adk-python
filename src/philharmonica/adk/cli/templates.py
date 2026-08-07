@@ -1,7 +1,7 @@
 """Project templates for ``philharmonica new``.
 
 Templates are plain string constants rendered with
-:class:`string.Template` (``$name`` placeholders) — transparent to
+``string.Template`` (``$name`` placeholders) — transparent to
 audit, no template-engine dependency, and no package-data files to
 ship. The published JSON Schemas are written next to the generated
 config so editors validate it offline via its ``$schema`` pointer.

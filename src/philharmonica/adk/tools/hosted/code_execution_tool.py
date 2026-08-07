@@ -14,14 +14,14 @@ class CodeExecutionTool(HostedTool):
 
     Provider matrix:
     - **OpenAI Responses**: native via the ``code_interpreter`` tool
-      type. Optionally honours :attr:`container` to bind a specific
+      type. Optionally honours ``container`` to bind a specific
       ephemeral container.
     - **Gemini**: native via the ``code_execution`` tool type. No
       tunable knobs.
     - **Anthropic**: not supported via this class. Anthropic's code
       execution lives behind beta headers; pass via
       ``LLMConfig.extra_body`` if needed. The Anthropic converter
-      raises :class:`UnsupportedHostedToolError`.
+      raises ``UnsupportedHostedToolError``.
     - **OpenAI Chat Completions / LiteLLM**: not supported.
 
     Refs:

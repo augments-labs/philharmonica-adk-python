@@ -9,7 +9,7 @@ Demonstrates every core Flow primitive in one runnable script:
 - ``@flow_router`` — conditional dispatch returning a route label
 - ``@flow_listen("label")`` — listener on a router's returned label
 - Typed Pydantic state shared across steps via ``self.state``
-- :class:`FlowCheckpoint` round-trip (capture + resume)
+- ``FlowCheckpoint`` round-trip (capture + resume)
 
 The example uses synthetic step bodies (no LLM calls) so it runs
 without credentials. For a runnable example with real agents, see
@@ -68,25 +68,25 @@ class ResearchFlow(Flow[ResearchState]):
 
     @flow_start
     async def init_topic(self) -> None:
-        """Seed the topic. Fires in parallel with :meth:`init_session`."""
+        """Seed the topic. Fires in parallel with ``init_session``."""
         self.state.topic = "decentralized AI orchestration"
         logger.info("init_topic: topic=%s", self.state.topic)
 
     @flow_start
     async def init_session(self) -> None:
-        """Set up a synthetic session. Fires in parallel with :meth:`init_topic`."""
+        """Set up a synthetic session. Fires in parallel with ``init_topic``."""
         logger.info("init_session: session ready")
 
     @flow_listen(init_topic)
     async def gather_fact(self) -> None:
-        """Listener triggered by :meth:`init_topic` completion."""
+        """Listener triggered by ``init_topic`` completion."""
         await asyncio.sleep(0)  # Yield to demonstrate async
         self.state.fact = f"{self.state.topic} reduces single-vendor lock-in."
         logger.info("gather_fact: fact=%s", self.state.fact)
 
     @flow_listen(init_topic)
     async def gather_quote(self) -> None:
-        """Second listener on :meth:`init_topic` — fires in parallel with :meth:`gather_fact`."""
+        """Second listener on ``init_topic`` — fires in parallel with ``gather_fact``."""
         await asyncio.sleep(0)
         self.state.quote = f"'{self.state.topic} is the next frontier.'"
         logger.info("gather_quote: quote=%s", self.state.quote)
@@ -95,7 +95,7 @@ class ResearchFlow(Flow[ResearchState]):
     async def synthesize(self) -> None:
         """AND gate — fires ONCE after BOTH gather_fact and gather_quote complete.
 
-        Built fluently via the ``&`` operator on :class:`FlowStep`
+        Built fluently via the ``&`` operator on ``FlowStep``
         wrappers. The framework tracks arrivals by name and fires
         ``synthesize`` exactly once when the gate is satisfied.
         """

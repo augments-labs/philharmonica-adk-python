@@ -1,4 +1,4 @@
-"""Tests for :mod:`philharmonica.adk.workflows.temporal.plugin`."""
+"""Tests for ``philharmonica.adk.workflows.temporal.plugin``."""
 
 from __future__ import annotations
 

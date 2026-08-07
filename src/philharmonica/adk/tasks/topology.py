@@ -1,13 +1,13 @@
-"""Topological-level resolver for :class:`TaskPipeline` DAG ordering.
+"""Topological-level resolver for ``TaskPipeline`` DAG ordering.
 
 Kahn's algorithm grouped by depth: every task at level 0 has zero
 declared dependencies; every task at level N depends only on tasks
-present at levels 0..N-1. :meth:`Runner.arun_task_pipeline` consumes
+present at levels 0..N-1. ``Runner.arun_task_pipeline`` consumes
 the result and runs each level's tasks concurrently via
 ``asyncio.gather``.
 
-Module-private by omission from :mod:`philharmonica.adk.tasks`'s ``__all__``
-— consumers go through :meth:`TaskPipeline.topological_levels`. The
+Module-private by omission from ``philharmonica.adk.tasks``'s ``__all__``
+— consumers go through ``TaskPipeline.topological_levels``. The
 file itself is not underscore-prefixed (module-private status is
 communicated by omission from the package's ``__all__``, not by file
 naming).
@@ -25,9 +25,9 @@ if TYPE_CHECKING:
 
 
 class TaskPipelineDefinitionError(UserError):
-    """Raised when a :class:`TaskPipeline` declares an invalid DAG.
+    """Raised when a ``TaskPipeline`` declares an invalid DAG.
 
-    Subclass of :class:`UserError` — these are developer-side bugs in
+    Subclass of ``UserError`` — these are developer-side bugs in
     pipeline definition (unknown dependency ids, duplicate ids,
     cycles), not runtime failures.
     """
@@ -36,11 +36,11 @@ class TaskPipelineDefinitionError(UserError):
 def normalised_depends_on(task: Task) -> tuple[str, ...]:
     """Resolve ``task.depends_on`` entries to task_id strings.
 
-    ``depends_on`` is ``None`` (no deps) or a :class:`Sequence` whose
-    entries are :class:`Task` instances, ``task_id`` strings, or
-    :class:`TaskDependency` wrappers. Task instances (whether
+    ``depends_on`` is ``None`` (no deps) or a ``Sequence`` whose
+    entries are ``Task`` instances, ``task_id`` strings, or
+    ``TaskDependency`` wrappers. Task instances (whether
     standalone or wrapped) MUST carry an explicit ``task_id``;
-    otherwise we raise :class:`TaskPipelineDefinitionError` since we
+    otherwise we raise ``TaskPipelineDefinitionError`` since we
     can't name them stably for the resolver.
 
     Args:
@@ -53,8 +53,8 @@ def normalised_depends_on(task: Task) -> tuple[str, ...]:
         when ``depends_on`` is ``None``.
 
     Raises:
-        TaskPipelineDefinitionError: When a :class:`Task` entry (bare
-            or wrapped in :class:`TaskDependency`) has no ``task_id``
+        TaskPipelineDefinitionError: When a ``Task`` entry (bare
+            or wrapped in ``TaskDependency``) has no ``task_id``
             set.
     """
     from philharmonica.adk.tasks.task import Task, TaskDependency

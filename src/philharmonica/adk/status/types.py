@@ -2,9 +2,9 @@
 
 Three types:
 
-- :class:`AgentRunRecord` — a single run record (one row per agent execution)
-- :class:`AgentStatus` — aggregated stats over a time window (computed, not stored)
-- :class:`AgentQuota` — a time-windowed usage quota definition
+- ``AgentRunRecord`` — a single run record (one row per agent execution)
+- ``AgentStatus`` — aggregated stats over a time window (computed, not stored)
+- ``AgentQuota`` — a time-windowed usage quota definition
 """
 
 from __future__ import annotations
@@ -17,8 +17,8 @@ class AgentRunRecord:
     """A single run record for one agent execution.
 
     Created at the end of each ``Runner.arun()`` call by
-    :class:`~philharmonica.adk.status.hooks.StatusTrackingHooks` and
-    persisted to an :class:`~philharmonica.adk.status.store.AgentStatusStore`.
+    ``StatusTrackingHooks`` and
+    persisted to an ``AgentStatusStore``.
 
     Attributes:
         id: Unique run identifier (UUID4 hex string).
@@ -80,9 +80,9 @@ class AgentRunRecord:
 class AgentStatus:
     """Aggregated status for an agent over a time window.
 
-    Computed from :class:`AgentRunRecord` rows via SQL aggregation.
+    Computed from ``AgentRunRecord`` rows via SQL aggregation.
     Not stored directly — returned by
-    :meth:`~philharmonica.adk.status.store.AgentStatusStore.get_status`.
+    ``get_status``.
 
     Attributes:
         agent_name: The agent's name.
@@ -151,7 +151,7 @@ class AgentQuota:
     """A time-windowed usage quota for an agent.
 
     Defines limits that are checked against accumulated
-    :class:`AgentRunRecord` history before each run.  Use
+    ``AgentRunRecord`` history before each run.  Use
     ``agent_name="*"`` to apply the quota to all agents.
 
     Attributes:

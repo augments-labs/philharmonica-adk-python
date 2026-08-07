@@ -1,9 +1,9 @@
 """``A2AServer`` — frozen config object pairing a local Agent with an AgentCard.
 
 ``A2AServer`` is intentionally **not** a running server. It is a frozen
-``@dataclass`` that pairs an :class:`philharmonica.adk.agents.Agent` with a
-manually-authored :class:`a2a.types.AgentCard`. The companion factory
-:func:`build_starlette_app` consumes the config and returns a Starlette
+``@dataclass`` that pairs an ``philharmonica.adk.agents.Agent`` with a
+manually-authored ``a2a.types.AgentCard``. The companion factory
+``build_starlette_app`` consumes the config and returns a Starlette
 ASGI app the developer's own ASGI runtime (``uvicorn``, ``hypercorn``,
 ``granian``, …) serves.
 
@@ -58,45 +58,45 @@ _DEFAULT_MAX_TURNS: int = 10
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class A2AServer:
-    """Frozen config object exposing a local :class:`Agent` over A2A.
+    """Frozen config object exposing a local ``Agent`` over A2A.
 
     Attributes:
-        agent: The local :class:`Agent` to expose. The agent's tools,
+        agent: The local ``Agent`` to expose. The agent's tools,
             guardrails, and instructions remain entirely local — the
             A2A boundary translates incoming task requests into
             ``Runner.arun(agent, prompt)`` calls and translates the
-            resulting :class:`RunResult` back into A2A artifacts.
-        agent_card: Manually-authored :class:`a2a.types.AgentCard`.
+            resulting ``RunResult`` back into A2A artifacts.
+        agent_card: Manually-authored ``a2a.types.AgentCard``.
             Includes the agent's identity (``name``, ``description``,
             ``url``, ``version``), capabilities (``streaming``,
             ``push_notifications``), authentication requirements, and
             skills list. The card is published at
             ``/.well-known/agent-card.json`` and is the discovery
             contract every A2A client reads before sending a task.
-        task_store: Optional :class:`a2a.server.tasks.TaskStore`. When
-            ``None`` (default), :func:`build_starlette_app` constructs
-            an :class:`InMemoryTaskStore`. **Production callers MUST
+        task_store: Optional ``a2a.server.tasks.TaskStore``. When
+            ``None`` (default), ``build_starlette_app`` constructs
+            an ``InMemoryTaskStore``. **Production callers MUST
             supply a persistent store** (e.g.
-            :class:`a2a.server.tasks.DatabaseTaskStore`) — in-memory
+            ``a2a.server.tasks.DatabaseTaskStore``) — in-memory
             storage loses tasks on server restart, which breaks the
-            :class:`A2AContinuationToken` resume contract for any
+            ``A2AContinuationToken`` resume contract for any
             background task that outlives the process.
         executor_task_store: Optional framework
-            :class:`~philharmonica.adk.a2a.task_store.TaskStore` for
-            :class:`~philharmonica.adk.a2a.executor.A2AExecutor` persistence.
+            ``TaskStore`` for
+            ``A2AExecutor`` persistence.
             When set, the executor writes each task's initial and terminal
             snapshot here, and a
-            :class:`~philharmonica.adk.a2a.task_store.SQLiteTaskStore`'s
+            ``SQLiteTaskStore``'s
             ``recover_on_startup`` can be called before the server accepts
             requests to mark unfinished tasks from a prior process as
             FAILED. ``None`` (default) gives the executor an
-            :class:`~philharmonica.adk.a2a.task_store.InMemoryTaskStore` — no
+            ``InMemoryTaskStore`` — no
             restart recovery. This is distinct from ``task_store``, which
             is the a2a-sdk store handed to ``DefaultRequestHandler`` for
             wire-protocol task lookups.
         max_turns: Maximum local-agent loop turns per A2A task. Maps
             directly to ``Runner.arun(max_turns=...)``. Default 10.
-        run_config: Optional :class:`RunConfig` override. When ``None``,
+        run_config: Optional ``RunConfig`` override. When ``None``,
             the executor lets ``Runner.arun`` use framework defaults.
             Use this to plumb usage limits, history processors, or
             tracing metadata that should apply to every task served by
@@ -113,27 +113,27 @@ class A2AServer:
             protocol route active. This is an opt-in flag; it is the
             caller's responsibility to ensure the installed a2a-sdk
             exposes ``enable_v0_3_compat``.
-        extended_agent_card: Optional second :class:`a2a.types.AgentCard`
+        extended_agent_card: Optional second ``a2a.types.AgentCard``
             passed as ``extended_agent_card`` to
-            :class:`a2a.server.request_handlers.DefaultRequestHandler`.
+            ``a2a.server.request_handlers.DefaultRequestHandler``.
             When set, authenticated clients that request the extended
             card receive this richer card (e.g. with additional skills
             or capability hints not shown to anonymous callers). ``None``
             (default) disables the extended-card endpoint.
         extended_card_modifier: Optional async callback passed as
             ``extended_card_modifier`` to
-            :class:`a2a.server.request_handlers.DefaultRequestHandler`.
-            The callback receives the extended :class:`AgentCard` and
-            the :class:`a2a.server.context.ServerCallContext` and must
-            return a (possibly transformed) :class:`AgentCard`. Useful
+            ``a2a.server.request_handlers.DefaultRequestHandler``.
+            The callback receives the extended ``AgentCard`` and
+            the ``a2a.server.context.ServerCallContext`` and must
+            return a (possibly transformed) ``AgentCard``. Useful
             for stamping per-caller metadata or scrubbing fields based
             on request context. ``None`` (default) disables the
             modifier; the extended card is returned verbatim.
         card_modifier: Optional async callback passed as
             ``card_modifier`` to the a2a-sdk's
             ``create_agent_card_routes`` factory.  The callback receives
-            the public :class:`AgentCard` and must return a (possibly
-            transformed) :class:`AgentCard`.  Useful for dynamically
+            the public ``AgentCard`` and must return a (possibly
+            transformed) ``AgentCard``.  Useful for dynamically
             patching the public card (e.g. injecting a live
             ``url`` field at request time).  ``None`` (default) serves
             the card verbatim.

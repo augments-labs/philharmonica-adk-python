@@ -14,11 +14,11 @@ class WebSearchTool(HostedTool):
 
     Provider matrix:
     - **Anthropic**: native via the ``web_search_20250305`` tool type.
-      Honours :attr:`max_uses`, :attr:`allowed_domains`,
-      :attr:`blocked_domains`, :attr:`user_location`.
+      Honours ``max_uses``, ``allowed_domains``,
+      ``blocked_domains``, ``user_location``.
     - **OpenAI Responses**: native via the ``web_search`` tool type
       (or ``web_search_preview`` for older Responses API deployments). Honours
-      :attr:`search_context_size` and :attr:`user_location`.
+      ``search_context_size`` and ``user_location``.
     - **Gemini**: native via the ``google_search`` tool type. No tunable
       knobs at this time; all attribute fields are silently ignored on
       this provider.
@@ -26,7 +26,7 @@ class WebSearchTool(HostedTool):
       tools array (Chat Completions exposes web search via the
       ``web_search_options`` config field instead). The
       ``OpenAIChatCompletionsLLM`` converter raises
-      :class:`UnsupportedHostedToolError` — callers should pass via
+      ``UnsupportedHostedToolError`` — callers should pass via
       ``LLMConfig.extra_body`` or use a different provider.
 
     Attribute support is per provider. Setting an attribute that the
@@ -65,11 +65,11 @@ class WebSearchTool(HostedTool):
 
     allowed_domains: list[str] | None = None
     """Whitelist of domains to include in results. Mutually exclusive
-    with :attr:`blocked_domains`. **Anthropic only.**"""
+    with ``blocked_domains``. **Anthropic only.**"""
 
     blocked_domains: list[str] | None = None
     """Blocklist of domains to exclude from results. Mutually exclusive
-    with :attr:`allowed_domains`. **Anthropic only.**"""
+    with ``allowed_domains``. **Anthropic only.**"""
 
     user_location: dict[str, str] | None = None
     """Approximate user-location dict for relevance ranking. Shape:

@@ -127,7 +127,7 @@ The Runner partitions tools by type at runtime:
   matching wire-format tool param. The framework does NOT execute
   these — the LLM provider does, server-side. Each provider's
   ``convert_tools`` either translates the variant or raises
-  :class:`UnsupportedHostedToolError`.
+  ``UnsupportedHostedToolError``.
 """
 
 __all__ = [

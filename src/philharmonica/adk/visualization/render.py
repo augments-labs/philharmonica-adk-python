@@ -1,17 +1,17 @@
 """Rendering helpers that turn emitter strings into image files on disk.
 
-Optional convenience layer over :func:`flow_to_mermaid` /
-:func:`flow_to_dot` / :func:`graph_to_mermaid` / :func:`graph_to_dot`.
+Optional convenience layer over ``flow_to_mermaid`` /
+``flow_to_dot`` / ``graph_to_mermaid`` / ``graph_to_dot``.
 Pull in the matching extras to get image output:
 
 - ``pip install 'philharmonica-adk[viz]'`` — adds the ``graphviz`` Python
   package, which shells out to the local ``dot`` CLI. Used by
-  :func:`render_dot` to produce SVG.
+  ``render_dot`` to produce SVG.
 - ``pip install 'philharmonica-adk[mermaid]'`` — adds ``mermaid-py``, which
   renders Mermaid strings via the Mermaid Live online API. Used by
-  :func:`render_mermaid` to produce PNG.
+  ``render_mermaid`` to produce PNG.
 
-Both helpers return a typed three-way :data:`RenderOutcome` so callers
+Both helpers return a typed three-way ``RenderOutcome`` so callers
 can distinguish "produced an image" from "wrote raw source" from
 "no-op (extra not installed)". The string emitters themselves never
 require either extra — the framework still works fully without them.
@@ -39,7 +39,7 @@ def render_dot(dot_source: str, out_path: Path) -> RenderOutcome:
 
     Args:
         dot_source: DOT digraph source — typically the return value
-            of :meth:`Flow.to_dot` or :meth:`Graph.to_dot`.
+            of ``Flow.to_dot`` or ``Graph.to_dot``.
         out_path: Target path (without extension). The extension is
             chosen by the outcome (``.svg`` on success, ``.dot`` on
             fallback).
@@ -81,8 +81,8 @@ def render_mermaid(mermaid_source: str, out_path: Path) -> RenderOutcome:
 
     Args:
         mermaid_source: Mermaid flowchart source — typically the
-            return value of :meth:`Flow.to_mermaid` or
-            :meth:`Graph.to_mermaid`.
+            return value of ``Flow.to_mermaid`` or
+            ``Graph.to_mermaid``.
         out_path: Target path (without extension).
 
     Returns:

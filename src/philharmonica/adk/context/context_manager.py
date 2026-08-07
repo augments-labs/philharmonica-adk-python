@@ -1,6 +1,6 @@
 """Context manager orchestrating all context management strategies.
 
-The :class:`ContextManager` is the single entry-point called by the
+The ``ContextManager`` is the single entry-point called by the
 Runner before each LLM call.  It applies context editing first
 (cheapest), then checks whether compaction is needed, and returns the
 managed message list.
@@ -69,7 +69,7 @@ class ContextManager:
     """Orchestrates context management strategies for a conversation.
 
     Instantiate once per conversation (or per ``Runner.run`` call) and
-    call :meth:`prepare_messages` before every LLM invocation.
+    call ``prepare_messages`` before every LLM invocation.
     """
 
     _PRESSURE_MARKER = "_context_pressure_feedback"
@@ -79,7 +79,7 @@ class ContextManager:
         """Initialize the ContextManager.
 
         Args:
-            config: The :class:`ContextManagementConfig` controlling
+            config: The ``ContextManagementConfig`` controlling
                 compaction, editing, and token budgets.
         """
         self.config = config
@@ -122,7 +122,7 @@ class ContextManager:
             messages: The current conversation messages (including system
                 message).
             llm: The ``LLM`` instance to call when compaction fires
-                (typically resolved via :func:`resolve_compaction_llm`
+                (typically resolved via ``resolve_compaction_llm``
                 so ``RunConfig.compaction_llm`` overrides the agent's
                 primary LLM).
             model: Model identifier used for token counting (the litellm
@@ -271,10 +271,10 @@ class ContextManager:
     def force_tool(self) -> str | None:
         """Tool name to force on the next LLM call, or ``None``.
 
-        Set by :meth:`prepare_messages` when context pressure exceeds
+        Set by ``prepare_messages`` when context pressure exceeds
         the warning threshold and ``forced_tool`` is configured.
         The Runner reads this after ``prepare_messages()`` and calls
-        :meth:`consume_force_tool` to prevent re-triggering on
+        ``consume_force_tool`` to prevent re-triggering on
         subsequent loop iterations within the same turn.
         """
         return self._force_tool
@@ -285,7 +285,7 @@ class ContextManager:
         Prevents the forced tool from re-triggering on every loop
         iteration within the same agent turn (which would cause a
         compaction spiral).  The signal is re-evaluated on the next
-        turn via :meth:`prepare_messages`.
+        turn via ``prepare_messages``.
         """
         self._force_tool = None
 
@@ -300,7 +300,7 @@ class ContextManager:
         and removes from the front of the body (oldest first).
 
         Orphaned tool-result cleanup is handled separately by
-        :meth:`ContextEditor.remove_orphaned_tool_results` (step 5).
+        ``ContextEditor.remove_orphaned_tool_results`` (step 5).
 
         Args:
             messages: The conversation messages to truncate.
@@ -398,7 +398,7 @@ class ContextManager:
         """Check whether compaction should be triggered.
 
         Returns ``True`` when compaction is enabled and the current token
-        count exceeds :attr:`CompactionConfig.trigger_tokens`.
+        count exceeds ``CompactionConfig.trigger_tokens``.
 
         Args:
             messages: The current conversation messages.
@@ -428,7 +428,7 @@ class ContextManager:
             model: Model identifier for token counting.
 
         Returns:
-            A :class:`TokenUsage` TypedDict with keys ``used``, ``max``,
+            A ``TokenUsage`` TypedDict with keys ``used``, ``max``,
             ``remaining``, ``utilisation``, and ``compaction_count``.
         """
         used = TokenCounter.count_messages(messages, model)

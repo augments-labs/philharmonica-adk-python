@@ -1,19 +1,19 @@
 """Interrupt primitives for graph human-in-the-loop pauses.
 
 These typed primitives define the interrupt/resume contract so the
-public import graph stays stable. Raising :class:`InterruptException`
+public import graph stays stable. Raising ``InterruptException``
 inside a node signals that the run must pause for human input; the BSP
-loop in ``run/graph_loop.py`` captures the carried :class:`Interrupt`
+loop in ``run/graph_loop.py`` captures the carried ``Interrupt``
 onto ``GraphState.pending_interrupts`` and exits with
 status=INTERRUPTED so the caller can resume the run via the checkpoint
 API.
 
-- :class:`InterruptException` — raised by a hook or a node to
-  request a pause; carries the :class:`Interrupt` payload describing
+- ``InterruptException`` — raised by a hook or a node to
+  request a pause; carries the ``Interrupt`` payload describing
   what the human approver must decide.
-- :class:`Interrupt` — the structured request: node id, a question,
+- ``Interrupt`` — the structured request: node id, a question,
   and optional kind-specific metadata.
-- :class:`GraphResume` — the caller's reply when resuming a paused
+- ``GraphResume`` — the caller's reply when resuming a paused
   run: human-supplied values keyed by ``node_id`` (``replies``) and
   model-visible decline messages (``rejected``).
 """
@@ -82,12 +82,12 @@ class InterruptException(PhilharmonicaError):
     """Raised by a hook or a node to signal that the run must pause for human input.
 
     The BSP loop in ``run/graph_loop.py`` captures the carried
-    :class:`Interrupt` onto :attr:`GraphState.pending_interrupts` and
+    ``Interrupt`` onto ``GraphState.pending_interrupts`` and
     exits with status=INTERRUPTED so the caller can resume the run via
-    :class:`GraphResume` and the checkpoint API.
+    ``GraphResume`` and the checkpoint API.
 
     Attributes:
-        interrupt: The :class:`Interrupt` describing what decision is
+        interrupt: The ``Interrupt`` describing what decision is
             needed.
     """
 
@@ -101,7 +101,7 @@ class GraphResume:
     """Human replies for resuming a paused graph run.
 
     Pass an instance to the resume entry-point so the graph loop can
-    unblock nodes that raised :class:`InterruptException`.
+    unblock nodes that raised ``InterruptException``.
 
     Attributes:
         replies: Human-supplied approval values keyed by ``node_id``.
@@ -129,7 +129,7 @@ def request_human_input(
     """Return the human-supplied reply, or raise InterruptException to pause.
 
     Called from inside a node's executable body. When the BSP loop has
-    not injected a reply for this node, raises :class:`InterruptException`
+    not injected a reply for this node, raises ``InterruptException``
     so the loop can suspend the run (status=INTERRUPTED, checkpointed).
     On a resumed invocation the loop sets
     ``ExecutableInput.metadata["__resume_reply__"]`` to the human-supplied
@@ -230,14 +230,14 @@ NestedAgentDecision = NestedAgentApproval | NestedAgentRejection
 
 @dataclass(frozen=True)
 class NestedAgentReply:
-    """Decisions to apply when resuming a :class:`NestedAgentInterrupt`.
+    """Decisions to apply when resuming a ``NestedAgentInterrupt``.
 
     Pass via ``GraphResume.replies[node_id]`` for a node whose interrupt
-    is a :class:`NestedAgentInterrupt`. Each decision targets one
+    is a ``NestedAgentInterrupt``. Each decision targets one
     deferred tool call by ``tool_call_id``. Decisions whose
     ``tool_call_id`` is not in the snapshot's
     ``deferred_tool_requests.approvals`` raise
-    :class:`NestedAgentResumeError` at resume time.
+    ``NestedAgentResumeError`` at resume time.
 
     Attributes:
         decisions: Tuple of approvals/rejections to apply. Empty tuple
@@ -253,7 +253,7 @@ class NestedAgentReply:
 class NestedAgentInterrupt(Interrupt):
     """Interrupt raised when a tool inside a graph-node Agent defers.
 
-    Subtypes :class:`Interrupt` so existing consumers (BSP loop's
+    Subtypes ``Interrupt`` so existing consumers (BSP loop's
     suspension path, ``GraphRunResult.interrupts``, telemetry) keep
     working. The full mid-run ``RunState`` lives in
     ``GraphState.nested_agent_snapshots[node_id]`` — this object only
@@ -263,7 +263,7 @@ class NestedAgentInterrupt(Interrupt):
         agent_name: Display name of the sub-agent that deferred.
         tool_call_ids: ``DeferredToolCall.tool_call_id`` values awaiting
             decision. The reviewer constructs a
-            :class:`NestedAgentReply` indexed by these ids.
+            ``NestedAgentReply`` indexed by these ids.
     """
 
     agent_name: str
@@ -286,11 +286,11 @@ class NestedAgentInterrupt(Interrupt):
 
         Args:
             node_id: Id of the graph node whose Agent deferred.
-            deferral: The :class:`AgentToolDeferral` raised by
+            deferral: The ``AgentToolDeferral`` raised by
                 ``Runner.arun`` for the sub-agent.
 
         Returns:
-            A :class:`NestedAgentInterrupt` carrying the sub-agent name
+            A ``NestedAgentInterrupt`` carrying the sub-agent name
             and the deferred tool-call ids the reviewer must decide on.
 
         Raises:
@@ -319,16 +319,16 @@ class NestedAgentInterrupt(Interrupt):
 class NestedGraphInterrupt(Interrupt):
     """Interrupt raised when a graph-node's inner ``Graph`` suspends on a PLAIN ``Interrupt``.
 
-    Lifted by :meth:`Graph.invoke` (and the resume re-lift in
+    Lifted by ``Graph.invoke`` (and the resume re-lift in
     ``run/graph_loop.py``) when the inner graph's lexicographically-first
-    pending interrupt is a plain :class:`Interrupt` — NOT a sub-agent tool
-    approval (:class:`NestedAgentInterrupt`).
+    pending interrupt is a plain ``Interrupt`` — NOT a sub-agent tool
+    approval (``NestedAgentInterrupt``).
 
-    Distinct from :class:`NestedAgentInterrupt` precisely so it carries no
+    Distinct from ``NestedAgentInterrupt`` precisely so it carries no
     ``agent_name`` / ``tool_call_ids``: the human reply is a plain value
-    forwarded verbatim into the inner graph's :class:`GraphResume`, not a
+    forwarded verbatim into the inner graph's ``GraphResume``, not a
     tool-approval decision. Using a distinct kind also lets
-    :meth:`GraphState.from_dict` rehydrate it WITHOUT the non-empty
+    ``GraphState.from_dict`` rehydrate it WITHOUT the non-empty
     ``agent_name`` guard a nested-agent interrupt requires — the guard that
     previously made an outer graph permanently non-resumable after a
     lifted-plain-Interrupt checkpoint.
@@ -342,7 +342,7 @@ class NestedGraphInterrupt(Interrupt):
 
 
 class NestedAgentResumeError(PhilharmonicaError):
-    """Raised when a :class:`NestedAgentReply` is inconsistent with the snapshot.
+    """Raised when a ``NestedAgentReply`` is inconsistent with the snapshot.
 
     Triggered when a decision's ``tool_call_id`` is not in the
     snapshot's ``deferred_tool_requests.approvals``, or when the same

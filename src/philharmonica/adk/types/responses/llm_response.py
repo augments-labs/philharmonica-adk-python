@@ -295,7 +295,7 @@ class LLMResponseProviderItem:
     ``computer_call``, ``mcp_call``. The framework does NOT wrap
     each provider-hosted tool in a dedicated class; instead the raw
     provider payload is carried verbatim in ``raw`` and replayed
-    verbatim via :meth:`to_param`.
+    verbatim via ``to_param``.
 
     ``raw`` is intentionally ``dict[str, Any]`` because it carries
     genuinely dynamic data (provider-specific extensions).

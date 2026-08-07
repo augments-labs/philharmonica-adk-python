@@ -38,17 +38,17 @@ class SharedContextConfig:
         budget: Token cap when strategy is ``SUMMARIZED`` — older
             history is compacted until the total fits. Ignored otherwise.
         max_handoff_message_chars: Optional cap on the number of
-            characters of a :class:`~philharmonica.adk.swarms.yield_signal.SwarmHandoff`
+            characters of a ``SwarmHandoff``
             message that are injected into the target agent's turn.
             When ``None`` (default), no truncation. When set, the
             ``SCOPED`` strategy truncates any longer handoff message to
-            this length and logs a :func:`logging.Logger.warning`.
+            this length and logs a ``logging.Logger.warning``.
             Characters (not tokens) because a character bound is
             deterministic across providers and cheap (``len(str)``); a
             token bound would need a provider-specific tokenizer.
-            Bypasses :attr:`FunctionTool.max_result_tokens`,
-            :attr:`HandoffConfig.budget`, and
-            :attr:`SwarmConfig.max_total_tokens` because the handoff
+            Bypasses ``FunctionTool.max_result_tokens``,
+            ``HandoffConfig.budget``, and
+            ``SwarmConfig.max_total_tokens`` because the handoff
             message is injected *before* the next turn's LLM call —
             the other three caps measure LLM-observable tokens, while
             this one measures the raw string pre-injection.
@@ -63,9 +63,9 @@ class SharedContextConfig:
             per-turn-cumulative. A pathological agent that emits
             multiple handoffs within a single turn can inject
             N × cap characters over N handoffs. The turn-cumulative
-            bound comes from :attr:`SwarmConfig.max_total_tokens`
+            bound comes from ``SwarmConfig.max_total_tokens``
             (measured post-LLM) plus the existing
-            :attr:`SwarmConfig.max_handoffs` agent-switch counter.
+            ``SwarmConfig.max_handoffs`` agent-switch counter.
     """
 
     strategy: SharedContextStrategy = SharedContextStrategy.SCOPED
@@ -83,7 +83,7 @@ class SharedContextConfig:
     def __post_init__(self) -> None:
         """Validate strategy/parameter coupling.
 
-        Lives here rather than on :class:`SwarmConfig` so the check
+        Lives here rather than on ``SwarmConfig`` so the check
         runs at the earliest construction site — a caller building a
         bare ``SharedContextConfig`` still gets the validation without
         having to wrap it in a ``SwarmConfig``.
@@ -125,7 +125,7 @@ class SwarmConfig:
         """Validate guard values are in legal ranges.
 
         ``shared_context`` validation lives on
-        :class:`SharedContextConfig` itself — this method only checks
+        ``SharedContextConfig`` itself — this method only checks
         the swarm-level budgets.
         """
         if self.max_handoffs <= 0:

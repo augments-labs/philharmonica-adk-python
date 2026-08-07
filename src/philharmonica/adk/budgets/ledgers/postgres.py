@@ -46,7 +46,7 @@ class PostgresCostLedger:
     atomic UPSERT that adds ``cost_usd`` to the running total; no optimistic
     locking token is needed because the increment is naturally atomic.
 
-    The caller owns the lifecycle — call :meth:`close` at application
+    The caller owns the lifecycle — call ``close`` at application
     shutdown or after a test.
 
     Requires PostgreSQL 9.5+ (``ON CONFLICT`` upsert support).

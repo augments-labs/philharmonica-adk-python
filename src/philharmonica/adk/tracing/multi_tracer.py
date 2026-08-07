@@ -1,8 +1,8 @@
 """Fan-out composite tracer.
 
-:class:`MultiTracer` wraps a list of :class:`Tracer` implementations
+``MultiTracer`` wraps a list of ``Tracer`` implementations
 and forwards every ``*_span`` factory call to all of them. The returned
-:class:`CompositeSpan` delegates ``start`` / ``finish`` / ``set_error``
+``CompositeSpan`` delegates ``start`` / ``finish`` / ``set_error``
 to every child span so a single ``with`` block lights up every backend
 simultaneously.
 
@@ -10,7 +10,7 @@ Use when you need two unrelated backends to observe the same run (for
 example, an OTel bridge exporting to a collector and an in-memory
 recorder feeding integration tests). When both backends are
 OTel-compatible, prefer configuring a second ``SpanProcessor`` on the
-shared :class:`~opentelemetry.sdk.trace.TracerProvider` instead — OTel's
+shared ``TracerProvider`` instead — OTel's
 own pipeline already handles multi-exporter fan-out with proper batching
 and sampling.
 """
@@ -41,10 +41,10 @@ TData = TypeVar("TData", bound=SpanData)
 class CompositeSpan[TData: SpanData](Span[TData]):
     """Span that fans lifecycle hooks out to a list of child spans.
 
-    Intentionally does **not** call :meth:`Span.start` / :meth:`Span.finish`
-    on itself (the base-class :class:`~contextvars.ContextVar` tracking).
+    Intentionally does **not** call ``Span.start`` / ``Span.finish``
+    on itself (the base-class ``ContextVar`` tracking).
     Each child manages its own parent chain — OTel children via OTel's
-    own context, framework children via :data:`_current_span`. Layering a
+    own context, framework children via ``_current_span``. Layering a
     composite on top of them would create duplicate entries in either
     stack.
 
@@ -125,25 +125,25 @@ class CompositeSpan[TData: SpanData](Span[TData]):
 
 
 class MultiTracer:
-    """Composite :class:`Tracer` that fans calls to a list of tracers.
+    """Composite ``Tracer`` that fans calls to a list of tracers.
 
     Every ``*_span`` factory delegates to every wrapped tracer and
-    returns a :class:`CompositeSpan` whose lifecycle hooks propagate to
+    returns a ``CompositeSpan`` whose lifecycle hooks propagate to
     all children. Pass an empty list to disable fan-out (every span
-    degrades to a :class:`NoOpSpan`).
+    degrades to a ``NoOpSpan``).
 
     .. warning::
 
-        Composing **two or more** :class:`~philharmonica.adk.tracing.otel.OTelTracer`
-        instances in the same :class:`MultiTracer` causes the second
+        Composing **two or more** ``OTelTracer``
+        instances in the same ``MultiTracer`` causes the second
         OTel child to parent itself to the first OTel span (because
         ``child[0].start()`` pushes a new OTel context before
         ``child[1].start()`` runs). To fan out to multiple OTel
         exporters, configure multiple ``SpanExporter`` / ``SpanProcessor``
         objects on a shared ``TracerProvider`` instead — OTel's own
         multi-exporter pipeline handles this correctly. Pairing a single
-        :class:`~philharmonica.adk.tracing.otel.OTelTracer` with a
-        :class:`~philharmonica.adk.tracing.metrics.MetricsTracer` or an
+        ``OTelTracer`` with a
+        ``MetricsTracer`` or an
         in-memory recorder is safe and the primary supported use-case.
     """
 
@@ -156,7 +156,7 @@ class MultiTracer:
 
         Raises:
             ValueError: When more than one of the supplied tracers is an
-                :class:`~philharmonica.adk.tracing.otel.OTelTracer` instance.
+                ``OTelTracer`` instance.
                 Use a single shared ``TracerProvider`` with multiple
                 ``SpanExporter`` / ``SpanProcessor`` objects instead.
         """
@@ -191,7 +191,7 @@ class MultiTracer:
 
         Each tracer's factory call is isolated in a try/except so a
         broken sub-tracer cannot abort the remaining ones.  When *no*
-        tracer succeeds a :class:`NoOpSpan` is returned so callers
+        tracer succeeds a ``NoOpSpan`` is returned so callers
         always get a valid span.
 
         Args:
@@ -200,8 +200,8 @@ class MultiTracer:
                 (e.g. ``"agent_span"``).
 
         Returns:
-            A :class:`CompositeSpan` over all successfully-created
-            children, or a :class:`NoOpSpan` when all factories failed
+            A ``CompositeSpan`` over all successfully-created
+            children, or a ``NoOpSpan`` when all factories failed
             or ``self._tracers`` is empty.
         """
         if len(self._tracers) == 0:
@@ -243,9 +243,9 @@ class MultiTracer:
         return self._collect(data, "custom_span")
 
     def flush(self) -> None:
-        """Synchronously drain pending spans on every :class:`Flushable` inner tracer.
+        """Synchronously drain pending spans on every ``Flushable`` inner tracer.
 
-        Tracers that do not implement :class:`~philharmonica.adk.tracing.tracer.Flushable`
+        Tracers that do not implement ``Flushable``
         are silently skipped.  Exceptions raised by individual flushes are logged
         and swallowed so one broken sub-tracer does not prevent the others from
         flushing.

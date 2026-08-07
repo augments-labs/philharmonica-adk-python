@@ -1,30 +1,30 @@
 """Registry — frozen snapshot of ``@flow_start`` / ``@flow_listen`` / ``@flow_router``
-declarations on a :class:`Flow` subclass, plus the precomputed dispatch
-table consumed by the :class:`FlowExecutor`.
+declarations on a ``Flow`` subclass, plus the precomputed dispatch
+table consumed by the ``FlowExecutor``.
 
 Two layers:
 
-1. :class:`FlowStepRegistry` — built ONCE by
-   :class:`philharmonica.adk.flows.flow.FlowMeta` at class-creation time, from
+1. ``FlowStepRegistry`` — built ONCE by
+   ``philharmonica.adk.flows.flow.FlowMeta`` at class-creation time, from
    walking ``cls.__dict__``. Captures the raw declarations: which methods
    are starts, listeners, routers, plus their declared trigger specs.
-2. :class:`FlowTransitionTable` — built per ``Runner.arun_flow`` call by
-   :func:`build_transition_table` from the registry. Denormalizes into
+2. ``FlowTransitionTable`` — built per ``Runner.arun_flow`` call by
+   ``build_transition_table`` from the registry. Denormalizes into
    the dispatch indexes the executor uses at runtime.
 
 The split is deliberate: the registry is class-level immutable data, while
 the transition table is a derived, per-run artifact that can be re-built
 cheaply (O(n) over registered steps). Keeping them separate lets the same
-``Flow`` class be executed with different :class:`FlowConfig` values
+``Flow`` class be executed with different ``FlowConfig`` values
 (e.g., different ``max_listeners_per_step``) without re-walking the class
 namespace.
 
 No hidden behavior:
 
-- :class:`FlowStepRegistry` validates at construction time and raises
-  :class:`FlowDefinitionError` for any structural problem — never
+- ``FlowStepRegistry`` validates at construction time and raises
+  ``FlowDefinitionError`` for any structural problem — never
   defaults silently or "fixes" the developer's wiring.
-- :func:`build_transition_table` is a pure function — no globals, no
+- ``build_transition_table`` is a pure function — no globals, no
   cache, no side effects.
 """
 
@@ -43,7 +43,7 @@ After decoration, callable method-references have been resolved to their
 ``__name__`` so only three forms reach the registry:
 
 - ``str`` — a step name or a route label.
-- :class:`Or` / :class:`And` — gate combinators.
+- ``Or`` / ``And`` — gate combinators.
 """
 
 
@@ -51,9 +51,9 @@ After decoration, callable method-references have been resolved to their
 class FlowStepRegistry:
     """Frozen registry of every Flow step declared on a class.
 
-    Built by :class:`philharmonica.adk.flows.flow.FlowMeta` walking ``cls.__dict__``
+    Built by ``philharmonica.adk.flows.flow.FlowMeta`` walking ``cls.__dict__``
     once at class-creation time. The metaclass collects function attributes
-    set by the decorators in :mod:`philharmonica.adk.flows.decorators`, validates
+    set by the decorators in ``philharmonica.adk.flows.decorators``, validates
     coherence, and stamps the resulting registry on the class as
     ``cls.__flow_registry__``.
 
@@ -86,7 +86,7 @@ class FlowStepRegistry:
     """Router method name → tuple of normalized trigger specs."""
 
     def __post_init__(self) -> None:
-        """Validate :class:`FlowStepRegistry` structural integrity.
+        """Validate ``FlowStepRegistry`` structural integrity.
 
         Raises:
             FlowDefinitionError: When ``starts`` is empty, or when a
@@ -129,7 +129,7 @@ class GateSpec:
         listener_name: The method that fires when the gate is satisfied.
         triggers: Frozen set of trigger names the gate watches. AND gates
             require every trigger; OR gates require the first trigger.
-        gate_id: Canonical id — set by :func:`_make_gate_id` to ensure
+        gate_id: Canonical id — set by ``_make_gate_id`` to ensure
             it matches the index used in the table's ``_for`` indexes.
     """
 
@@ -164,10 +164,10 @@ def _make_gate_id(listener_name: str, kind: str, triggers: tuple[str, ...]) -> s
 
 @dataclass(frozen=True)
 class FlowTransitionTable:
-    """Precomputed dispatch table for :class:`FlowExecutor`.
+    """Precomputed dispatch table for ``FlowExecutor``.
 
-    Built per-run from :class:`FlowStepRegistry` by
-    :func:`build_transition_table`. The executor consults this table at
+    Built per-run from ``FlowStepRegistry`` by
+    ``build_transition_table``. The executor consults this table at
     every step completion / route resolution to decide which methods to
     fire next.
 
@@ -220,24 +220,24 @@ def build_transition_table(
     *,
     max_listeners_per_step: int = 20,
 ) -> FlowTransitionTable:
-    """Compile :class:`FlowStepRegistry` into a runtime dispatch table.
+    """Compile ``FlowStepRegistry`` into a runtime dispatch table.
 
     Pure function: same input → same output, no side effects. Enforces
     the ``max_listeners_per_step`` fan-out cap structurally — exceeding
-    it raises :class:`FlowDefinitionError` here, NOT silently at runtime.
+    it raises ``FlowDefinitionError`` here, NOT silently at runtime.
     The cap exists to prevent accidental explosions in mis-wired flows;
     developers who want wider fan-out raise it explicitly via
-    :class:`FlowConfig`.
+    ``FlowConfig``.
 
     Args:
         registry: The frozen registry built by ``FlowMeta``.
         max_listeners_per_step: Maximum number of listener / router /
             gate methods that may fire on a single trigger arrival.
             Cost-conservative default of 20. Raise via
-            :class:`FlowConfig.max_listeners_per_step`.
+            ``FlowConfig.max_listeners_per_step``.
 
     Returns:
-        A frozen :class:`FlowTransitionTable` keyed by trigger name.
+        A frozen ``FlowTransitionTable`` keyed by trigger name.
 
     Raises:
         FlowDefinitionError: When the fan-out for any trigger exceeds
@@ -313,7 +313,7 @@ def _enforce_fanout_cap(
     or_gates_for: dict[str, list[str]],
     cap: int,
 ) -> None:
-    """Raise :class:`FlowDefinitionError` if any trigger exceeds the fan-out cap.
+    """Raise ``FlowDefinitionError`` if any trigger exceeds the fan-out cap.
 
     The cap counts the total number of distinct downstream methods that
     fire on a single trigger arrival: direct listeners + routers + gates

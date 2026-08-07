@@ -1,4 +1,4 @@
-"""Unit tests for guardrail merging in :meth:`Runner.arun_task`.
+"""Unit tests for guardrail merging in ``Runner.arun_task``.
 
 Task input/output guardrails MUST be APPENDED after the caller's
 ``RunConfig.guardrails`` lists — run-scope first, task-scope second.

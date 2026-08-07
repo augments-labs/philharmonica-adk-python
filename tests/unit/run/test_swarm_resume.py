@@ -2,7 +2,7 @@
 
 Covers ``run_resumed_nested_turn`` (nested-agent-defer path with
 ``AgentExecutable.resume_from_snapshot``) and ``run_resumed_hitl_turn``
-(HITL-pure path with reply seeded onto :class:`RunContext`). Both
+(HITL-pure path with reply seeded onto ``RunContext``). Both
 helpers are tested in isolation by mocking the inner dependency
 (``AgentExecutable.resume_from_snapshot`` and ``run_agent_loop``).
 """

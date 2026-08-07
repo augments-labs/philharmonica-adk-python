@@ -77,7 +77,7 @@ class RunHooks[TContext]:
     # --- Task Hooks ---
     #
     # Task lifecycle brackets ``Runner.arun_task`` / ``Runner.arun_task_pipeline``
-    # invocations. Fires once per :class:`Task` execution — for a
+    # invocations. Fires once per ``Task`` execution — for a
     # pipeline, the runner fires ``on_task_start`` / ``on_task_end``
     # for every non-skipped task in order. Skipped tasks (predicate
     # returned True) emit neither hook — the verbose renderer surfaces
@@ -91,20 +91,20 @@ class RunHooks[TContext]:
         agent: Agent | Swarm | Graph,
         task: Task,
     ) -> None:
-        """Called when a :class:`Task` starts execution.
+        """Called when a ``Task`` starts execution.
 
-        Fires once at the top of :meth:`Runner.arun_task`, before any
+        Fires once at the top of ``Runner.arun_task``, before any
         ``on_agent_start`` for the task's agent. In a pipeline, fires
         once per non-skipped task.
 
         Args:
             context: The run context wrapper.
-            agent: The execution target. May be an :class:`Agent`, a
-                :class:`Swarm`, or a :class:`Graph` — matches the
-                widened :attr:`Task.agent` field. Hooks observing
+            agent: The execution target. May be an ``Agent``, a
+                ``Swarm``, or a ``Graph`` — matches the
+                widened ``Task.agent`` field. Hooks observing
                 multiple target types should branch via
-                :func:`isinstance`.
-            task: The :class:`Task` about to run, carrying its
+                ``isinstance``.
+            task: The ``Task`` about to run, carrying its
                 description, overrides, and metadata.
         """
         del context, agent, task
@@ -117,18 +117,18 @@ class RunHooks[TContext]:
         *,
         output: TaskOutput,
     ) -> None:
-        """Called when a :class:`Task` finishes execution.
+        """Called when a ``Task`` finishes execution.
 
-        Fires in the ``finally`` arm of :meth:`Runner.arun_task` — so
+        Fires in the ``finally`` arm of ``Runner.arun_task`` — so
         observers see both success and failure paths. The
-        :class:`TaskOutput` carries ``error`` set when the task raised.
+        ``TaskOutput`` carries ``error`` set when the task raised.
 
         Args:
             context: The run context wrapper.
             agent: The execution target. Mirrors the value passed to
-                :meth:`on_task_start` — Agent, Swarm, or Graph.
-            task: The :class:`Task` that just finished.
-            output: The resulting :class:`TaskOutput` — inspect
+                ``on_task_start`` — Agent, Swarm, or Graph.
+            task: The ``Task`` that just finished.
+            output: The resulting ``TaskOutput`` — inspect
                 ``output.error`` to discriminate success from failure.
         """
         del context, agent, task, output
@@ -622,14 +622,14 @@ class CompositeRunHooks(RunHooks[Any]):
     """Fan-out composite over a sequence of ``RunHooks``.
 
     Internal helper used by the runner to layer framework-installed
-    hooks (e.g. :class:`~philharmonica.adk.verbose.VerboseHooks`) on top of
+    hooks (e.g. ``VerboseHooks``) on top of
     a user-provided hooks instance. All member hooks receive every
     callback in registration order; exceptions from one member do
     not short-circuit the others (they are re-raised after all have
     run).
 
     Not part of the public API. Users compose their own behaviour by
-    overriding :class:`RunHooks` directly.
+    overriding ``RunHooks`` directly.
     """
 
     def __init__(self, members: list[RunHooks[Any]]) -> None:
@@ -852,7 +852,7 @@ def compose_run_hooks(*members: RunHooks[Any] | None) -> RunHooks[Any]:
     """Compose multiple ``RunHooks`` into a single fan-out instance.
 
     ``None`` entries are silently dropped. Returns a no-op
-    :class:`RunHooks` when every input is ``None``. Returns the sole
+    ``RunHooks`` when every input is ``None``. Returns the sole
     member directly (no wrapping) when only one is provided — keeps
     the hot path cheap when verbose is disabled.
 
@@ -860,9 +860,9 @@ def compose_run_hooks(*members: RunHooks[Any] | None) -> RunHooks[Any]:
         *members: Hook instances to compose. ``None`` values are ignored.
 
     Returns:
-        A no-op :class:`RunHooks` when all inputs are ``None``, the single
+        A no-op ``RunHooks`` when all inputs are ``None``, the single
         non-``None`` member unchanged when exactly one is provided, or a
-        :class:`CompositeRunHooks` fan-out over all non-``None`` members.
+        ``CompositeRunHooks`` fan-out over all non-``None`` members.
     """
     filtered = [m for m in members if m is not None]
     if len(filtered) == 0:

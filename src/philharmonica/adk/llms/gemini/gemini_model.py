@@ -577,7 +577,7 @@ class GeminiLLM(LLM):
 
         Yields ``part_start`` / ``part_delta`` / ``part_end`` events
         per part, ending with a ``"done"`` event carrying the assembled
-        :class:`LLMResponse`.
+        ``LLMResponse``.
         """
         client = self._get_client()
         # Same widening rationale as the non-streaming path: the SDK

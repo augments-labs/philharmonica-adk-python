@@ -1,10 +1,10 @@
 """OTel-bridge attribute mapping for graph / graph-superstep / graph-node spans.
 
 The graph-tracing factories route through ``custom_span``, so the OTel
-bridge sees :class:`CustomSpanData` and dispatches to graph-specific
+bridge sees ``CustomSpanData`` and dispatches to graph-specific
 attribute helpers based on the inner ``data["type"]`` discriminator.
 
-Tests use OTel's own :class:`InMemorySpanExporter` so assertions run
+Tests use OTel's own ``InMemorySpanExporter`` so assertions run
 against true-to-runtime span shapes — names, attributes, parent chains.
 """
 

@@ -7,7 +7,7 @@ Exercises the paths V6 instrumented:
 * ``emit_cache_miss`` when a tool executes
 * ``emit_tool_error`` when a tool raises
 
-Each test installs a :class:`VerboseConfig` on the :class:`RunConfig`,
+Each test installs a ``VerboseConfig`` on the ``RunConfig``,
 captures the renderer output on an in-memory stream, and asserts
 that the expected event lines appear. The fake LLM pattern is lifted
 from ``tests/unit/hooks/test_agent_hooks.py``; see that file for the
@@ -242,7 +242,7 @@ class TestRunnerVerboseIntegration:
 
         Pins the promise that auto mode never crashes in CI, piped, or
         file-redirected runs because no TTY is attached to the explicit
-        ``output`` stream passed to :class:`VerboseConfig`.
+        ``output`` stream passed to ``VerboseConfig``.
         """
         sink = io.StringIO()
         cfg = VerboseConfig(mode="auto", output=sink, use_color=False)

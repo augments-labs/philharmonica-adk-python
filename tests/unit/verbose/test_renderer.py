@@ -1,4 +1,4 @@
-"""Tests for :class:`VerboseRenderer`.
+"""Tests for ``VerboseRenderer``.
 
 Focuses on the ANSI fallback path to keep tests deterministic
 regardless of whether Rich is installed. Rich is exercised indirectly

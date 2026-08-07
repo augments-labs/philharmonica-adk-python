@@ -1,4 +1,4 @@
-"""Unit tests for :class:`TaskPipelineState` + persistence + resume.
+"""Unit tests for ``TaskPipelineState`` + persistence + resume.
 
 Covered:
 

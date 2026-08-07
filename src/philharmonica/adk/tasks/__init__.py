@@ -13,12 +13,12 @@ Canonical minimal example — two tasks in a sequential pipeline::
     pipeline = TaskPipeline(tasks=(gather, summarize))
     result = await Runner.arun_task_pipeline(pipeline)
 
-A :class:`Task` packages an agent, a description, and per-call
+A ``Task`` packages an agent, a description, and per-call
 overrides (guardrails, output schema, budgets) into a single
-declarative value. :class:`TaskPipeline` composes multiple tasks
+declarative value. ``TaskPipeline`` composes multiple tasks
 sequentially with explicit (never implicit) context chaining. The
-Runner executes both via :meth:`Runner.arun_task` /
-:meth:`Runner.arun_task_pipeline`.
+Runner executes both via ``Runner.arun_task`` /
+``Runner.arun_task_pipeline``.
 
 This module is purely additive — every existing ``Runner.arun(...)``
 call continues to work unchanged. Task is a higher-level convenience

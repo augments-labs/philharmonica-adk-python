@@ -1,6 +1,6 @@
 """Swarm-level pause/resume primitives.
 
-Mirrors :mod:`philharmonica.adk.graphs.interrupt`'s ``GraphResume`` for the
+Mirrors ``philharmonica.adk.graphs.interrupt``'s ``GraphResume`` for the
 swarms substrate. The ``Interrupt`` / ``NestedAgentInterrupt`` types
 themselves are reused from the graphs module (cross-substrate by
 design — same human-decision payload regardless of orchestration
@@ -34,15 +34,15 @@ if TYPE_CHECKING:
 class SwarmResume:
     """Human replies for resuming a paused swarm run.
 
-    Pass an instance to :meth:`Runner.arun_swarm_from_checkpoint` so the
+    Pass an instance to ``Runner.arun_swarm_from_checkpoint`` so the
     swarm driver can unblock members that raised an
-    :class:`~philharmonica.adk.graphs.interrupt.InterruptException` or whose
-    tool deferred via :class:`AgentToolDeferral`.
+    ``InterruptException`` or whose
+    tool deferred via ``AgentToolDeferral``.
 
     Attributes:
         replies: Human-supplied approval values keyed by member name.
             For ``NestedAgentInterrupt`` resumes, the value MUST be a
-            :class:`~philharmonica.adk.graphs.interrupt.NestedAgentReply`. For
+            ``NestedAgentReply``. For
             plain HITL interrupts, any JSON-safe value the originating
             tool understands.
         rejected: Model-visible decline messages keyed by member name.
@@ -66,13 +66,13 @@ def request_human_input_in_swarm(
     kind: str = "generic",
     metadata: dict[str, Any] | None = None,
 ) -> Any:
-    """Return the seeded reply, or raise :class:`InterruptException`.
+    """Return the seeded reply, or raise ``InterruptException``.
 
     Swarm-substrate companion to
-    :func:`philharmonica.adk.graphs.interrupt.request_human_input`. Called
+    ``philharmonica.adk.graphs.interrupt.request_human_input``. Called
     from inside a swarm member's tool body. When the swarm driver
     has seeded a reply on the run context (because the caller
-    re-entered via :meth:`Runner.arun_swarm_from_checkpoint` with a
+    re-entered via ``Runner.arun_swarm_from_checkpoint`` with a
     matching ``SwarmResume.replies`` entry), this function consumes
     and returns it. Otherwise it raises ``InterruptException`` so the
     swarm loop captures the interrupt under ``member_name`` and parks
@@ -83,7 +83,7 @@ def request_human_input_in_swarm(
     reply".
 
     Args:
-        ctx_wrapper: The :class:`RunContext` flowing through the
+        ctx_wrapper: The ``RunContext`` flowing through the
             current run. The seeded reply lives on this object.
         member_name: The swarm member's name. Becomes the parked
             interrupt's ``node_id`` so the swarm loop can match it
@@ -94,7 +94,7 @@ def request_human_input_in_swarm(
         kind: Discriminator (``"tool_approval"``, ``"route_choice"``,
             ``"input_request"``, …). Defaults to ``"generic"``.
         metadata: Kind-specific payload forwarded onto
-            :attr:`Interrupt.metadata`. Pass a plain dict; ``None``
+            ``Interrupt.metadata``. Pass a plain dict; ``None``
             is treated as an empty dict.
 
     Returns:

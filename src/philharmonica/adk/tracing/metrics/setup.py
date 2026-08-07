@@ -19,7 +19,7 @@ def setup_metrics(
     service_name: str = "philharmonica-adk",
     export_interval_ms: int = _DEFAULT_EXPORT_INTERVAL_MS,
 ) -> MetricsTracer:
-    """Install an OTel ``MeterProvider`` and return a :class:`MetricsTracer`.
+    """Install an OTel ``MeterProvider`` and return a ``MetricsTracer``.
 
     Args:
         endpoint: OTLP metrics endpoint; ``None`` falls back to OTel's

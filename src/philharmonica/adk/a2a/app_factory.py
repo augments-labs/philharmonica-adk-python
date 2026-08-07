@@ -1,13 +1,13 @@
-"""``build_starlette_app`` — turn an :class:`A2AServer` config into an ASGI app.
+"""``build_starlette_app`` — turn an ``A2AServer`` config into an ASGI app.
 
 This is the factory that composes:
 
-* :class:`A2AExecutor` (server-side bridge to ``Runner.arun``)
-* :class:`a2a.server.tasks.InMemoryTaskStore` (or the caller's
-  :class:`TaskStore`)
-* :class:`a2a.server.request_handlers.DefaultRequestHandler` (a2a-sdk's
+* ``A2AExecutor`` (server-side bridge to ``Runner.arun``)
+* ``a2a.server.tasks.InMemoryTaskStore`` (or the caller's
+  ``TaskStore``)
+* ``a2a.server.request_handlers.DefaultRequestHandler`` (a2a-sdk's
   request-handling glue)
-* :class:`starlette.applications.Starlette` (the ASGI app)
+* ``starlette.applications.Starlette`` (the ASGI app)
 
 into a runnable Starlette app the developer's own ASGI server (uvicorn,
 hypercorn, granian) serves.
@@ -78,7 +78,7 @@ logger = logging.getLogger(__name__)
 
 
 def build_starlette_app(server: A2AServer) -> Starlette:
-    """Build a Starlette ASGI app from an :class:`A2AServer` config.
+    """Build a Starlette ASGI app from an ``A2AServer`` config.
 
     The returned app exposes:
 
@@ -89,26 +89,26 @@ def build_starlette_app(server: A2AServer) -> Starlette:
       handling ``send_message`` (blocking and streaming),
       ``get_task``, ``cancel_task``, ``list_tasks``, and the push
       notification config endpoints. SSE responses are emitted by the
-      a2a-sdk's :class:`EventSourceResponse` for streaming methods.
+      a2a-sdk's ``EventSourceResponse`` for streaming methods.
 
     When ``server.task_store is None``, the factory installs an
-    :class:`InMemoryTaskStore`. **Production callers MUST provide a
+    ``InMemoryTaskStore``. **Production callers MUST provide a
     persistent ``task_store``** — the in-memory store loses every
     task on server restart, which breaks the
-    :class:`A2AContinuationToken` resume contract for any task that
+    ``A2AContinuationToken`` resume contract for any task that
     outlives the process.
 
     ``server.executor_task_store`` is forwarded to the
-    :class:`A2AExecutor` for its own task-snapshot persistence. When
+    ``A2AExecutor`` for its own task-snapshot persistence. When
     ``None`` (default) the executor uses an in-memory store; pass a
-    :class:`~philharmonica.adk.a2a.task_store.SQLiteTaskStore` for
+    ``SQLiteTaskStore`` for
     executor-level restart recovery via its ``recover_on_startup``.
 
     Args:
-        server: The frozen :class:`A2AServer` config to materialise.
+        server: The frozen ``A2AServer`` config to materialise.
 
     Returns:
-        A :class:`starlette.applications.Starlette` ASGI app, ready
+        A ``starlette.applications.Starlette`` ASGI app, ready
         for the caller's ASGI runtime to serve.
     """
     task_store = server.task_store if server.task_store is not None else InMemoryTaskStore()

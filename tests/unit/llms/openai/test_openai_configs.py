@@ -1,12 +1,12 @@
 """Tests for OpenAI config dataclasses.
 
-Verifies that :class:`OpenAIResponsesConfig` and
-:class:`OpenAIChatCompletionsConfig`:
+Verifies that ``OpenAIResponsesConfig`` and
+``OpenAIChatCompletionsConfig``:
 
 - Default every field to ``None`` (unset).
-- Inherit all provider-agnostic :class:`LLMConfig` fields unchanged.
+- Inherit all provider-agnostic ``LLMConfig`` fields unchanged.
 - Round-trip ``openai.types.*`` field values verbatim (no translation).
-- Merge correctly via :meth:`LLMConfig.resolve` — override wins per field,
+- Merge correctly via ``LLMConfig.resolve`` — override wins per field,
   ``extra_args`` deep-merges.
 """
 

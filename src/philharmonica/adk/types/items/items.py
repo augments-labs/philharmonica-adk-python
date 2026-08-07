@@ -459,7 +459,7 @@ class MCPApprovalResponseItem(RunItemBase["MCPApprovalResponse"]):
 class ProviderItem(RunItemBase["LLMResponseProviderItem"]):
     """A provider-hosted tool output item (generic catch-all).
 
-    Wraps :class:`LLMResponseProviderItem`. Created when a provider
+    Wraps ``LLMResponseProviderItem``. Created when a provider
     (currently: OpenAI Responses API) emits a hosted-tool output that
     does not fit the function-call / text / reasoning / refusal
     taxonomy — e.g. ``file_search_call``, ``web_search_call``,

@@ -1,6 +1,6 @@
 """Reference resolution for declarative agent configuration.
 
-:func:`resolve_dotted_spec` turns a dotted-path string in a config document
+``resolve_dotted_spec`` turns a dotted-path string in a config document
 (a tool function, an output-schema class, an edge-condition predicate) into
 the live Python object it names.
 

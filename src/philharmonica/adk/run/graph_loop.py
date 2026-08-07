@@ -1,33 +1,33 @@
-"""``run_graph_loop`` — BSP superstep driver for :class:`Graph` execution.
+"""``run_graph_loop`` — BSP superstep driver for ``Graph`` execution.
 
-This is the graph-world counterpart of :func:`run_swarm_loop`. The
+This is the graph-world counterpart of ``run_swarm_loop``. The
 driver owns:
 
 - **Scheduling** — at the top of each superstep, it computes the set of
   ready nodes (entry on the first pass; all nodes whose
-  :class:`JoinBarrier` is satisfied thereafter).
+  ``JoinBarrier`` is satisfied thereafter).
 - **Concurrent execution** — ready nodes run concurrently via
-  :func:`asyncio.wait` with ``FIRST_COMPLETED`` so a fail-fast error
+  ``asyncio.wait`` with ``FIRST_COMPLETED`` so a fail-fast error
   cancels siblings as early as possible. On happy paths the loop
-  degrades to :func:`asyncio.gather` semantics (all results before
+  degrades to ``asyncio.gather`` semantics (all results before
   barrier).
 - **Deterministic state-apply** — after all ready tasks complete, the
-  loop applies their results into :class:`GraphState` sorted by node
+  loop applies their results into ``GraphState`` sorted by node
   id. This matches LangGraph's path-sorted write application and
   guarantees reducers run in a stable order regardless of completion
   order.
 - **Edge evaluation** — for each completed node, outgoing edges fire
   (subject to their ``when`` predicate). Each firing records the
-  upstream's :class:`NodeResult` on the target's :class:`JoinBarrier`.
+  upstream's ``NodeResult`` on the target's ``JoinBarrier``.
 - **Terminal tracking** — terminal outputs are copied off as they fire
   and the loop exits once every terminal has fired at least once
   (OR-semantics — exit on ``any``; an AND-all-terminals flag is not
   yet implemented).
-- **Budget guards** — :attr:`GraphConfig.max_supersteps` /
-  :attr:`GraphConfig.max_total_tokens` trip the loop.
-- **Hook fan-out** — :class:`HookRegistry` is wired once at top,
-  fired at every documented boundary. :class:`Checkpointer`\\ s subscribe
-  via :meth:`HookProvider.register` and persist state on
+- **Budget guards** — ``GraphConfig.max_supersteps`` /
+  ``GraphConfig.max_total_tokens`` trip the loop.
+- **Hook fan-out** — ``HookRegistry`` is wired once at top,
+  fired at every documented boundary. ``Checkpointer``\\ s subscribe
+  via ``HookProvider.register`` and persist state on
   ``on_node_end`` — the loop itself never calls ``save()``.
 
 Deliberate non-goals:
@@ -35,7 +35,7 @@ Deliberate non-goals:
 - No dynamic fan-out (``Send``-equivalent).
 
 The loop never re-enters ``run_agent_loop`` with a graph-specific
-next-step. :meth:`Executable.invoke` is the only delegation seam.
+next-step. ``Executable.invoke`` is the only delegation seam.
 """
 
 from __future__ import annotations
@@ -131,7 +131,7 @@ class TaskTracker(Protocol):
 def _generate_thread_id() -> str:
     """Auto-generate a ``thread-XXXX`` id when checkpointing is opted in.
 
-    Matches :func:`philharmonica.adk.graphs.graph._generate_graph_id` in format
+    Matches ``philharmonica.adk.graphs.graph._generate_graph_id`` in format
     so ``graph-<id>`` and ``thread-<id>`` read alike in logs. 12 hex
     chars (~48 bits of entropy) is more than enough to avoid collisions
     within a single process lifetime.
@@ -142,7 +142,7 @@ def _generate_thread_id() -> str:
 def _build_join_barriers(
     graph: Graph[Any],
 ) -> dict[str, JoinBarrier]:
-    """Compute a :class:`JoinBarrier` for every node with ≥1 incoming edge.
+    """Compute a ``JoinBarrier`` for every node with ≥1 incoming edge.
 
     Entry nodes have zero incoming edges and therefore no barrier
     (they fire on the first superstep by construction). Single-parent
@@ -151,7 +151,7 @@ def _build_join_barriers(
     cost is negligible.
 
     The barrier's ``semantics`` is read from the target
-    :class:`GraphNode`. Most graphs keep the AND default; fan-in-
+    ``GraphNode``. Most graphs keep the AND default; fan-in-
     heavy workflows (race-to-respond patterns) set OR on the join node.
     """
     barriers: dict[str, JoinBarrier] = {}
@@ -171,10 +171,10 @@ async def _eval_edge_predicate(
     predicate: Any,
     result: NodeResult[Any],
 ) -> bool:
-    """Evaluate a possibly-async :class:`EdgeCondition` predicate.
+    """Evaluate a possibly-async ``EdgeCondition`` predicate.
 
-    :class:`EdgeCondition` MAY be sync or async. We call it, detect an
-    awaitable via :func:`inspect.isawaitable`, await if needed, and
+    ``EdgeCondition`` MAY be sync or async. We call it, detect an
+    awaitable via ``inspect.isawaitable``, await if needed, and
     coerce the return to ``bool`` so downstream can rely on a strict
     type.
     """
@@ -194,10 +194,10 @@ async def _invoke_node(
     context: RunContext[Any],
     config: RunConfig,
 ) -> NodeResult[Any]:
-    """Invoke a single node's :meth:`Executable.invoke`.
+    """Invoke a single node's ``Executable.invoke``.
 
     Thin wrapper: looks up the node, calls ``.executable.invoke(...)``.
-    Kept out of the main loop body so that :func:`asyncio.create_task`
+    Kept out of the main loop body so that ``asyncio.create_task``
     sees a single awaitable per node and the task name is easy to
     attribute in traces.
     """
@@ -226,11 +226,11 @@ async def _stream_node(
     graph_path: tuple[str, ...],
     result: GraphRunResultStreaming[Any],
 ) -> NodeResult[Any]:
-    """Run one node via :meth:`Executable.stream_async`, forwarding interior events.
+    """Run one node via ``Executable.stream_async``, forwarding interior events.
 
-    The default :meth:`Executable.stream_async` yields exactly one terminal
+    The default ``Executable.stream_async`` yields exactly one terminal
     ``{"type": "result", "result": NodeResult}``; any non-result item is an
-    interior event forwarded wrapped in :class:`NodeStreamEvent`. Wrapped by
+    interior event forwarded wrapped in ``NodeStreamEvent``. Wrapped by
     the SP2 reliability policy so retry/timeout semantics are preserved.
     """
     node = graph.get_node(node_id)
@@ -271,7 +271,7 @@ async def _seed_barriers_from_checkpoint(
     JoinBarrier arrivals are never serialised, so on resume barriers
     are rebuilt empty. For each edge ``(u -> d)`` where
     ``state.produced_at[u] > state.versions_seen[d].get(u, -1)``, this
-    records ``u``'s persisted :class:`NodeResult` on ``d``'s barrier
+    records ``u``'s persisted ``NodeResult`` on ``d``'s barrier
     (or a skip when ``edge.when`` is False / raises). Already-consumed
     edges are not re-delivered, so completed nodes do not re-execute.
     """
@@ -330,10 +330,10 @@ def _setup_graph_run(
     thread_id: str | None,
     initial_state: GraphState[Any] | None,
 ) -> tuple[HookRegistry, GraphState[Any]]:
-    """Assemble the :class:`HookRegistry` and initial :class:`GraphState`.
+    """Assemble the ``HookRegistry`` and initial ``GraphState``.
 
     Returns the registry and state ready for the BSP loop. Callers must
-    await :func:`_seed_barriers_from_checkpoint` when ``initial_state``
+    await ``_seed_barriers_from_checkpoint`` when ``initial_state``
     is not ``None``.
     """
     registry = HookRegistry()
@@ -394,8 +394,8 @@ def _require_nested_snapshot(
 ) -> RunState:
     """Return the parked sub-agent snapshot for ``node_id``; raise if absent.
 
-    Caller is responsible for removal via :func:`_stage_nested_reply`.
-    The cross-reference check in :meth:`GraphState.from_dict` already
+    Caller is responsible for removal via ``_stage_nested_reply``.
+    The cross-reference check in ``GraphState.from_dict`` already
     guards loaded payloads — this is the in-process counterpart that
     refuses to dispatch a nested-resume without a paired snapshot.
     """
@@ -420,8 +420,8 @@ def _stage_nested_reply(
     """Write the staged reply + snapshot onto the prepared input + state.
 
     Centralised so the approval and rejection branches both clear
-    :attr:`GraphState.pending_interrupts` and
-    :attr:`GraphState.nested_agent_snapshots` identically — splitting the
+    ``GraphState.pending_interrupts`` and
+    ``GraphState.nested_agent_snapshots`` identically — splitting the
     metadata-write from the state-pop avoided dropping one branch's
     cleanup as the function grew.
     """
@@ -436,10 +436,10 @@ def _require_agent_executable_for_nested_resume(
     graph: Graph[Any],
     node_id: str,
 ) -> AgentExecutable[Any]:
-    """Return the node's executable narrowed to :class:`AgentExecutable`.
+    """Return the node's executable narrowed to ``AgentExecutable``.
 
-    Raises :class:`GraphResumeError` synchronously when the node parked
-    on a :class:`NestedAgentInterrupt` is now backed by a non-Agent
+    Raises ``GraphResumeError`` synchronously when the node parked
+    on a ``NestedAgentInterrupt`` is now backed by a non-Agent
     executable — the graph shape must have changed between checkpoint
     and resume.
     """
@@ -459,7 +459,7 @@ def _synthesise_rejection_reply(
     snap: RunState,
     message: str,
 ) -> NestedAgentReply:
-    """Build a :class:`NestedAgentReply` rejecting every pending approval.
+    """Build a ``NestedAgentReply`` rejecting every pending approval.
 
     Raises:
         GraphResumeError: When ``snap.deferred_tool_requests.approvals``
@@ -488,10 +488,10 @@ def _inject_nested_agent_resume(
     prepared_input: ExecutableInput,
     state: GraphState[Any],
 ) -> None:
-    """Stage a :class:`NestedAgentInterrupt` resume payload on the node's input.
+    """Stage a ``NestedAgentInterrupt`` resume payload on the node's input.
 
-    Translates the human-supplied :class:`NestedAgentReply` (or a bare
-    decline message under :attr:`GraphResume.rejected`) into reserved
+    Translates the human-supplied ``NestedAgentReply`` (or a bare
+    decline message under ``GraphResume.rejected``) into reserved
     metadata keys, runs the executable-type guard synchronously so any
     mismatch propagates to the outer
     ``except GraphResumeError: raise`` rather than being absorbed by
@@ -500,7 +500,7 @@ def _inject_nested_agent_resume(
 
     Raises:
         GraphResumeError: On type-incompatible reply, missing snapshot,
-            or executable that is no longer an :class:`AgentExecutable`.
+            or executable that is no longer an ``AgentExecutable``.
     """
     _require_agent_executable_for_nested_resume(graph=graph, node_id=node_id)
     if node_id in resume.replies:
@@ -548,11 +548,11 @@ def _inject_nested_graph_resume(
 ) -> None:
     """Stage a graph-backed nested resume payload on the node's input.
 
-    Sibling of :func:`_inject_nested_agent_resume` for nodes whose
-    executable is a :class:`Graph` (not an :class:`Agent`) and whose
-    inner graph suspended. The outer reply (a :class:`NestedAgentReply`)
+    Sibling of ``_inject_nested_agent_resume`` for nodes whose
+    executable is a ``Graph`` (not an ``Agent``) and whose
+    inner graph suspended. The outer reply (a ``NestedAgentReply``)
     is forwarded to the inner-graph's deferring agent by the dispatch
-    helper :func:`_dispatch_inner_graph_resume`.
+    helper ``_dispatch_inner_graph_resume``.
 
     Pops ``state.pending_interrupts[node_id]`` and
     ``state.nested_graph_snapshots[node_id]`` once staged.
@@ -560,7 +560,7 @@ def _inject_nested_graph_resume(
     Raises:
         GraphResumeError: When ``state.nested_graph_snapshots`` has no
             matching entry, or when the supplied reply is not a
-            :class:`NestedAgentReply`.
+            ``NestedAgentReply``.
     """
     if node_id not in state.nested_graph_snapshots:
         raise GraphResumeError(
@@ -623,11 +623,11 @@ def _inject_resume_for_node(
 ) -> None:
     """Dispatch one node's resume payload kind-aware.
 
-    Branches on the parked :class:`Interrupt` subtype: a
-    :class:`NestedAgentInterrupt` routes through
-    :func:`_inject_nested_agent_resume`; any other interrupt uses the
+    Branches on the parked ``Interrupt`` subtype: a
+    ``NestedAgentInterrupt`` routes through
+    ``_inject_nested_agent_resume``; any other interrupt uses the
     plain ``__resume_reply__`` channel consumed by
-    :func:`request_human_input`. Both branches pop the consumed
+    ``request_human_input``. Both branches pop the consumed
     ``pending_interrupts`` entry. A node missing from ``resume.replies``
     and ``resume.rejected`` re-suspends naturally on the next invocation.
 
@@ -636,7 +636,7 @@ def _inject_resume_for_node(
     ``state.nested_graph_snapshots`` has an entry for ``node_id`` the
     graph-backed seed path runs, populating the
     ``__nested_graph_*__`` metadata keys consumed by
-    :func:`_dispatch_inner_graph_resume`.
+    ``_dispatch_inner_graph_resume``.
 
     Raises:
         GraphResumeError: When the same ``node_id`` appears in BOTH
@@ -693,20 +693,20 @@ def _seed_interrupt_side_channel(
     Combines two passes the BSP loop would otherwise run back-to-back:
 
     1. Seed two reserved metadata keys on each prepared input —
-       ``__interrupt_node_id__`` (read by :func:`request_human_input`
-       to build the parked :class:`Interrupt`) and
+       ``__interrupt_node_id__`` (read by ``request_human_input``
+       to build the parked ``Interrupt``) and
        ``__nested_agent_snapshots__`` (a reference to the same
-       :attr:`GraphState.nested_agent_snapshots` dict the
-       :meth:`AgentExecutable.invoke` catch path writes into — no copy,
+       ``GraphState.nested_agent_snapshots`` dict the
+       ``AgentExecutable.invoke`` catch path writes into — no copy,
        no marshalling).
     2. When ``resume`` is supplied, dispatch each node's resume payload
-       kind-aware via :func:`_inject_resume_for_node`. Nodes missing
+       kind-aware via ``_inject_resume_for_node``. Nodes missing
        from both ``resume.replies`` and ``resume.rejected`` re-suspend
        naturally on the next invocation.
 
     Raises:
         GraphResumeError: Propagated from
-            :func:`_inject_nested_agent_resume` when the resume payload
+            ``_inject_nested_agent_resume`` when the resume payload
             is incompatible with the parked interrupt.
     """
     for node_id in ready_nodes:
@@ -736,30 +736,30 @@ async def _dispatch_inner_graph_resume(
 
     Forwards the outer caller's reply to the lexicographically-first inner
     pending interrupt (the one that surfaced as the outer interrupt). The
-    reply is a :class:`NestedAgentReply` when the inner interrupt is a
-    :class:`NestedAgentInterrupt`, or a plain value when the inner interrupt
-    is a plain :class:`Interrupt` (lifted as a :class:`NestedGraphInterrupt`)
+    reply is a ``NestedAgentReply`` when the inner interrupt is a
+    ``NestedAgentInterrupt``, or a plain value when the inner interrupt
+    is a plain ``Interrupt`` (lifted as a ``NestedGraphInterrupt``)
     — the inner graph's own ``_inject_resume_for_node`` routes each kind. If
     the inner still has pending
     interrupts after the resume (multi-interrupt fan-out case), lifts
     the next inner interrupt to a fresh outer
-    :class:`InterruptException` so the outer node fires again for the
+    ``InterruptException`` so the outer node fires again for the
     next caller reply.
 
     Args:
         outer_graph: Compiled outer graph (caller of ``Graph.invoke``).
-        outer_node_id: Outer node whose executable is a :class:`Graph`.
-        inner_graph_state: The parked inner :class:`GraphState` (read
+        outer_node_id: Outer node whose executable is a ``Graph``.
+        inner_graph_state: The parked inner ``GraphState`` (read
             from the outer state's
             ``nested_graph_snapshots[outer_node_id]`` by the seed
             phase, then staged on prepared_input.metadata).
-        outer_reply: The :class:`NestedAgentReply` the caller composed
+        outer_reply: The ``NestedAgentReply`` the caller composed
             against ``outer_node_id``.
         context: Outer run context, forwarded into the inner re-entry.
         config: Outer run config, forwarded.
 
     Returns:
-        A :class:`NodeResult` when the inner graph completes.
+        A ``NodeResult`` when the inner graph completes.
 
     Raises:
         InterruptException: When the inner still has pending
@@ -769,7 +769,7 @@ async def _dispatch_inner_graph_resume(
             ``GraphState`` on ``_nested_graph_state`` for re-parking by
             the outer catch.
         Exception: When the inner fails (re-raised as a wrapped
-            :class:`RuntimeError`).
+            ``RuntimeError``).
     """
     inner_graph = cast("Graph[Any]", outer_graph.get_node(outer_node_id).executable)
 
@@ -873,14 +873,14 @@ async def _dispatch_nested_resume(
     state: GraphState[Any],
     is_streaming: bool,
 ) -> NodeResult[Any]:
-    """Route a staged nested-agent resume through :meth:`resume_from_snapshot`.
+    """Route a staged nested-agent resume through ``resume_from_snapshot``.
 
-    Verifies the node's executable is still an :class:`AgentExecutable`
+    Verifies the node's executable is still an ``AgentExecutable``
     (the seed-phase guard already rejected the mismatch case; this is a
     defensive re-check) and emits a warning when a streamed driver
     routes through the non-streaming resume bridge — interior
     ``agent_event`` items will not be forwarded as
-    :class:`NodeStreamEvent` during the resumed turn.
+    ``NodeStreamEvent`` during the resumed turn.
     """
     executable = graph.get_node(node_id).executable
     if not isinstance(executable, AgentExecutable):
@@ -916,8 +916,8 @@ async def _call_error_handler(
     """Call the effective error handler for ``node_id`` and return its result.
 
     Resolution order:
-    1. :attr:`~philharmonica.adk.graphs.node.GraphNode.on_error` on the node.
-    2. :attr:`~philharmonica.adk.graphs.config.GraphConfig.default_error_handler`.
+    1. ``on_error`` on the node.
+    2. ``default_error_handler``.
     3. ``None`` (caller re-raises original exception).
 
     The handler is awaited when its return value is awaitable so both sync
@@ -925,12 +925,12 @@ async def _call_error_handler(
     INSIDE the handler propagates directly — no suppression.
 
     Args:
-        graph: The compiled :class:`~philharmonica.adk.graphs.graph.Graph`.
+        graph: The compiled ``Graph``.
         node_id: Id of the node whose execution failed.
         exc: The exception raised after all retry attempts were exhausted.
 
     Returns:
-        A fallback :class:`~philharmonica.adk.orchestration.executable.NodeResult`
+        A fallback ``NodeResult``
         when the handler returns one, or ``None`` when no handler is
         configured or the handler itself returns ``None``.
     """
@@ -959,12 +959,12 @@ async def _dispatch_node(
 
     Pops the staged nested-agent reply + snapshot from the prepared
     input's metadata. When both are present, routes through
-    :func:`_dispatch_nested_resume` so the resumed sub-agent
-    re-applies decisions to the paused :class:`RunState` instead of
+    ``_dispatch_nested_resume`` so the resumed sub-agent
+    re-applies decisions to the paused ``RunState`` instead of
     starting over. When both are absent, delegates to ``node_runner``
     so the standard invoke / stream paths run unchanged. A half-formed
     pair (exactly one of the two reserved keys present) raises
-    :class:`GraphResumeError` — the seed phase normally rejects such
+    ``GraphResumeError`` — the seed phase normally rejects such
     payloads earlier.
 
     Raises:
@@ -1139,20 +1139,20 @@ async def _reconstruct_arrivals_from_state(
     node_id: str,
     state: GraphState[Any],
 ) -> tuple[list[NodeResult[Any]], list[str]]:
-    """Rebuild a parked node's upstream arrivals from :attr:`GraphState.node_results`.
+    """Rebuild a parked node's upstream arrivals from ``GraphState.node_results``.
 
-    Used when a node parked on an :class:`Interrupt` re-readies on resume
-    but its :class:`JoinBarrier` is empty — the upstream(s) fired during
+    Used when a node parked on an ``Interrupt`` re-readies on resume
+    but its ``JoinBarrier`` is empty — the upstream(s) fired during
     the suspending superstep, the barrier was consumed there, and
-    :func:`_seed_barriers_from_checkpoint` correctly skipped re-delivery
+    ``_seed_barriers_from_checkpoint`` correctly skipped re-delivery
     because ``produced_at == versions_seen``. Without this reconstruction
     the resumed node would receive empty input, masking the parked
-    interrupt's question for plain :func:`request_human_input` HITL.
+    interrupt's question for plain ``request_human_input`` HITL.
 
     For each incoming edge of ``node_id``, looks up the upstream's
-    persisted :class:`NodeResult` in ``state.node_results`` and includes
+    persisted ``NodeResult`` in ``state.node_results`` and includes
     it — but only when the edge's ``when`` predicate fires, exactly as
-    :func:`_seed_barriers_from_checkpoint` decides live delivery. An edge
+    ``_seed_barriers_from_checkpoint`` decides live delivery. An edge
     whose predicate returns ``False`` (or raises) is excluded, so the
     resumed node never sees content from a branch that never fired.
     Upstreams with no persisted result are skipped (a defensive guard —
@@ -1160,14 +1160,14 @@ async def _reconstruct_arrivals_from_state(
     to reach the suspending superstep at all).
 
     Args:
-        graph: The compiled :class:`Graph` (used for edge lookup).
+        graph: The compiled ``Graph`` (used for edge lookup).
         node_id: Id of the parked node whose input we are rebuilding.
-        state: Current :class:`GraphState`.
+        state: Current ``GraphState``.
 
     Returns:
         ``(results, sources)``: Parallel lists of upstream
-        :class:`NodeResult` values and their source node ids, sorted by
-        source id for determinism (matches :meth:`JoinBarrier.consume`).
+        ``NodeResult`` values and their source node ids, sorted by
+        source id for determinism (matches ``JoinBarrier.consume``).
     """
     upstream_results: dict[str, NodeResult[Any]] = {}
     for edge in graph.incoming_edges(node_id):
@@ -1202,9 +1202,9 @@ async def _cancel_pending_node_tasks(
 
     Called on every exit from a superstep's task-wait loop — normal
     completion (a no-op: all tasks already done), a fail-fast break, an
-    operator-actionable :class:`GraphResumeError` re-raised from inside the
-    loop, or an external :class:`asyncio.CancelledError` (the driver task
-    cancelled from outside). :func:`asyncio.wait` never cancels the futures
+    operator-actionable ``GraphResumeError`` re-raised from inside the
+    loop, or an external ``asyncio.CancelledError`` (the driver task
+    cancelled from outside). ``asyncio.wait`` never cancels the futures
     it waits on, so a cancelled driver would otherwise orphan its running
     node tasks — surfacing as "Task was destroyed but it is pending" /
     "Task exception was never retrieved". Cancelling first (synchronous,
@@ -1228,9 +1228,9 @@ def _resolve_edge_label(
     """Return the label of the single triggering edge, or ``None``.
 
     Only meaningful when exactly one upstream delivered — this mirrors
-    :attr:`ExecutableInput.from_node`, which is likewise ``None`` for a
+    ``ExecutableInput.from_node``, which is likewise ``None`` for a
     multi-input fan-in. When one source arrived, returns the
-    :attr:`GraphEdge.label` of the ``source -> node_id`` edge that fired so
+    ``GraphEdge.label`` of the ``source -> node_id`` edge that fired so
     the downstream adapter can route on which branch delivered (e.g.
     "approved" vs "rejected"). The label is left ``None`` on the entry
     node (no incoming edge) and on any fan-in.
@@ -1252,7 +1252,7 @@ async def _prepare_superstep_inputs(
     state: GraphState[Any],
     user_prompt: UserPrompt,
 ) -> dict[str, ExecutableInput]:
-    """Build each ready node's :class:`ExecutableInput` for this superstep.
+    """Build each ready node's ``ExecutableInput`` for this superstep.
 
     Entry (barrier-less) nodes bootstrap from ``user_prompt``. Barrier nodes
     consume their arrivals; when a parked-interrupt node re-readies with an
@@ -1317,10 +1317,10 @@ async def _apply_completed_results(
 
     Applied in node-id-sorted order for deterministic reducer behaviour.
     Each result is recorded on ``state``, ``on_node_end`` fires, a
-    :class:`NodeEndEvent` is emitted, terminal outputs are captured, and
+    ``NodeEndEvent`` is emitted, terminal outputs are captured, and
     every outgoing edge evaluates its ``when`` predicate — recording a real
     arrival, a fail-closed failure (predicate raised), or a skip (predicate
-    ``False``) on the target node's :class:`JoinBarrier`.
+    ``False``) on the target node's ``JoinBarrier``.
     """
     for nid in sorted(completed_results.keys()):
         node_result = completed_results[nid]
@@ -1399,9 +1399,9 @@ async def _run_bsp_loop(
     tasks complete but no new superstep is started), an optional ``resume``
     payload that delivers human replies to pending interrupt nodes on the
     first superstep, and ``is_streaming`` (``True`` when driven from
-    :func:`run_graph_loop_streamed`) so the dispatch layer can warn when a
+    ``run_graph_loop_streamed``) so the dispatch layer can warn when a
     streaming run routes through the non-streaming
-    :meth:`AgentExecutable.resume_from_snapshot` bridge.
+    ``AgentExecutable.resume_from_snapshot`` bridge.
     """
     first_pass = state.superstep == 0
     status: GraphRunStatus = GraphRunStatus.COMPLETED
@@ -1838,13 +1838,13 @@ async def run_graph_loop(
     emit: EventEmitter = _noop_emitter,
     resume: GraphResume | None = None,
 ) -> GraphRunResult[Any]:
-    """Execute a :class:`Graph` end-to-end.
+    """Execute a ``Graph`` end-to-end.
 
     The driver is BSP-structured:
 
-    1. Build the :class:`HookRegistry`, fire :meth:`on_graph_start`.
-    2. Initialise (or restore) :class:`GraphState` and
-       :class:`JoinBarrier`\\ s.
+    1. Build the ``HookRegistry``, fire ``on_graph_start``.
+    2. Initialise (or restore) ``GraphState`` and
+       ``JoinBarrier``\\ s.
     3. Superstep loop until (a) every terminal has fired at least once,
        (b) ``max_supersteps`` hit, (c) ``max_total_tokens`` hit, or
        (d) no more ready nodes and no terminals fired
@@ -1853,34 +1853,34 @@ async def run_graph_loop(
        tasks → wait (fail-fast aware) → apply results sorted by id →
        fire outgoing edges → check terminals.
     5. On exit, populate ``final_output`` and fire
-       :meth:`on_graph_end` / build :class:`GraphRunResult`.
+       ``on_graph_end`` / build ``GraphRunResult``.
 
     Args:
-        graph: The compiled :class:`Graph` to run.
+        graph: The compiled ``Graph`` to run.
         user_prompt: Initial input for the entry node's first firing.
-        context: Shared :class:`RunContext`. Usage from nested
+        context: Shared ``RunContext``. Usage from nested
             executables accumulates here.
-        config: :class:`RunConfig` — threaded to every nested invoke.
-        hooks: Optional list of :class:`GraphHooks` or
-            :class:`HookProvider` (e.g. a :class:`Checkpointer`) to
-            attach. Combined with :attr:`Graph.hooks`.
+        config: ``RunConfig`` — threaded to every nested invoke.
+        hooks: Optional list of ``GraphHooks`` or
+            ``HookProvider`` (e.g. a ``Checkpointer``) to
+            attach. Combined with ``Graph.hooks``.
         thread_id: Opt-in identifier for checkpointing. When provided
-            and a :class:`Checkpointer` is attached, per-node saves
+            and a ``Checkpointer`` is attached, per-node saves
             fire. When ``None`` and a checkpointer is attached, the
             loop auto-generates a ``thread-XXXX`` id; the checkpointer
             skips writes when state.thread_id is ``None``.
-        initial_state: Optional pre-existing :class:`GraphState` from a
+        initial_state: Optional pre-existing ``GraphState`` from a
             restored checkpoint. When supplied, the loop skips
             initialisation and resumes from ``state.superstep + 1``.
         resume: Optional human replies for pending interrupt nodes.
             When supplied, the loop injects each reply into the matching
-            node's :class:`ExecutableInput` metadata on the first
+            node's ``ExecutableInput`` metadata on the first
             superstep where that node is ready, then clears the consumed
-            entry from :attr:`GraphState.pending_interrupts`. Nodes
+            entry from ``GraphState.pending_interrupts``. Nodes
             with no matching reply in ``resume`` re-suspend naturally.
 
     Returns:
-        A :class:`GraphRunResult` with terminal output, status, and
+        A ``GraphRunResult`` with terminal output, status, and
         per-node attribution.
 
     Raises:
@@ -1987,38 +1987,38 @@ async def run_graph_loop_streamed(
     initial_state: GraphState[Any] | None = None,
     resume: GraphResume | None = None,
 ) -> None:
-    """Streaming twin of :func:`run_graph_loop`.
+    """Streaming twin of ``run_graph_loop``.
 
     Drives the same BSP superstep loop but forwards every
-    :class:`GraphStreamEvent` to ``result`` via
-    :meth:`GraphRunResultStreaming.put_event`. Interior events from
-    :meth:`Executable.stream_async` are wrapped in
-    :class:`NodeStreamEvent` before forwarding. On completion, terminal
+    ``GraphStreamEvent`` to ``result`` via
+    ``GraphRunResultStreaming.put_event``. Interior events from
+    ``Executable.stream_async`` are wrapped in
+    ``NodeStreamEvent`` before forwarding. On completion, terminal
     fields on ``result`` are populated and
-    :meth:`GraphRunResultStreaming.complete` is called to unblock
-    consumers of :meth:`GraphRunResultStreaming.stream_events`.
+    ``GraphRunResultStreaming.complete`` is called to unblock
+    consumers of ``GraphRunResultStreaming.stream_events``.
 
     ``result.cancel(mode="after_superstep")`` requests cooperative
     termination at the next superstep boundary; the driver checks
-    :attr:`GraphRunResultStreaming.cancel_mode` before each superstep.
+    ``GraphRunResultStreaming.cancel_mode`` before each superstep.
     ``result.cancel(mode="immediate")`` cancels the driver task and
     all in-flight node tasks directly (tracked via
-    :meth:`~GraphRunResultStreaming.register_node_task` /
-    :meth:`~GraphRunResultStreaming.discard_node_task`).
+    ``register_node_task`` /
+    ``discard_node_task``).
 
     Args:
-        graph: The compiled :class:`Graph` to run.
+        graph: The compiled ``Graph`` to run.
         user_prompt: Initial input for the entry node.
-        context: Shared :class:`RunContext`.
-        config: :class:`RunConfig` threaded to every nested invoke.
-        result: Pre-created :class:`GraphRunResultStreaming` that the
+        context: Shared ``RunContext``.
+        config: ``RunConfig`` threaded to every nested invoke.
+        result: Pre-created ``GraphRunResultStreaming`` that the
             caller has already handed to the consumer.
-        hooks: Optional :class:`GraphHooks` / :class:`HookProvider` list.
+        hooks: Optional ``GraphHooks`` / ``HookProvider`` list.
         thread_id: Opt-in checkpointing thread identifier.
-        initial_state: Optional restored :class:`GraphState` for resume.
+        initial_state: Optional restored ``GraphState`` for resume.
         resume: Optional human replies for pending interrupt nodes.
-            Threaded to :func:`_run_bsp_loop` which injects each reply
-            into the matching node's :class:`ExecutableInput` metadata.
+            Threaded to ``_run_bsp_loop`` which injects each reply
+            into the matching node's ``ExecutableInput`` metadata.
     """
     registry, state = _setup_graph_run(
         graph=graph,
@@ -2145,11 +2145,11 @@ async def run_graph_loop_streamed(
 def _has_checkpointer(
     hooks: list[GraphHooks[Any] | HookProvider] | None,
 ) -> bool:
-    """Return ``True`` if any attached hook is a :class:`HookProvider`.
+    """Return ``True`` if any attached hook is a ``HookProvider``.
 
     Used to decide whether to auto-generate a ``thread_id`` when one
     was not supplied — the assumption being that if the caller
-    attached a :class:`Checkpointer` they want per-node persistence
+    attached a ``Checkpointer`` they want per-node persistence
     even without explicitly naming the thread.
     """
     if hooks is None:

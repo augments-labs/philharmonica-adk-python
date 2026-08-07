@@ -20,7 +20,7 @@ class MemorySource(StrEnum):
     """Injected directly by the developer."""
 
     TOOL = "tool"
-    """Added by an agent via :class:`MemoryTool`."""
+    """Added by an agent via ``MemoryTool``."""
 
 
 class MemoryKind(StrEnum):

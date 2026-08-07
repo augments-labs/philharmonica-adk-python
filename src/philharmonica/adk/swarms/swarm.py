@@ -74,10 +74,10 @@ class _Unset:
 
 
 _UNSET: Final = _Unset()
-"""Sentinel marking omitted constructor arguments (see :class:`_Unset`)."""
+"""Sentinel marking omitted constructor arguments (see ``_Unset``)."""
 
 DEFAULT_MAX_TURNS: int = 25
-"""Default member-turn cap used by :data:`DEFAULT_TERMINATION`.
+"""Default member-turn cap used by ``DEFAULT_TERMINATION``.
 
 Cost-conservative safety net: high enough that a well-behaved swarm
 (the shipped examples cap theirs at 6–20 turns) never trips it, low
@@ -124,23 +124,23 @@ class Swarm[TContext]:
     Attributes:
         members: The tuple of agents participating in the swarm.
             Tuple (not list) for immutability and stable iteration.
-            Order determines the default :class:`RoundRobinPolicy`
+            Order determines the default ``RoundRobinPolicy``
             rotation.
         entry: The agent that takes the first turn. The constructor
             also accepts the member *name* (resolved against the
             roster); this attribute is always an
-            :class:`~philharmonica.adk.agents.agent.Agent`.
-        policy: The routing policy. Default: :class:`LLMHandoffPolicy`
+            ``Agent``.
+        policy: The routing policy. Default: ``LLMHandoffPolicy``
             (LLM picks the next speaker via ``transfer_to_<name>``
             tools). MUST NOT be ``None``.
         termination: The termination condition. Default:
-            :data:`DEFAULT_TERMINATION` — explicit ``swarm_done`` or a
+            ``DEFAULT_TERMINATION`` — explicit ``swarm_done`` or a
             25-turn safety net. MUST NOT be ``None`` (an explicit
             ``None`` raises); explicit termination remains the contract
             — the default merely ships that contract pre-wired. See
-            :class:`~philharmonica.adk.swarms.termination.TerminationCondition`.
+            ``TerminationCondition``.
         config: Swarm-level budgets and limits. Default:
-            :class:`SwarmConfig` with cost-conservative settings.
+            ``SwarmConfig`` with cost-conservative settings.
         hooks: Optional swarm-level lifecycle hooks. Fires alongside
             ``RunHooks`` and ``AgentHooks``.
         name: Optional human-readable swarm name (parity with
@@ -148,7 +148,7 @@ class Swarm[TContext]:
             available for observability; not used by the driver.
         description: Optional human-readable blurb. Pure metadata.
         handoff_descriptions: Optional per-member descriptions used by
-            :class:`LLMHandoffPolicy` when it builds the
+            ``LLMHandoffPolicy`` when it builds the
             ``transfer_to_<member>`` tools — they tell the routing LLM
             *when* to route to each member (mirrors the OpenAI Agents
             SDK ``handoff_description``). Keys must be member names.
@@ -165,7 +165,7 @@ class Swarm[TContext]:
     entry: Agent[TContext]
     """The agent that takes the first turn. Construction also accepts the
     member *name* (see ``__init__``); the attribute is always an
-    :class:`~philharmonica.adk.agents.agent.Agent`."""
+    ``Agent``."""
 
     policy: SwarmPolicy[TContext] = field(default_factory=LLMHandoffPolicy)
     """Routing policy — who speaks next, what tools do they see?"""
@@ -215,20 +215,20 @@ class Swarm[TContext]:
                 is resolved against the roster here; unknown names raise
                 ``ValueError`` listing the valid names.
             policy: Routing policy. Omit for the default
-                :class:`LLMHandoffPolicy`. Passing ``None`` explicitly
+                ``LLMHandoffPolicy``. Passing ``None`` explicitly
                 is an error — it used to construct fine and crash the
                 driver with ``AttributeError`` mid-run.
             termination: Termination condition. Omit for
-                :data:`DEFAULT_TERMINATION`. ``None`` is an error —
+                ``DEFAULT_TERMINATION``. ``None`` is an error —
                 never terminate by absence.
             config: Swarm-level budgets. Omit for the default
-                :class:`SwarmConfig`. ``None`` is an error.
+                ``SwarmConfig``. ``None`` is an error.
             hooks: Optional swarm-level lifecycle hooks. ``None``
                 (the default) means no hooks.
             name: Optional human-readable swarm name (metadata only).
             description: Optional human-readable blurb (metadata only).
             handoff_descriptions: Optional per-member routing hints for
-                :class:`LLMHandoffPolicy` transfer tools.
+                ``LLMHandoffPolicy`` transfer tools.
 
         Raises:
             ValueError: On an explicit ``None`` for ``policy`` /
@@ -388,7 +388,7 @@ class Swarm[TContext]:
         """Pickle support: ``MappingProxyType`` is not picklable.
 
         Stores ``handoff_descriptions`` as a plain dict;
-        :meth:`__setstate__` re-wraps it on restore. Without this,
+        ``__setstate__`` re-wraps it on restore. Without this,
         ``pickle.dumps`` / ``copy.deepcopy`` on a Swarm raise
         ``TypeError: cannot pickle 'mappingproxy' object``.
         """
@@ -397,7 +397,7 @@ class Swarm[TContext]:
         return state
 
     def __setstate__(self, state: dict[str, Any]) -> None:
-        """Restore from :meth:`__getstate__`, re-wrapping the immutable mapping."""
+        """Restore from ``__getstate__``, re-wrapping the immutable mapping."""
         for key, value in state.items():
             object.__setattr__(self, key, value)
         object.__setattr__(
@@ -415,8 +415,8 @@ class Swarm[TContext]:
             description: Optional human-readable blurb (metadata only).
 
         Returns:
-            A :class:`~philharmonica.adk.swarms.builder.SwarmBuilder`;
-            call ``.compile()`` to produce the frozen :class:`Swarm`.
+            A ``SwarmBuilder``;
+            call ``.compile()`` to produce the frozen ``Swarm``.
         """
         from philharmonica.adk.swarms.builder import SwarmBuilder
 
@@ -426,14 +426,14 @@ class Swarm[TContext]:
         """Look up a member by name. Raises if not found.
 
         Used by the swarm driver when resolving
-        :class:`~philharmonica.adk.swarms.yield_signal.SwarmHandoff` targets.
+        ``SwarmHandoff`` targets.
 
         Args:
             name: The agent name to look up (matched by exact equality
                 against ``Agent.name``).
 
         Returns:
-            The matching :class:`~philharmonica.adk.agents.agent.Agent`
+            The matching ``Agent``
             instance.
 
         Raises:

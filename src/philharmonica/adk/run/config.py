@@ -43,12 +43,12 @@ logger = logging.getLogger(__name__)
 
 
 class ErrorHandler(Protocol):
-    """Protocol for exception recovery handlers on :attr:`RunConfig.error_handlers`.
+    """Protocol for exception recovery handlers on ``RunConfig.error_handlers``.
 
     A callable that receives the raised exception and returns a fallback
     ``final_output`` value.  Both synchronous and asynchronous callables
     are accepted: the runner awaits the return value when it is
-    :func:`inspect.isawaitable`.
+    ``inspect.isawaitable``.
 
     The return value is used directly as the run's ``final_output``; no
     schema re-validation is attempted.
@@ -67,10 +67,10 @@ type OnMaxTurnsHandler = Callable[
 
 Receives the agent that exhausted its budget and the turn count.
 Return a string to use as the run's final output (in which case the
-run completes normally) or ``None`` to let the :class:`MaxTurnsExceeded`
+run completes normally) or ``None`` to let the ``MaxTurnsExceeded``
 exception propagate.
 
-The swarm-level :attr:`RunConfig.max_total_turns` cap is **not** routed
+The swarm-level ``RunConfig.max_total_turns`` cap is **not** routed
 through this handler — it represents a runaway workflow, not a
 per-agent budget, and always raises.
 """
@@ -114,7 +114,7 @@ class ModelInputData:
 
     Note:
         Unlike OpenAI's ``ModelInputData``, this class does *not* carry a
-        separate ``instructions`` field. Philharmonica's :meth:`LLM.acomplete`
+        separate ``instructions`` field. Philharmonica's ``LLM.acomplete``
         takes the system prompt in-band as part of ``messages``; a filter
         that wants to rewrite the system prompt edits the message with
         ``role="system"`` in-place on ``input``.
@@ -126,7 +126,7 @@ class ModelInputData:
 
 @dataclass
 class CallModelData[TContext]:
-    """Payload handed to a :data:`CallModelInputFilter`.
+    """Payload handed to a ``CallModelInputFilter``.
 
     Wraps the mutable input plus the agent identity and run context so
     the filter can make context-aware edits (e.g. inject a per-user
@@ -158,9 +158,9 @@ type CallModelInputFilter = Callable[
 
 Runs on every turn, immediately before the LLM call, after context
 management and history processors, and before ``hooks.on_llm_start``.
-Receives a :class:`CallModelData` with the current agent, unwrapped run
-context, and a :class:`ModelInputData` wrapping a shallow copy of the
-input items list. Must return a :class:`ModelInputData` — either the
+Receives a ``CallModelData`` with the current agent, unwrapped run
+context, and a ``ModelInputData`` wrapping a shallow copy of the
+input items list. Must return a ``ModelInputData`` — either the
 same instance with edits applied, or a new one. May be sync or async.
 
 Use this to:
@@ -171,7 +171,7 @@ Use this to:
 - Implement application-level caching or deduplication
 
 For pure Layer 3 (``RunItem``) transforms, use
-:attr:`RunConfig.history_processors` instead.
+``RunConfig.history_processors`` instead.
 """
 
 
@@ -199,7 +199,7 @@ class RunConfig:
         context_management: Optional context management configuration
             (compaction, editing, token budget). ``None`` disables
             context management.
-        compaction_llm: Explicit :class:`~philharmonica.adk.llms.llm.LLM`
+        compaction_llm: Explicit ``LLM``
             instance for compaction calls. Falls back to the agent's
             primary LLM when ``None``.
         usage_limits: Token usage limits checked after each LLM
@@ -237,7 +237,7 @@ class RunConfig:
         max_parallel_tools: Maximum concurrent function tools per turn when
             parallel execution is active. ``None`` = unbounded gather (default).
             A positive integer *N* throttles via an asyncio semaphore.
-            ``0`` or negative raises :class:`ValueError` at execution time.
+            ``0`` or negative raises ``ValueError`` at execution time.
         error_handlers: Mapping from exception type to a recovery handler
             that returns a fallback ``final_output``.  ``None`` (the
             default) — all exceptions propagate unchanged.  Recovered runs
@@ -247,7 +247,7 @@ class RunConfig:
             the progress made before the error.
         include_hook_events: When ``True``, hook lifecycle moments (tool
             start/end, guardrail start/end) are emitted as first-class typed
-            :class:`~philharmonica.adk.run.stream.HookLifecycleEvent` stream events
+            ``HookLifecycleEvent`` stream events
             during streaming runs.  Off by default.
 
     Example:
@@ -285,9 +285,9 @@ class RunConfig:
     metrics_enabled: bool = False
     """Whether to emit OTel metric instruments for this run.
 
-    Independent of :attr:`tracing_enabled`: when ``True``, span objects
+    Independent of ``tracing_enabled``: when ``True``, span objects
     are created at every emission seam so a composed
-    :class:`~philharmonica.adk.tracing.metrics.MetricsTracer` records
+    ``MetricsTracer`` records
     instruments, even when span export is off. Default ``False`` — opt-in.
     """
 
@@ -300,9 +300,9 @@ class RunConfig:
     verbose: VerboseConfig | None = None
     """Configurable colourful output during execution.
 
-    When set to a :class:`~philharmonica.adk.verbose.VerboseConfig` with
+    When set to a ``VerboseConfig`` with
     ``enabled=True``, the runner installs a
-    :class:`~philharmonica.adk.verbose.VerboseHooks` instance that renders
+    ``VerboseHooks`` instance that renders
     lifecycle events (agent start/end, LLM calls, tool calls,
     handoffs, guardrails, skills, sessions) with per-event colours,
     icons, and prefixes.
@@ -344,7 +344,7 @@ class RunConfig:
 
     When set, every compaction call (the ``ContextManager`` pipeline,
     JIT ``CompactDirective``, and ``HandoffStrategy.SUMMARY``) routes
-    through this instance via :meth:`LLM.acomplete`. When ``None``
+    through this instance via ``LLM.acomplete``. When ``None``
     (the default), compaction falls back to the agent's resolved
     ``LLM`` — the same instance used for the main turn.
 
@@ -352,7 +352,7 @@ class RunConfig:
     expensive and a cheaper model is acceptable for summarisation
     (e.g. primary ``claude-opus-4-7`` + compaction ``claude-haiku-4-5``).
     Because the call goes through the ``LLM`` ABC, compaction tokens
-    land in :attr:`RunContext.usage` and ``Agent.middleware.llms`` sees
+    land in ``RunContext.usage`` and ``Agent.middleware.llms`` sees
     the call.
 
     Example::
@@ -367,7 +367,7 @@ class RunConfig:
     usage_limits: LLMUsageLimits | None = None
     """Token usage limits for the run.
 
-    Checked after each LLM response. Raises :class:`UsageLimitExceeded`
+    Checked after each LLM response. Raises ``UsageLimitExceeded``
     when any limit is exceeded. Each limit can be set independently;
     ``None`` disables that specific limit.
 
@@ -415,7 +415,7 @@ class RunConfig:
     """Append-only sink for tool-call audit events (default ``None`` =
     audit logging off). Each tool-call resolution (executed, denied, or
     errored) is recorded as a privacy-preserving
-    :class:`~philharmonica.adk.audit.AuditEvent` (hashes, not raw payloads).
+    ``AuditEvent`` (hashes, not raw payloads).
 
     Scope: covers ``FunctionTool`` calls and framework-executed built-ins
     on the normal and HITL-resume paths, including tenant-allowlist denials.
@@ -453,10 +453,10 @@ class RunConfig:
 
     Runs on every turn, immediately before the LLM call, after context
     management and history processors, and before
-    :meth:`RunHooks.on_llm_start`. The filter receives a
-    :class:`CallModelData` with the current agent, unwrapped run context,
-    and a :class:`ModelInputData` wrapping a shallow copy of the input
-    items list. It must return a :class:`ModelInputData` — either the
+    ``RunHooks.on_llm_start``. The filter receives a
+    ``CallModelData`` with the current agent, unwrapped run context,
+    and a ``ModelInputData`` wrapping a shallow copy of the input
+    items list. It must return a ``ModelInputData`` — either the
     same instance with edits applied, or a new one. May be sync or async.
 
     Use this to:
@@ -467,7 +467,7 @@ class RunConfig:
     - Implement application-level caching or deduplication
 
     For pure Layer 3 (``RunItem``) transforms, use
-    :attr:`history_processors` instead.
+    ``history_processors`` instead.
 
     Example::
 
@@ -487,9 +487,9 @@ class RunConfig:
     """Handler invoked when per-agent ``max_turns`` is exhausted.
 
     When set, the runner awaits the handler instead of raising
-    :class:`MaxTurnsExceeded` at the end of the agent loop. A string
+    ``MaxTurnsExceeded`` at the end of the agent loop. A string
     return value becomes the run's final output; ``None`` falls through
-    to the exception. The swarm-level :attr:`max_total_turns` cap is
+    to the exception. The swarm-level ``max_total_turns`` cap is
     deliberately **not** routed through this handler — it represents a
     runaway workflow, not a per-agent budget.
 
@@ -505,7 +505,7 @@ class RunConfig:
     """Cross-agent cumulative turn limit for multi-agent swarms.
 
     When set, the Runner tracks total turns across all agents
-    (including handoffs) and raises :class:`MaxTurnsExceeded` when
+    (including handoffs) and raises ``MaxTurnsExceeded`` when
     exceeded. Distinct from per-agent ``max_turns`` which resets
     on each agent.
 
@@ -515,9 +515,9 @@ class RunConfig:
     handoff. The default is a bounded ``500`` so a run is always capped
     unless the developer explicitly opts out — never silently unbounded.
     Set to ``None`` explicitly to disable the safety net for
-    a specific run. A swarm using :class:`~philharmonica.adk.swarms.Swarm`
-    complements this with :attr:`SwarmConfig.max_handoffs` and
-    :attr:`SwarmConfig.max_total_tokens` — three different exhaustion
+    a specific run. A swarm using ``Swarm``
+    complements this with ``SwarmConfig.max_handoffs`` and
+    ``SwarmConfig.max_total_tokens`` — three different exhaustion
     dimensions (turns, handoffs, tokens).
 
     Example::
@@ -533,7 +533,7 @@ class RunConfig:
     guardrails: AgentGuardrails = field(default_factory=AgentGuardrails)
     """Run-scope agent-level guardrails applied across all agents in a run.
 
-    A single :class:`~philharmonica.adk.agents.agent_guardrails.AgentGuardrails`
+    A single ``AgentGuardrails``
     config object holds ``input`` and ``output`` phase-typed lists.
     Empty lists (the default) mean no run-scope guardrails — the
     agent's own ``Agent.guardrails`` still applies.
@@ -595,7 +595,7 @@ class RunConfig:
 
     tenant_allowlist_soft_deny: bool = False
     """When ``True``, a forbidden tool call returns a denial message to the
-    model instead of raising :class:`ToolNotPermittedForTenant`. Default
+    model instead of raising ``ToolNotPermittedForTenant``. Default
     ``False`` = fail-fast (the tool never executes)."""
 
     messages: RunMessages | None = None
@@ -637,9 +637,9 @@ class RunConfig:
     turn when the agent's ``tool_execution_mode`` is ``"parallel"``.
 
     ``None`` (default) preserves unbounded
-    :func:`asyncio.gather` behaviour — all tools in the batch start at
+    ``asyncio.gather`` behaviour — all tools in the batch start at
     once.  Set to a positive integer *N* to bound concurrency to *N*
-    simultaneous tool coroutines via an :class:`asyncio.Semaphore`;
+    simultaneous tool coroutines via an ``asyncio.Semaphore``;
     the remaining tools queue and start as slots become free.
 
     This is a concurrency knob for resource-sensitive back-ends (e.g.
@@ -647,7 +647,7 @@ class RunConfig:
     token-cost knob, so the ``None`` default is intentional — unlike
     most cost-affecting fields, no opt-out is required.
 
-    Raises :class:`ValueError` at execution time when set to ``0`` or
+    Raises ``ValueError`` at execution time when set to ``0`` or
     any negative value.  The sequential execution path
     (``tool_execution_mode != "parallel"``) is unaffected.
 
@@ -682,7 +682,7 @@ class RunConfig:
     specific handler wins.
 
     Both sync and async handlers are supported: an
-    :func:`inspect.isawaitable` return value is awaited automatically.
+    ``inspect.isawaitable`` return value is awaited automatically.
 
     ``None`` (the default) disables error recovery entirely — all exceptions
     propagate unchanged.
@@ -700,14 +700,14 @@ class RunConfig:
     include_hook_events: bool = False
     """Emit hook lifecycle moments as stream events during streaming runs.
 
-    When ``True``, the runner wraps the active :class:`~philharmonica.adk.hooks.RunHooks`
+    When ``True``, the runner wraps the active ``RunHooks``
     instance with an emitter that publishes a
-    :class:`~philharmonica.adk.run.stream.HookLifecycleEvent` to the stream queue at
+    ``HookLifecycleEvent`` to the stream queue at
     each tool-start, tool-end, guardrail-input-start, guardrail-input-end,
     guardrail-output-start, and guardrail-output-end call site.
 
     Off by default (``False``) — zero overhead unless enabled.
-    Non-streaming :meth:`~philharmonica.adk.run.runner.Runner.arun` calls are
+    Non-streaming ``arun`` calls are
     unaffected regardless of this flag.
     """
 

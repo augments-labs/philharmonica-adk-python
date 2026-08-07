@@ -20,7 +20,7 @@ class CheapestFirstRouter(LLMRouter):
     Candidates whose cost is unknown (``estimated_cost_usd is None``) sort
     last — priced models are tried before unpriced ones.
 
-    Note: :meth:`candidates` calls :meth:`LLM.estimate_cost` once per
+    Note: ``candidates`` calls ``LLM.estimate_cost`` once per
     candidate on every invocation (token counting is O(N x message_tokens)),
     so keep the candidate list small on hot paths.
     """

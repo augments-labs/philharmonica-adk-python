@@ -1,4 +1,4 @@
-"""Unit tests for :meth:`Runner.arun_flow_for_each` batch helper."""
+"""Unit tests for ``Runner.arun_flow_for_each`` batch helper."""
 
 from __future__ import annotations
 
@@ -146,7 +146,7 @@ class TestErrorIsolation:
     async def test_step_exception_captured_per_item(self) -> None:
         """Step body exceptions are routed through ``error_policy`` inside the executor.
 
-        Even a plain :class:`RuntimeError` raised from a step body
+        Even a plain ``RuntimeError`` raised from a step body
         surfaces as ``FlowRunResult.status="failed"`` because the
         executor catches it. The batch helper never sees the raw
         exception — only the result.

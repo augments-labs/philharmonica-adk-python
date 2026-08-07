@@ -2,15 +2,15 @@
 
 Covers the introspection and ergonomics additions:
 
-- :class:`Flow` / :class:`FlowRunResult` compact one-line ``__repr__``s.
-- :class:`FlowStep` ``role`` / ``triggers`` / ``approval_policy``
+- ``Flow`` / ``FlowRunResult`` compact one-line ``__repr__``s.
+- ``FlowStep`` ``role`` / ``triggers`` / ``approval_policy``
   read-only properties.
 - ``FLOW_ERROR_TRIGGER`` — the ``"__error__"`` route-literal constant.
 - ``Flow.state_factory`` class attribute as an explicit state path.
-- :class:`FlowCheckpoint` ``approve`` / ``reject`` accepting a bare
+- ``FlowCheckpoint`` ``approve`` / ``reject`` accepting a bare
   step-name string.
 - ``approval_policy=`` decorator kwarg plumbing through to
-  :class:`FlowDeferredStep.policy`.
+  ``FlowDeferredStep.policy``.
 """
 
 from __future__ import annotations

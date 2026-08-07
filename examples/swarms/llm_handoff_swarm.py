@@ -1,11 +1,11 @@
 """LLM-orchestrated swarm: author <-> reviewer <-> security auditor.
 
-The :class:`LLMHandoffPolicy` injects a ``transfer_to_<member>`` tool
+The ``LLMHandoffPolicy`` injects a ``transfer_to_<member>`` tool
 for every other member plus a ``swarm_done`` termination tool on each
 turn. The active agent's LLM decides who speaks next by calling one
 of the injected tools. When ``swarm_done`` is called — and *only*
 then — the run is allowed to terminate via
-:class:`ExplicitDoneTermination`.
+``ExplicitDoneTermination``.
 
 This is the AutoGen/Strands parity pattern, but with the Philharmonica
 guardrails intact:

@@ -6,7 +6,7 @@ Demonstrates the two key behaviours of the per-tenant run budget:
    single haiku call. The run completes normally and the final output is
    logged.
 2. **Tiny budget** — a ``dollars_per_run=0.0000001`` cap is lower than the
-   pre-call cost estimate, so :class:`~philharmonica.adk.exceptions.TenantBudgetExceeded`
+   pre-call cost estimate, so ``TenantBudgetExceeded``
    is raised *before* any API call is made. The tenant, scope, and budget are
    logged from the caught exception.
 

@@ -1,5 +1,5 @@
-"""Tests for :class:`~philharmonica.adk.workflows.temporal.streaming.TemporalStreamingLLM`
-and :class:`~philharmonica.adk.workflows.temporal.streaming.StreamTokenEvent`.
+"""Tests for ``TemporalStreamingLLM``
+and ``StreamTokenEvent``.
 
 Covers:
 - StreamTokenEvent defaults and frozen semantics.

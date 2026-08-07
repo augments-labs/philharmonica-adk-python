@@ -7,7 +7,7 @@ The intent is durable, long-term storage where a single writer per
 ``thread_id`` is the expected operational pattern.
 
 boto3 is synchronous; every S3 call is wrapped in ``asyncio.to_thread``
-to satisfy the async :class:`~philharmonica.adk.swarms.checkpointer.SwarmCheckpointer`
+to satisfy the async ``SwarmCheckpointer``
 Protocol without blocking the event loop.
 
 Requires ``boto3>=1.34.0``: ``pip install 'philharmonica-adk[checkpointer-s3]'``.
@@ -56,7 +56,7 @@ class S3SwarmCheckpointer:
 
     Each ``thread_id`` maps to one S3 object at
     ``{prefix}{thread_id}.json``. Writes are unconditional — no fencing
-    tokens and no :class:`~philharmonica.adk.exceptions.CheckpointConflictError`.
+    tokens and no ``CheckpointConflictError``.
     This makes S3 the right choice for archival / audit workloads with a
     single writer per run, not for concurrent multi-writer coordination.
 
@@ -84,7 +84,7 @@ class S3SwarmCheckpointer:
                 ``"swarm-checkpoints/"``).
             region: AWS region name (e.g. ``"us-east-1"``). ``None``
                 uses the boto3 default resolution chain.
-            thread_id: Identifier used by :meth:`register`'s auto-save
+            thread_id: Identifier used by ``register``'s auto-save
                 hook. Defaults to ``"default"`` when the caller does not
                 supply an explicit id.
         """
@@ -104,7 +104,7 @@ class S3SwarmCheckpointer:
         return f"{self._prefix}{thread_id}.json"
 
     def register(self, registry: SwarmHookRegistry) -> None:
-        """Subscribe a :class:`SwarmCheckpointerHooks` to ``registry``."""
+        """Subscribe a ``SwarmCheckpointerHooks`` to ``registry``."""
         from philharmonica.adk.swarms.checkpointers.hooks import SwarmCheckpointerHooks
 
         registry.add(SwarmCheckpointerHooks(self, self._thread_id))
@@ -155,17 +155,17 @@ class S3SwarmCheckpointer:
 
         The ``swarm`` parameter is accepted for protocol parity with the
         graphs ``Checkpointer.load`` shape. Member-name resolution in
-        :meth:`SwarmState.from_dict` provides the de-facto integrity check
+        ``SwarmState.from_dict`` provides the de-facto integrity check
         at rehydration time.
 
         Args:
             thread_id: The logical run key.
-            swarm: The :class:`Swarm` the checkpoint belongs to. Accepted
+            swarm: The ``Swarm`` the checkpoint belongs to. Accepted
                 for protocol parity; member validation happens at
-                :meth:`SwarmState.from_dict` call time.
+                ``SwarmState.from_dict`` call time.
 
         Returns:
-            A :class:`SwarmCheckpoint`, or ``None`` when no object exists
+            A ``SwarmCheckpoint``, or ``None`` when no object exists
             for ``thread_id``.
 
         Raises:

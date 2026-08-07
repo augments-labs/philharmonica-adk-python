@@ -1,10 +1,10 @@
-"""Shared hook bridge for :class:`~philharmonica.adk.swarms.checkpointer.SwarmCheckpointer`
+"""Shared hook bridge for ``SwarmCheckpointer``
 implementations.
 
 Every swarm checkpointer persists the same way: on ``on_swarm_turn_end``
 and on ``on_swarm_turn_interrupt``, snapshot the current
-:class:`~philharmonica.adk.swarms.state.SwarmState` into a
-:class:`~philharmonica.adk.swarms.checkpointer.SwarmCheckpoint` and ``save`` it.
+``SwarmState`` into a
+``SwarmCheckpoint`` and ``save`` it.
 This bridge factors that identical logic out so each concrete checkpointer
 only implements storage.
 
@@ -37,13 +37,13 @@ logger = logging.getLogger(__name__)
 
 class SwarmCheckpointerHooks(SwarmHooks[Any]):
     """Forwards ``on_swarm_turn_end`` / ``on_swarm_turn_interrupt`` into any
-    :class:`~philharmonica.adk.swarms.checkpointer.SwarmCheckpointer`.
+    ``SwarmCheckpointer``.
 
     Constructed by a checkpointer's
-    :meth:`~philharmonica.adk.swarms.checkpointer.SwarmCheckpointer.register` method.
+    ``register`` method.
 
     Setting ``propagate_errors = True`` ensures that a failed
-    :meth:`~philharmonica.adk.swarms.checkpointer.SwarmCheckpointer.save` is not
+    ``save`` is not
     silently swallowed by the hook fan-out — the caller receives the error
     and can decide how to handle it.
     """

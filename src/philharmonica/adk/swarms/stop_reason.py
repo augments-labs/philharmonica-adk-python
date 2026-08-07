@@ -33,7 +33,7 @@ class StopReason:
             ``"token_budget"``, ``"handoff_to"``, ``"text_mention"``,
             ``"max_handoffs"``, ``"max_total_tokens"``,
             ``"interrupted"``, ``"policy_error"``. Custom
-            :class:`~philharmonica.adk.swarms.termination.TerminationCondition`
+            ``TerminationCondition``
             subclasses may supply their own.
         detail: Human-readable explanation. Included in logs, tracing
             spans, and ``SwarmDoneEvent.reason``.

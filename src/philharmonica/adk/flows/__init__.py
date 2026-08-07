@@ -1,12 +1,12 @@
 """Flow primitive — decorator-driven multi-step orchestration over typed shared state.
 
-A :class:`Flow` is a class-based, declarative orchestration that composes
-:class:`~philharmonica.adk.agents.agent.Agent`, :class:`~philharmonica.adk.swarms.swarm.Swarm`,
-:class:`~philharmonica.adk.graphs.graph.Graph`, and :class:`~philharmonica.adk.tasks.task.Task`
+A ``Flow`` is a class-based, declarative orchestration that composes
+``Agent``, ``Swarm``,
+``Graph``, and ``Task``
 calls as ordered steps, with typed shared state, event-driven listeners,
 and state-based routers. Fills the gap between the existing
-:class:`~philharmonica.adk.graphs.graph.Graph` (DAG with message-threading) and
-:class:`~philharmonica.adk.tasks.task_pipeline.TaskPipeline` (sequential with no
+``Graph`` (DAG with message-threading) and
+``TaskPipeline`` (sequential with no
 typed shared state).
 
 Canonical minimal example — a two-step Flow over a Pydantic state::
@@ -40,7 +40,7 @@ Canonical minimal example — a two-step Flow over a Pydantic state::
 **Anti-hidden-behavior contract**: every wire is declared by an explicit
 decorator on a method; step methods take only ``self``; ``self.state`` is
 the developer's mutable typed object; persistence is explicit via
-:class:`~philharmonica.adk.flows.checkpoint.FlowCheckpoint`. The framework
+``FlowCheckpoint``. The framework
 NEVER auto-injects arguments, auto-persists state, auto-routes on bare
 string returns, or auto-instantiates state from the generic parameter.
 

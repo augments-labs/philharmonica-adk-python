@@ -120,7 +120,7 @@ if TYPE_CHECKING:
 
 @dataclass
 class LiteLLMConfig(LLMConfig):
-    """LiteLLM-specific config extending the base :class:`LLMConfig`.
+    """LiteLLM-specific config extending the base ``LLMConfig``.
 
     Adds fields for reasoning and prompt caching that litellm supports.
     Provider-specific fields use litellm types directly.

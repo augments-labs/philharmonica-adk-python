@@ -53,7 +53,7 @@ class _FakeAsyncStream:
     is bypassed by patching ``_call_messages`` directly rather than
     going through the SDK boundary — that lets tests exercise the
     event-handling logic without instantiating the real
-    :class:`anthropic.AsyncStream` (which has constructor requirements
+    ``anthropic.AsyncStream`` (which has constructor requirements
     we don't want to mock).
     """
 
@@ -82,7 +82,7 @@ def _patch_async_stream(monkeypatch: pytest.MonkeyPatch) -> Generator[None, None
     Used to bypass the model code's
     ``isinstance(stream_iter, AsyncStream)`` assertion at the SDK
     boundary without instantiating the real
-    :class:`anthropic.AsyncStream`. ``monkeypatch`` restores the
+    ``anthropic.AsyncStream``. ``monkeypatch`` restores the
     original symbol after the test, preventing cross-test bleed.
     """
     from philharmonica.adk.llms.anthropic import anthropic_model
@@ -94,7 +94,7 @@ def _patch_async_stream(monkeypatch: pytest.MonkeyPatch) -> Generator[None, None
 def _install_streaming_mock(llm: AnthropicLLM, events: list[Any]) -> AsyncMock:
     """Patch ``llm._call_messages`` to return a fake stream.
 
-    Avoids the SDK's :class:`anthropic.AsyncStream` instance check by
+    Avoids the SDK's ``anthropic.AsyncStream`` instance check by
     monkey-patching the boundary helper rather than the SDK itself.
     The fixture ``_patch_async_stream`` covers the matching
     isinstance assertion on the model module — every test that uses

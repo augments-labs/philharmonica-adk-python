@@ -1,6 +1,6 @@
 """Batch-kickoff example — fan out a Flow over a list of inputs.
 
-Demonstrates :meth:`Runner.arun_flow_for_each` driving the same
+Demonstrates ``Runner.arun_flow_for_each`` driving the same
 ``SentimentFlow`` over a batch of headlines.
 
 Three call shapes are exercised:

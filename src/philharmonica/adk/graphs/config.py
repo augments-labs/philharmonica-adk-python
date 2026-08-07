@@ -1,7 +1,7 @@
 """``GraphConfig`` — cost levers and behavioural knobs for a graph run.
 
-Composable with :class:`~philharmonica.adk.run.config.RunConfig`. A
-:class:`~philharmonica.adk.graphs.graph.Graph` is the container that binds
+Composable with ``RunConfig``. A
+``Graph`` is the container that binds
 ``GraphConfig`` to the node roster; the ``RunConfig`` passed to
 ``Runner.arun_graph`` still applies the absolute safety nets
 (``max_total_turns``, ``usage_limits``, tracing toggles).
@@ -9,7 +9,7 @@ Composable with :class:`~philharmonica.adk.run.config.RunConfig`. A
 Design principle. Every field here is either (a) graph-wide (e.g.
 default node timeout) or (b) a budget the graph loop enforces across
 supersteps (e.g. ``max_supersteps``). Per-node overrides live on
-:class:`~philharmonica.adk.graphs.node.GraphNode` via typed ``retry`` and
+``GraphNode`` via typed ``retry`` and
 ``timeout`` fields; when those fields are ``None``, the graph-level
 ``default_retry`` and ``per_node_timeout`` apply.
 """
@@ -25,24 +25,24 @@ if TYPE_CHECKING:
 
 
 class NodeInputStrategy(StrEnum):
-    """How a downstream node's :class:`ExecutableInput.content` is built.
+    """How a downstream node's ``ExecutableInput.content`` is built.
 
-    This is orthogonal to :class:`Merge` strategies:
+    This is orthogonal to ``Merge`` strategies:
 
-    - :class:`Merge` decides WHAT the merged payload looks like
+    - ``Merge`` decides WHAT the merged payload looks like
       (concat, last-wins, extend-items).
-    - :class:`NodeInputStrategy` decides WHICH upstream context the
+    - ``NodeInputStrategy`` decides WHICH upstream context the
       downstream node sees (only the direct parent? the full run's
       history? the last N items across the graph?).
 
-    Default is :attr:`LAST_OUTPUT` — the downstream node sees only
+    Default is ``LAST_OUTPUT`` — the downstream node sees only
     its direct upstream (merged per the node's merge strategy). This
     mirrors ``Swarm``'s ``SCOPED`` default and keeps graph runs cheap
     by default.
     """
 
     LAST_OUTPUT = "last_output"
-    """Downstream sees only merged upstream :class:`NodeResult` values.
+    """Downstream sees only merged upstream ``NodeResult`` values.
 
     Default and cheapest. Each node is essentially a function from
     upstream output to its own output. No global history broadcast.
@@ -57,7 +57,7 @@ class NodeInputStrategy(StrEnum):
     """
 
     FULL_HISTORY = "full_history"
-    """Downstream sees every Layer 3 :class:`RunItem` produced in the run.
+    """Downstream sees every Layer 3 ``RunItem`` produced in the run.
 
     Expensive — full replay of every agent turn's history, every
     tool call, every reasoning block. Reserved for workflows that
@@ -118,22 +118,22 @@ class GraphConfig:
             unbounded cycles in a misconfigured graph. Default
             ``50`` — generous for production pipelines, tight enough
             to catch runaway loops in development. Distinct from
-            :attr:`RunConfig.max_total_turns` which counts LLM calls
+            ``RunConfig.max_total_turns`` which counts LLM calls
             (a single node may make many LLM calls in its inner run).
         max_total_tokens: Optional graph-wide cumulative token cap.
-            Checked against :attr:`GraphState.cumulative_usage` at the
+            Checked against ``GraphState.cumulative_usage`` at the
             top of each superstep. ``None`` = no cap.
-        node_input: Default :class:`NodeInputStrategy`. A per-node
+        node_input: Default ``NodeInputStrategy``. A per-node
             override via ``GraphNode.metadata["input"]`` is not yet
             implemented.
-        default_retry: Default per-node :class:`NodeRetryPolicy`; a
-            node may override it via :attr:`GraphNode.retry`.
+        default_retry: Default per-node ``NodeRetryPolicy``; a
+            node may override it via ``GraphNode.retry``.
         per_node_timeout: Default per-attempt node timeout in seconds.
             ``None`` = no timeout. Override per node via
             ``GraphNode.timeout``.
         fail_fast: When ``True`` (default), the first node error
             cancels all sibling tasks in the same superstep and
-            surfaces on :class:`GraphRunResult`. When ``False``,
+            surfaces on ``GraphRunResult``. When ``False``,
             siblings finish and their results are preserved;
             downstream nodes depending on the failed node do not
             fire.
@@ -159,7 +159,7 @@ class GraphConfig:
 
     default_error_handler: NodeErrorHandlerFn | None = None
     """Graph-level fallback error handler.  Applied to any node whose
-    :attr:`~philharmonica.adk.graphs.node.GraphNode.on_error` is ``None``.
+    ``on_error`` is ``None``.
     When both are ``None`` the original exception propagates unchanged.
     A per-node ``on_error`` always takes precedence over this field."""
 

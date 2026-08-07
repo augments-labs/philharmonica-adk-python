@@ -1,10 +1,10 @@
 """Shared-context preparation — builds the per-turn input message list.
 
-Given the live :class:`~philharmonica.adk.swarms.state.SwarmState` and the
-agent about to take the next turn, :func:`prepare_turn_input` returns a
-list of Layer 1 :class:`~philharmonica.adk.types.input.LLMInputContentItem`
+Given the live ``SwarmState`` and the
+agent about to take the next turn, ``prepare_turn_input`` returns a
+list of Layer 1 ``LLMInputContentItem``
 suitable for passing straight to the runner loop. Each
-:class:`~philharmonica.adk.swarms.shared_context_strategy.SharedContextStrategy`
+``SharedContextStrategy``
 controls what the next agent sees:
 
 - ``SCOPED`` (default) — the agent sees only its own per-agent scratch
@@ -12,10 +12,10 @@ controls what the next agent sees:
   was a handoff addressed to it. No hidden cross-agent broadcast —
   every cross-agent item is developer-supplied.
 - ``LAST_N`` — the last N items from the full shared history. ``N``
-  comes from :attr:`SharedContextConfig.window`.
+  comes from ``SharedContextConfig.window``.
 - ``SUMMARIZED`` — full shared history compacted via
-  :class:`~philharmonica.adk.context.ContextCompactor` to fit
-  :attr:`SharedContextConfig.budget` tokens. Reuses the same compactor
+  ``ContextCompactor`` to fit
+  ``SharedContextConfig.budget`` tokens. Reuses the same compactor
   that powers run-level context management.
 - ``FULL_BROADCAST`` — the entire shared history (AutoGen parity).
   Explicit opt-in only — the default is ``SCOPED`` for cost-control
@@ -67,7 +67,7 @@ async def prepare_turn_input(
             ``SwarmDone`` or ``None``). Used by ``SCOPED`` to inject
             the handoff message when the yield targets this agent.
         config: Strategy + parameters. Validated by
-            :class:`~philharmonica.adk.swarms.config.SharedContextConfig.__post_init__`.
+            ``__post_init__``.
 
     Returns:
         Ordered list of Layer 1 input items for the runner.
@@ -247,12 +247,12 @@ async def _prepare_summarized(
 ) -> list[LLMInputContentItem]:
     """SUMMARIZED — full history compacted to fit ``budget`` tokens.
 
-    Reuses :class:`~philharmonica.adk.context.compaction.ContextCompactor` so
+    Reuses ``ContextCompactor`` so
     summarization behaves identically to run-level context compaction.
     When the current history is already under ``budget`` the compactor
     returns the preserved messages unchanged (no extra LLM call). The
-    summarization call routes through :meth:`LLM.acomplete`, so its
-    usage lands on :attr:`RunContext.usage` and middleware sees it.
+    summarization call routes through ``LLM.acomplete``, so its
+    usage lands on ``RunContext.usage`` and middleware sees it.
 
     The compactor is imported lazily to keep the swarms module
     importable in environments that don't install the

@@ -3,7 +3,7 @@
 Uses ``psycopg`` 3 (async) with a connection pool and optimistic locking:
 a ``lock_token`` UUID column acts as a fencing token. On ``save`` the token
 is verified; a stale token (concurrent writer) raises
-:class:`~philharmonica.adk.exceptions.CheckpointConflictError`.
+``CheckpointConflictError``.
 
 One row per ``thread_id`` — the latest checkpoint overwrites the prior
 one (upsert-on-insert, conditional-UPDATE thereafter).
@@ -67,9 +67,9 @@ class PostgresSwarmCheckpointer:
     first write; subsequent saves use a conditional ``UPDATE`` guarded by
     the fencing token cached from the prior ``load`` or ``save``. A
     concurrent writer that rotates the token causes the losing ``save``
-    to raise :class:`~philharmonica.adk.exceptions.CheckpointConflictError`.
+    to raise ``CheckpointConflictError``.
 
-    The caller owns the lifecycle — call :meth:`close` at application
+    The caller owns the lifecycle — call ``close`` at application
     shutdown or after a test.
 
     Requires PostgreSQL 13+ (``gen_random_uuid()`` built-in; no
@@ -84,7 +84,7 @@ class PostgresSwarmCheckpointer:
 
         Args:
             conninfo: libpq connection string used to open the pool.
-            thread_id: Identifier used by :meth:`register`'s auto-save
+            thread_id: Identifier used by ``register``'s auto-save
                 hook. Defaults to ``"default"`` when the caller does not
                 supply an explicit id.
         """
@@ -126,7 +126,7 @@ class PostgresSwarmCheckpointer:
                 logger.debug("PostgresSwarmCheckpointer: pool closed.")
 
     def register(self, registry: SwarmHookRegistry) -> None:
-        """Subscribe a :class:`SwarmCheckpointerHooks` to ``registry``."""
+        """Subscribe a ``SwarmCheckpointerHooks`` to ``registry``."""
         from philharmonica.adk.swarms.checkpointers.hooks import SwarmCheckpointerHooks
 
         registry.add(SwarmCheckpointerHooks(self, self._thread_id))
@@ -139,13 +139,13 @@ class PostgresSwarmCheckpointer:
         ON CONFLICT DO NOTHING RETURNING lock_token``; subsequent saves
         perform a conditional ``UPDATE … WHERE lock_token = <cached>
         RETURNING lock_token``. If either returns no row — meaning a
-        concurrent writer won the race — :class:`CheckpointConflictError`
+        concurrent writer won the race — ``CheckpointConflictError``
         is raised.
 
         To resume an existing ``thread_id`` on a fresh instance, call
-        :meth:`load` first so the fencing token is cached; otherwise the
+        ``load`` first so the fencing token is cached; otherwise the
         first ``save`` takes the insert path and a pre-existing row raises
-        :class:`CheckpointConflictError`.
+        ``CheckpointConflictError``.
 
         Args:
             checkpoint: The snapshot to persist.
@@ -201,22 +201,22 @@ class PostgresSwarmCheckpointer:
     ) -> SwarmCheckpoint | None:
         """Rehydrate the checkpoint for ``thread_id`` (``None`` if absent).
 
-        Caches the observed ``lock_token`` so a subsequent :meth:`save`
+        Caches the observed ``lock_token`` so a subsequent ``save``
         can verify it has not been rotated by a concurrent writer.
 
         The ``swarm`` parameter is accepted for protocol parity with the
         graphs ``Checkpointer.load`` shape. Member-name resolution in
-        :meth:`SwarmState.from_dict` provides the de-facto integrity check
+        ``SwarmState.from_dict`` provides the de-facto integrity check
         at rehydration time.
 
         Args:
             thread_id: The logical run key.
-            swarm: The :class:`Swarm` the checkpoint belongs to. Accepted
+            swarm: The ``Swarm`` the checkpoint belongs to. Accepted
                 for protocol parity; member validation happens at
-                :meth:`SwarmState.from_dict` call time.
+                ``SwarmState.from_dict`` call time.
 
         Returns:
-            A :class:`SwarmCheckpoint`, or ``None`` when no checkpoint
+            A ``SwarmCheckpoint``, or ``None`` when no checkpoint
             exists for ``thread_id``.
         """
         del swarm

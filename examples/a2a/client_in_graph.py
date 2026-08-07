@@ -2,7 +2,7 @@
 
 Demonstrates the third A2A composition surface (alongside ``run()``
 and ``as_tool()``): a remote A2A agent slots directly into a
-:class:`~philharmonica.adk.graphs.graph.Graph` as a node, alongside local
+``Graph`` as a node, alongside local
 ``Agent`` / ``Swarm`` / callable nodes.
 
 The graph below is a 2-node pipeline:

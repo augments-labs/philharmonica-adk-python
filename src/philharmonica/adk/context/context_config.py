@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 
 
 class TokenUsage(TypedDict):
-    """Token usage statistics returned by :meth:`ContextManager.get_token_usage`.
+    """Token usage statistics returned by ``ContextManager.get_token_usage``.
 
     Attributes:
         used: Number of tokens currently in the managed context.
@@ -66,7 +66,7 @@ class CompactionConfig(BaseModel):
     summarized by an LLM call and replaced with a compact summary.
 
     The LLM used for the summarization call is resolved from
-    :attr:`RunConfig.compaction_llm` (explicit override) or, when unset,
+    ``RunConfig.compaction_llm`` (explicit override) or, when unset,
     falls back to the agent's resolved ``LLM``. This keeps
     ``CompactionConfig`` provider-agnostic — no model name or ``LLM``
     instance lives on the context-management config itself.

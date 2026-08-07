@@ -1,5 +1,5 @@
 """Adapters — thin bridges that let ``Agent`` / ``Swarm`` / plain callables
-act as :class:`Executable`\\ s inside a graph without inheriting from it.
+act as ``Executable``\\ s inside a graph without inheriting from it.
 
 Why thin wrappers and not a mixin on ``Agent`` / ``Swarm`` themselves?
 
@@ -10,29 +10,29 @@ Why thin wrappers and not a mixin on ``Agent`` / ``Swarm`` themselves?
 - **Composition without subclass surgery.** Graphs compose three
   primitives today (``Agent``, ``Swarm``, ``Graph``) plus arbitrary
   callables. Each needs its own adapter; none needs to know about the
-  others. The :class:`Executable` ABC is the only shared contract.
+  others. The ``Executable`` ABC is the only shared contract.
 
 Three adapters in this file:
 
-- :class:`AgentExecutable` — wraps an :class:`Agent`, forwards to
-  :meth:`Runner.arun`. Produces a :class:`NodeResult` whose
+- ``AgentExecutable`` — wraps an ``Agent``, forwards to
+  ``Runner.arun``. Produces a ``NodeResult`` whose
   ``new_items`` are the agent run's produced items and whose ``usage``
-  is the inner :class:`RunContext.usage` delta.
+  is the inner ``RunContext.usage`` delta.
 
-- :class:`SwarmExecutable` — wraps a :class:`Swarm`, forwards to
-  :meth:`Runner.arun_swarm`. Same conversion.
+- ``SwarmExecutable`` — wraps a ``Swarm``, forwards to
+  ``Runner.arun_swarm``. Same conversion.
 
-- :class:`CallableExecutable` — wraps a plain Python callable for
+- ``CallableExecutable`` — wraps a plain Python callable for
   trivial transformation nodes (routing predicates, format adapters,
   deterministic post-processing). Zero LLM cost. Detects the
   callable's arity at wrap time so users can write the simplest
   signature that suits their task.
 
-Design note on context threading. :meth:`Runner.arun` creates its own
-inner :class:`RunContext` and does not mutate the caller's. The
+Design note on context threading. ``Runner.arun`` creates its own
+inner ``RunContext`` and does not mutate the caller's. The
 adapter returns the inner context's ``usage`` on the
-:class:`NodeResult`; the graph loop aggregates it into the outer
-``RunContext`` by calling :meth:`GraphState.record`. Mirror of how
+``NodeResult``; the graph loop aggregates it into the outer
+``RunContext`` by calling ``GraphState.record``. Mirror of how
 ``run/swarm_loop.py`` threads usage upward through
 ``SwarmState.cumulative_usage``.
 """
@@ -90,8 +90,8 @@ def _extract_text_from_content(
     """Best-effort ``str`` view of a Layer 1 content list.
 
     Concatenates text payloads from user-role messages. Rationale: a
-    :class:`CallableExecutable` usually wants a plain ``str`` — the
-    graph merge strategies (:class:`Merge`) produce either a ``str``
+    ``CallableExecutable`` usually wants a plain ``str`` — the
+    graph merge strategies (``Merge``) produce either a ``str``
     wrapped into a single message or a list of Layer 1 items built
     from upstream ``final_text`` values. Either shape yields readable
     text here.
@@ -123,9 +123,9 @@ def _extract_text_from_content(
 def _content_to_user_prompt(
     content: list[LLMInputContentItem],
 ) -> str | list[LLMInputContentItem]:
-    """Shape :class:`ExecutableInput.content` into a :data:`UserPrompt`.
+    """Shape ``ExecutableInput.content`` into a ``UserPrompt``.
 
-    :meth:`Runner.arun` accepts either a raw string or a
+    ``Runner.arun`` accepts either a raw string or a
     ``list[LLMInputContentItem]``. When the content is empty we return
     an empty string so the inner runner starts from a clean slate; the
     agent's system prompt still drives the first turn.
@@ -147,24 +147,24 @@ def _run_agent_node_result(
     inner_usage: LLMUsage,
     last_agent_name: str | None,
 ) -> NodeResult[Any]:
-    """Build a :class:`NodeResult` from the fields produced by an agent run.
+    """Build a ``NodeResult`` from the fields produced by an agent run.
 
     Single source of truth for converting an agent execution's terminal
-    fields into a :class:`NodeResult`. Called by both
-    :meth:`AgentExecutable.invoke` (non-streaming) and
-    :meth:`AgentExecutable.stream_async` (streaming) so the two paths
+    fields into a ``NodeResult``. Called by both
+    ``AgentExecutable.invoke`` (non-streaming) and
+    ``AgentExecutable.stream_async`` (streaming) so the two paths
     produce byte-identical results for the same inputs.
 
     Args:
         agent_name: Name of the wrapped agent.
         final_output: Terminal value from the agent run.
         new_items: Layer 3 items produced during the run.
-        inner_usage: Cumulative :class:`LLMUsage` from the inner run context.
+        inner_usage: Cumulative ``LLMUsage`` from the inner run context.
         last_agent_name: Name of the last active agent (after handoffs), or
             ``None`` when unavailable.
 
     Returns:
-        A fully populated :class:`NodeResult`.
+        A fully populated ``NodeResult``.
     """
     final_text = final_output if isinstance(final_output, str) else None
     return NodeResult(
@@ -187,17 +187,17 @@ def _run_agent_node_result(
 
 @dataclass
 class AgentExecutable[TContext](Executable[TContext]):
-    """Wrap an :class:`Agent` so it can sit inside a graph node.
+    """Wrap an ``Agent`` so it can sit inside a graph node.
 
-    Calling :meth:`invoke` delegates to :meth:`Runner.arun` and
-    converts the resulting :class:`RunResult` into a
-    :class:`NodeResult`. The agent is NOT mutated — it stays pure
+    Calling ``invoke`` delegates to ``Runner.arun`` and
+    converts the resulting ``RunResult`` into a
+    ``NodeResult``. The agent is NOT mutated — it stays pure
     configuration.
 
     Attributes:
-        agent: The :class:`Agent` to run.
+        agent: The ``Agent`` to run.
         max_turns: Optional per-node ``max_turns`` override. When
-            ``None`` the agent's default from :meth:`Runner.arun`
+            ``None`` the agent's default from ``Runner.arun``
             applies.
     """
 
@@ -205,7 +205,7 @@ class AgentExecutable[TContext](Executable[TContext]):
     """The wrapped agent. Kept as-is — no runtime mutation."""
 
     max_turns: int | None = None
-    """Optional override. ``None`` uses :meth:`Runner.arun`'s default."""
+    """Optional override. ``None`` uses ``Runner.arun``'s default."""
 
     @override
     async def invoke(
@@ -217,22 +217,22 @@ class AgentExecutable[TContext](Executable[TContext]):
         """Run the wrapped agent once and package its ``RunResult``.
 
         Threads ``context.context`` (the user's TContext) to the inner
-        runner. The inner :class:`RunContext` created by
-        :meth:`Runner.arun` is independent of ``context``; its usage
-        delta surfaces on :attr:`NodeResult.usage` for the graph loop
+        runner. The inner ``RunContext`` created by
+        ``Runner.arun`` is independent of ``context``; its usage
+        delta surfaces on ``NodeResult.usage`` for the graph loop
         to aggregate.
 
         Args:
-            input: The :class:`ExecutableInput` envelope from the graph
+            input: The ``ExecutableInput`` envelope from the graph
                 loop. ``input.content`` is normalised to a
-                :data:`UserPrompt` and forwarded to the agent.
-            context: The outer :class:`RunContext`. Its ``context``
+                ``UserPrompt`` and forwarded to the agent.
+            context: The outer ``RunContext``. Its ``context``
                 field (user's ``TContext``) is threaded to the inner
                 runner.
-            config: :class:`RunConfig` threaded from the graph run.
+            config: ``RunConfig`` threaded from the graph run.
 
         Returns:
-            A :class:`NodeResult` wrapping the agent's terminal output,
+            A ``NodeResult`` wrapping the agent's terminal output,
             produced items, and inner usage.
 
         Raises:
@@ -240,7 +240,7 @@ class AgentExecutable[TContext](Executable[TContext]):
                 approval (HITL) — either the top-level run returns a
                 ``RunResult`` with ``requires_action`` True, or a nested
                 sub-agent raises
-                :class:`~philharmonica.adk.exceptions.AgentToolDeferral` — and the
+                ``AgentToolDeferral`` — and the
                 BSP loop has seeded the required side-channel metadata.
             RuntimeError: When the BSP loop has not seeded the required
                 ``__interrupt_node_id__`` or ``__nested_agent_snapshots__``
@@ -386,23 +386,23 @@ class AgentExecutable[TContext](Executable[TContext]):
         context: RunContext[TContext],
         config: RunConfig,
     ) -> RunResultStreaming:
-        """Call :meth:`Runner.arun` with ``stream=True`` honouring ``max_turns``.
+        """Call ``Runner.arun`` with ``stream=True`` honouring ``max_turns``.
 
-        Shared with :meth:`stream_async`. Splitting on the ``max_turns is None``
-        branch here keeps :meth:`stream_async` under the project's per-function
+        Shared with ``stream_async``. Splitting on the ``max_turns is None``
+        branch here keeps ``stream_async`` under the project's per-function
         length limit without duplicating the ``Runner.arun`` invocation. The
-        ``max_turns`` default is centralized in :mod:`philharmonica.adk.run.config`;
+        ``max_turns`` default is centralized in ``philharmonica.adk.run.config``;
         the adapter must NOT hardcode a fallback that would silently shadow it.
 
         Args:
-            user_prompt: Normalised user input forwarded to :meth:`Runner.arun`.
-            context: The outer :class:`RunContext`. Its ``context`` field is
+            user_prompt: Normalised user input forwarded to ``Runner.arun``.
+            context: The outer ``RunContext``. Its ``context`` field is
                 threaded to the inner runner.
-            config: :class:`RunConfig` threaded from the graph run.
+            config: ``RunConfig`` threaded from the graph run.
 
         Returns:
-            A :class:`RunResultStreaming` ready for iteration via
-            :meth:`stream_events`.
+            A ``RunResultStreaming`` ready for iteration via
+            ``stream_events``.
         """
         from philharmonica.adk.run.runner import Runner
 
@@ -435,20 +435,20 @@ class AgentExecutable[TContext](Executable[TContext]):
         Forwards every inner event as
         ``{"type": "agent_event", "event": ev}``. A HITL deferral never
         raises out of ``stream_events()`` — the streaming runner absorbs
-        the :class:`AgentToolDeferral` and stores
+        the ``AgentToolDeferral`` and stores
         ``deferred_requests`` + ``state`` on the result. This bridge
         inspects those fields AFTER iteration: when populated it
         synthesises the deferral and routes through
-        :meth:`_lift_deferral_to_interrupt`, suppressing the terminal
+        ``_lift_deferral_to_interrupt``, suppressing the terminal
         event. Otherwise the terminal
         ``{"type": "result", "result": NodeResult}`` fires, built from
-        the same helper as :meth:`invoke` for byte-identical results.
+        the same helper as ``invoke`` for byte-identical results.
 
         Args:
-            input: The :class:`ExecutableInput` envelope from the graph
+            input: The ``ExecutableInput`` envelope from the graph
                 loop.
-            context: The outer :class:`RunContext`.
-            config: :class:`RunConfig` threaded from the graph run.
+            context: The outer ``RunContext``.
+            config: ``RunConfig`` threaded from the graph run.
 
         Raises:
             InterruptException: When the streaming run's deferred
@@ -515,7 +515,7 @@ class AgentExecutable[TContext](Executable[TContext]):
         """Validate ``reply`` against ``snapshot`` then apply each decision.
 
         Fail-fast on an unknown or duplicate ``tool_call_id`` — raises
-        :class:`NestedAgentResumeError` BEFORE any mutation so the
+        ``NestedAgentResumeError`` BEFORE any mutation so the
         caller can retry against the unmutated snapshot. Membership is
         checked before duplicates so the error pinpoints the more
         actionable failure first. Closed-union dispatch on
@@ -635,22 +635,22 @@ class AgentExecutable[TContext](Executable[TContext]):
         context: RunContext[TContext],
         config: RunConfig,
     ) -> RunResult[Any]:
-        """Call :meth:`Runner.arun` from a ``RunState`` honouring ``max_turns``.
+        """Call ``Runner.arun`` from a ``RunState`` honouring ``max_turns``.
 
-        Mirror of :meth:`_arun_streamed` for the non-streaming resume path —
+        Mirror of ``_arun_streamed`` for the non-streaming resume path —
         splitting on the ``max_turns is None`` branch here keeps the caller
         within the project's per-function length limit without duplicating
         the ``Runner.arun`` invocation.
 
         Args:
-            snapshot: The paused :class:`~philharmonica.adk.run.state.RunState` to
+            snapshot: The paused ``RunState`` to
                 resume from (after decisions have been applied).
-            context: The outer :class:`RunContext`. Its ``context`` field is
+            context: The outer ``RunContext``. Its ``context`` field is
                 threaded to the inner runner.
-            config: :class:`RunConfig` threaded from the graph run.
+            config: ``RunConfig`` threaded from the graph run.
 
         Returns:
-            The terminal :class:`RunResult` from the resumed agent run.
+            The terminal ``RunResult`` from the resumed agent run.
         """
         from philharmonica.adk.run.runner import Runner
 
@@ -677,27 +677,27 @@ class AgentExecutable[TContext](Executable[TContext]):
         """Resume the wrapped agent from a paused ``RunState`` with a typed reply.
 
         Validates ``reply`` against the snapshot's deferred approvals
-        (fail-fast — :class:`NestedAgentResumeError` on unknown or duplicate
+        (fail-fast — ``NestedAgentResumeError`` on unknown or duplicate
         ``tool_call_id``, snapshot untouched), applies each decision via
         ``RunState.approve`` / ``RunState.reject``, then re-enters the agent
         loop via ``Runner.arun(agent, state, ...)``. ``node_id`` threads
-        through any raised :class:`NestedAgentResumeError` so the caller's
+        through any raised ``NestedAgentResumeError`` so the caller's
         error handler knows which ``GraphResume.replies`` entry was bad.
 
         When the resumed agent defers AGAIN, deposits the fresh snapshot in
         ``nested_agent_snapshots`` keyed by the same ``node_id`` (the dict
         the BSP loop owns on ``GraphState``) and lifts a fresh
-        :class:`NestedAgentInterrupt` so the loop pauses again for the next
+        ``NestedAgentInterrupt`` so the loop pauses again for the next
         round of human decisions.
 
         Args:
-            snapshot: The paused :class:`~philharmonica.adk.run.state.RunState`
+            snapshot: The paused ``RunState``
                 from ``GraphState.nested_agent_snapshots[node_id]``.
-            reply: The human-supplied :class:`NestedAgentReply` carrying
+            reply: The human-supplied ``NestedAgentReply`` carrying
                 approve/reject decisions for each deferred tool call.
-            context: The outer :class:`RunContext`. Its ``context`` field
+            context: The outer ``RunContext``. Its ``context`` field
                 is threaded to the inner runner.
-            config: :class:`RunConfig` threaded from the graph run.
+            config: ``RunConfig`` threaded from the graph run.
             node_id: Id of the graph node being resumed. Used for error
                 messages and snapshot keying.
             nested_agent_snapshots: The mutable snapshot dict from
@@ -705,7 +705,7 @@ class AgentExecutable[TContext](Executable[TContext]):
                 when the agent re-defers.
 
         Returns:
-            A :class:`NodeResult` wrapping the agent's terminal output
+            A ``NodeResult`` wrapping the agent's terminal output
             once it completes without further deferral.
 
         Raises:
@@ -713,7 +713,7 @@ class AgentExecutable[TContext](Executable[TContext]):
             NestedAgentResumeError: When ``reply`` references an unknown
                 or duplicate ``tool_call_id``.
             InterruptException: When the resumed agent defers again — a
-                fresh :class:`NestedAgentInterrupt` is lifted and the
+                fresh ``NestedAgentInterrupt`` is lifted and the
                 caller should pause the run again.
             RuntimeError: When the re-deferred run is missing ``state``
                 or ``deferred_requests``.
@@ -752,17 +752,17 @@ class AgentExecutable[TContext](Executable[TContext]):
 
 @dataclass
 class SwarmExecutable[TContext](Executable[TContext]):
-    """Wrap a :class:`Swarm` so it can sit inside a graph node.
+    """Wrap a ``Swarm`` so it can sit inside a graph node.
 
-    Delegates to :meth:`Runner.arun_swarm`; the swarm's own
+    Delegates to ``Runner.arun_swarm``; the swarm's own
     termination conditions and budgets still apply. A
-    :class:`SwarmRunResult` is produced and flattened into a
-    :class:`NodeResult` — the full ``SwarmRunResult`` is preserved on
-    :attr:`NodeResult.output` so downstream edge predicates can
+    ``SwarmRunResult`` is produced and flattened into a
+    ``NodeResult`` — the full ``SwarmRunResult`` is preserved on
+    ``NodeResult.output`` so downstream edge predicates can
     inspect fields like ``stop_reason`` when routing.
 
     Attributes:
-        swarm: The :class:`Swarm` to run.
+        swarm: The ``Swarm`` to run.
     """
 
     swarm: Swarm[TContext]
@@ -778,15 +778,15 @@ class SwarmExecutable[TContext](Executable[TContext]):
         """Run the wrapped swarm once and package its ``SwarmRunResult``.
 
         Args:
-            input: The :class:`ExecutableInput` envelope from the graph
+            input: The ``ExecutableInput`` envelope from the graph
                 loop. ``input.content`` is normalised to a
-                :data:`UserPrompt` and forwarded to the swarm.
-            context: The outer :class:`RunContext`. Its ``context``
+                ``UserPrompt`` and forwarded to the swarm.
+            context: The outer ``RunContext``. Its ``context``
                 field is threaded to the inner runner.
-            config: :class:`RunConfig` threaded from the graph run.
+            config: ``RunConfig`` threaded from the graph run.
 
         Returns:
-            A :class:`NodeResult` whose :attr:`~NodeResult.output` is
+            A ``NodeResult`` whose ``output`` is
             the full ``SwarmRunResult``, allowing downstream edge
             predicates to inspect fields such as ``stop_reason``.
         """
@@ -848,20 +848,20 @@ class SwarmExecutable[TContext](Executable[TContext]):
 # Detected at wrap time via inspect.signature — a malformed callable
 # raises ValueError up-front instead of crashing mid-run.
 CallableNodeFn = Callable[..., Any]
-"""Any user-supplied callable wrapped by :class:`CallableExecutable`."""
+"""Any user-supplied callable wrapped by ``CallableExecutable``."""
 
 
 @dataclass
 class CallableExecutable[TContext](Executable[TContext]):
     """Wrap a plain Python callable as a graph-composable node.
 
-    Zero LLM cost — :attr:`NodeResult.usage` is an empty
-    :class:`LLMUsage`. Use for routing predicates that emit a label,
+    Zero LLM cost — ``NodeResult.usage`` is an empty
+    ``LLMUsage``. Use for routing predicates that emit a label,
     text formatters, deterministic post-processing between two agent
     nodes, or bridging to an external API.
 
     The callable's arity is detected at wrap time via
-    :func:`inspect.signature`. Supported signatures:
+    ``inspect.signature``. Supported signatures:
 
     - ``() -> Any`` — pure producer (ignores upstream).
     - ``(text: str) -> Any`` — text transformer.
@@ -869,14 +869,14 @@ class CallableExecutable[TContext](Executable[TContext]):
     - ``(input: ExecutableInput, context: RunContext) -> Any`` —
       full-control hook for advanced use.
 
-    The return value becomes :attr:`NodeResult.output`. When it is a
-    ``str`` the same value is mirrored on :attr:`NodeResult.final_text`
+    The return value becomes ``NodeResult.output``. When it is a
+    ``str`` the same value is mirrored on ``NodeResult.final_text``
     so downstream merge strategies can read it without introspection.
 
     Attributes:
         fn: The user callable. Sync or async.
         passes_full_input: Computed at construction — ``True`` iff the
-            detected signature takes the full :class:`ExecutableInput`
+            detected signature takes the full ``ExecutableInput``
             (both parameters) instead of a plain ``str``. Internal;
             users don't set this.
         arity: Computed at construction — parameter count of ``fn``.
@@ -886,7 +886,7 @@ class CallableExecutable[TContext](Executable[TContext]):
     """The user callable. Shape detected at wrap time."""
 
     passes_full_input: bool = False
-    """``True`` when the detected signature takes :class:`ExecutableInput`."""
+    """``True`` when the detected signature takes ``ExecutableInput``."""
 
     arity: int = 0
     """Detected positional-parameter count of ``fn``."""
@@ -952,23 +952,23 @@ class CallableExecutable[TContext](Executable[TContext]):
         context: RunContext[TContext],
         config: RunConfig,
     ) -> NodeResult[TContext]:
-        """Call :attr:`fn` with the detected signature and wrap the result.
+        """Call ``fn`` with the detected signature and wrap the result.
 
         Args:
-            input: The :class:`ExecutableInput` envelope from the graph
-                loop. Text is extracted via :func:`_extract_text_from_content`
+            input: The ``ExecutableInput`` envelope from the graph
+                loop. Text is extracted via ``_extract_text_from_content``
                 for single- and double-argument callables.
-            context: The outer :class:`RunContext`. Passed through to
+            context: The outer ``RunContext``. Passed through to
                 the callable when its arity is 2 (or it accepts the full
-                :class:`ExecutableInput`).
-            config: :class:`RunConfig` threaded from the graph run.
+                ``ExecutableInput``).
+            config: ``RunConfig`` threaded from the graph run.
                 Not passed to the callable; present for ABC conformance.
 
         Returns:
-            A zero-usage :class:`NodeResult` whose
-            :attr:`~NodeResult.output` is the callable's return value.
+            A zero-usage ``NodeResult`` whose
+            ``output`` is the callable's return value.
             When the return value is a ``str`` it is also mirrored on
-            :attr:`~NodeResult.final_text`.
+            ``final_text``.
         """
         # Local import to avoid circular dependency at module import time.
         from philharmonica.adk.types.tokens.llm_usage import LLMUsage
@@ -1016,22 +1016,22 @@ class CallableExecutable[TContext](Executable[TContext]):
 
 
 def to_executable(obj: Any) -> Executable[Any]:
-    """Coerce a graph-composable object into an :class:`Executable`.
+    """Coerce a graph-composable object into an ``Executable``.
 
     Type dispatch:
 
     =======================  ========================================
     Input                    Returned adapter
     =======================  ========================================
-    :class:`Executable`      returned as-is (including
-                             :class:`Graph`, nested)
-    :class:`Agent`           :class:`AgentExecutable` wrapper
-    :class:`Swarm`           :class:`SwarmExecutable` wrapper
-    callable                 :class:`CallableExecutable` wrapper
+    ``Executable``      returned as-is (including
+                             ``Graph``, nested)
+    ``Agent``           ``AgentExecutable`` wrapper
+    ``Swarm``           ``SwarmExecutable`` wrapper
+    callable                 ``CallableExecutable`` wrapper
     anything else            ``TypeError``
     =======================  ========================================
 
-    Used by :meth:`GraphBuilder.node` so callers can write::
+    Used by ``GraphBuilder.node`` so callers can write::
 
         builder.node("triage", triage_agent)  # Agent
         builder.node("research", research_swarm)  # Swarm
@@ -1044,7 +1044,7 @@ def to_executable(obj: Any) -> Executable[Any]:
         obj: The object to coerce.
 
     Returns:
-        An :class:`Executable`. Already-Executables are returned
+        An ``Executable``. Already-Executables are returned
         unchanged so nested graphs compose without an extra wrapper.
 
     Raises:

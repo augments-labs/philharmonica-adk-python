@@ -1,4 +1,4 @@
-"""Unit tests for :class:`FlowExecutable` Graph adapter."""
+"""Unit tests for ``FlowExecutable`` Graph adapter."""
 
 from __future__ import annotations
 

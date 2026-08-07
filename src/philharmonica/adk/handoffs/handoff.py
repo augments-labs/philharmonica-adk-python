@@ -138,7 +138,7 @@ class Handoff(Generic[TAgent, TContext, THandoffInput]):
     metadata: Mapping[str, str] = field(default_factory=dict)
     """Arbitrary string-valued labels for tracing / telemetry.
 
-    Symmetric with :attr:`FunctionTool.metadata`. Useful for tagging
+    Symmetric with ``FunctionTool.metadata``. Useful for tagging
     every transfer to a particular agent with team / owner / SLA
     metadata without participating in execution semantics. NOT
     shown to the LLM."""
@@ -148,7 +148,7 @@ class Handoff(Generic[TAgent, TContext, THandoffInput]):
         """Denormalized view of the target agent's name.
 
         Lets telemetry / handoff filters discriminate on the
-        destination without dereferencing :attr:`target` (the
+        destination without dereferencing ``target`` (the
         ``Agent`` import pulls a heavier graph than callers usually
         want at log-emit time).
         """
@@ -301,7 +301,7 @@ class Handoff(Generic[TAgent, TContext, THandoffInput]):
     def _handle_callback_error(self, exc: Exception, callback_kind: Literal["input_filter", "on_handoff"]) -> NoReturn:
         """Apply ``config.on_error`` to an exception from a user callback.
 
-        Delegates to the shared :func:`apply_callback_error_policy` so this
+        Delegates to the shared ``apply_callback_error_policy`` so this
         LLM-orchestrated path and the code-orchestrated ``HandoffTarget.invoke``
         path reject identically. Always raises.
 

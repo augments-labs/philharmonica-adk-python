@@ -176,7 +176,7 @@ class ChromaVectorStore:
             filter: Optional metadata filters (categories are silently ignored).
 
         Returns:
-            List of :class:`VectorQueryResult` ordered by descending score.
+            List of ``VectorQueryResult`` ordered by descending score.
 
         Raises:
             RuntimeError: If Chroma returns ``None`` for a requested include field.
@@ -205,7 +205,7 @@ class ChromaVectorStore:
             record_id: The unique record identifier (namespace-free).
 
         Returns:
-            The matching :class:`VectorRecord`, or ``None`` if not found.
+            The matching ``VectorRecord``, or ``None`` if not found.
 
         Raises:
             RuntimeError: If Chroma returns ``None`` for a requested include field.

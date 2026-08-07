@@ -1,19 +1,19 @@
 """Cost-aware context compaction under budget pressure.
 
-Demonstrates two aspects of :attr:`~philharmonica.adk.context.context_config.CompactionConfig.cost_aware`:
+Demonstrates two aspects of ``cost_aware``:
 
 **Part 1 — Pure demonstration (no API call)**:
-:func:`~philharmonica.adk.context.context_manager.effective_compaction_config` is
+``effective_compaction_config`` is
 called directly with a run cost that exceeds 80 % of the per-run budget. The
 returned config has a tightened ``trigger_tokens`` (halved) and a reduced
 ``preserve_recent_items`` (capped at 1), shedding input tokens as the run
 approaches its budget.
 
 **Part 2 — End-to-end wiring (one real haiku call)**:
-A :class:`~philharmonica.adk.run.config.RunConfig` with both a
-:class:`~philharmonica.adk.context.context_config.ContextManagementConfig` (compaction
-enabled and cost-aware) and a :class:`~philharmonica.adk.budgets.TenantBudget` is
-passed to :meth:`~philharmonica.adk.run.Runner.arun`. The run completes normally;
+A ``RunConfig`` with both a
+``ContextManagementConfig`` (compaction
+enabled and cost-aware) and a ``TenantBudget`` is
+passed to ``arun``. The run completes normally;
 this confirms the wiring is live and the cost-aware compaction path is reachable.
 
 Usage::

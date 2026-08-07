@@ -1,8 +1,8 @@
 """Write generated deploy artifacts to disk.
 
-The render functions in :mod:`philharmonica.adk.deploy.templates` (and each
+The render functions in ``philharmonica.adk.deploy.templates`` (and each
 target's ``generate``) return ``{relative_path: content}`` maps;
-:func:`write_artifacts` materializes them, never clobbering an existing
+``write_artifacts`` materializes them, never clobbering an existing
 file unless ``force`` is set.
 """
 

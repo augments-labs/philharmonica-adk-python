@@ -73,7 +73,7 @@ class LLMConfigBlock(BaseModel):
     base for every provider config sub-model. Only JSON-shaped fields are
     surfaced; ``timeout`` is a float (an ``httpx.Timeout`` object has no
     JSON form) and ``retry_policy`` is the nested
-    :class:`LLMRetryPolicyBlock`.
+    ``LLMRetryPolicyBlock``.
 
     Attributes:
         temperature: Sampling temperature (0–1).

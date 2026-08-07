@@ -1,15 +1,15 @@
-"""Tests for :mod:`philharmonica.adk.tracing.otel`.
+"""Tests for ``philharmonica.adk.tracing.otel``.
 
 Exercises the OpenTelemetry bridge against OTel's own
-:class:`~opentelemetry.sdk.trace.export.in_memory_span_exporter.InMemorySpanExporter`
+``InMemorySpanExporter``
 so we get true-to-runtime assertions about span names, attributes, and
 parent-child relationships.
 
 Also verifies the graceful-degradation contract: when the
 ``opentelemetry`` packages are not installed, constructing an
-:class:`OTelTracer` MUST raise
-:class:`~philharmonica.adk.exceptions.TracingDependencyError` with the install
-command — not a confusing low-level :class:`ImportError`.
+``OTelTracer`` MUST raise
+``TracingDependencyError`` with the install
+command — not a confusing low-level ``ImportError``.
 """
 
 from __future__ import annotations
@@ -49,7 +49,7 @@ from philharmonica.adk.tracing.otel import OTelTracer
 
 @pytest.fixture
 def exporter_and_tracer() -> Any:
-    """Fresh :class:`InMemorySpanExporter` + :class:`OTelTracer` per test.
+    """Fresh ``InMemorySpanExporter`` + ``OTelTracer`` per test.
 
     The ``TracerProvider`` is passed explicitly so the test never
     touches the global OTel provider (other tests in the suite could
@@ -271,14 +271,14 @@ def test_construction_fails_with_helpful_error_when_otel_missing(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Simulate a fresh Python process where ``opentelemetry`` is not
-    installed: :class:`OTelTracer` MUST raise
-    :class:`TracingDependencyError`, not ``ImportError``.
+    installed: ``OTelTracer`` MUST raise
+    ``TracingDependencyError``, not ``ImportError``.
 
     Implemented by clearing every cached ``opentelemetry.*`` module from
-    :data:`sys.modules` and wiring an import hook that raises
+    ``sys.modules`` and wiring an import hook that raises
     ``ModuleNotFoundError`` for the package root. Inline the
-    :class:`OTelTracer` constructor below re-imports
-    :mod:`opentelemetry.trace` — the hook intercepts it.
+    ``OTelTracer`` constructor below re-imports
+    ``opentelemetry.trace`` — the hook intercepts it.
     """
 
     class _BlockOTel:

@@ -54,7 +54,7 @@ class LLMRouter(ABC):
 
     Cheap-first-with-fallback: candidates are ordered cheapest-acceptable
     first; the runner escalates to the next on failure (exception,
-    output-schema validation failure, or :meth:`should_escalate`).
+    output-schema validation failure, or ``should_escalate``).
     """
 
     @abstractmethod
@@ -67,7 +67,7 @@ class LLMRouter(ABC):
         Returns:
             Ordered sequence of candidates.  The runner tries them in
             order, escalating on provider exception, output-schema
-            validation failure, or :meth:`should_escalate` returning
+            validation failure, or ``should_escalate`` returning
             ``True``.
         """
 

@@ -141,14 +141,14 @@ def resolve_compaction_llm(agent: Agent, config: RunConfig) -> LLM:
     Resolution rules:
 
     - If ``config.compaction_llm`` is set, use it directly.
-    - Otherwise, fall back to :func:`resolve_llm` (the agent's
+    - Otherwise, fall back to ``resolve_llm`` (the agent's
       configured ``LLM`` — same instance used for the main turn).
 
     Used by every framework site that needs to invoke an LLM for
     summarisation: the ``ContextManager`` pipeline, JIT
     ``CompactDirective``, and ``HandoffStrategy.SUMMARY``. Routing
     through this helper keeps compaction usage observable in
-    :attr:`RunContext.usage` and visible to ``Agent.middleware.llms``.
+    ``RunContext.usage`` and visible to ``Agent.middleware.llms``.
 
     Args:
         agent: The agent whose primary ``LLM`` is the fallback.
@@ -749,10 +749,10 @@ class RoutingOutcome:
     """Result of a routed call: the response plus which candidate served it.
 
     Attributes:
-        response: The :class:`~philharmonica.adk.types.responses.LLMResponse`
+        response: The ``LLMResponse``
             returned by the winning candidate.
         model: Model name of the candidate that served the request.
-        llm: The :class:`~philharmonica.adk.llms.llm.LLM` instance of the
+        llm: The ``LLM`` instance of the
             candidate that served the request.
     """
 
@@ -853,7 +853,7 @@ async def call_llm_with_routing(
 
     Escalates on non-``PhilharmonicaError`` exceptions, ``router.should_escalate``
     returning ``True``, or output-schema validation failure. ``PhilharmonicaError``
-    subclasses propagate immediately. See :func:`call_llm` for shared args.
+    subclasses propagate immediately. See ``call_llm`` for shared args.
 
     Raises:
         NoRoutingCandidateError: Chains the last error when all candidates fail.
@@ -926,7 +926,7 @@ async def call_llm_streamed_with_routing(
     escalates to the next candidate. Once streaming has begun, the error is surfaced
     (re-running on another model would double-bill and reorder output). There is no
     ``should_escalate`` / output-schema check here — tokens are already forwarded by
-    the time the full response exists. Args mirror :func:`call_llm_streamed`. Each
+    the time the full response exists. Args mirror ``call_llm_streamed``. Each
     candidate is budget-gated before its attempt.
 
     Raises:

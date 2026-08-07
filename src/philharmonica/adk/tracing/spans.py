@@ -1,10 +1,10 @@
 """Span implementations and factory functions.
 
-Defines :class:`Span` as a generic protocol over a :class:`SpanData`
-payload, the :class:`NoOpSpan` default, and the public
+Defines ``Span`` as a generic protocol over a ``SpanData``
+payload, the ``NoOpSpan`` default, and the public
 ``*_span()`` factory functions that runner and ADK code call to
 create spans. Factories always route through
-:func:`get_tracer`, so swapping the tracer at runtime is a
+``get_tracer``, so swapping the tracer at runtime is a
 single-call affair.
 
 Span objects are context managers::
@@ -18,15 +18,15 @@ close the span explicitly when the context-manager form does not fit.
 Parent tracking
 ---------------
 
-:class:`Span` uses a module-level :class:`contextvars.ContextVar` to
+``Span`` uses a module-level ``contextvars.ContextVar`` to
 maintain an implicit parent chain across nested ``with`` blocks and
-``await`` boundaries. On :meth:`Span.start` the current span is captured
+``await`` boundaries. On ``Span.start`` the current span is captured
 as ``self._parent`` and the span installs itself as the new current
-span; :meth:`Span.finish` restores the previous value. The chain is
-exposed via the :attr:`Span.parent_id` property so non-OTel tracers can
+span; ``Span.finish`` restores the previous value. The chain is
+exposed via the ``Span.parent_id`` property so non-OTel tracers can
 attribute children to the correct parent.
 
-:class:`NoOpSpan` overrides these hooks to be truly empty — no
+``NoOpSpan`` overrides these hooks to be truly empty — no
 ``ContextVar`` reads or writes — so the hot path remains zero-cost when
 tracing is disabled.
 """
@@ -62,12 +62,12 @@ TData = TypeVar("TData", bound=SpanData)
 
 
 _current_span: ContextVar[Span[Any] | None] = ContextVar("philharmonica_current_span", default=None)
-"""Process-wide current-span stack, scoped by :mod:`contextvars`.
+"""Process-wide current-span stack, scoped by ``contextvars``.
 
-Each :class:`Span` subclass that wants implicit parent tracking reads
-this on :meth:`start` and writes itself as the new value; :meth:`finish`
-restores the previous value via the captured :class:`~contextvars.Token`.
-:class:`NoOpSpan` intentionally never touches this variable so the
+Each ``Span`` subclass that wants implicit parent tracking reads
+this on ``start`` and writes itself as the new value; ``finish``
+restores the previous value via the captured ``Token``.
+``NoOpSpan`` intentionally never touches this variable so the
 disabled path stays zero-cost.
 """
 
@@ -76,7 +76,7 @@ class Span[TData: SpanData]:
     """Generic span wrapping a typed data payload.
 
     Subclasses specialise the ``TData`` type parameter for a given
-    span kind. :class:`NoOpSpan` is the default implementation.
+    span kind. ``NoOpSpan`` is the default implementation.
     """
 
     data: TData
@@ -117,7 +117,7 @@ class Span[TData: SpanData]:
     def start(self) -> None:
         """Install this span as the current span on the context stack.
 
-        Captures the previous current-span value so :meth:`finish` can
+        Captures the previous current-span value so ``finish`` can
         restore it. Subclasses that manage their own parent tracking
         (e.g. the OTel bridge) MUST override this hook.
         """
@@ -150,8 +150,8 @@ class Span[TData: SpanData]:
 class NoOpSpan(Span[TData]):
     """Span that records nothing.
 
-    Returned by :class:`~philharmonica.adk.tracing.tracer.NoOpTracer`. Hooks
-    are truly empty — no :class:`~contextvars.ContextVar` reads or
+    Returned by ``NoOpTracer``. Hooks
+    are truly empty — no ``ContextVar`` reads or
     writes — so the disabled tracing path stays zero-cost.
     """
 
@@ -169,9 +169,9 @@ def current_span() -> Span[Any] | None:
     """Return the current span on the context stack, or ``None``.
 
     Public helper for tracer implementations (e.g. the OTel bridge, a
-    :class:`~philharmonica.adk.tracing.multi_tracer.MultiTracer` composite) that
+    ``MultiTracer`` composite) that
     need to attribute children to the active parent without importing
-    the private :data:`_current_span` directly.
+    the private ``_current_span`` directly.
     """
     return _current_span.get()
 
@@ -198,7 +198,7 @@ def agent_span(
         tenant_id: Opaque tenant identifier, surfaced as the
             ``philharmonica.tenant.id`` span attribute.
         disabled: When ``True``, bypass the tracer and return a
-            :class:`NoOpSpan` regardless of the installed tracer.
+            ``NoOpSpan`` regardless of the installed tracer.
     """
     data = AgentSpanData(
         name=name,
@@ -239,7 +239,7 @@ def function_span(
             prefix from ``tool.`` (or ``mcp.``) to ``a2a.``. Takes
             precedence over ``mcp_data`` when both are set.
         disabled: When ``True``, bypass the tracer and return a
-            :class:`NoOpSpan` regardless of the installed tracer.
+            ``NoOpSpan`` regardless of the installed tracer.
     """
     data = FunctionSpanData(
         name=name,
@@ -274,7 +274,7 @@ def generation_span(
         tenant_id: Opaque tenant identifier, surfaced as the
             ``philharmonica.tenant.id`` span attribute.
         disabled: When ``True``, bypass the tracer and return a
-            :class:`NoOpSpan` regardless of the installed tracer.
+            ``NoOpSpan`` regardless of the installed tracer.
     """
     data = GenerationSpanData(
         input=input,
@@ -301,7 +301,7 @@ def response_span(
         response_id: Provider-assigned response identifier.
         input: Prompt messages sent to the provider.
         disabled: When ``True``, bypass the tracer and return a
-            :class:`NoOpSpan` regardless of the installed tracer.
+            ``NoOpSpan`` regardless of the installed tracer.
     """
     data = ResponseSpanData(response_id=response_id, input=input)
     if disabled:
@@ -321,7 +321,7 @@ def handoff_span(
         from_agent: Name of the agent initiating the handoff.
         to_agent: Name of the agent receiving the handoff.
         disabled: When ``True``, bypass the tracer and return a
-            :class:`NoOpSpan` regardless of the installed tracer.
+            ``NoOpSpan`` regardless of the installed tracer.
     """
     data = HandoffSpanData(from_agent=from_agent, to_agent=to_agent)
     if disabled:
@@ -342,7 +342,7 @@ def guardrail_span(
         triggered: ``True`` when the guardrail fired and blocked the
             request or response.
         disabled: When ``True``, bypass the tracer and return a
-            :class:`NoOpSpan` regardless of the installed tracer.
+            ``NoOpSpan`` regardless of the installed tracer.
     """
     data = GuardrailSpanData(name=name, triggered=triggered)
     if disabled:
@@ -416,7 +416,7 @@ def sandbox_span(
         snapshot_id: Optional snapshot address persisted during this
             command's lifecycle.
         disabled: When ``True``, bypass the tracer and return a
-            :class:`NoOpSpan` regardless of the installed tracer.
+            ``NoOpSpan`` regardless of the installed tracer.
     """
     data = SandboxSpanData(
         backend_id=backend_id,
@@ -452,7 +452,7 @@ def graph_span(
     """Create a root graph-execution span via the current tracer.
 
     Routed through ``custom_span`` so user-installed tracers receive a
-    uniform :class:`CustomSpanData` payload; the inner
+    uniform ``CustomSpanData`` payload; the inner
     ``data["type"] == "graph"`` discriminator lets the OTel bridge
     apply graph-specific attribute conventions (the ``philharmonica.graph.*``
     namespace).
@@ -464,7 +464,7 @@ def graph_span(
         supersteps_total: Total supersteps executed; set by the
             closing caller.
         disabled: When ``True``, bypass the tracer and return a
-            :class:`NoOpSpan` regardless of the installed tracer.
+            ``NoOpSpan`` regardless of the installed tracer.
     """
     data = GraphSpanData(
         graph_id=graph_id,
@@ -500,7 +500,7 @@ def graph_superstep_span(
         ready_nodes: Node ids that were ready at superstep start.
         fired_nodes: Node ids that fired; set by the closing caller.
         disabled: When ``True``, bypass the tracer and return a
-            :class:`NoOpSpan` regardless of the installed tracer.
+            ``NoOpSpan`` regardless of the installed tracer.
     """
     data = GraphSuperstepSpanData(
         graph_id=graph_id,
@@ -513,7 +513,7 @@ def graph_superstep_span(
     custom = get_tracer().custom_span(
         CustomSpanData(name=f"graph.superstep.{index}", data=data.export()),
     )
-    # See :func:`graph_span` for the custom-span routing rationale.
+    # See ``graph_span`` for the custom-span routing rationale.
     return custom  # type: ignore[return-value]
 
 
@@ -543,7 +543,7 @@ def graph_node_span(
         duration_ms: Wall-clock duration; set by the closing caller.
         resume_attempt: Set when this span covers a resumed node.
         disabled: When ``True``, bypass the tracer and return a
-            :class:`NoOpSpan` regardless of the installed tracer.
+            ``NoOpSpan`` regardless of the installed tracer.
     """
     data = GraphNodeSpanData(
         graph_id=graph_id,
@@ -558,7 +558,7 @@ def graph_node_span(
     custom = get_tracer().custom_span(
         CustomSpanData(name=f"graph.node.{node_name}", data=data.export()),
     )
-    # See :func:`graph_span` for the custom-span routing rationale.
+    # See ``graph_span`` for the custom-span routing rationale.
     return custom  # type: ignore[return-value]
 
 
@@ -573,7 +573,7 @@ def swarm_span(
     """Create a root swarm-execution span via the current tracer.
 
     Routed through ``custom_span`` so user-installed tracers receive a
-    uniform :class:`CustomSpanData` payload; the inner
+    uniform ``CustomSpanData`` payload; the inner
     ``data["type"] == "swarm"`` discriminator lets the OTel bridge
     apply swarm-specific attribute conventions.
 
@@ -585,7 +585,7 @@ def swarm_span(
         turns_total: Total turns executed; set by the closing
             caller.
         disabled: When ``True``, bypass the tracer and return a
-            :class:`NoOpSpan` regardless of the installed tracer.
+            ``NoOpSpan`` regardless of the installed tracer.
     """
     data = SwarmSpanData(
         swarm_id=swarm_id,
@@ -598,7 +598,7 @@ def swarm_span(
     custom = get_tracer().custom_span(
         CustomSpanData(name=f"swarm.{swarm_id}", data=data.export()),
     )
-    # See :func:`graph_span` for the custom-span routing rationale.
+    # See ``graph_span`` for the custom-span routing rationale.
     return custom  # type: ignore[return-value]
 
 
@@ -626,7 +626,7 @@ def swarm_turn_span(
             opened the deep-resume splice; ``None`` on fresh
             turns.
         disabled: When ``True``, bypass the tracer and return a
-            :class:`NoOpSpan` regardless of the installed tracer.
+            ``NoOpSpan`` regardless of the installed tracer.
     """
     data = SwarmTurnSpanData(
         swarm_id=swarm_id,
@@ -641,5 +641,5 @@ def swarm_turn_span(
     custom = get_tracer().custom_span(
         CustomSpanData(name=f"swarm.turn.{index}", data=data.export()),
     )
-    # See :func:`graph_span` for the custom-span routing rationale.
+    # See ``graph_span`` for the custom-span routing rationale.
     return custom  # type: ignore[return-value]

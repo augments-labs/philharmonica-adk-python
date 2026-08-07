@@ -7,7 +7,7 @@ import time) must be registered as passthrough modules.
 
 This module defines the default set of passthrough modules for
 Philharmonica workflows and provides a factory that produces a configured
-:class:`~temporalio.worker.workflow_sandbox.SandboxRestrictions` object.
+``SandboxRestrictions`` object.
 """
 
 from __future__ import annotations
@@ -44,20 +44,20 @@ def build_sandbox_restrictions(
     *,
     import_notification_policy: SandboxImportNotificationPolicy | None = None,
 ) -> SandboxRestrictions:
-    """Return a :class:`~temporalio.worker.workflow_sandbox.SandboxRestrictions` for Philharmonica workflows.
+    """Return a ``SandboxRestrictions`` for Philharmonica workflows.
 
-    Starts from :attr:`SandboxRestrictions.default` and registers each
-    module in :data:`DEFAULT_PASSTHROUGH_MODULES` plus any caller-supplied
+    Starts from ``SandboxRestrictions.default`` and registers each
+    module in ``DEFAULT_PASSTHROUGH_MODULES`` plus any caller-supplied
     extras as sandbox passthrough entries.
 
     Args:
         extra_passthrough_modules: Additional module names to pass through
-            the sandbox beyond :data:`DEFAULT_PASSTHROUGH_MODULES`.
+            the sandbox beyond ``DEFAULT_PASSTHROUGH_MODULES``.
         import_notification_policy: Optional
-            :class:`~temporalio.workflow.SandboxImportNotificationPolicy`
+            ``SandboxImportNotificationPolicy``
             controlling how the sandbox reacts to dynamic or unintentional
             imports.  When ``None`` (the default), the policy from
-            :attr:`~temporalio.worker.workflow_sandbox.SandboxRestrictions.default`
+            ``default``
             is preserved unchanged — currently
             ``SandboxImportNotificationPolicy.WARN_ON_DYNAMIC_IMPORT``.
             Pass a stricter value such as

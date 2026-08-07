@@ -1,4 +1,4 @@
-"""Tests for :func:`~philharmonica.adk.workflows.restate.activity.invoke_model_handler`.
+"""Tests for ``invoke_model_handler``.
 
 Covers:
 - Handler forwards ``tools`` and ``output_schema`` to ``llm.acomplete`` when

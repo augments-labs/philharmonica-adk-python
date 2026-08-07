@@ -1,15 +1,15 @@
 """Speech-to-text abstractions — framework-owned, provider-agnostic.
 
-:class:`STTModel` is the speech-to-text counterpart to the
-:class:`~philharmonica.adk.llms.llm.LLM` ABC: the pipeline talks to it,
+``STTModel`` is the speech-to-text counterpart to the
+``LLM`` ABC: the pipeline talks to it,
 never to a provider SDK. Concrete implementations (e.g. the OpenAI
 models under ``llms/openai/``) convert these provider-agnostic settings
 to their wire format internally.
 
 Two transcription paths exist:
 
-- :meth:`STTModel.transcribe` — one buffered utterance to one transcript.
-- :meth:`STTModel.create_session` — a long-lived realtime session that
+- ``STTModel.transcribe`` — one buffered utterance to one transcript.
+- ``STTModel.create_session`` — a long-lived realtime session that
   segments a continuous microphone stream into one transcript per turn.
 """
 
@@ -77,7 +77,7 @@ class STTModelSettings:
             model auto-detect.
         temperature: Optional decoding temperature.
         turn_detection: Realtime-session voice-activity detection; ignored
-            by the buffered :meth:`STTModel.transcribe` path.
+            by the buffered ``STTModel.transcribe`` path.
     """
 
     prompt: str | None = None
@@ -96,9 +96,9 @@ class STTModelSettings:
 class StreamedTranscriptionSession(ABC):
     """A live transcription session over a continuous audio stream.
 
-    Produced by :meth:`STTModel.create_session`. Iterating
-    :meth:`transcribe_turns` yields one transcript per detected speaking
-    turn until the audio stream ends. :meth:`close` releases the
+    Produced by ``STTModel.create_session``. Iterating
+    ``transcribe_turns`` yields one transcript per detected speaking
+    turn until the audio stream ends. ``close`` releases the
     underlying connection.
     """
 
@@ -119,7 +119,7 @@ class STTModel(ABC):
     """Abstract speech-to-text model.
 
     Implementations live in their provider's module (e.g.
-    ``llms/openai/``) and convert :class:`STTModelSettings` to provider
+    ``llms/openai/``) and convert ``STTModelSettings`` to provider
     wire parameters internally.
     """
 
@@ -152,10 +152,10 @@ class STTModel(ABC):
         Args:
             audio: The append-as-you-go microphone stream.
             settings: Transcription knobs, including
-                :attr:`STTModelSettings.turn_detection`.
+                ``STTModelSettings.turn_detection``.
 
         Returns:
-            A live :class:`StreamedTranscriptionSession`.
+            A live ``StreamedTranscriptionSession``.
 
         Raises:
             STTWebsocketError: When the realtime session cannot be opened.

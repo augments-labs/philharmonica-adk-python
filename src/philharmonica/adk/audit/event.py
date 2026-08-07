@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True, kw_only=True)
 class AuditEvent:
-    """One tool-call resolution recorded to an :class:`AuditSink`.
+    """One tool-call resolution recorded to an ``AuditSink``.
 
     Frozen + keyword-only: an audit record is immutable once created
     (append-only semantics) and is always constructed by name.

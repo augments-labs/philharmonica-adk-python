@@ -5,25 +5,25 @@ it owns the cross-agent control flow, while the single-agent runner
 still owns per-turn execution. The seam between them is narrow:
 
 - The driver computes per-turn ``extra_tools`` / ``swarm_tool_names``
-  from the active :class:`SwarmPolicy` and threads them through
+  from the active ``SwarmPolicy`` and threads them through
   ``run_agent_loop``.
 - When the inner loop detects a policy-injected tool call it returns a
-  :class:`RunResult` with ``swarm_yield`` set (see
-  :class:`~philharmonica.adk.run.next_step.NextStepSwarmYield`).
+  ``RunResult`` with ``swarm_yield`` set (see
+  ``NextStepSwarmYield``).
 - The driver inspects ``result.swarm_yield``, updates state, runs
-  :class:`~philharmonica.adk.swarms.termination.TerminationCondition` checks,
-  and calls :meth:`SwarmPolicy.select_next` for the next turn.
+  ``TerminationCondition`` checks,
+  and calls ``SwarmPolicy.select_next`` for the next turn.
 
 Deliberate non-goals:
 
 - No parallel intra-swarm execution. Agents take serial turns.
 - No auto-injection of system prompts. If a member needs swarm
   awareness the developer calls
-  :func:`philharmonica.adk.swarms.swarm_prompt.prompt_with_swarm_instructions`
+  ``philharmonica.adk.swarms.swarm_prompt.prompt_with_swarm_instructions``
   explicitly.
 - No provider-specific wire types. Inputs are Layer 1
-  :class:`~philharmonica.adk.types.input.LLMInputContentItem`; outputs are
-  Layer 3 :class:`~philharmonica.adk.types.items.items.RunItem`.
+  ``LLMInputContentItem``; outputs are
+  Layer 3 ``RunItem``.
 
 Hard guards (``SwarmConfig.max_handoffs`` / ``max_total_tokens``) and
 soft conditions (``TerminationCondition``) both live above this loop;
@@ -82,7 +82,7 @@ logger = logging.getLogger(__name__)
 def _usage_delta(before: LLMUsage, after: LLMUsage) -> LLMUsage:
     """Compute a field-wise delta ``after - before``.
 
-    :class:`LLMUsage` defines ``__add__`` but not ``__sub__`` — the
+    ``LLMUsage`` defines ``__add__`` but not ``__sub__`` — the
     driver needs the delta for per-member attribution. Only the four
     numeric top-level counters are diffed; nested ``*_details`` are
     not accumulated in the per-member dict because cache-hit /
@@ -100,7 +100,7 @@ def _usage_delta(before: LLMUsage, after: LLMUsage) -> LLMUsage:
 def _snapshot_usage(usage: LLMUsage) -> LLMUsage:
     """Shallow copy of the counters we need for delta computation.
 
-    The ``usage`` attribute on :class:`RunContext` is rebound each
+    The ``usage`` attribute on ``RunContext`` is rebound each
     time ``context.usage = context.usage + response.usage`` runs, so
     a simple reference grab would be stable. We still take a snapshot
     to make intent explicit and to survive any future in-place mutation.
@@ -118,7 +118,7 @@ def user_prompt_text(user_prompt: UserPrompt) -> str:
 
     Used when the swarm driver synthesizes a ``SwarmHandoff`` for
     policy-driven transitions (see the ``else`` branch in
-    :func:`run_swarm_loop`).
+    ``run_swarm_loop``).
 
     ``UserPrompt`` is ``str | list[LLMInputContentItem]``. When it is a
     list, the helper walks the items in **reverse** and returns the
@@ -206,8 +206,8 @@ def _stamp_turn_span(
     """Stamp terminal attributes on ``turn_span`` and finish it.
 
     When both tracing and metrics are disabled the span is a
-    :class:`NoOpSpan` whose ``data`` field is the typed
-    :class:`SwarmTurnSpanData` payload — NOT a :class:`CustomSpanData`
+    ``NoOpSpan`` whose ``data`` field is the typed
+    ``SwarmTurnSpanData`` payload — NOT a ``CustomSpanData``
     envelope. The ``cast()`` itself is a no-op at runtime; it is the
     subsequent dict subscript ``.data["..."]`` that would raise
     ``TypeError`` because ``SwarmTurnSpanData`` is a dataclass, not a
@@ -216,7 +216,7 @@ def _stamp_turn_span(
 
     Args:
         turn_span: The per-turn span returned by
-            :func:`swarm_turn_span`.
+            ``swarm_turn_span``.
         status: Terminal status to record on the span payload.
         monotonic_start: ``time.monotonic()`` snapshot taken at
             span-open; used to compute ``duration_ms``.
@@ -334,24 +334,24 @@ async def run_swarm_loop(
     Sequence per turn:
 
     1. Check termination condition against current state. Fire
-       :class:`StopReason` and exit if it says stop.
+       ``StopReason`` and exit if it says stop.
     2. Check hard guards (``max_handoffs``, ``max_total_tokens``).
     3. Increment ``state.total_turns``; fire ``on_swarm_turn_start``.
     4. Build the next turn's messages. Turn 1 uses
-       :func:`build_initial_messages` (system + user prompt). Turn N
-       uses the :class:`SharedContextStrategy` to build the body,
+       ``build_initial_messages`` (system + user prompt). Turn N
+       uses the ``SharedContextStrategy`` to build the body,
        with a fresh system prompt injected for the current agent.
     5. Ask the policy for ``extra_tools``; derive
        ``swarm_tool_names`` for the runner's yield-detection path.
     6. Snapshot ``ctx_wrapper.usage`` for per-member delta.
-    7. Call :func:`run_agent_loop` and inspect ``result.swarm_yield``.
+    7. Call ``run_agent_loop`` and inspect ``result.swarm_yield``.
     8. Extend ``state.shared_history`` and per-agent scratch; update
        ``cumulative_usage``.
     9. Dispatch the yield:
-       - :class:`SwarmHandoff` — record, advance agent, bump counters.
-       - :class:`SwarmDone` — record on state; termination check
+       - ``SwarmHandoff`` — record, advance agent, bump counters.
+       - ``SwarmDone`` — record on state; termination check
          catches it at step 1 of the next iteration via
-         :class:`ExplicitDoneTermination`.
+         ``ExplicitDoneTermination``.
        - ``None`` (free-form turn) — pass control to ``policy.select_next``.
     10. Fire ``on_swarm_turn_end`` + emit ``SwarmTurnEndEvent``.
 
@@ -359,12 +359,12 @@ async def run_swarm_loop(
     surfaces from the inner loop when ``RunConfig.max_total_turns``
     is exceeded. The swarm's own max-handoffs / max-total-tokens
     guards instead stop the loop cleanly with a
-    :class:`~philharmonica.adk.swarms.stop_reason.StopReason`
+    ``StopReason``
     (``kind="max_handoffs"`` / ``kind="max_total_tokens"``) so the
     caller still receives a well-formed ``SwarmRunResult``.
 
     Args:
-        swarm: The :class:`Swarm` configuration (roster, policy,
+        swarm: The ``Swarm`` configuration (roster, policy,
             termination, shared-context strategy, budgets).
         user_prompt: The initial user input (string or Layer 1 item list).
         ctx_wrapper: The run context. Usage is accumulated across
@@ -375,24 +375,24 @@ async def run_swarm_loop(
         config: Run configuration (tracing, usage limits, ctx_mgmt).
             ``config.max_total_turns`` still applies as the absolute
             safety net on LLM-call count.
-        initial_state: Optional :class:`SwarmState` carried over from a
+        initial_state: Optional ``SwarmState`` carried over from a
             prior checkpoint. When supplied, ``total_turns`` /
             ``shared_history`` / ``per_agent_scratch`` continue from
             the parked turn boundary. Without ``swarm_resume``, any
             parked interrupts and nested-agent snapshots are dropped
             and the parked turn re-runs from scratch.
-        swarm_resume: Optional :class:`SwarmResume` carrying per-member
+        swarm_resume: Optional ``SwarmResume`` carrying per-member
             replies. When provided alongside ``initial_state``, the
             splice at step 7 substitutes a deep-resume call for the
             parked member: a nested-agent-defer reply is applied via
-            :meth:`AgentExecutable.resume_from_snapshot`, and a pure
+            ``AgentExecutable.resume_from_snapshot``, and a pure
             HITL reply is seeded onto the run context for the parked
             member's tool to consume on its re-fire.
 
     Returns:
-        A :class:`SwarmRunResult` with the terminal output, the final
-        :class:`SwarmState`, per-member usage, and the triggering
-        :class:`StopReason`.
+        A ``SwarmRunResult`` with the terminal output, the final
+        ``SwarmState``, per-member usage, and the triggering
+        ``StopReason``.
 
     Raises:
         MaxTurnsExceeded: Propagated from the inner runner when

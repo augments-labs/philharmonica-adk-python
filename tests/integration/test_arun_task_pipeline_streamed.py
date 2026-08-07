@@ -1,4 +1,4 @@
-"""End-to-end tests for :meth:`Runner.arun_task_pipeline_streamed`.
+"""End-to-end tests for ``Runner.arun_task_pipeline_streamed``.
 
 Exercises the stream-of-streams pipeline entry point. The outer
 async iterator yields ``(task_index, RunResultStreaming | None)``

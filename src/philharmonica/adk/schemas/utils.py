@@ -36,18 +36,18 @@ class SchemaEnforcement(enum.StrEnum):
         NONE: No schema transformation is applied.  The raw schema is
             sent as-is to the provider.
         NORMALIZED: Provider-agnostic normalization via
-            :func:`normalize_schema`.  Ensures sensible defaults
+            ``normalize_schema``.  Ensures sensible defaults
             (``type``, ``properties``, ``required``) without imposing
             strict-mode constraints.  Suitable for providers that do
             not support or require strict schemas.
         STRICT: Full OpenAI strict-mode compliance via
-            :func:`ensure_strict_schema`.  Enforces
+            ``ensure_strict_schema``.  Enforces
             ``additionalProperties: false``, forces all properties into
             ``required``, converts ``oneOf`` to ``anyOf``, flattens
             single-element ``allOf``, resolves ``$ref`` with sibling
             keys, and removes ``default: null``.
         COMPACT: Strict-mode compliance plus metadata stripping for
-            cost optimization.  Applies :func:`ensure_strict_schema`
+            cost optimization.  Applies ``ensure_strict_schema``
             then removes ``title`` keys and ``description`` from
             ``const``-valued properties (discriminator fields where
             the constant is self-documenting).
@@ -96,9 +96,9 @@ def enforce_schema(
         enforcement: The enforcement level to apply.
 
             - ``STRICT``: Full OpenAI strict-mode compliance via
-              :func:`ensure_strict_schema`.
+              ``ensure_strict_schema``.
             - ``NORMALIZED``: Provider-agnostic defaults via
-              :func:`normalize_schema`.
+              ``normalize_schema``.
             - ``NONE``: Return the schema as-is.
 
     Returns:
@@ -206,7 +206,7 @@ def _normalize_property(prop_def: Any) -> dict[str, Any] | bool:
     - Any other non-dict value is malformed and is replaced with a minimal
       ``{"type": "string"}`` stub.
     - Nested objects (``type: "object"`` with ``properties``) are
-      recursively normalized via :func:`normalize_schema`.
+      recursively normalized via ``normalize_schema``.
     - Properties containing a ``$ref`` are returned as-is because the
       referenced definition is expected to carry its own type.
     - Properties using composition keywords (``anyOf``, ``oneOf``,
@@ -275,7 +275,7 @@ def normalize_schema(schema: dict[str, Any]) -> dict[str, Any]:
         - ``properties`` defaults to ``{}``.
         - ``required`` defaults to ``[]``.
         - Each property is individually normalized via
-          :func:`_normalize_property`.
+          ``_normalize_property``.
 
     References:
         - Strands SDK ``normalize_schema``:
@@ -284,7 +284,7 @@ def normalize_schema(schema: dict[str, Any]) -> dict[str, Any]:
           https://json-schema.org/understanding-json-schema/reference/object
 
     See Also:
-        :func:`ensure_strict_schema`: For OpenAI strict-mode compliance
+        ``ensure_strict_schema``: For OpenAI strict-mode compliance
         on top of general normalization.
     """
     normalized = schema.copy()
@@ -332,7 +332,7 @@ def ensure_strict_schema(
     Returns:
         The transformed schema.  For non-empty inputs this is the same
         ``dict`` reference passed in (mutated).  For empty inputs a
-        fresh copy of :data:`_EMPTY_SCHEMA` is returned.
+        fresh copy of ``_EMPTY_SCHEMA`` is returned.
 
     Raises:
         TypeError: If *schema* (or any nested sub-schema encountered
@@ -349,7 +349,7 @@ def ensure_strict_schema(
           https://github.com/openai/openai-agents-python/blob/main/src/agents/strict_schema.py
 
     See Also:
-        :func:`normalize_schema`: For lightweight, provider-agnostic
+        ``normalize_schema``: For lightweight, provider-agnostic
         normalization without strict-mode enforcement.
     """
     if schema == {}:
@@ -365,7 +365,7 @@ def ensure_compact_schema(
 ) -> dict[str, Any]:
     """Apply strict-mode compliance then strip metadata for cost optimization.
 
-    Runs :func:`ensure_strict_schema` first, then removes:
+    Runs ``ensure_strict_schema`` first, then removes:
 
     - All ``"title"`` keys (Pydantic metadata, not useful for the LLM).
     - ``"description"`` from properties that have a ``"const"`` value
@@ -377,7 +377,7 @@ def ensure_compact_schema(
     Args:
         schema: The JSON schema dictionary.  A copy should be passed
             if the original must be preserved (mutations from
-            :func:`ensure_strict_schema` apply).
+            ``ensure_strict_schema`` apply).
 
     Returns:
         The transformed schema with metadata stripped.
@@ -480,14 +480,14 @@ def _ensure_strict_schema(
     path: tuple[str, ...],
     root: dict[str, object],
 ) -> dict[str, Any]:
-    """Recursive engine for :func:`ensure_strict_schema`.
+    """Recursive engine for ``ensure_strict_schema``.
 
     Walks a JSON schema tree depth-first, mutating each node to satisfy
     OpenAI strict-mode constraints.
 
     Args:
         json_schema: The current schema node to process.  Must be a
-            ``dict``; raises :class:`TypeError` otherwise.
+            ``dict``; raises ``TypeError`` otherwise.
         path: The traversal path from the root to this node, used for
             diagnostic messages (e.g. ``("properties", "address")``).
         root: The top-level schema dict, needed to resolve ``$ref``

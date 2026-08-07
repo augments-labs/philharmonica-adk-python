@@ -1,13 +1,13 @@
 """MCP tool execution routed through Temporal activities.
 
-:class:`TemporalMCPToolSet` treats each MCP server as a pair of Temporal
+``TemporalMCPToolSet`` treats each MCP server as a pair of Temporal
 activities — one for listing tools and one for calling a tool — so that MCP
 I/O is durable, retried, and tracked in the Temporal event history.
 
 Each instance holds the MCP server identifier, its connection parameters, and
 the activity timeout / retry settings.  At runtime the two
 ``*_in_workflow`` methods dispatch through
-:func:`temporalio.workflow.execute_activity` using the per-instance activity
+``temporalio.workflow.execute_activity`` using the per-instance activity
 name convention.
 
 References:
@@ -32,15 +32,15 @@ class TemporalMCPToolSet:
     """MCP server descriptor that routes tool calls through Temporal activities.
 
     Each MCP server is represented as two Temporal activities whose names are
-    derived from :attr:`name`.  Calling :meth:`list_tools_in_workflow` or
-    :meth:`call_tool_in_workflow` dispatches through
-    :func:`~temporalio.workflow.execute_activity`, making MCP calls durable
+    derived from ``name``.  Calling ``list_tools_in_workflow`` or
+    ``call_tool_in_workflow`` dispatches through
+    ``execute_activity``, making MCP calls durable
     and replay-safe.
 
     Attributes:
         name: MCP server identifier.  Used as the prefix for both activity
-            names (see :attr:`list_tools_activity_name` and
-            :attr:`call_tool_activity_name`).
+            names (see ``list_tools_activity_name`` and
+            ``call_tool_activity_name``).
         connection_params: MCP connection parameters forwarded to the
             activity worker when establishing the MCP session.
         start_to_close_timeout: Maximum seconds allowed for a single activity

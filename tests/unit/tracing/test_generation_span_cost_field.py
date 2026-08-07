@@ -1,4 +1,4 @@
-"""Tests for ``cost_usd`` field on :class:`GenerationSpanData`."""
+"""Tests for ``cost_usd`` field on ``GenerationSpanData``."""
 
 from philharmonica.adk.types.tracing.span_data import GenerationSpanData
 

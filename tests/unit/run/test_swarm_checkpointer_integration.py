@@ -2,13 +2,13 @@
 
 Verifies that ``Runner.arun_swarm``, ``Runner.arun_swarm_from_checkpoint``,
 and ``SwarmRunner.checkpointer`` correctly thread a
-:class:`SwarmCheckpointer` through the runner and into the swarm loop,
+``SwarmCheckpointer`` through the runner and into the swarm loop,
 where it auto-saves after each turn via the swarm hook registry.
 
 The patched-member harness from ``test_swarm_loop_checkpointer.py`` is
 reused: ``run_agent_loop`` is replaced with an ``AsyncMock`` that returns a
-minimal :class:`RunResult` so the driver can complete one iteration via
-:class:`MaxTurnsTermination` without touching an LLM.
+minimal ``RunResult`` so the driver can complete one iteration via
+``MaxTurnsTermination`` without touching an LLM.
 """
 
 from __future__ import annotations

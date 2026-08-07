@@ -1,7 +1,7 @@
 """TemporalLLM — routes LLM calls through Temporal activities when inside a workflow.
 
-Wraps any :class:`~philharmonica.adk.llms.llm.LLM` implementation and transparently
-routes :meth:`acomplete` through :func:`~temporalio.workflow.execute_activity`
+Wraps any ``LLM`` implementation and transparently
+routes ``acomplete`` through ``execute_activity``
 when called from inside a Temporal workflow.  Outside a workflow the call is
 forwarded directly to the wrapped LLM, making ``TemporalLLM`` safe to use in
 both durable and non-durable contexts.
@@ -66,12 +66,12 @@ class TemporalLLM(LLM):
     is added in non-durable paths.
 
     Attributes:
-        wrapped: The real :class:`~philharmonica.adk.llms.llm.LLM` instance that
+        wrapped: The real ``LLM`` instance that
             handles provider communication.
         activity_config: Timeout and retry policy applied to every activity
             execution.
         model_name: Registry key used by the worker to look up the wrapped
-            LLM via :func:`~philharmonica.adk.workflows.temporal.activity.get_model`.
+            LLM via ``get_model``.
             When empty, ``__post_init__`` derives it from the wrapped LLM's
             ``model`` identifier (falling back to ``str(wrapped)`` only when no
             ``model`` is exposed).
@@ -110,7 +110,7 @@ class TemporalLLM(LLM):
     def cost(self, model: str, usage: LLMUsage) -> float | None:
         """Delegate USD costing to the wrapped LLM.
 
-        Without this override the base :meth:`~philharmonica.adk.llms.llm.LLM.cost`
+        Without this override the base ``cost``
         returns ``None`` for every call, so a durable run's tenant dollar
         budget would silently never be charged.  Forwarding to the wrapped
         provider preserves the underlying cost table.
@@ -135,7 +135,7 @@ class TemporalLLM(LLM):
     ) -> CostEstimate:
         """Delegate the pre-call cost estimate to the wrapped LLM.
 
-        Symmetric with :meth:`cost`: the wrapped provider owns token counting
+        Symmetric with ``cost``: the wrapped provider owns token counting
         and pricing, so pre-call dollar gating stays correct under durable
         execution.
 
@@ -145,7 +145,7 @@ class TemporalLLM(LLM):
             max_output_tokens: Optional output-side bound for the estimate.
 
         Returns:
-            The wrapped LLM's :class:`~philharmonica.adk.llms.cost.CostEstimate`.
+            The wrapped LLM's ``CostEstimate``.
         """
         return self.wrapped.estimate_cost(messages, model, max_output_tokens=max_output_tokens)
 
@@ -232,9 +232,9 @@ class TemporalLLM(LLM):
     ) -> LLMResponse:
         """Serialize inputs and dispatch to the Temporal activity.
 
-        Builds a :class:`~philharmonica.adk.workflows.temporal.activity.ModelActivityInput`,
-        calls :func:`~temporalio.workflow.execute_activity`, and deserializes
-        the returned dict back to an :class:`~philharmonica.adk.types.responses.llm_response.LLMResponse`.
+        Builds a ``ModelActivityInput``,
+        calls ``execute_activity``, and deserializes
+        the returned dict back to an ``LLMResponse``.
 
         Args:
             messages: Conversation input.
@@ -243,7 +243,7 @@ class TemporalLLM(LLM):
             output_schema: Optional structured output schema.
 
         Returns:
-            The :class:`~philharmonica.adk.types.responses.llm_response.LLMResponse`
+            The ``LLMResponse``
             produced by the worker-side LLM invocation.
 
         References:
@@ -332,15 +332,15 @@ class TemporalLLM(LLM):
         """Recursively wrap every agent LLM in the handoff graph with ``TemporalLLM``.
 
         Walks ``agent.llm`` and all handoff-target agents' LLMs, replacing each
-        :class:`~philharmonica.adk.llms.llm.LLM` instance with a ``TemporalLLM`` wrapper.
+        ``LLM`` instance with a ``TemporalLLM`` wrapper.
         Agents that already carry a ``TemporalLLM`` are skipped to prevent
         double-wrapping.  Circular handoff references are handled via a visited
         set of agent ``id()`` values.
 
         Args:
-            agent: The root :class:`~philharmonica.adk.agents.agent.Agent` to install on.
+            agent: The root ``Agent`` to install on.
             activity_config: Timeout and retry policy.  Defaults to
-                :class:`~philharmonica.adk.workflows.engine.ModelActivityConfig` defaults.
+                ``ModelActivityConfig`` defaults.
             model_name: Registry key for worker-side lookup.  Defaults to
                 ``str(wrapped)`` for each individual LLM.
         """
@@ -356,7 +356,7 @@ class TemporalLLM(LLM):
 def _derive_registry_key(wrapped: LLM) -> str:
     """Return the worker-registry key for *wrapped*.
 
-    The :class:`~philharmonica.adk.llms.llm.LLM` ABC does not declare a ``model``
+    The ``LLM`` ABC does not declare a ``model``
     attribute, but every concrete provider (``LiteLLM``, ``AnthropicModel``,
     ``OpenAIResponsesModel``, ``GeminiModel``, …) exposes the model identifier
     there.  It is the stable key that matches ``register_model()`` on the
@@ -431,17 +431,17 @@ def _install_recursive(
 
 
 def _dict_to_llm_response(data: dict[str, Any]) -> LLMResponse:
-    """Reconstruct an :class:`~philharmonica.adk.types.responses.llm_response.LLMResponse` from a dict.
+    """Reconstruct an ``LLMResponse`` from a dict.
 
     The dict is produced by ``dataclasses.asdict(response)`` inside
-    :func:`~philharmonica.adk.workflows.temporal.activity.invoke_model_activity`.
+    ``invoke_model_activity``.
     Each ``response`` part is re-instantiated from its ``type`` discriminator.
 
     Args:
         data: Dict produced by ``dataclasses.asdict(LLMResponse(...))``.
 
     Returns:
-        A fully reconstructed :class:`~philharmonica.adk.types.responses.llm_response.LLMResponse`.
+        A fully reconstructed ``LLMResponse``.
     """
     from philharmonica.adk.types.responses.llm_response import (
         LLMResponse,
@@ -495,7 +495,7 @@ def _dict_to_llm_response(data: dict[str, Any]) -> LLMResponse:
 
 
 def _dict_to_usage(usage_data: dict[str, Any] | None) -> LLMUsage | None:
-    """Reconstruct :class:`LLMUsage` from its ``asdict`` form.
+    """Reconstruct ``LLMUsage`` from its ``asdict`` form.
 
     ``LLMUsage`` is a plain dataclass whose ``BeforeValidator`` normalizers fire
     only under pydantic validation, so a bare ``LLMUsage(**usage_data)`` would

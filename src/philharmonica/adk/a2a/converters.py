@@ -218,7 +218,7 @@ def extract_text_from_task(task: Task) -> str:
     last message in the task ``history``.
 
     Args:
-        task: The completed :class:`a2a.types.Task` whose text content
+        task: The completed ``a2a.types.Task`` whose text content
             should be extracted.
 
     Returns:
@@ -285,7 +285,7 @@ def build_send_request(
             the server to keep producing events through to terminal.
             When ``True`` the server returns as soon as a
             ``task_id`` / ``context_id`` pair has been minted —
-            used by :meth:`A2AClient.submit_background` only.
+            used by ``A2AClient.submit_background`` only.
             Wire-level field name comes from the
             ``a2a.types.SendMessageConfiguration`` protobuf.
         accepted_output_modes: Optional content-type filter passed to
@@ -293,7 +293,7 @@ def build_send_request(
             etc.). Defaults to ``None`` — the server picks.
 
     Returns:
-        A :class:`a2a.types.SendMessageRequest` ready to pass to the
+        A ``a2a.types.SendMessageRequest`` ready to pass to the
         protocol client.
     """
     config = SendMessageConfiguration(return_immediately=return_immediately)
@@ -315,11 +315,11 @@ def task_to_status(task: Task) -> A2ATaskStatus:
     populated only when the task reached ``"completed"``.
 
     Args:
-        task: The :class:`a2a.types.Task` snapshot returned by the
+        task: The ``a2a.types.Task`` snapshot returned by the
             remote server's ``get_task`` endpoint.
 
     Returns:
-        An :class:`A2ATaskStatus` reflecting the current state,
+        An ``A2ATaskStatus`` reflecting the current state,
         with ``result`` populated if completed and ``message``
         populated if the status carries human-readable detail.
     """
@@ -353,7 +353,7 @@ def stream_response_kind(response: StreamResponse) -> str | None:
     options: ``task``, ``message``, ``status_update``, ``artifact_update``.
 
     Args:
-        response: A single :class:`a2a.types.StreamResponse` chunk
+        response: A single ``a2a.types.StreamResponse`` chunk
             from the protocol iterator.
 
     Returns:
@@ -382,7 +382,7 @@ def build_get_task_request(task_id: str, *, history_length: int = 0) -> GetTaskR
             response. Default 0 (status only, no history).
 
     Returns:
-        A :class:`a2a.types.GetTaskRequest` ready to pass to the
+        A ``a2a.types.GetTaskRequest`` ready to pass to the
         protocol client's ``get_task`` method.
     """
     return GetTaskRequest(id=task_id, history_length=history_length)
@@ -395,7 +395,7 @@ def build_cancel_task_request(task_id: str) -> CancelTaskRequest:
         task_id: The remote task identifier to cancel.
 
     Returns:
-        A :class:`a2a.types.CancelTaskRequest` ready to pass to the
+        A ``a2a.types.CancelTaskRequest`` ready to pass to the
         protocol client's ``cancel_task`` method.
     """
     return CancelTaskRequest(id=task_id)
@@ -420,14 +420,14 @@ def stream_response_to_event(
     on the client.
 
     Args:
-        chunk: A single :class:`a2a.types.StreamResponse` from the
+        chunk: A single ``a2a.types.StreamResponse`` from the
             protocol iterator.
         accumulator: Mutable list collecting text-delta strings so a
             downstream ``"completed"`` event can return the full
             accumulated text.
 
     Returns:
-        An :class:`A2AStreamEvent` TypedDict when the chunk carries
+        An ``A2AStreamEvent`` TypedDict when the chunk carries
         actionable content, or ``None`` when the chunk has no
         text-bearing update.
     """

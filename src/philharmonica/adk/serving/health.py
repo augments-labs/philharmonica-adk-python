@@ -4,7 +4,7 @@
 (readiness — dependencies are reachable) let Kubernetes probes, Cloud
 Run startup checks, and load-balancer health checks observe the service.
 
-Both routes are **opt-in**: :func:`health_routes` is mounted only when
+Both routes are **opt-in**: ``health_routes`` is mounted only when
 the caller asks for it, so the framework never serves an endpoint the
 developer did not request.
 """
@@ -47,7 +47,7 @@ def health_routes(
             always reports ready.
 
     Returns:
-        The liveness and readiness :class:`starlette.routing.Route` objects.
+        The liveness and readiness ``starlette.routing.Route`` objects.
 
     Raises:
         ValueError: If either path is empty.

@@ -83,7 +83,7 @@ class TextChunker:
             document: The document to split.
 
         Returns:
-            One :class:`LoadedDocument` per chunk. Each carries the original
+            One ``LoadedDocument`` per chunk. Each carries the original
             ``source`` and ``metadata`` plus a ``chunk`` facet (its 0-based
             index). A document already within ``chunk_size`` returns a
             single-element list with no ``chunk`` facet added.

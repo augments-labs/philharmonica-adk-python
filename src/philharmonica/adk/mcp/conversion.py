@@ -148,7 +148,7 @@ def call_tool_result_to_str(
     ``isError=True`` raises ``MCPToolCallError`` so the framework's
     tool-error pathway produces the model-visible message. Text
     parts are concatenated; non-text parts are omitted from this
-    string and retained by :func:`call_tool_result_to_artifact`.
+    string and retained by ``call_tool_result_to_artifact``.
 
     Args:
         result: The raw MCP call result.

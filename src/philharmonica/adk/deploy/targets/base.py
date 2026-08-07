@@ -1,6 +1,6 @@
 """``DeployTarget`` — the uniform seam every cloud target implements.
 
-Each target renders its artifacts from a :class:`DeployContext`.
+Each target renders its artifacts from a ``DeployContext``.
 ``generate`` is the uniform part ``deploy init`` calls for every target;
 build/ship actions are target-specific methods invoked by the matching
 CLI subcommand, because their flags differ per cloud.

@@ -28,7 +28,7 @@ class HostedMCPTool(HostedTool):
     Provider matrix:
     - **OpenAI Responses**: native via the ``mcp`` tool type. Honours
       every attribute below.
-    - All other providers raise :class:`UnsupportedHostedToolError`.
+    - All other providers raise ``UnsupportedHostedToolError``.
       Use ``MCPToolset`` (client-side) for Anthropic / Gemini /
       stdio / private-network MCP servers.
 
@@ -61,7 +61,7 @@ class HostedMCPTool(HostedTool):
     headers: Mapping[str, str] | None = field(default=None, repr=False)
     """Static HTTP headers attached to every request to ``server_url``.
     Typical use: ``{"Authorization": "Bearer ..."}`` for API-key auth.
-    For OAuth tokens prefer :attr:`authorization`. ``repr=False`` so
+    For OAuth tokens prefer ``authorization``. ``repr=False`` so
     the token is not leaked through ``str(tool)`` or default logging.
     **OpenAI Responses only.**"""
 
@@ -81,11 +81,11 @@ class HostedMCPTool(HostedTool):
       — per-tool fine-grained policy.
 
     When approval is required, the Responses API emits a typed
-    ``MCPApprovalRequestItem`` in :attr:`RunResult.new_items` (the
+    ``MCPApprovalRequestItem`` in ``RunResult.new_items`` (the
     framework lifts the wire-format ``mcp_approval_request`` item out
     of the generic provider_item channel). Reply by appending an
     ``MCPApprovalResponseItem(raw=MCPApprovalResponse(...))`` to the
-    next turn's input — :meth:`MCPApprovalResponseItem.to_param`
+    next turn's input — ``MCPApprovalResponseItem.to_param``
     builds the matching wire-format ``mcp_approval_response`` so the
     provider sees the approve/reject decision.
 

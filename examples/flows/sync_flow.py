@@ -1,10 +1,10 @@
 """Sync flow example — ``Runner.run_flow(flow)``.
 
 Demonstrates the blocking wrapper for flow execution. Same event-loop
-strategy as :meth:`Runner.run` / :meth:`Runner.run_task_pipeline`:
+strategy as ``Runner.run`` / ``Runner.run_task_pipeline``:
 when invoked inside a running loop, the call offloads to a worker
 thread so the parent loop is not blocked. When invoked from a plain
-script (no loop), :func:`asyncio.run` drives the coroutine.
+script (no loop), ``asyncio.run`` drives the coroutine.
 
 Use from synchronous entry points (scripts, REPLs, framework hooks
 that don't expose async surfaces).

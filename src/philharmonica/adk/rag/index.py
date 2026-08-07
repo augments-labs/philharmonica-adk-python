@@ -1,8 +1,8 @@
 """DocumentIndex — chunk, embed, store, and search a document corpus.
 
-The retrieval core of the RAG layer. It composes an :class:`Embedder` and a
-:class:`VectorStore` (the same primitives :class:`VectorMemory` uses, so any of
-the framework's vector backends works) with a :class:`TextChunker`. Documents
+The retrieval core of the RAG layer. It composes an ``Embedder`` and a
+``VectorStore`` (the same primitives ``VectorMemory`` uses, so any of
+the framework's vector backends works) with a ``TextChunker``. Documents
 are split into chunks, embedded in batches, and upserted; a query is embedded
 and matched by cosine similarity. Chunks are stored under an explicit namespace
 so an index can share a backend with conversation memory without collision.
@@ -36,9 +36,9 @@ class DocumentIndex:
     Args:
         embedder: Converts chunk and query text into vectors.
         store: Vector backend. Defaults to an ephemeral
-            :class:`InMemoryVectorStore`.
+            ``InMemoryVectorStore``.
         chunker: Splitter applied before embedding. Defaults to a
-            :class:`TextChunker` with standard bounds.
+            ``TextChunker`` with standard bounds.
         namespace: Scoping key for this index's chunks. Defaults to
             ``"documents"``.
         batch_size: Maximum chunks embedded per provider call. Must be > 0.
@@ -126,7 +126,7 @@ class DocumentIndex:
         await self._store.close()
 
     def _build_record(self, chunk: LoadedDocument, *, vector: tuple[float, ...], now: float) -> VectorRecord:
-        """Build a :class:`VectorRecord` carrying the chunk's provenance."""
+        """Build a ``VectorRecord`` carrying the chunk's provenance."""
         # Provenance goes last so a loader metadata key named "source" cannot
         # overwrite the reserved facet that _result_to_hit reports as the hit
         # source.

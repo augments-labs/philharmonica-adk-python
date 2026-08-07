@@ -3,7 +3,7 @@
 Demonstrates the explicit checkpoint workflow:
 
 1. Run a flow partially, capture state at a step boundary.
-2. Serialize :class:`FlowCheckpoint` to JSON (portable across processes).
+2. Serialize ``FlowCheckpoint`` to JSON (portable across processes).
 3. Reload the checkpoint, rehydrate the state, and resume execution.
 
 Persistence is **explicit** — there is no ``@persist`` decorator. The

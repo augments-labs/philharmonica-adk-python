@@ -1,18 +1,18 @@
 """Events streamed from a running voice pipeline.
 
-:meth:`~philharmonica.adk.voice.result.StreamedAudioResult.stream` yields a
+``stream`` yields a
 union of three event variants, discriminated by their ``type`` field:
 
-- :class:`VoiceStreamEventAudio` — a chunk of synthesized PCM audio to
+- ``VoiceStreamEventAudio`` — a chunk of synthesized PCM audio to
   play.
-- :class:`VoiceStreamEventLifecycle` — a turn/session boundary marker,
+- ``VoiceStreamEventLifecycle`` — a turn/session boundary marker,
   useful for driving UI state (e.g. a "speaking" indicator).
-- :class:`VoiceStreamEventError` — an error raised mid-stream; the
+- ``VoiceStreamEventError`` — an error raised mid-stream; the
   stream ends after it.
 
 These are plain ``@dataclass`` discriminated-union members, mirroring the
 runner's own boundary stream events
-(:class:`~philharmonica.adk.run.stream.RawResponseStreamEvent` and friends)
+(``RawResponseStreamEvent`` and friends)
 rather than the validation-heavy response types.
 """
 

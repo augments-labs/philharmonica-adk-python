@@ -1,6 +1,6 @@
 """Result types for graph execution.
 
-Mirrors :class:`~philharmonica.adk.swarms.result.SwarmRunResult` so consumers
+Mirrors ``SwarmRunResult`` so consumers
 who already read ``.final_output`` / ``.new_items`` / ``.context`` on
 single-agent runs get the same ergonomics for graphs. Adds
 graph-specific fields that do not make sense on a single-agent or
@@ -9,17 +9,17 @@ swarm result:
 - ``per_node_usage`` — cost attribution broken down by node id. The
   feature neither LangGraph nor Strands surfaces ergonomically on
   their Graph result.
-- ``node_results`` — the full :class:`NodeResult` per node, available
-  without unpacking :attr:`state`.
-- ``status`` — :class:`GraphRunStatus` lifecycle tag (``completed``,
+- ``node_results`` — the full ``NodeResult`` per node, available
+  without unpacking ``state``.
+- ``status`` — ``GraphRunStatus`` lifecycle tag (``completed``,
   ``failed``, ``max_supersteps``, ``max_tokens``, ``no_ready_nodes``, or
   ``interrupted``).
 
-:class:`GraphRunResultStreaming` is the streaming twin of
-:class:`GraphRunResult`, produced by
-:meth:`~philharmonica.adk.run.runner.Runner.arun_graph_streamed` and
+``GraphRunResultStreaming`` is the streaming twin of
+``GraphRunResult``, produced by
+``arun_graph_streamed`` and
 ``Runner.configure().graph(graph).arun(stream=True)``. Events are consumed via
-:meth:`GraphRunResultStreaming.stream_events`; terminal fields
+``GraphRunResultStreaming.stream_events``; terminal fields
 (``final_output``, ``status``, ``state``, usage, etc.) are populated
 when the run completes.
 """
@@ -56,15 +56,15 @@ class StructuredInterrupts:
     Groups the flat ``interrupts`` tuple into named categories so
     consumers can distinguish pending human decisions from each other
     without inspecting raw dict keys.  This is additive — the existing
-    ``interrupts`` field on :class:`GraphRunResult` and
-    :class:`GraphRunResultStreaming` is unchanged.
+    ``interrupts`` field on ``GraphRunResult`` and
+    ``GraphRunResultStreaming`` is unchanged.
 
     Attributes:
-        generic: Plain :class:`Interrupt` instances (``kind="generic"``
+        generic: Plain ``Interrupt`` instances (``kind="generic"``
             or any non-typed kind).
-        nested_agent: :class:`NestedAgentInterrupt` instances — a nested
+        nested_agent: ``NestedAgentInterrupt`` instances — a nested
             agent deferred a tool call awaiting human approval.
-        nested_graph: :class:`NestedGraphInterrupt` instances — an inner
+        nested_graph: ``NestedGraphInterrupt`` instances — an inner
             graph suspended on a plain interrupt that was lifted to the
             outer graph.
         by_node: All pending interrupts keyed by node id for direct
@@ -91,7 +91,7 @@ class StructuredInterrupts:
 
     @classmethod
     def from_interrupts(cls, interrupts: tuple[Interrupt, ...]) -> StructuredInterrupts:
-        """Build a :class:`StructuredInterrupts` from a flat interrupt tuple.
+        """Build a ``StructuredInterrupts`` from a flat interrupt tuple.
 
         Classifies each interrupt into the appropriate category based on
         its concrete type.  ``by_node`` is built from all entries;
@@ -103,7 +103,7 @@ class StructuredInterrupts:
                 sourced from ``GraphState.pending_interrupts.values()``.
 
         Returns:
-            A fully populated :class:`StructuredInterrupts`.
+            A fully populated ``StructuredInterrupts``.
         """
         generic: list[Interrupt] = []
         nested_agent: list[NestedAgentInterrupt] = []
@@ -135,18 +135,18 @@ class GraphRunStatus(StrEnum):
 
     FAILED = "failed"
     """A node raised an exception that was surfaced.  With
-    :attr:`GraphConfig.fail_fast` set (the default), the run stops
+    ``GraphConfig.fail_fast`` set (the default), the run stops
     immediately.  With ``fail_fast=False``, node errors are accumulated and
     the run continues; if errored nodes cause all downstream paths to
     deadlock (no ready nodes and no terminal fired), the status is set to
-    ``FAILED`` and :attr:`GraphRunResult.error` names which nodes
+    ``FAILED`` and ``GraphRunResult.error`` names which nodes
     failed."""
 
     MAX_SUPERSTEPS = "max_supersteps"
-    """Loop exited because :attr:`GraphConfig.max_supersteps` was hit."""
+    """Loop exited because ``GraphConfig.max_supersteps`` was hit."""
 
     MAX_TOKENS = "max_tokens"
-    """Loop exited because :attr:`GraphConfig.max_total_tokens` was hit."""
+    """Loop exited because ``GraphConfig.max_total_tokens`` was hit."""
 
     NO_READY_NODES = "no_ready_nodes"
     """Loop exited because no more nodes were schedulable and no
@@ -154,8 +154,8 @@ class GraphRunStatus(StrEnum):
     every branch's predicate returned ``False``."""
 
     INTERRUPTED = "interrupted"
-    """Loop paused because a node raised :class:`InterruptException`;
-    the caller must supply a :class:`~philharmonica.adk.graphs.interrupt.GraphResume`
+    """Loop paused because a node raised ``InterruptException``;
+    the caller must supply a ``GraphResume``
     to continue."""
 
 
@@ -163,7 +163,7 @@ class GraphRunStatus(StrEnum):
 class GraphRunResult[TContext]:
     """Result of a completed graph run.
 
-    A :class:`GraphRunResult` is produced for every terminal outcome
+    A ``GraphRunResult`` is produced for every terminal outcome
     — completed, failed, or budget-exceeded. The ``status`` field
     tells the caller which one. For hard-crash exits (e.g.
     ``MaxTurnsExceeded`` from a nested agent) the graph loop still
@@ -172,24 +172,24 @@ class GraphRunResult[TContext]:
     Attributes:
         final_output: Aggregate graph output. When the graph has one
             terminal, this is that terminal's
-            :attr:`NodeResult.output`. When it has multiple
+            ``NodeResult.output``. When it has multiple
             terminals, this is a dict ``{terminal_id: output}``.
-        status: :class:`GraphRunStatus` lifecycle tag.
+        status: ``GraphRunStatus`` lifecycle tag.
         user_prompt: The original input passed to
-            :meth:`Runner.arun_graph`.
+            ``Runner.arun_graph``.
         new_items: Layer 3 items produced across the whole run, in
             completion order. Equivalent to
-            :attr:`GraphState.all_items` but surfaced at the top level
-            for API parity with :class:`RunResult`.
-        state: Final :class:`GraphState`. Serialisable via
-            :meth:`GraphState.to_json`.
-        node_results: Latest :class:`NodeResult` per node id, at loop
-            exit. Mirrors :attr:`GraphState.node_results`.
-        context: The :class:`RunContext` shared across the run.
+            ``GraphState.all_items`` but surfaced at the top level
+            for API parity with ``RunResult``.
+        state: Final ``GraphState``. Serialisable via
+            ``GraphState.to_json``.
+        node_results: Latest ``NodeResult`` per node id, at loop
+            exit. Mirrors ``GraphState.node_results``.
+        context: The ``RunContext`` shared across the run.
         per_node_usage: Per-node cost attribution keyed by node id.
         cumulative_usage: Graph-wide cumulative usage. Equal to the
-            sum of :attr:`per_node_usage` values.
-        total_supersteps: Mirror of :attr:`GraphState.superstep`.
+            sum of ``per_node_usage`` values.
+        total_supersteps: Mirror of ``GraphState.superstep``.
         error: Populated only when ``status == GraphRunStatus.FAILED``.
         interrupts: Pending interrupts when ``status == INTERRUPTED``.
             Empty for all other statuses.
@@ -211,7 +211,7 @@ class GraphRunResult[TContext]:
     """Final graph state."""
 
     node_results: dict[str, NodeResult] = field(default_factory=dict)
-    """Latest :class:`NodeResult` per node id."""
+    """Latest ``NodeResult`` per node id."""
 
     context: RunContext[TContext] | None = None
     """The run context."""
@@ -223,7 +223,7 @@ class GraphRunResult[TContext]:
     """Graph-wide cumulative usage."""
 
     total_supersteps: int = 0
-    """Mirror of :attr:`GraphState.superstep`."""
+    """Mirror of ``GraphState.superstep``."""
 
     error: str | None = None
     """Serialised error when ``status == FAILED``."""
@@ -233,19 +233,19 @@ class GraphRunResult[TContext]:
     other statuses."""
 
     structured_interrupts: StructuredInterrupts = field(default_factory=StructuredInterrupts)
-    """Structured view of :attr:`interrupts`, grouped by subtype.
+    """Structured view of ``interrupts``, grouped by subtype.
 
     Populated when ``status == INTERRUPTED``; all category tuples are
     empty for all other statuses.  Additive — does not replace
-    :attr:`interrupts`.
+    ``interrupts``.
     """
 
     def release_agents(self) -> None:
         """Drop strong references to heavy fields.
 
-        Parity with :meth:`RunResult.release_agents` /
-        :meth:`SwarmRunResult.release_agents`. Caches holding many
-        completed :class:`GraphRunResult` instances can pin whole
+        Parity with ``RunResult.release_agents`` /
+        ``SwarmRunResult.release_agents``. Caches holding many
+        completed ``GraphRunResult`` instances can pin whole
         agent+swarm+sub-graph structures via the node executables;
         call this after you're done with ``new_items`` and
         ``node_results`` to free them for GC.
@@ -263,27 +263,27 @@ class GraphRunResult[TContext]:
 
 @dataclass
 class GraphRunResultStreaming[TContext]:
-    """Streaming twin of :class:`GraphRunResult`.
+    """Streaming twin of ``GraphRunResult``.
 
-    Produced by :meth:`~philharmonica.adk.run.runner.Runner.arun_graph_streamed`
+    Produced by ``arun_graph_streamed``
     and ``Runner.configure().graph(graph).arun(stream=True)``. Iterate events
-    in real time via :meth:`stream_events`, which yields :class:`GraphStreamEvent`
+    in real time via ``stream_events``, which yields ``GraphStreamEvent``
     instances until the run completes or is cancelled. Terminal fields
     (``final_output``, ``status``, ``state``, ``per_node_usage``,
     ``cumulative_usage``, etc.) are populated once the run completes.
-    Cancellation is available via :meth:`cancel`.
+    Cancellation is available via ``cancel``.
 
     Attributes:
         final_output: Aggregate graph output. ``None`` while streaming;
             populated on run completion.
-        status: Terminal :class:`GraphRunStatus`. ``None`` while
+        status: Terminal ``GraphRunStatus``. ``None`` while
             streaming.
         user_prompt: Original input passed to the run entry point.
             Set at start.
         new_items: Layer 3 items accumulated so far.
-        state: Live :class:`GraphState` reference.
+        state: Live ``GraphState`` reference.
         node_results: Latest per-node results accumulated so far.
-        context: The :class:`RunContext` shared across the run.
+        context: The ``RunContext`` shared across the run.
         per_node_usage: Per-node usage accumulated so far.
         cumulative_usage: Graph-wide cumulative usage accumulated so far.
         total_supersteps: Current superstep count.
@@ -343,11 +343,11 @@ class GraphRunResultStreaming[TContext]:
     streaming and for all non-interrupted terminal statuses."""
 
     structured_interrupts: StructuredInterrupts = field(default_factory=StructuredInterrupts)
-    """Structured view of :attr:`interrupts`, grouped by subtype.
+    """Structured view of ``interrupts``, grouped by subtype.
 
     Populated when ``status == INTERRUPTED``; all category tuples are
     empty while streaming and for all non-interrupted terminal statuses.
-    Additive — does not replace :attr:`interrupts`.
+    Additive — does not replace ``interrupts``.
     """
 
     _event_queue: asyncio.Queue = field(default_factory=asyncio.Queue)
@@ -378,7 +378,7 @@ class GraphRunResultStreaming[TContext]:
 
         Raises:
             Exception: Re-raises any exception that the driver task
-                stored via :meth:`set_exception`.
+                stored via ``set_exception``.
         """
         if self._run_task is None and self._deferred_run_impl is not None:
             self._run_task = asyncio.get_running_loop().create_task(self._deferred_run_impl())
@@ -458,7 +458,7 @@ class GraphRunResultStreaming[TContext]:
         """Enqueue an event unless an immediate cancel is in flight.
 
         Args:
-            event: The :class:`GraphStreamEvent` (or any object) to enqueue.
+            event: The ``GraphStreamEvent`` (or any object) to enqueue.
         """
         if self._cancel_mode != CancelMode.IMMEDIATE:
             await self._event_queue.put(event)
@@ -487,9 +487,9 @@ class GraphRunResultStreaming[TContext]:
     def set_deferred_run_impl(self, impl: Any) -> None:
         """Store the driver coroutine factory for lazy task creation.
 
-        Called when :meth:`Runner.arun_graph_streamed` is invoked outside
+        Called when ``Runner.arun_graph_streamed`` is invoked outside
         an active event loop. The task is created on the first call to
-        :meth:`stream_events`.
+        ``stream_events``.
 
         Args:
             impl: A zero-argument callable that returns the driver

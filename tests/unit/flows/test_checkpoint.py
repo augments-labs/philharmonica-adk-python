@@ -1,4 +1,4 @@
-"""Unit tests for :class:`FlowCheckpoint` JSON round-trip + structural validation."""
+"""Unit tests for ``FlowCheckpoint`` JSON round-trip + structural validation."""
 
 from __future__ import annotations
 

@@ -177,7 +177,7 @@ class QdrantVectorStore:
             filter: Optional metadata filters applied as Qdrant conditions.
 
         Returns:
-            List of :class:`VectorQueryResult` ordered by descending score.
+            List of ``VectorQueryResult`` ordered by descending score.
         """
         await self._ensure_ready()
         response = await self._client.query_points(
@@ -200,7 +200,7 @@ class QdrantVectorStore:
             record_id: The unique record identifier (UUID string; namespace-free).
 
         Returns:
-            The matching :class:`VectorRecord`, or ``None`` if not found.
+            The matching ``VectorRecord``, or ``None`` if not found.
         """
         await self._ensure_ready()
         points = await self._client.retrieve(self._collection, ids=[record_id], with_payload=True, with_vectors=True)

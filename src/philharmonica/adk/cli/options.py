@@ -21,7 +21,7 @@ def target_options[F: Callable[..., object]](f: F) -> F:
     ``CONFIG`` is an optional positional path to a ``.json`` / ``.yaml`` /
     ``.yml`` agent or topology file. ``--agent`` references a Python object
     (``module:variable``) instead. Commands require exactly one of the two
-    via :func:`philharmonica.adk.cli.loading.resolve_target`.
+    via ``philharmonica.adk.cli.loading.resolve_target``.
     """
     f = click.option(
         "--agent",

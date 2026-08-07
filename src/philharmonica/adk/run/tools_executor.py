@@ -102,7 +102,7 @@ async def drain_streaming_tool_value(
     unconditionally from each terminal closure: only the innermost
     one (the one wrapping the user's async-gen) actually drains.
 
-    Reads the active :class:`ToolStreamSink` from the
+    Reads the active ``ToolStreamSink`` from the
     ``_TOOL_STREAM_SINK`` contextvar. ``None`` (the non-streaming
     path) silences partial-event forwarding and emits one warning so
     the operator notices their streaming tool's chunks are being
@@ -110,7 +110,7 @@ async def drain_streaming_tool_value(
 
     On any exit path — normal completion, exception, or cancellation
     — the iterator is explicitly ``aclose()``-d via
-    :func:`contextlib.aclosing` so the producer's ``finally`` blocks
+    ``contextlib.aclosing`` so the producer's ``finally`` blocks
     run promptly. Without this, an in-flight cancel or a raise from
     ``sink.put_event`` would abandon the user's generator until GC,
     leaking any sockets / file handles / DB cursors it holds open
@@ -354,8 +354,8 @@ async def execute_approved_tool(
         config: Run configuration.
         context: Caller-supplied user context passed through to ToolContext.
         messages: Optional conversation history (Layer 1 params) used to
-            construct :class:`ExecutionAwareToolContext` or
-            :class:`HistoryAwareToolContext` when the tool opts in via
+            construct ``ExecutionAwareToolContext`` or
+            ``HistoryAwareToolContext`` when the tool opts in via
             ``tool.execution_aware`` or ``tool.history_aware``.
 
     Returns:

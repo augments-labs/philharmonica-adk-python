@@ -5,17 +5,17 @@ counts as a failure. Error-category detection is delegated to each
 ``LLM`` implementation because exception types differ per provider
 SDK. The framework-level contract is:
 
-- :data:`LLMRetryErrorKind` — the set of categories the runtime may
+- ``LLMRetryErrorKind`` — the set of categories the runtime may
   produce.
-- :class:`LLMRetryPolicy` — the policy parameters a developer sets on
+- ``LLMRetryPolicy`` — the policy parameters a developer sets on
   ``LLMConfig.retry_policy``.
 
 An ``LLM`` implementation receives the ``LLMRetryPolicy`` through
 config, catches its own provider-specific exceptions, maps them to a
-:data:`LLMRetryErrorKind`, and decides whether to retry based on
-:meth:`LLMRetryPolicy.should_retry`.
+``LLMRetryErrorKind``, and decides whether to retry based on
+``LLMRetryPolicy.should_retry``.
 
-This is distinct from :attr:`LLMConfig.num_retries`, which is a
+This is distinct from ``LLMConfig.num_retries``, which is a
 provider-side retry hint passed straight to the SDK. The retry
 policy runs *outside* the SDK and owns jitter, backoff, and
 category selection — knobs that are typically absent from SDK-level
@@ -57,7 +57,7 @@ class LLMRetryPolicy:
             ``[0, computed_delay]`` to avoid thundering-herd problems.
         retry_on: Optional subset of error kinds to retry. Defaults to
             ``frozenset(["rate_limit"])`` — the narrowest useful set.
-            Pass ``None`` to retry all :data:`LLMRetryErrorKind` kinds,
+            Pass ``None`` to retry all ``LLMRetryErrorKind`` kinds,
             or supply an explicit set to control which categories trigger
             a retry.
 
@@ -116,11 +116,11 @@ class LLMRetryPolicy:
 
         Args:
             attempt: Zero-indexed attempt number. ``attempt=0`` yields
-                :attr:`initial_delay` (±jitter).
+                ``initial_delay`` (±jitter).
 
         Returns:
-            Delay in seconds, capped at :attr:`max_delay` and optionally
-            randomized when :attr:`jitter` is ``True``.
+            Delay in seconds, capped at ``max_delay`` and optionally
+            randomized when ``jitter`` is ``True``.
         """
         raw = self.initial_delay * (self.multiplier ** max(0, attempt))
         capped = min(raw, self.max_delay)

@@ -1,4 +1,4 @@
-"""Unit tests for :class:`Flow` base class and :class:`FlowMeta`.
+"""Unit tests for ``Flow`` base class and ``FlowMeta``.
 
 Covers state initialization, registry stamping, abstract-base detection,
 and the no-inheritance contract.

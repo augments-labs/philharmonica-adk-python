@@ -4,7 +4,7 @@ Each checkpoint is a Redis hash under ``graph:ckpt:<thread_id>`` holding a
 JSON ``payload``, a ``lock_token`` fencing token, and ``updated_at``.
 Optimistic locking compares and rotates the token atomically with a Lua
 script; a stale token (concurrent writer) raises
-:class:`~philharmonica.adk.exceptions.CheckpointConflictError`.
+``CheckpointConflictError``.
 
 TTL is opt-in (``ttl_seconds``); the default keeps checkpoints until they
 are explicitly deleted. An expired or evicted key reads back as ``None``
@@ -86,7 +86,7 @@ class RedisCheckpointer(Checkpointer):
     atomic Lua compare-and-set against the token cached from the prior
     ``load`` or ``save``; a concurrent writer that rotates the token
     causes the losing ``save`` to raise
-    :class:`~philharmonica.adk.exceptions.CheckpointConflictError`.
+    ``CheckpointConflictError``.
 
     Supply either a configured ``client`` or a ``url``. The caller owns
     the client lifecycle.
@@ -159,7 +159,7 @@ class RedisCheckpointer(Checkpointer):
         The first save for a ``thread_id`` (no cached token) requires the
         key to be absent; subsequent saves require the stored token to
         match the one cached from the prior ``load`` / ``save``. A losing
-        race raises :class:`CheckpointConflictError`.
+        race raises ``CheckpointConflictError``.
 
         Args:
             checkpoint: The snapshot to persist.
@@ -200,16 +200,16 @@ class RedisCheckpointer(Checkpointer):
         """Rehydrate the checkpoint for ``thread_id`` (``None`` if absent).
 
         A missing, expired, or evicted key returns ``None``. The observed
-        ``lock_token`` is cached so a subsequent :meth:`save` can verify it.
+        ``lock_token`` is cached so a subsequent ``save`` can verify it.
 
         Args:
             thread_id: The logical run key.
-            graph: The :class:`Graph` the checkpoint belongs to; a stored
+            graph: The ``Graph`` the checkpoint belongs to; a stored
                 ``graph_id`` that differs from ``graph.id`` raises
                 ``ValueError``.
 
         Returns:
-            A rehydrated :class:`GraphState`, or ``None`` when no live
+            A rehydrated ``GraphState``, or ``None`` when no live
             checkpoint exists for ``thread_id``.
 
         Raises:

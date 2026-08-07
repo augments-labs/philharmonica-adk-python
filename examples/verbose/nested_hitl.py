@@ -7,7 +7,7 @@ panel shows the full path ``outer_agent → delegate_tool → inner_tool``.
 
 CrewAI cannot render this because the framework itself does not model
 agents-as-tools with approval propagation. In Philharmonica ADK it is
-first-class: :class:`~philharmonica.adk.types.agents.DeferredToolCall` carries
+first-class: ``DeferredToolCall`` carries
 ``metadata.nested_agent=True`` at the as_tool() boundary, and the
 renderer uses it to build the breadcrumb header.
 

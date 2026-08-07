@@ -1,9 +1,9 @@
-"""SQLite-backed :class:`FlowWorkerBackend` for cross-process distribution.
+"""SQLite-backed ``FlowWorkerBackend`` for cross-process distribution.
 
 A file-backed backend suitable for distributing flow execution
 across multiple processes on a single host. Uses ``BEGIN IMMEDIATE``
 transactions for claim contention and stores the full
-:class:`FlowCheckpoint` JSON payload in one row per flow.
+``FlowCheckpoint`` JSON payload in one row per flow.
 
 Tables:
 
@@ -58,18 +58,18 @@ CREATE TABLE IF NOT EXISTS flow_checkpoints (
 
 @dataclass
 class SqliteFlowWorkerBackend:
-    """File-backed :class:`FlowWorkerBackend` using SQLite for cross-process coordination.
+    """File-backed ``FlowWorkerBackend`` using SQLite for cross-process coordination.
 
     Suitable for multiple worker processes on one host sharing
     one SQLite file. ``BEGIN IMMEDIATE`` acquires a reserved
     lock on every claim attempt so contention is resolved by
     SQLite itself; the asyncio dimension is handled by running
     DB calls in the default executor via
-    :meth:`asyncio.to_thread`.
+    ``asyncio.to_thread``.
 
-    The clock defaults to :func:`time.time` (Unix epoch seconds)
-    — NOT :func:`time.monotonic` — so claim timestamps are
-    comparable across processes. The :class:`InMemoryFlowWorkerBackend`
+    The clock defaults to ``time.time`` (Unix epoch seconds)
+    — NOT ``time.monotonic`` — so claim timestamps are
+    comparable across processes. The ``InMemoryFlowWorkerBackend``
     uses ``time.monotonic`` because its claims never cross a
     process boundary.
 
@@ -80,7 +80,7 @@ class SqliteFlowWorkerBackend:
             eagerly in ``__post_init__`` so concurrent writers
             never race on ``CREATE TABLE IF NOT EXISTS``.
         clock: Override-able wall-clock (epoch seconds); primarily for
-            tests. Defaults to :func:`time.time`.
+            tests. Defaults to ``time.time``.
     """
 
     path: str | Path
@@ -115,8 +115,8 @@ class SqliteFlowWorkerBackend:
     ) -> bool:
         """Attempt to claim ``(flow_id, batch_id)`` for ``worker_id``.
 
-        Delegates to :meth:`_claim_batch_sync` in
-        :func:`asyncio.to_thread`. Uses ``BEGIN IMMEDIATE`` to serialize
+        Delegates to ``_claim_batch_sync`` in
+        ``asyncio.to_thread``. Uses ``BEGIN IMMEDIATE`` to serialize
         contention. An existing claim is superseded only when its
         heartbeat has lapsed beyond ``ttl_seconds``.
 
@@ -175,7 +175,7 @@ class SqliteFlowWorkerBackend:
             flow_id: Identifier of the flow instance.
             batch_id: Monotonic batch identifier.
             worker_id: The worker releasing the claim.
-            checkpoint: Post-batch :class:`FlowCheckpoint` to persist.
+            checkpoint: Post-batch ``FlowCheckpoint`` to persist.
         """
         await asyncio.to_thread(
             self._release_batch_sync,
@@ -192,8 +192,8 @@ class SqliteFlowWorkerBackend:
             flow_id: Identifier of the flow instance.
 
         Returns:
-            The most recent :class:`FlowCheckpoint` written by
-            :meth:`release_batch` or :meth:`save_checkpoint`, or
+            The most recent ``FlowCheckpoint`` written by
+            ``release_batch`` or ``save_checkpoint``, or
             ``None`` when no checkpoint exists for ``flow_id``.
         """
         return await asyncio.to_thread(self._load_checkpoint_sync, flow_id)
@@ -202,7 +202,7 @@ class SqliteFlowWorkerBackend:
         """Persist ``checkpoint`` outside the claim/release cycle.
 
         Args:
-            checkpoint: The :class:`FlowCheckpoint` to persist.
+            checkpoint: The ``FlowCheckpoint`` to persist.
                 Overwrites any prior checkpoint for the same
                 ``checkpoint.flow_id``.
         """
@@ -211,16 +211,16 @@ class SqliteFlowWorkerBackend:
     async def load_checkpoint_by_id(self, checkpoint_id: str) -> FlowCheckpoint | None:
         """Return the checkpoint whose ``flow_id`` equals ``checkpoint_id``, or ``None``.
 
-        Convenience alias over :meth:`load_checkpoint` for callers that
+        Convenience alias over ``load_checkpoint`` for callers that
         hold only the string id. Semantically identical to
         ``load_checkpoint(checkpoint_id)``.
 
         Args:
-            checkpoint_id: The :attr:`FlowCheckpoint.flow_id` to look
+            checkpoint_id: The ``FlowCheckpoint.flow_id`` to look
                 up.
 
         Returns:
-            The stored :class:`FlowCheckpoint`, or ``None`` when not
+            The stored ``FlowCheckpoint``, or ``None`` when not
             found.
         """
         return await self.load_checkpoint(checkpoint_id)
@@ -232,7 +232,7 @@ class SqliteFlowWorkerBackend:
             flow_id: Identifier of the flow instance.
 
         Returns:
-            Tuple of :class:`FlowBatchClaim` audit records for every
+            Tuple of ``FlowBatchClaim`` audit records for every
             active claim against ``flow_id``. Empty when no claims
             exist.
         """
@@ -337,7 +337,7 @@ class SqliteFlowWorkerBackend:
         """Synchronous save implementation.
 
         Uses ``BEGIN IMMEDIATE`` to acquire a write lock upfront, matching
-        the pattern in :meth:`_release_batch_sync`. Without it, the INSERT
+        the pattern in ``_release_batch_sync``. Without it, the INSERT
         runs in autocommit mode under a shared lock and a concurrent reader
         can observe a partial write on a page boundary.
         """
@@ -375,7 +375,7 @@ class SqliteFlowWorkerBackend:
     def _connect(self) -> sqlite3.Connection:
         """Open a connection with the required pragmas.
 
-        Schema is initialised eagerly in :meth:`__post_init__`; this
+        Schema is initialised eagerly in ``__post_init__``; this
         method only opens connections for queries / transactions.
         """
         conn = sqlite3.connect(str(self.path), isolation_level=None, timeout=30.0)

@@ -1,7 +1,7 @@
 """Unit tests for ``@flow_start`` / ``@flow_listen`` / ``@flow_router`` decorators.
 
-Covers the markers set on :class:`FlowStep`, signature validation
-in :class:`FlowMeta`, and the operator-built combinators.
+Covers the markers set on ``FlowStep``, signature validation
+in ``FlowMeta``, and the operator-built combinators.
 """
 
 from __future__ import annotations

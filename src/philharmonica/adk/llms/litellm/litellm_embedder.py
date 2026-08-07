@@ -27,7 +27,7 @@ class LiteLLMEmbedder(Embedder):
         model: litellm model id (e.g. ``"text-embedding-3-small"``).
         cache: Optional opt-in LRU cache; ``None`` disables caching.
         dimensions_hint: Output dimension for models that accept one, also
-            returned by :attr:`dimensions`.
+            returned by ``dimensions``.
         api_key: Optional explicit key; ``None`` uses litellm's env resolution.
         api_base: Optional explicit endpoint; ``None`` uses the provider default.
     """

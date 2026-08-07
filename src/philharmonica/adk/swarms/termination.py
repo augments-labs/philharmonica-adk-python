@@ -62,7 +62,7 @@ class TerminationCondition(ABC):
                 counters, yield signals, and usage figures.
 
         Returns:
-            A :class:`~philharmonica.adk.swarms.stop_reason.StopReason`
+            A ``StopReason``
             when this condition fires, ``None`` to continue the run.
         """
 
@@ -70,7 +70,7 @@ class TerminationCondition(ABC):
         """Fail-fast check against the swarm roster. Default: no-op.
 
         Called by ``Swarm.__post_init__`` so conditions that reference
-        member names (e.g. :class:`TextMentionTermination`) reject
+        member names (e.g. ``TextMentionTermination``) reject
         typos at construction time — fail at compile time, not at run
         time. Composites recurse into their children.
 
@@ -125,7 +125,7 @@ class AndTermination(TerminationCondition):
     """Stops only when both child conditions fire in the same call.
 
     Returned by ``TerminationCondition.__and__``. Public for the same
-    reason as :class:`OrTermination` — introspection of a composed
+    reason as ``OrTermination`` — introspection of a composed
     termination tree needs a stable name.
 
     Attributes:
@@ -267,7 +267,7 @@ class TextMentionTermination(TerminationCondition):
     Mirrors AutoGen's ``TextMentionTermination`` — a pragmatic escape
     hatch for flows where asking the LLM to call ``swarm_done`` is
     overkill (e.g. a debate that ends when a judge writes "VERDICT:").
-    Only :class:`MessageOutputItem` text is scanned, so user input and
+    Only ``MessageOutputItem`` text is scanned, so user input and
     tool payloads never trigger it.
 
     Explicit ``swarm_done`` remains the recommended primary stop
@@ -282,7 +282,7 @@ class TextMentionTermination(TerminationCondition):
         member: Optional member name restricting whose messages can
             trigger the stop. ``None`` (default) lets any member
             trigger it. Validated against the roster at
-            :class:`Swarm` construction time.
+            ``Swarm`` construction time.
         case_sensitive: When ``True``, match ``phrase`` exactly instead
             of lowercasing both sides.
     """

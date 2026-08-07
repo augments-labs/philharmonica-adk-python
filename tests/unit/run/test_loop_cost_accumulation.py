@@ -1,7 +1,7 @@
 """Tests that the agent loop accumulates per-call cost onto ``RunContext.cost_usd``
 and stamps it on ``GenerationSpanData.cost_usd``.
 
-Uses :func:`run_agent_loop` directly (same pattern as
+Uses ``run_agent_loop`` directly (same pattern as
 ``test_reset_tool_choice.py``), patching ``call_llm`` to return a response
 with usage and patching ``resolve_llm`` to return a fake ``LLM`` subclass
 whose ``cost()`` returns a fixed value.

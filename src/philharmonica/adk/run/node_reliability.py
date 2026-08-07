@@ -8,7 +8,7 @@ retry policy nor a timeout re-raises its original exception unchanged.
 
 Timeout retryability
 --------------------
-By default a :class:`~philharmonica.adk.exceptions.GraphNodeTimeoutError` is
+By default a ``GraphNodeTimeoutError`` is
 terminal even when a retry policy is configured.  The new opt-in
 semantic is:
 
@@ -17,10 +17,10 @@ semantic is:
   (subject to ``retry_on`` filtering: empty = retry-all, or
   ``TimeoutError`` must match).
 - On the **final** attempt a timeout ALWAYS raises
-  :class:`~philharmonica.adk.exceptions.GraphNodeTimeoutError` — the typed
+  ``GraphNodeTimeoutError`` — the typed
   wrapper is always present when a timeout was the terminal cause.
 - Without a retry policy (``max_attempts == 1``) a timeout raises
-  :class:`~philharmonica.adk.exceptions.GraphNodeTimeoutError` immediately,
+  ``GraphNodeTimeoutError`` immediately,
   preserving existing behaviour (zero behavioural change without an
   explicit policy).
 """
@@ -55,17 +55,17 @@ def resolve_node_reliability(
     not ``None``; otherwise the graph default applies.
 
     Args:
-        graph: The compiled :class:`~philharmonica.adk.graphs.graph.Graph`
-            whose :attr:`~philharmonica.adk.graphs.graph.Graph.config` holds
+        graph: The compiled ``Graph``
+            whose ``config`` holds
             the graph-level defaults.
-        node: The :class:`~philharmonica.adk.graphs.node.GraphNode` being
-            evaluated. Its :attr:`~philharmonica.adk.graphs.node.GraphNode.retry`
-            and :attr:`~philharmonica.adk.graphs.node.GraphNode.timeout` fields
+        node: The ``GraphNode`` being
+            evaluated. Its ``retry``
+            and ``timeout`` fields
             take precedence when set.
 
     Returns:
         A two-tuple ``(policy, timeout)`` where ``policy`` is the
-        effective :class:`~philharmonica.adk.graphs.config.NodeRetryPolicy` and
+        effective ``NodeRetryPolicy`` and
         ``timeout`` is the effective per-attempt timeout in seconds, or
         ``None`` when no timeout applies.
     """
@@ -182,9 +182,9 @@ def _raise_final_failure(
 ) -> NoReturn:
     """Raise the typed final-failure exception for an exhausted node.
 
-    A timeout raises :class:`~philharmonica.adk.exceptions.GraphNodeTimeoutError`;
+    A timeout raises ``GraphNodeTimeoutError``;
     an exhausted multi-attempt policy raises
-    :class:`~philharmonica.adk.exceptions.NodeRetriesExhaustedError`; anything
+    ``NodeRetriesExhaustedError``; anything
     else re-raises the original exception unchanged.
     """
     if timed_out:

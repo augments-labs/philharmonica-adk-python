@@ -106,8 +106,8 @@ def apply_cache_control(
             message's last text block is marked when present.
         tools: Tool definitions. The last entry is marked when
             present.
-        config: The LLM configuration. Only :class:`AnthropicConfig`
-            instances trigger injection — plain :class:`LLMConfig`
+        config: The LLM configuration. Only ``AnthropicConfig``
+            instances trigger injection — plain ``LLMConfig``
             values pass through unchanged.
 
     Returns:

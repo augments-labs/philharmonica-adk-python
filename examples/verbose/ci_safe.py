@@ -4,7 +4,7 @@ Demonstrates that ``mode="auto"`` is the responsible default for any
 script that might run in a non-interactive environment (CI, piped
 stdout, file-redirected output, ``TERM=dumb``).
 
-The resolution ladder in :func:`philharmonica.adk.verbose.mode.resolve_mode`
+The resolution ladder in ``philharmonica.adk.verbose.mode.resolve_mode``
 silently downgrades ``panel`` to ``line`` in each hostile environment,
 so operators get coloured output on their laptop and plain lines in
 GitHub Actions — with zero changes to application code.

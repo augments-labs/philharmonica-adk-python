@@ -12,8 +12,8 @@ Verifies two properties:
 
 Both tests use the lightest real harness: a patched ``run_agent_loop``
 (non-streamed) or ``_stream_member_turn`` (streamed) that returns a
-minimal :class:`RunResult` so the driver can complete one iteration via
-:class:`MaxTurnsTermination`.  The registry-construction path is
+minimal ``RunResult`` so the driver can complete one iteration via
+``MaxTurnsTermination``.  The registry-construction path is
 exercised by the loop itself, so these tests cover the new routing
 end-to-end without needing a real LLM.
 """

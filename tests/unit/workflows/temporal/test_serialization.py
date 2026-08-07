@@ -1,4 +1,4 @@
-"""Tests for :mod:`philharmonica.adk.workflows.temporal.serialization`.
+"""Tests for ``philharmonica.adk.workflows.temporal.serialization``.
 
 Covers:
 - DataConverter roundtrips a dataclass payload.

@@ -451,7 +451,7 @@ class _SettingsAwareInnerStore(_InnerStore):
     """Inner double that mirrors SQLiteSession: a ``limit=None`` ``get()`` falls
     back to ``settings.limit`` and truncates to the N most-recent events.
 
-    The plain :class:`_InnerStore` returns everything on ``limit=None``, so it
+    The plain ``_InnerStore`` returns everything on ``limit=None``, so it
     cannot reproduce the truncation seen against a real settings-bound store.
     """
 

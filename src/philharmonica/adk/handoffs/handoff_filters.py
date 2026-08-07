@@ -90,7 +90,7 @@ def keep_last_n(n: int) -> HandoffInputFilter:
 
     Args:
         n: Number of trailing items to keep. ``0`` forwards nothing;
-            negative values raise :class:`ValueError`.
+            negative values raise ``ValueError``.
 
     Returns:
         A HandoffInputFilter function.

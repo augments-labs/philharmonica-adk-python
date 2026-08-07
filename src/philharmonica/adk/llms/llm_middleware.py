@@ -36,11 +36,11 @@ This Protocol returns ``LLMResponse`` and applies to
 ``LLM.acomplete(stream=False)``. Streaming calls
 (``LLM.acomplete(stream=True)``) return
 ``AsyncIterator[LLMStreamEvent]`` and have a sibling Protocol —
-:class:`~philharmonica.adk.llms.llm_stream_middleware.LLMStreamMiddleware`
+``LLMStreamMiddleware``
 — registered via ``Agent.middleware.stream_llms``. Two non-overlapping
 return types mean two Protocols rather than a polymorphic union.
 
-Use :func:`~philharmonica.adk.llms.llm_stream_middleware.make_logging_middlewares`
+Use ``make_logging_middlewares``
 to register one paired logger across both LLM paths in one call.
 
 When ``Agent.middleware.llms`` is non-empty AND the runner issues a
@@ -388,7 +388,7 @@ class LLMMetricsMiddleware:
     specific metrics library.
 
     Attributes:
-        recorder: The metrics sink. See :class:`LLMMetricsRecorder`.
+        recorder: The metrics sink. See ``LLMMetricsRecorder``.
     """
 
     recorder: LLMMetricsRecorder

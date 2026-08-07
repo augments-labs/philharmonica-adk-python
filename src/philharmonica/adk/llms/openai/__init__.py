@@ -3,8 +3,8 @@
 Two first-class ``LLM`` subclasses call the ``openai`` SDK directly —
 no litellm indirection.
 
-- :class:`OpenAIResponsesLLM` — backed by ``client.responses.create()``.
-- :class:`OpenAIChatCompletionsLLM` — backed by ``client.chat.completions.create()``.
+- ``OpenAIResponsesLLM`` — backed by ``client.responses.create()``.
+- ``OpenAIChatCompletionsLLM`` — backed by ``client.chat.completions.create()``.
 
 Both classes consume provider-agnostic Layer 1 inputs
 (``list[LLMInputContentItem]``) and return framework-owned
@@ -15,10 +15,10 @@ the raw provider JSON through ``LLMConfig.extra_body`` /
 ``LLMConfig.extra_args``.
 
 Configuration for each class is carried by a dedicated
-``@dataclass`` subclass of :class:`LLMConfig`:
+``@dataclass`` subclass of ``LLMConfig``:
 
-- :class:`OpenAIResponsesConfig`
-- :class:`OpenAIChatCompletionsConfig`
+- ``OpenAIResponsesConfig``
+- ``OpenAIChatCompletionsConfig``
 
 The configs type OpenAI-specific fields verbatim against
 ``openai.types.*`` — never via framework-owned re-definitions.
@@ -26,9 +26,9 @@ The configs type OpenAI-specific fields verbatim against
 Two voice models live here as well, implementing the framework-owned
 speech ABCs (``voice/``) against the same SDK:
 
-- :class:`OpenAISTTModel` — buffered transcription plus a realtime
+- ``OpenAISTTModel`` — buffered transcription plus a realtime
   transcription websocket session.
-- :class:`OpenAITTSModel` — streaming PCM speech synthesis.
+- ``OpenAITTSModel`` — streaming PCM speech synthesis.
 """
 
 from __future__ import annotations

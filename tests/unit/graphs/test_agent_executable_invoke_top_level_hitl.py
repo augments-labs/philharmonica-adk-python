@@ -2,7 +2,7 @@
 deferral.
 
 The real top-level ``Runner.arun`` does NOT raise
-:class:`~philharmonica.adk.exceptions.AgentToolDeferral` when a tool is gated on
+``AgentToolDeferral`` when a tool is gated on
 human approval — it RETURNS a ``RunResult`` with ``requires_action`` True and
 ``deferred_requests`` + ``state`` populated (see the agent loop's
 ``NextStepInterruption`` arm). The sibling

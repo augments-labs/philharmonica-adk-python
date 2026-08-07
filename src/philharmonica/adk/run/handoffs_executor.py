@@ -111,7 +111,7 @@ async def prepare_handoff_input(
         handoff_data: The filtered HandoffInputData from target.invoke().
         llm: The ``LLM`` instance for the summarization call (required
             only when ``strategy=SUMMARY``; ``None`` otherwise).
-            Typically resolved via :func:`resolve_compaction_llm`.
+            Typically resolved via ``resolve_compaction_llm``.
         model: Model identifier for token counting in the summarization
             call (used only when ``strategy=SUMMARY``).
 
@@ -243,7 +243,7 @@ async def prepare_handoff_input_from_data(
         handoff_data: The filtered HandoffInputData from target.invoke().
         llm: The ``LLM`` instance for the summarization call (required
             only when ``strategy=SUMMARY``; ``None`` otherwise).
-            Typically resolved via :func:`resolve_compaction_llm`.
+            Typically resolved via ``resolve_compaction_llm``.
         model: Model identifier for token counting in the summarization
             call (used only when ``strategy=SUMMARY``).
 
@@ -298,7 +298,7 @@ def _rewrite_trailing_assistant(
     Two repairs, in order:
 
     1. Drop unpaired tool-call / tool-result params via
-       :func:`_drop_orphan_tool_calls` — the source agent's
+       ``_drop_orphan_tool_calls`` — the source agent's
        ``transfer_to_<name>`` handoff call enters the forwarded slice
        without its synthetic result, which strict providers (Anthropic)
        reject as a ``tool_use`` with no ``tool_result``.
@@ -501,8 +501,8 @@ async def _summarize_for_handoff(
 
     Uses the context compaction layer to produce a concise summary of the
     conversation, then wraps it as a single user message for the new agent.
-    Routes through :meth:`LLM.acomplete` so the summarization tokens land
-    in :attr:`RunContext.usage` (when ``context`` is provided) and
+    Routes through ``LLM.acomplete`` so the summarization tokens land
+    in ``RunContext.usage`` (when ``context`` is provided) and
     ``Agent.middleware.llms`` sees the call.
 
     Args:
@@ -566,7 +566,7 @@ async def apply_handoff_budget(
     body length (NASA R2 — explicit upper bound on the loop).
 
     This is **free**: no LLM call is made. Earlier revisions invoked
-    :class:`ContextCompactor` (summarisation), which made a hidden
+    ``ContextCompactor`` (summarisation), which made a hidden
     LLM call that bypassed ``RunContext.usage`` and middleware. The
     truncation path keeps the budget cap useful for input-token
     economy without introducing an unobservable cost surface — the
@@ -590,7 +590,7 @@ async def apply_handoff_budget(
         with oldest non-system messages dropped until under budget.
         FIFO eviction has no tool-call/result pairing awareness, so the
         truncated result is passed through
-        :func:`_drop_orphan_tool_calls` to remove any pair split by the
+        ``_drop_orphan_tool_calls`` to remove any pair split by the
         cut (a ``tool_use`` with no ``tool_result``, or vice versa)
         before it reaches a strict provider.
     """

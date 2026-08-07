@@ -40,7 +40,7 @@ FILE_EXTENSIONS: dict[str, str] = {
     ".docx": "docx",
 }
 """File extension → loader key. The key abstracts over the concrete class so
-:func:`resolve_loader` stays a typed dispatch rather than dynamic lookup."""
+``resolve_loader`` stays a typed dispatch rather than dynamic lookup."""
 
 
 def is_url(source: str) -> bool:
@@ -98,7 +98,7 @@ def resolve_loader(source: str) -> DocumentLoader:
         source: A file path, directory path, or http(s) URL.
 
     Returns:
-        The :class:`DocumentLoader` that handles ``source``.
+        The ``DocumentLoader`` that handles ``source``.
 
     Raises:
         UnsupportedDocumentSourceError: If no loader matches ``source``.

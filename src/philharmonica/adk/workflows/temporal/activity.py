@@ -1,11 +1,11 @@
 """Temporal activity for durable LLM invocation.
 
-Provides :func:`invoke_model_activity` — a Temporal
-:func:`~temporalio.activity.defn`-decorated coroutine that executes an LLM
+Provides ``invoke_model_activity`` — a Temporal
+``defn``-decorated coroutine that executes an LLM
 call inside a durable activity boundary with automatic heartbeating.
 
 Also exposes a module-level model registry so that worker processes can
-register :class:`~philharmonica.adk.llms.llm.LLM` instances by name before
+register ``LLM`` instances by name before
 activities execute::
 
     from philharmonica.adk.workflows.temporal.activity import register_model
@@ -13,8 +13,8 @@ activities execute::
 
     register_model("gpt-4o", LiteLLM(model="gpt-4o"))
 
-The registry and :class:`ModelActivityInput` are importable without
-``temporalio`` installed.  The :func:`invoke_model_activity` function is
+The registry and ``ModelActivityInput`` are importable without
+``temporalio`` installed.  The ``invoke_model_activity`` function is
 registered only when the ``temporalio`` package is present.
 
 References:
@@ -44,35 +44,35 @@ logger = logging.getLogger(__name__)
 # ==================================================================
 
 _MODEL_REGISTRY: dict[str, LLM] = {}
-"""Registry mapping model names to :class:`~philharmonica.adk.llms.llm.LLM` instances.
+"""Registry mapping model names to ``LLM`` instances.
 
-Populated by :func:`register_model` before workers start.  Private to this
-module — consumers use :func:`register_model` and :func:`get_model`.
+Populated by ``register_model`` before workers start.  Private to this
+module — consumers use ``register_model`` and ``get_model``.
 """
 
 
 def register_model(name: str, llm: LLM) -> None:
-    """Register an :class:`~philharmonica.adk.llms.llm.LLM` instance by name.
+    """Register an ``LLM`` instance by name.
 
-    The name is used as the registry key in :class:`ModelActivityInput`.
+    The name is used as the registry key in ``ModelActivityInput``.
     Registering the same name twice overwrites the previous entry.
 
     Args:
-        name: Registry key — matches :attr:`ModelActivityInput.model_name`.
-        llm: The :class:`~philharmonica.adk.llms.llm.LLM` instance to register.
+        name: Registry key — matches ``ModelActivityInput.model_name``.
+        llm: The ``LLM`` instance to register.
     """
     _MODEL_REGISTRY[name] = llm
     logger.info("Registered model %r in activity registry", name)
 
 
 def get_model(name: str) -> LLM:
-    """Return the :class:`~philharmonica.adk.llms.llm.LLM` registered under *name*.
+    """Return the ``LLM`` registered under *name*.
 
     Args:
         name: Registry key to look up.
 
     Returns:
-        The registered :class:`~philharmonica.adk.llms.llm.LLM` instance.
+        The registered ``LLM`` instance.
 
     Raises:
         KeyError: When *name* is not in the registry.  The error message
@@ -96,7 +96,7 @@ def get_model(name: str) -> LLM:
 
 @dataclasses.dataclass(frozen=True, kw_only=True)
 class ModelActivityInput:
-    """Serialized input for :func:`invoke_model_activity`.
+    """Serialized input for ``invoke_model_activity``.
 
     All fields that carry complex types (messages, tools, config) are
     pre-serialized to JSON strings so that Temporal's DataConverter can
@@ -104,15 +104,15 @@ class ModelActivityInput:
 
     Attributes:
         model_name: Registry key used to look up the
-            :class:`~philharmonica.adk.llms.llm.LLM` via :func:`get_model`.
+            ``LLM`` via ``get_model``.
         messages_json: JSON-serialized conversation messages
             (``list[LLMInputContentItem]`` serialized with
             ``json.dumps``).
         tools_json: JSON-serialized tool schemas
             (``list[dict]`` serialized with ``json.dumps``).
         config_json: JSON-serialized
-            :class:`~philharmonica.adk.llms.llm_config.LLMConfig` fields
-            produced by :meth:`~philharmonica.adk.llms.llm_config.LLMConfig.to_json_dict`.
+            ``LLMConfig`` fields
+            produced by ``to_json_dict``.
         output_schema_json: Optional JSON-serialized output schema.
             Empty string means no structured output.
     """
@@ -152,7 +152,7 @@ try:
         Looks up the LLM from the module registry, deserializes all inputs from
         JSON, fires a background heartbeat task at half the configured
         ``heartbeat_timeout`` interval, then delegates to
-        :meth:`~philharmonica.adk.llms.llm.LLM.acomplete`.
+        ``acomplete``.
 
         Heartbeating keeps the Temporal server informed that the worker is still
         alive during long-running LLM calls.  The task is always cancelled in
@@ -164,7 +164,7 @@ try:
 
         Returns:
             The LLM response serialized via
-            :func:`dataclasses.asdict`, suitable for JSON transport.
+            ``dataclasses.asdict``, suitable for JSON transport.
 
         References:
             Temporal heartbeat docs:

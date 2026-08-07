@@ -59,7 +59,7 @@ class MCPServerManager:
     """MCP servers under management; order is the sequential connect order."""
 
     _connected: bool = field(default=False, init=False, repr=False)
-    """Backing field for :attr:`is_active` — surfaced via the public
+    """Backing field for ``is_active`` — surfaced via the public
     property below. Callers read ``manager.is_active``, never
     ``manager._connected``."""
 
@@ -68,7 +68,7 @@ class MCPServerManager:
     accessor by design. Same reasoning as ``MCPToolset._connect_lock``."""
 
     _ref_counts: dict[int, int] = field(default_factory=dict, init=False, repr=False)
-    """Backing field for :meth:`get_ref_count` — per-server reference
+    """Backing field for ``get_ref_count`` — per-server reference
     count keyed by ``id(server)``. Surfaced via the public method
     below so callers can audit shared-server topology without
     coupling to the dict layout."""

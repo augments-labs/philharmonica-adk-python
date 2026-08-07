@@ -1,8 +1,8 @@
 """Swarm-run persistence types + Checkpointer protocol.
 
-Mirrors the graphs :mod:`philharmonica.adk.graphs.checkpointer` module shape:
-a frozen :class:`SwarmCheckpoint` payload + a runtime-checkable
-:class:`SwarmCheckpointer` Protocol that exposes ``register``, ``save``,
+Mirrors the graphs ``philharmonica.adk.graphs.checkpointer`` module shape:
+a frozen ``SwarmCheckpoint`` payload + a runtime-checkable
+``SwarmCheckpointer`` Protocol that exposes ``register``, ``save``,
 ``load``, ``list_checkpoints``, and ``delete``.
 
 The graphs and swarms checkpointer protocols are deliberately
@@ -12,7 +12,7 @@ subsystem.
 
 Concurrency contract: network hot-store backends (Postgres, Redis) MUST
 detect concurrent modification of a single ``thread_id`` and raise
-:class:`~philharmonica.adk.exceptions.CheckpointConflictError` on the losing
+``CheckpointConflictError`` on the losing
 writer. Single-process in-memory backends and archival, last-write-wins
 object stores (S3) need not implement this check.
 
@@ -38,15 +38,15 @@ class SwarmHookRegistry(Protocol):
     Any object exposing ``add(hooks)`` satisfies it — notably
     ``philharmonica.adk.swarms.hooks.HookRegistry``, which the swarm loop
     builds and through which a checkpointer's
-    :class:`~philharmonica.adk.swarms.checkpointers.hooks.SwarmCheckpointerHooks`
+    ``SwarmCheckpointerHooks``
     are registered for auto-save.
     """
 
     def add(self, hooks: Any) -> None:
-        """Attach a :class:`SwarmHooks` instance to the registry.
+        """Attach a ``SwarmHooks`` instance to the registry.
 
         Args:
-            hooks: The :class:`~philharmonica.adk.swarms.hooks.SwarmHooks`
+            hooks: The ``SwarmHooks``
                 instance to attach.
         """
         ...
@@ -59,10 +59,10 @@ class SwarmCheckpoint:
     Attributes:
         thread_id: Logical run identifier; the key under which the
             checkpoint is stored.
-        state: Output of :meth:`SwarmState.to_dict`. Loader uses
-            :meth:`SwarmState.from_dict` with the caller-supplied
-            :class:`Swarm` to rehydrate. Member-name resolution in
-            :meth:`SwarmState.from_dict` is the de-facto integrity
+        state: Output of ``SwarmState.to_dict``. Loader uses
+            ``SwarmState.from_dict`` with the caller-supplied
+            ``Swarm`` to rehydrate. Member-name resolution in
+            ``SwarmState.from_dict`` is the de-facto integrity
             check against a swarm mismatch.
         turn: The 1-indexed turn count at the time of save.
     """
@@ -71,7 +71,7 @@ class SwarmCheckpoint:
     """Logical run identifier; the key under which the checkpoint is stored."""
 
     state: dict[str, Any]
-    """Output of :meth:`SwarmState.to_dict`. JSON-safe."""
+    """Output of ``SwarmState.to_dict``. JSON-safe."""
 
     turn: int
     """1-indexed turn count at the time of save."""
@@ -86,7 +86,7 @@ class SwarmCheckpointer(Protocol):
     ``on_swarm_turn_interrupt``.
 
     Implementations:
-        - :class:`InMemorySwarmCheckpointer` — reference impl.
+        - ``InMemorySwarmCheckpointer`` — reference impl.
         - ``PostgresSwarmCheckpointer`` / ``RedisSwarmCheckpointer`` /
           ``S3SwarmCheckpointer`` — network backends for cross-process resume.
         - ``TieredSwarmCheckpointer`` — hot/cold composite.
@@ -112,16 +112,16 @@ class SwarmCheckpointer(Protocol):
         cross-validate against the persisted state's member names if
         they choose. The in-memory reference implementation does not
         validate the swarm against persisted member names;
-        :meth:`SwarmState.from_dict` provides the integrity check at
+        ``SwarmState.from_dict`` provides the integrity check at
         rehydration time.
 
         Args:
             thread_id: Logical run identifier to look up.
-            swarm: The :class:`~philharmonica.adk.swarms.swarm.Swarm` the
+            swarm: The ``Swarm`` the
                 checkpoint belongs to.
 
         Returns:
-            The stored :class:`SwarmCheckpoint`, or ``None`` when no
+            The stored ``SwarmCheckpoint``, or ``None`` when no
             checkpoint exists for ``thread_id``.
         """
         ...
@@ -143,7 +143,7 @@ class SwarmCheckpointer(Protocol):
         ...
 
     def register(self, registry: SwarmHookRegistry) -> None:
-        """Subscribe a :class:`SwarmHooks` instance to ``registry`` for auto-save.
+        """Subscribe a ``SwarmHooks`` instance to ``registry`` for auto-save.
 
         Args:
             registry: The hook registry to attach auto-save callbacks to.

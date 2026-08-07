@@ -1,8 +1,8 @@
 """Text-to-speech abstractions — framework-owned, provider-agnostic.
 
-:class:`TTSModel` is the text-to-speech counterpart to the
-:class:`~philharmonica.adk.llms.llm.LLM` ABC. The pipeline streams agent
-text into :meth:`TTSModel.run`, which yields synthesized PCM audio
+``TTSModel`` is the text-to-speech counterpart to the
+``LLM`` ABC. The pipeline streams agent
+text into ``TTSModel.run``, which yields synthesized PCM audio
 chunks. Concrete implementations live in their provider's module (e.g.
 ``llms/openai/``).
 """
@@ -51,7 +51,7 @@ class TTSModel(ABC):
     """Abstract text-to-speech model.
 
     Implementations live in their provider's module (e.g.
-    ``llms/openai/``) and convert :class:`TTSModelSettings` to provider
+    ``llms/openai/``) and convert ``TTSModelSettings`` to provider
     wire parameters internally.
     """
 

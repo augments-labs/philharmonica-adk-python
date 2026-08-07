@@ -2,11 +2,11 @@
 
 Three new span kinds for the graph orchestration layer:
 
-- :class:`GraphSpanData` — root span for a whole graph run.
-- :class:`GraphSuperstepSpanData` — one BSP superstep boundary.
-- :class:`GraphNodeSpanData` — one node attempt inside a superstep.
+- ``GraphSpanData`` — root span for a whole graph run.
+- ``GraphSuperstepSpanData`` — one BSP superstep boundary.
+- ``GraphNodeSpanData`` — one node attempt inside a superstep.
 
-Factories route through ``custom_span``: the inner :class:`CustomSpanData`
+Factories route through ``custom_span``: the inner ``CustomSpanData``
 carries the graph-typed payload as ``data["type"]`` + the exported fields.
 OTel-bridge attribute mapping (follow-up phase) inspects the discriminator
 to route to graph-specific attribute conventions.

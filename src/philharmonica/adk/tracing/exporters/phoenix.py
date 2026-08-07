@@ -13,7 +13,7 @@ from philharmonica.adk.types.tracing.convention import TracingConvention
 
 
 def setup_phoenix(*, endpoint: str | None = None, service_name: str = "philharmonica-adk") -> OTelTracer:
-    """Return an :class:`OTelTracer` exporting OpenInference spans to Phoenix.
+    """Return an ``OTelTracer`` exporting OpenInference spans to Phoenix.
 
     Args:
         endpoint: Phoenix OTLP collector endpoint; ``None`` uses the OTel
@@ -21,7 +21,7 @@ def setup_phoenix(*, endpoint: str | None = None, service_name: str = "philharmo
         service_name: Value for the ``service.name`` resource attribute.
 
     Returns:
-        A configured :class:`OTelTracer` using the
+        A configured ``OTelTracer`` using the
         ``TracingConvention.OPENINFERENCE`` attribute vocabulary, pointing
         at the Phoenix collector.
 

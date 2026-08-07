@@ -1,24 +1,24 @@
-"""FlowExecutor — drives Flow execution per :class:`FlowConfig`.
+"""FlowExecutor — drives Flow execution per ``FlowConfig``.
 
-The executor is created per :meth:`Runner.arun_flow` call. It:
+The executor is created per ``Runner.arun_flow`` call. It:
 
-1. Builds a :class:`FlowTransitionTable` from the Flow class's
-   :class:`FlowStepRegistry` (built once by :class:`FlowMeta`).
+1. Builds a ``FlowTransitionTable`` from the Flow class's
+   ``FlowStepRegistry`` (built once by ``FlowMeta``).
 2. Seeds a pending queue with every ``@flow_start`` method.
 3. In each iteration: pops the entire pending batch, invokes each step
-   in parallel via :func:`asyncio.gather`, and resolves successors
+   in parallel via ``asyncio.gather``, and resolves successors
    (direct listeners + routers + AND/OR gates) for each completed
    step.
-4. Tracks total step invocations against :attr:`FlowConfig.max_steps`,
+4. Tracks total step invocations against ``FlowConfig.max_steps``,
    halting cleanly with ``status="halted_max_steps"`` on overflow.
-5. Handles step errors per :attr:`FlowConfig.error_policy` — either
+5. Handles step errors per ``FlowConfig.error_policy`` — either
    halts on first failure (``"halt"``) or routes to a ``@flow_listen("__error__")``
    handler (``"route_to_error_handler"``).
 6. Evaluates per-step ``enabled`` / ``requires_approval`` gates and
    wraps step bodies in the configured ``timeout`` + ``max_retries``
    loop before successor dispatch. ``requires_approval`` short-circuits
    the run into ``status="deferred"`` with a populated checkpoint.
-7. Builds the final :class:`FlowRunResult` from the accumulated state.
+7. Builds the final ``FlowRunResult`` from the accumulated state.
 
 The executor is single-use: one instance per ``Runner.arun_flow`` call.
 NOT thread-safe; designed for single-loop asyncio execution.
@@ -86,9 +86,9 @@ logger = logging.getLogger(__name__)
 
 
 _RATE_LIMIT_RETRY_HEADROOM = 8
-"""Extra iterations beyond ``rpm`` allowed inside :meth:`FlowExecutor._acquire_rate_limit`.
+"""Extra iterations beyond ``rpm`` allowed inside ``FlowExecutor._acquire_rate_limit``.
 
-The bound is :attr:`FlowStepRateLimit.rpm` plus this constant — small
+The bound is ``FlowStepRateLimit.rpm`` plus this constant — small
 enough that a misconfigured rate limit fails loud rather than spinning,
 large enough that legitimate burst-then-wait acquires complete cleanly.
 """
@@ -106,7 +106,7 @@ _FLOW_INTERNAL_SIGNALS: tuple[type[BaseException], ...] = (
 These are raised to drive the executor's own state machine (HITL
 deferral, enablement skip, guardrail/rejection routing) and are caught at
 the batch-processing boundary. They MUST propagate untouched through
-:meth:`FlowExecutor._run_body`'s retry loop: retrying a control-flow
+``FlowExecutor._run_body``'s retry loop: retrying a control-flow
 signal re-runs the step body and its inner agent (double billing) and
 captures duplicate deferrals (corrupted checkpoint) — the same reason
 cancellation is never retried. Grouped here so every error/retry boundary
@@ -115,43 +115,43 @@ shares one exclusion set.
 
 
 class FlowExecutor[StateT]:
-    """Drives a :class:`Flow` to completion under a :class:`FlowConfig`.
+    """Drives a ``Flow`` to completion under a ``FlowConfig``.
 
     One executor per ``Runner.arun_flow`` call. The executor reads the
-    flow's :class:`FlowStepRegistry`, compiles a
-    :class:`FlowTransitionTable`, and walks the step graph.
+    flow's ``FlowStepRegistry``, compiles a
+    ``FlowTransitionTable``, and walks the step graph.
 
     The optional ``on_event`` callback is invoked once per
-    :class:`FlowEvent`. The streaming runner hooks into this to push
+    ``FlowEvent``. The streaming runner hooks into this to push
     events to a queue; the non-streaming runner leaves it as a no-op.
 
-    HITL contract — mirrors :class:`FunctionTool.requires_approval` /
-    :class:`RunState.approve` exactly:
+    HITL contract — mirrors ``FunctionTool.requires_approval`` /
+    ``RunState.approve`` exactly:
 
     1. A step whose ``requires_approval`` gate trips emits
-       :class:`FlowStepDeferredEvent`, captures a
-       :class:`FlowDeferredStep`, and halts the run with
+       ``FlowStepDeferredEvent``, captures a
+       ``FlowDeferredStep``, and halts the run with
        ``status="deferred"`` — both on the streaming and non-streaming
        paths. There is NO live-inject channel; the streaming path
        behaves exactly like the non-streaming path (the stream simply
        ends after the deferred event).
     2. The developer records decisions on the returned
-       :class:`FlowCheckpoint` via
-       :meth:`FlowCheckpoint.approve` /
-       :meth:`FlowCheckpoint.reject` — same shape as
-       :meth:`RunState.approve` / :meth:`RunState.reject`.
-    3. Resume via :meth:`Runner.arun_flow_from_checkpoint(flow, checkpoint)`
+       ``FlowCheckpoint`` via
+       ``FlowCheckpoint.approve`` /
+       ``FlowCheckpoint.reject`` — same shape as
+       ``RunState.approve`` / ``RunState.reject``.
+    3. Resume via ``Runner.arun_flow_from_checkpoint(flow, checkpoint)``
        — the checkpoint carries the decisions; there is NO separate
        ``approvals=`` kwarg.
 
     Args:
-        flow: The :class:`Flow` instance to run.
-        config: :class:`FlowConfig` bounds for the run.
+        flow: The ``Flow`` instance to run.
+        config: ``FlowConfig`` bounds for the run.
         on_event: Optional event sink. ``None`` = no-op.
     """
 
     flow: Flow[StateT]
-    """The :class:`Flow` instance being executed."""
+    """The ``Flow`` instance being executed."""
 
     config: FlowConfig
     """Bounds for this run (max_steps, error policy, fan-out cap)."""
@@ -190,26 +190,26 @@ class FlowExecutor[StateT]:
     """Snapshot of the pending queue at the moment a deferral halted the run."""
 
     last_invocation_triggers: dict[str, tuple[FlowTriggerEvent, ...]]
-    """``step_name → triggers tuple`` captured by the most recent :meth:`_build_step_context`.
+    """``step_name → triggers tuple`` captured by the most recent ``_build_step_context``.
 
-    Read by :meth:`_capture_agent_deferral` so the post-invocation
+    Read by ``_capture_agent_deferral`` so the post-invocation
     rescue path can recover the trigger list the step body saw,
-    even after :meth:`_build_step_context` has popped the
-    :attr:`pending_triggers` entry.
+    even after ``_build_step_context`` has popped the
+    ``pending_triggers`` entry.
     """
 
     rate_limit_buckets: dict[str, deque[float]]
     """Per-step ``deque`` of monotonic timestamps for sliding-window rate limiting."""
 
     step_caches: dict[str, _StepCache]
-    """Per-step :class:`_StepCache` instance for :class:`FlowStepCachePolicy`."""
+    """Per-step ``_StepCache`` instance for ``FlowStepCachePolicy``."""
 
     per_step_usage: dict[str, LLMUsage]
     """``step_name → LLMUsage`` delta accumulated as each step finalises.
 
-    Recorded on the success path (and as an empty :class:`LLMUsage` for a
-    cache hit) so :meth:`_build_result` can surface per-step cost attribution
-    on :attr:`FlowRunResult.per_step_usage`. Best-effort for concurrently
+    Recorded on the success path (and as an empty ``LLMUsage`` for a
+    cache hit) so ``_build_result`` can surface per-step cost attribution
+    on ``FlowRunResult.per_step_usage``. Best-effort for concurrently
     executed steps, whose shared-context spend interleaves.
     """
 
@@ -257,10 +257,10 @@ class FlowExecutor[StateT]:
 
         Drives one BSP-like loop: drain pending, run in parallel,
         resolve successors, repeat. Bounded by
-        :attr:`FlowConfig.max_steps`.
+        ``FlowConfig.max_steps``.
 
         Returns:
-            A :class:`FlowRunResult` whose ``status`` reflects how the
+            A ``FlowRunResult`` whose ``status`` reflects how the
             run terminated. Failures and deferrals surface via ``status``,
             not as raised exceptions; ``CancelledError`` /
             ``KeyboardInterrupt`` / ``SystemExit`` still propagate so
@@ -315,9 +315,9 @@ class FlowExecutor[StateT]:
     ) -> FlowRunResult[StateT] | None:
         """Process one parallel batch's results; return a terminal result on halt.
 
-        Updates :attr:`completed_steps`, dispatches successors into
+        Updates ``completed_steps``, dispatches successors into
         ``pending`` for non-error results, and enforces
-        :attr:`FlowConfig.error_policy` for exceptions.
+        ``FlowConfig.error_policy`` for exceptions.
 
         Args:
             batch: The step names that just ran (parallel batch).
@@ -325,7 +325,7 @@ class FlowExecutor[StateT]:
             pending: Mutable queue to extend with successors.
 
         Returns:
-            A terminal :class:`FlowRunResult` when the run should halt
+            A terminal ``FlowRunResult`` when the run should halt
             (error under ``"halt"`` policy with no recovery handler, or
             any deferred step in this batch); ``None`` to continue.
         """
@@ -389,16 +389,16 @@ class FlowExecutor[StateT]:
         return None
 
     def _capture_agent_deferral(self, exc: FlowAgentDeferred) -> None:
-        """Record a :class:`FlowAgentDeferred` as a :class:`FlowDeferredStep`.
+        """Record a ``FlowAgentDeferred`` as a ``FlowDeferredStep``.
 
-        Pops triggers from :attr:`pending_triggers` (same contract as
-        :meth:`_build_step_context`) so cyclic re-fires don't
+        Pops triggers from ``pending_triggers`` (same contract as
+        ``_build_step_context``) so cyclic re-fires don't
         accumulate stale entries; emits a WARNING when the step name
         has no recorded triggers so a misconfigured ``defer_key``
         surfaces in logs rather than silently producing an
         empty-trigger deferral.
 
-        Guards an empty :attr:`exc.defer_key` because resumption
+        Guards an empty ``exc.defer_key`` because resumption
         keys the agent-bridge map on this string — an empty key
         would silently send the resume down the cold-start path.
         """
@@ -445,12 +445,12 @@ class FlowExecutor[StateT]:
         exc: BaseException,
         pending: deque[str],
     ) -> bool:
-        """Apply :attr:`FlowConfig.error_policy` to a step exception.
+        """Apply ``FlowConfig.error_policy`` to a step exception.
 
         Args:
             step_name: Step whose body OR pre-body governance hook
                 (rate limit, guardrails, cache) raised.
-                :class:`FlowStepGovernanceError` carries the hook
+                ``FlowStepGovernanceError`` carries the hook
                 breadcrumb so operators can tell the source apart.
             exc: The raised exception.
             pending: Queue to extend with the error-handler listener
@@ -459,8 +459,8 @@ class FlowExecutor[StateT]:
         Returns:
             ``True`` when the run must halt (no handler routed the
             error); ``False`` when the run continues via error handler.
-            The terminal :class:`FlowRunResult` is built once by the
-            caller after the batch loop so :class:`FlowEndEvent` fires
+            The terminal ``FlowRunResult`` is built once by the
+            caller after the batch loop so ``FlowEndEvent`` fires
             at most once even when several steps fail in one batch.
         """
         # Critical exceptions MUST propagate — never route through the
@@ -510,7 +510,7 @@ class FlowExecutor[StateT]:
     ) -> bool:
         """Route a streaming-HITL rejection through ``error_policy``.
 
-        Emits :class:`FlowStepRejectedEvent` and then defers to the
+        Emits ``FlowStepRejectedEvent`` and then defers to the
         same policy machinery as a step exception, so consumers can
         register ``@flow_listen("__error__")`` handlers that observe
         rejections alongside ordinary failures.
@@ -533,7 +533,7 @@ class FlowExecutor[StateT]:
         Evaluation order (see ``docs/flows/flows.md`` for the full
         discussion):
 
-        1. Build the :class:`FlowStepContext`.
+        1. Build the ``FlowStepContext``.
         2. Gate chain — ``enabled`` → resume-decision → ``requires_approval``.
         3. Resolve the cache key ONCE (used for both lookup and write).
         4. Cache lookup — hit short-circuits the body, restores
@@ -633,13 +633,13 @@ class FlowExecutor[StateT]:
     ) -> str | None:
         """Run the rate-limit / pre-guardrail / body / post-guardrail / cache-write chain.
 
-        Extracted so :meth:`_invoke_step` stays under the 60-line
+        Extracted so ``_invoke_step`` stays under the 60-line
         function cap and the post-gate sequence reads top-to-bottom
         in one place. ``cache_key`` was resolved once in
-        :meth:`_invoke_step` and is reused on the write path.
+        ``_invoke_step`` and is reused on the write path.
 
-        Every :class:`FlowStepStartEvent` is guaranteed to be balanced
-        by a :class:`FlowStepEndEvent` via the ``finally`` block, even
+        Every ``FlowStepStartEvent`` is guaranteed to be balanced
+        by a ``FlowStepEndEvent`` via the ``finally`` block, even
         when the body raises or a guardrail trips. This ensures streaming
         consumers never see dangling start events.
         """
@@ -684,7 +684,7 @@ class FlowExecutor[StateT]:
            (state changed between defer and resume, or the
            ``enabled`` callable's underlying flag flipped) is
            silently skipped just like any cold-start disabled step.
-        2. Pre-queued :class:`FlowApprovalDecision` from the resume
+        2. Pre-queued ``FlowApprovalDecision`` from the resume
            checkpoint short-circuits the ``requires_approval`` gate
            — and the decision is *consumed* (popped from
            ``flow._pending_approvals``) so a cyclic re-fire of the
@@ -694,7 +694,7 @@ class FlowExecutor[StateT]:
            already settled the question.
 
         Mirrors the tool gate chain in
-        :mod:`philharmonica.adk.run.tools_executor`: enablement and approval
+        ``philharmonica.adk.run.tools_executor``: enablement and approval
         are orthogonal gates with different semantics — one is a
         feature flag / dynamic skip, the other is a policy gate.
         """
@@ -783,11 +783,11 @@ class FlowExecutor[StateT]:
     async def _acquire_rate_limit(self, name: str, step: FlowStep) -> None:
         """Acquire a slot in the step's sliding-window rate limit, if configured.
 
-        Maintains :attr:`rate_limit_buckets[name]` — a deque of
+        Maintains ``rate_limit_buckets[name]`` — a deque of
         monotonic timestamps. Drops timestamps older than 60s on
         each acquire. On saturation: ``"wait"`` (default) sleeps
         until the oldest timestamp expires, ``"error"`` raises
-        :class:`FlowStepRateLimitExceeded`. The ``max_wait_seconds``
+        ``FlowStepRateLimitExceeded``. The ``max_wait_seconds``
         cap converts ``"wait"`` semantics to ``"error"`` when the
         cumulative wait would exceed it.
         """
@@ -829,7 +829,7 @@ class FlowExecutor[StateT]:
         """Evaluate the configured guardrail chain for ``phase`` ∈ {"pre", "post"}.
 
         First non-allow verdict short-circuits. Reject verdicts
-        raise :class:`FlowStepGuardrailTripped`; raise-exception
+        raise ``FlowStepGuardrailTripped``; raise-exception
         verdicts surface the carried exception directly. Empty
         guardrail tuples no-op.
         """
@@ -895,8 +895,8 @@ class FlowExecutor[StateT]:
         body that mutates state never causes the cache to write under
         a different key than the one looked up. Wraps any
         developer-supplied callable raise as
-        :class:`FlowStepGovernanceError` so the resulting
-        :class:`FlowStepErrorEvent` clearly identifies the failure
+        ``FlowStepGovernanceError`` so the resulting
+        ``FlowStepErrorEvent`` clearly identifies the failure
         source (cache hook, not step body).
         """
         cfg = step.cache
@@ -924,7 +924,7 @@ class FlowExecutor[StateT]:
 
         Cache-hit semantics: cache hits skip the body AND the
         rate-limit acquire (no real resource is consumed). Document
-        this when a step's :class:`FlowStepRateLimit` is meant to
+        this when a step's ``FlowStepRateLimit`` is meant to
         protect an external service from accidental amplification:
         cache hits do not count toward the ``rpm`` cap.
         """
@@ -954,19 +954,19 @@ class FlowExecutor[StateT]:
     ) -> None:
         """Write a post-body state snapshot into the cache under ``key``.
 
-        ``key`` is the value resolved by :meth:`_resolve_step_cache_key`
+        ``key`` is the value resolved by ``_resolve_step_cache_key``
         pre-body — passing it explicitly guarantees lookup/write
         consistency even when ``cache_key_fn`` reads mutable state.
 
         Only a ``@flow_router`` step's string return is cached as a
         route label. Non-router return values are ignored on the live
-        path (:meth:`_finalize_step` returns ``None`` for them), so they
+        path (``_finalize_step`` returns ``None`` for them), so they
         MUST NOT be cached as a route label either — otherwise a cache
         hit would replay a spurious route the cache-miss path never
         produced.
 
         Cache-write failures (typically ``_snapshot_state`` raising
-        :class:`FlowDefinitionError` on an un-serialisable state) are
+        ``FlowDefinitionError`` on an un-serialisable state) are
         soft: they log at ERROR but DO NOT mark the step failed.
         Caching is an optimisation; a successful body must not be
         invalidated by a cache-infrastructure problem.
@@ -997,11 +997,11 @@ class FlowExecutor[StateT]:
         step: FlowStep,
         ctx: FlowStepContext[StateT],
     ) -> _StepCache | None:
-        """Return the per-step :class:`_StepCache`, creating it on first access.
+        """Return the per-step ``_StepCache``, creating it on first access.
 
         Extracted so the lookup and write paths share the same
         creation site — the invariant "lookup precedes write"
-        is encoded in the call sequence inside :meth:`_invoke_step`,
+        is encoded in the call sequence inside ``_invoke_step``,
         not in duplicated ``setdefault`` calls.
         """
         cfg = step.cache
@@ -1023,7 +1023,7 @@ class FlowExecutor[StateT]:
             name: The step method name.
             result: The body's return value.
             usage: Scalar usage delta attributed to this step, emitted on
-                the :class:`FlowStepEndEvent`.
+                the ``FlowStepEndEvent``.
         """
         self.per_step_usage[name] = usage
         if role == "router":
@@ -1056,7 +1056,7 @@ class FlowExecutor[StateT]:
     def _warn_unconsumed_agent_resolutions(self) -> None:
         """Emit a warning when agent_resolutions outlive the run.
 
-        :meth:`Runner.arun_flow_from_checkpoint(agent_resolutions=...)`
+        ``Runner.arun_flow_from_checkpoint(agent_resolutions=...)``
         may legitimately supply more decisions than the resumed flow
         consumes (e.g. when a sibling deferral was already handled
         out of band). Surface the leftovers so developers can
@@ -1072,14 +1072,14 @@ class FlowExecutor[StateT]:
             )
 
     def _build_step_context(self, name: str) -> FlowStepContext[StateT]:
-        """Construct the :class:`FlowStepContext` snapshot for one step invocation.
+        """Construct the ``FlowStepContext`` snapshot for one step invocation.
 
         Pops the accumulated triggers for ``name`` so a step that
         fires more than once in a run (rare but possible via routed
         cycles) gets a fresh trigger list each iteration. Records
-        the popped tuple onto :attr:`last_invocation_triggers` so
+        the popped tuple onto ``last_invocation_triggers`` so
         the agent-bridge rescue path can recover them after the
-        step body raises :class:`FlowAgentDeferred`.
+        step body raises ``FlowAgentDeferred``.
         """
         triggers = tuple(self.pending_triggers.pop(name, ()))
         self.last_invocation_triggers[name] = triggers
@@ -1093,7 +1093,7 @@ class FlowExecutor[StateT]:
         )
 
     def _get_step_descriptor(self, name: str) -> FlowStep:
-        """Return the unbound :class:`FlowStep` descriptor for ``name``.
+        """Return the unbound ``FlowStep`` descriptor for ``name``.
 
         Reads ``type(self.flow).__dict__`` so we get the class-level
         descriptor (with the gate config) rather than a bound copy
@@ -1114,7 +1114,7 @@ class FlowExecutor[StateT]:
 
         Returns:
             One of ``"start"`` / ``"listen"`` / ``"router"`` — typed as
-            :data:`FlowRole` so callers can ``match`` exhaustively.
+            ``FlowRole`` so callers can ``match`` exhaustively.
 
         Raises:
             FlowDefinitionError: When ``name`` is not in the definition —
@@ -1138,16 +1138,16 @@ class FlowExecutor[StateT]:
     ) -> list[str]:
         """Return the next step names to fire after ``completed_step``.
 
-        Also records the :class:`FlowTriggerEvent` that scheduled each
-        successor into :attr:`pending_triggers` so the next iteration's
-        :class:`FlowStepContext` reflects accurate provenance.
+        Also records the ``FlowTriggerEvent`` that scheduled each
+        successor into ``pending_triggers`` so the next iteration's
+        ``FlowStepContext`` reflects accurate provenance.
 
         The returned fire list is deduplicated preserving first-occurrence
         order: when ``route_label`` equals an existing step's method name,
         the step-completion arrival and the route-label arrival resolve
         the same listener, and firing it twice in one batch would run its
         body twice. Both provenance trigger events are STILL recorded in
-        :attr:`pending_triggers` — only the fire list is deduped.
+        ``pending_triggers`` — only the fire list is deduped.
         """
         nxt = self._resolve_arrival(completed_step, kind="step_completion")
         if route_label is not None:
@@ -1175,8 +1175,8 @@ class FlowExecutor[StateT]:
         """Return listener / router method names that fire on ``trigger`` arrival.
 
         ``kind`` is one of ``"step_completion"`` / ``"route_label"`` and
-        is stamped on every :class:`FlowTriggerEvent` recorded into
-        :attr:`pending_triggers`. ``source`` overrides the trigger's
+        is stamped on every ``FlowTriggerEvent`` recorded into
+        ``pending_triggers``. ``source`` overrides the trigger's
         ``source_step`` for the route-label case (where the source is
         the router method, not the route literal).
         """
@@ -1213,12 +1213,12 @@ class FlowExecutor[StateT]:
 
         Called once when a deferral terminates the run, so the
         developer can persist the checkpoint and later resume via
-        :meth:`Runner.arun_flow_from_checkpoint`.
+        ``Runner.arun_flow_from_checkpoint``.
 
         The pending-steps tuple includes both the carry-over queue
         (steps scheduled but not yet run) and the deferred step
         names — so the resume executor re-fires the deferred steps
-        first, picks up their now-recorded :class:`FlowApprovalDecision`
+        first, picks up their now-recorded ``FlowApprovalDecision``
         from the checkpoint, and proceeds.
         """
         state_data = encode_state(self.flow.state)
@@ -1246,11 +1246,11 @@ class FlowExecutor[StateT]:
         )
 
     def _build_result(self, *, status: FlowRunStatus) -> FlowRunResult[StateT]:
-        """Assemble the final :class:`FlowRunResult`.
+        """Assemble the final ``FlowRunResult``.
 
         Reads ``flow.run_context.usage`` for cumulative LLM usage if the
-        developer wired their inner :meth:`Runner.arun` calls to share
-        the context; defaults to an empty :class:`LLMUsage` otherwise.
+        developer wired their inner ``Runner.arun`` calls to share
+        the context; defaults to an empty ``LLMUsage`` otherwise.
         """
         error_msg: str | None = None
         if self.errored is not None:
@@ -1302,9 +1302,9 @@ async def _resolve_cache_key(raw_key: str | Awaitable[str]) -> str:
 def _snapshot_state(state: Any) -> Any:
     """Capture a deep copy of ``state`` for caching.
 
-    Pydantic ``BaseModel`` → :meth:`BaseModel.model_copy(deep=True)`.
-    ``@dataclass`` → :func:`copy.deepcopy`. Other types raise
-    :class:`FlowDefinitionError` rather than caching a shallow
+    Pydantic ``BaseModel`` → ``BaseModel.model_copy(deep=True)``.
+    ``@dataclass`` → ``copy.deepcopy``. Other types raise
+    ``FlowDefinitionError`` rather than caching a shallow
     alias (silent state aliasing would let post-hit step bodies
     corrupt the cache).
     """
@@ -1321,7 +1321,7 @@ def _snapshot_state(state: Any) -> Any:
 def _restore_state(snapshot: Any) -> Any:
     """Return a deep copy of a cached snapshot for restoration onto ``flow.state``.
 
-    Mirrors :func:`_snapshot_state` — re-copying is mandatory so a
+    Mirrors ``_snapshot_state`` — re-copying is mandatory so a
     cache hit does not silently alias the cached entry into the
     live flow state (the next step's mutations would then corrupt
     the cache).
@@ -1337,7 +1337,7 @@ def _apply_cached_state(flow: Flow[Any], snapshot: Any) -> None:
     Copies the (freshly deep-copied) snapshot's fields onto the EXISTING
     ``flow.state`` object in place so a sibling step running concurrently in
     the same parallel batch — which captured the same ``flow.state`` reference
-    via its :class:`FlowStepContext` — does not lose its writes to an object
+    via its ``FlowStepContext`` — does not lose its writes to an object
     swap. Falls back to rebinding the reference when the state rejects in-place
     assignment (a frozen dataclass / frozen ``BaseModel``).
 
@@ -1394,10 +1394,10 @@ class _CacheHit:
 class _StepCache:
     """Per-step LRU + TTL result cache.
 
-    Stored on :attr:`FlowExecutor.step_caches`; one instance per
-    step that declares a :class:`FlowStepCachePolicy`. Entries are
+    Stored on ``FlowExecutor.step_caches``; one instance per
+    step that declares a ``FlowStepCachePolicy``. Entries are
     deep-copied state snapshots (Pydantic ``model_copy(deep=True)``
-    for BaseModel, :func:`copy.deepcopy` for dataclasses) so that
+    for BaseModel, ``copy.deepcopy`` for dataclasses) so that
     cache writes capture an immutable view at body-exit time.
 
     Eviction is LRU when ``len > max_entries``; expiry is by
@@ -1406,7 +1406,7 @@ class _StepCache:
     Attributes:
         max_entries: LRU cap on entries retained.
         ttl_seconds: Optional TTL in seconds; ``None`` ⇒ entries
-            never expire, bounded only by :attr:`max_entries`.
+            never expire, bounded only by ``max_entries``.
         entries: ``key → (created_at_monotonic, state_snapshot,
             route_label)`` ordered dict providing LRU semantics.
     """
@@ -1462,12 +1462,12 @@ def encode_state(state: Any) -> str:
     default=str)``: ``default=str`` coerces the exotic values ``asdict``
     leaves in place (``datetime``, ``set``, ``Enum``, a nested
     ``BaseModel``) to strings rather than raising ``TypeError``. This runs
-    inside :meth:`FlowExecutor._build_checkpoint`, PAST the
+    inside ``FlowExecutor._build_checkpoint``, PAST the
     ``error_policy`` boundary — a bare ``json.dumps`` would let that
-    ``TypeError`` bubble unchecked out of :meth:`FlowExecutor.run`, so the
+    ``TypeError`` bubble unchecked out of ``FlowExecutor.run``, so the
     coercion is mandatory even though it is lossy for round-tripping.
     Anything that is neither a BaseModel nor a dataclass raises
-    :class:`FlowDefinitionError` with flow-specific context.
+    ``FlowDefinitionError`` with flow-specific context.
     """
     if isinstance(state, BaseModel):
         return state.model_dump_json()

@@ -1,12 +1,12 @@
 """Durable execution engine Protocol and activity configuration types.
 
-:class:`DurableEngine` is a :class:`typing.Protocol` that any durable
+``DurableEngine`` is a ``typing.Protocol`` that any durable
 execution backend must satisfy.  Concrete implementations live in
 sub-packages of this module (``temporal/``, ``restate/``) and are never
 imported here to keep the core package dependency-free.
 
-The two frozen dataclasses (:class:`ModelActivityConfig` and
-:class:`ToolActivityConfig`) carry cost-conservative defaults so callers
+The two frozen dataclasses (``ModelActivityConfig`` and
+``ToolActivityConfig``) carry cost-conservative defaults so callers
 only pay for durability they explicitly configure.
 
 Exports:
@@ -93,7 +93,7 @@ class ToolActivityConfig:
     """Retry and timeout policy for tool-call activities.
 
     Applied by the engine to every ``wrap_tool`` invocation.  The
-    per-attempt timeout is tighter than :class:`ModelActivityConfig`
+    per-attempt timeout is tighter than ``ModelActivityConfig``
     because tool calls are expected to be short-lived; retries stay off
     by default so a wrapped tool call is never re-run unless the
     developer opts in.
@@ -125,8 +125,8 @@ class ToolActivityConfig:
 class DurableEngine(Protocol):
     """Runtime-checkable Protocol for durable execution engines.
 
-    A ``DurableEngine`` wraps :class:`~philharmonica.adk.llms.llm.LLM` calls and
-    :class:`~philharmonica.adk.tools.function_tool.FunctionTool` calls so they
+    A ``DurableEngine`` wraps ``LLM`` calls and
+    ``FunctionTool`` calls so they
     survive worker crashes via journaling or checkpointing.  Concrete
     backends (``temporal/``, ``restate/``) implement all three methods.
 
@@ -145,11 +145,11 @@ class DurableEngine(Protocol):
         """Return a durable wrapper around ``llm``.
 
         Args:
-            llm: The :class:`~philharmonica.adk.llms.llm.LLM` instance to wrap.
+            llm: The ``LLM`` instance to wrap.
             config: Retry and timeout policy for the activity.
 
         Returns:
-            A :class:`~philharmonica.adk.llms.llm.LLM` that delegates to
+            A ``LLM`` that delegates to
             ``llm`` but executes inside the engine's durable activity
             boundary.
         """
@@ -164,12 +164,12 @@ class DurableEngine(Protocol):
         """Return a durable wrapper around ``tool``.
 
         Args:
-            tool: The :class:`~philharmonica.adk.tools.function_tool.FunctionTool`
+            tool: The ``FunctionTool``
                 to wrap.
             config: Retry and timeout policy for the activity.
 
         Returns:
-            A :class:`~philharmonica.adk.tools.function_tool.FunctionTool` that
+            A ``FunctionTool`` that
             delegates to ``tool`` inside the engine's durable activity
             boundary.
         """

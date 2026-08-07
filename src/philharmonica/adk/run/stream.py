@@ -122,7 +122,7 @@ class RunItemStreamEvent:
     and handoffs during agent execution.
 
     Attributes:
-        name: The :class:`RunItemType` discriminating which kind of item this is.
+        name: The ``RunItemType`` discriminating which kind of item this is.
         item: The actual item data (message, tool call, etc.).
         type: Discriminator literal — always ``"run_item_stream_event"``.
     """
@@ -154,9 +154,9 @@ class AgentUpdatedStreamEvent:
 
 
 class HookEventKind(StrEnum):
-    """Discriminator values for :class:`HookLifecycleEvent`.
+    """Discriminator values for ``HookLifecycleEvent``.
 
-    Each member corresponds to a :class:`~philharmonica.adk.hooks.RunHooks`
+    Each member corresponds to a ``RunHooks``
     method that fires at a tool or guardrail lifecycle boundary.
     """
 
@@ -183,7 +183,7 @@ class HookEventKind(StrEnum):
 class HookLifecycleEvent:
     """Stream event carrying a hook lifecycle moment.
 
-    Emitted only when :attr:`~philharmonica.adk.run.config.RunConfig.include_hook_events`
+    Emitted only when ``include_hook_events``
     is ``True``.  Carries the hook kind and any available payload data.
 
     Attributes:
@@ -210,7 +210,7 @@ class HookLifecycleEvent:
 # All single-agent stream events.
 #
 # Swarm runs expose an iterator that yields ``StreamEvent | SwarmEvent``
-# — the :class:`~philharmonica.adk.swarms.events.SwarmEvent` variants bracket
+# — the ``SwarmEvent`` variants bracket
 # each member turn while the per-agent events below continue to flow
 # unchanged. The multiplexed union lives on the swarm streaming result
 # (``SwarmRunResultStreaming.stream_events``) rather than here to avoid
@@ -268,12 +268,12 @@ class RunResultStreaming:
         final_output: The final output (populated after streaming completes).
         is_complete: Whether streaming has completed.
         user_prompt: The original user prompt provided to the run.
-        new_items: Layer 3 :class:`~philharmonica.adk.types.items.items.RunItem`
+        new_items: Layer 3 ``RunItem``
             objects generated during execution.
         context: The run context carrying cumulative usage metrics.
         deferred_requests: Tools captured for approval or external execution.
             ``None`` if the run completed without interruption.
-        state: Serializable :class:`~philharmonica.adk.run.state.RunState` for
+        state: Serializable ``RunState`` for
             resuming an interrupted run (HITL). ``None`` when not interrupted.
         swarm_yield: Set only by the streamed swarm driver when an agent
             turn yielded control. ``None`` for every non-swarm run.

@@ -1,6 +1,6 @@
 """Streaming tool results — partial output events without LLM token cost.
 
-A *streaming function tool* yields :class:`ToolStreamEvent` instances
+A *streaming function tool* yields ``ToolStreamEvent`` instances
 instead of returning a single value. The framework drains the
 iterator, surfaces each non-``"done"`` event as a
 ``RunItemType.TOOL_PARTIAL_OUTPUT`` event to consumers of

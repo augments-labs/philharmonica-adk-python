@@ -1,4 +1,4 @@
-"""Configuration for a :class:`~philharmonica.adk.voice.pipeline.VoicePipeline`.
+"""Configuration for a ``VoicePipeline``.
 
 Trace-capture of transcripts and audio defaults to **off**: a span never
 records the user's words or voice unless the developer explicitly opts

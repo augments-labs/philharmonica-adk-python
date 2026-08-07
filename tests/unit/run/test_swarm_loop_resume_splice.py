@@ -3,12 +3,12 @@
 Exercises the dispatch logic that picks between ``run_agent_loop`` and
 the two deep-resume helpers (``run_resumed_nested_turn`` /
 ``run_resumed_hitl_turn``) based on the combination of parked state in
-the loaded :class:`SwarmState` and the presence of a ``SwarmResume``
+the loaded ``SwarmState`` and the presence of a ``SwarmResume``
 payload threaded through from
-:meth:`Runner.arun_swarm_from_checkpoint`.
+``Runner.arun_swarm_from_checkpoint``.
 
 The inner runners are mocked so the loop exits cleanly after a single
-iteration via :class:`MaxTurnsTermination`; the assertions cover which
+iteration via ``MaxTurnsTermination``; the assertions cover which
 callable was awaited rather than the full per-turn semantics.
 """
 

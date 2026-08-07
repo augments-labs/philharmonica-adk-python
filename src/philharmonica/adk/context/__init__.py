@@ -1,7 +1,7 @@
 """Context management for Philharmonica Agents.
 
 Provides token counting, context editing, compaction (LLM summarisation),
-and a unified :class:`ContextManager` that orchestrates all strategies.
+and a unified ``ContextManager`` that orchestrates all strategies.
 """
 
 from .compaction import CompactionResult, ContextCompactor

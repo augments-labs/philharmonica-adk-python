@@ -1,12 +1,12 @@
 """Voice workflows — what an agent *says* in response to a transcript.
 
-A :class:`VoiceWorkflow` is the brain between speech-to-text and
+A ``VoiceWorkflow`` is the brain between speech-to-text and
 text-to-speech: it receives a transcript and yields the text to speak,
 streaming so synthesis can begin before the full answer is generated.
 
-:class:`SingleAgentVoiceWorkflow` is the common case — it drives one
-:class:`~philharmonica.adk.agents.agent.Agent` through the
-:class:`~philharmonica.adk.run.runner.Runner`, accumulating conversation
+``SingleAgentVoiceWorkflow`` is the common case — it drives one
+``Agent`` through the
+``Runner``, accumulating conversation
 history across turns and following handoffs. It extracts spoken text
 provider-agnostically from the runner's stream: only assistant *text*
 deltas are surfaced, so the model's reasoning and tool-call arguments
@@ -41,7 +41,7 @@ class VoiceWorkflowCallbacks(Protocol):
 class VoiceWorkflow(ABC):
     """Maps a transcript to streamed text for synthesis.
 
-    Subclasses implement :meth:`run`. :meth:`on_start` optionally emits a
+    Subclasses implement ``run``. ``on_start`` optionally emits a
     greeting before the first transcript (used by continuous sessions).
     """
 
@@ -73,7 +73,7 @@ class VoiceWorkflow(ABC):
 class SingleAgentVoiceWorkflow(VoiceWorkflow):
     """Drives one agent per turn, keeping history and following handoffs.
 
-    Each :meth:`run` call appends the transcript to the running history,
+    Each ``run`` call appends the transcript to the running history,
     streams the agent's spoken text, then folds the turn's items back
     into history so the next turn has full context. When the agent hands
     off, the active agent is updated for subsequent turns.

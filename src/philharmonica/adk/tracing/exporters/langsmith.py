@@ -19,7 +19,7 @@ def langsmith_headers(*, api_key: str, project: str | None = None) -> dict[str, 
 
     Returns:
         Header dict suitable for the ``headers`` argument of
-        :func:`~philharmonica.adk.tracing.otel.setup.setup_otel`.
+        ``setup_otel``.
 
     Raises:
         ValueError: When ``api_key`` is empty.
@@ -38,7 +38,7 @@ def langsmith_headers(*, api_key: str, project: str | None = None) -> dict[str, 
 def setup_langsmith(
     *, api_key: str, project: str | None = None, endpoint: str | None = None, service_name: str = "philharmonica-adk"
 ) -> OTelTracer:
-    """Return an :class:`OTelTracer` exporting spans to LangSmith's OTLP endpoint.
+    """Return an ``OTelTracer`` exporting spans to LangSmith's OTLP endpoint.
 
     Args:
         api_key: LangSmith API key (non-empty). Load from the environment.
@@ -49,7 +49,7 @@ def setup_langsmith(
         service_name: Value for the ``service.name`` resource attribute.
 
     Returns:
-        A configured :class:`OTelTracer` pointing at LangSmith.
+        A configured ``OTelTracer`` pointing at LangSmith.
 
     Raises:
         TracingDependencyError: When the ``opentelemetry`` packages are

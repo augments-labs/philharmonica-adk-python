@@ -1,6 +1,6 @@
 """``TieredSwarmCheckpointer`` — hot/cold composite for swarm runs.
 
-Wraps two :class:`~philharmonica.adk.swarms.checkpointer.SwarmCheckpointer` backends
+Wraps two ``SwarmCheckpointer`` backends
 in a hot/cold tiering pattern:
 
 - **Hot tier**: low-latency store (Redis, in-memory) for active runs.
@@ -8,20 +8,20 @@ in a hot/cold tiering pattern:
 
 Write path: all saves go to the hot tier. Read path: hot is consulted first;
 on a miss the cold tier is read and the result is re-warmed into hot.
-Age-based archival: :meth:`archive` migrates hot entries older than
+Age-based archival: ``archive`` migrates hot entries older than
 ``archive_after_seconds`` to the cold tier (measured in-process from the
 last save or re-warm through this composite).
 
-Hook path: :meth:`register` installs
-:class:`~philharmonica.adk.swarms.checkpointers.hooks.SwarmCheckpointerHooks` with
+Hook path: ``register`` installs
+``SwarmCheckpointerHooks`` with
 the composite as the owner, so hook-driven auto-saves
 (``on_swarm_turn_end`` / ``on_swarm_turn_interrupt``) call the composite's
-:meth:`save`, which writes to the hot tier AND records the timestamp for
-:meth:`archive`.
+``save``, which writes to the hot tier AND records the timestamp for
+``archive``.
 
 Concurrency semantics are inherited from the hot store. The age used by
-:meth:`archive` is tracked in-memory by this composite (reset on process
-restart), not read from the backends — so :meth:`archive` only considers
+``archive`` is tracked in-memory by this composite (reset on process
+restart), not read from the backends — so ``archive`` only considers
 threads saved or loaded through this instance since it was created.
 """
 
@@ -43,15 +43,15 @@ logger = logging.getLogger(__name__)
 
 class TieredSwarmCheckpointer:
     """Hot+cold composite: writes go to hot; reads fall through hot→cold and
-    re-warm hot; :meth:`archive` migrates aged entries hot→cold.
+    re-warm hot; ``archive`` migrates aged entries hot→cold.
 
-    Hook-driven auto-saves (via :meth:`register`) go through the composite's
-    own :meth:`save`, so both the hot tier and the archive-eligibility table
+    Hook-driven auto-saves (via ``register``) go through the composite's
+    own ``save``, so both the hot tier and the archive-eligibility table
     (``_saved_at``) are updated on every hook-triggered write.
 
     Concurrency semantics are inherited from the hot store. The age used by
-    :meth:`archive` is tracked in-memory by this composite (reset on process
-    restart), not read from the backends — so :meth:`archive` only considers
+    ``archive`` is tracked in-memory by this composite (reset on process
+    restart), not read from the backends — so ``archive`` only considers
     threads saved or loaded through this instance since it was created.
 
     """
@@ -72,10 +72,10 @@ class TieredSwarmCheckpointer:
             cold: Archival checkpointer consulted on hot misses and as
                 the archive destination.
             archive_after_seconds: Minimum age (seconds) before a hot
-                entry is eligible for :meth:`archive`. The age is
+                entry is eligible for ``archive``. The age is
                 measured from the last save or re-warm recorded by this
                 composite.
-            thread_id: Identifier used by :meth:`register`'s auto-save
+            thread_id: Identifier used by ``register``'s auto-save
                 hook. Defaults to ``"default"`` when the caller does
                 not supply an explicit id.
 
@@ -124,18 +124,18 @@ class TieredSwarmCheckpointer:
         """Return the latest checkpoint for ``thread_id`` or ``None``.
 
         Reads the hot tier first. On a miss, falls through to the cold tier.
-        When the cold tier has a match, the raw :class:`SwarmCheckpoint` is
+        When the cold tier has a match, the raw ``SwarmCheckpoint`` is
         re-warmed into hot so subsequent reads avoid the cold path. If the
         re-warm fails it is logged as a warning and the cold state is returned
         uncached — the next load will attempt cold again.
 
         Args:
             thread_id: The logical run key.
-            swarm: The :class:`Swarm` the checkpoint belongs to. Passed
+            swarm: The ``Swarm`` the checkpoint belongs to. Passed
                 through to both backends for structural parity.
 
         Returns:
-            The latest :class:`SwarmCheckpoint`, or ``None`` when neither
+            The latest ``SwarmCheckpoint``, or ``None`` when neither
             tier holds a checkpoint for ``thread_id``.
         """
         checkpoint = await self._hot.load(thread_id, swarm)
@@ -205,13 +205,13 @@ class TieredSwarmCheckpointer:
         the hot entry is gone before archival (e.g. evicted), a warning is
         logged and the tracking entry is dropped.
 
-        The raw :class:`SwarmCheckpoint` is moved directly to cold with no
+        The raw ``SwarmCheckpoint`` is moved directly to cold with no
         rehydration — the swarm payload is already a plain dict and
         round-trips faithfully without deserialisation.
 
         Args:
-            swarm: The :class:`Swarm` used to consult the hot backend on
-                load (parity with the :class:`SwarmCheckpointer` Protocol).
+            swarm: The ``Swarm`` used to consult the hot backend on
+                load (parity with the ``SwarmCheckpointer`` Protocol).
 
         Returns:
             The number of thread ids moved from hot to cold.

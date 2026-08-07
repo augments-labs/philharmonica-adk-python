@@ -1,31 +1,31 @@
-"""``A2ARunner`` — execution entry point for :class:`A2AAgent`.
+"""``A2ARunner`` — execution entry point for ``A2AAgent``.
 
 ``A2ARunner`` is the execution side of the A2A peer surface, paired
-with :class:`A2AAgent` as its config side — the same config/execution
+with ``A2AAgent`` as its config side — the same config/execution
 split used everywhere else:
 
-* :class:`philharmonica.adk.run.runner.Runner` is execution for local
-  :class:`Agent`, :class:`Swarm`, and :class:`Graph`.
-* :class:`A2ARunner` (this class) is execution for remote
-  :class:`A2AAgent` peers — and ONLY for ``A2AAgent``.
+* ``philharmonica.adk.run.runner.Runner`` is execution for local
+  ``Agent``, ``Swarm``, and ``Graph``.
+* ``A2ARunner`` (this class) is execution for remote
+  ``A2AAgent`` peers — and ONLY for ``A2AAgent``.
 
 .. important::
 
-   Every public method on :class:`A2ARunner` accepts only an
-   :class:`A2AAgent` as the agent argument — NOT :class:`Agent`,
-   :class:`BaseAgent`, :class:`Swarm`, :class:`Graph`, or any other
-   primitive. Local-agent execution belongs on :class:`Runner`; this
+   Every public method on ``A2ARunner`` accepts only an
+   ``A2AAgent`` as the agent argument — NOT ``Agent``,
+   ``BaseAgent``, ``Swarm``, ``Graph``, or any other
+   primitive. Local-agent execution belongs on ``Runner``; this
    runner is exclusively for the remote-A2A peer surface.
 
    Static type checkers reject the wrong type at the call site. A
    defensive ``isinstance(agent, A2AAgent)`` guard at runtime raises
-   :class:`TypeError` with a message pointing the caller at
-   :class:`Runner` for local agents. Both layers exist deliberately:
+   ``TypeError`` with a message pointing the caller at
+   ``Runner`` for local agents. Both layers exist deliberately:
    the static check catches most misuses at edit time; the runtime
    guard catches ``Any``-typed boundary cases (dynamic dispatch
    tables, JSON-loaded configs, untyped third-party callers).
 
-``A2ARunner`` is the only execution entry point for :class:`A2AAgent`;
+``A2ARunner`` is the only execution entry point for ``A2AAgent``;
 the agent itself is pure config.
 """
 
@@ -42,11 +42,11 @@ logger = logging.getLogger(__name__)
 
 
 def _check_a2a_agent(agent: object, method_name: str) -> A2AAgent:
-    """Validate that ``agent`` is an :class:`A2AAgent`; narrow the type.
+    """Validate that ``agent`` is an ``A2AAgent``; narrow the type.
 
-    Raises :class:`TypeError` with a message pointing the caller at
-    :class:`Runner` for local agents. Used by every public method
-    on :class:`A2ARunner` to enforce the A2AAgent-only contract.
+    Raises ``TypeError`` with a message pointing the caller at
+    ``Runner`` for local agents. Used by every public method
+    on ``A2ARunner`` to enforce the A2AAgent-only contract.
     """
     if not isinstance(agent, A2AAgent):
         raise TypeError(
@@ -58,21 +58,21 @@ def _check_a2a_agent(agent: object, method_name: str) -> A2AAgent:
 
 
 class A2ARunner:
-    """Execution entry point for :class:`A2AAgent` peers (remote A2A endpoints).
+    """Execution entry point for ``A2AAgent`` peers (remote A2A endpoints).
 
     Pure namespace of ``@classmethod`` entry points — no instance
     state. The agent itself carries the lazy
-    :class:`A2AClient`; this runner translates the caller's flag
+    ``A2AClient``; this runner translates the caller's flag
     combinations into client method calls and enforces the type +
     mutex contracts.
 
     .. important::
-       Every method here accepts ONLY :class:`A2AAgent` instances.
-       Passing a local :class:`Agent`, :class:`Swarm`, or any other
-       primitive raises :class:`TypeError`. Use
-       :class:`philharmonica.adk.run.runner.Runner` for those.
+       Every method here accepts ONLY ``A2AAgent`` instances.
+       Passing a local ``Agent``, ``Swarm``, or any other
+       primitive raises ``TypeError``. Use
+       ``philharmonica.adk.run.runner.Runner`` for those.
 
-    Why a separate runner from :class:`Runner`? :class:`Runner`
+    Why a separate runner from ``Runner``? ``Runner``
     already exists for local primitives. Multiplexing local + remote
     on a single runner would force every entry point to discriminate
     at the type level — for no benefit, since the wire format,
@@ -138,12 +138,12 @@ class A2ARunner:
         """Run a remote A2A peer; dispatch by ``stream`` / ``background``.
 
         Flag combinations and return types (typed via ``@overload``):
-        default → :class:`A2ARunResult` (blocks until terminal);
+        default → ``A2ARunResult`` (blocks until terminal);
         ``stream=True`` → ``AsyncIterator[A2AStreamEvent]``;
-        ``background=True`` → :class:`A2AContinuationToken`.
+        ``background=True`` → ``A2AContinuationToken``.
 
         Args:
-            agent: The remote :class:`A2AAgent` — MUST be an
+            agent: The remote ``A2AAgent`` — MUST be an
                 ``A2AAgent``; other primitives raise ``TypeError``.
             prompt: User-facing prompt text.
             stream: Mutually exclusive with ``background``.
@@ -153,10 +153,10 @@ class A2ARunner:
             context_id: Continue a multi-turn conversation.
 
         Raises:
-            TypeError: ``agent`` is not an :class:`A2AAgent`.
+            TypeError: ``agent`` is not an ``A2AAgent``.
             ValueError: mutually-exclusive flags combined.
             A2A*Error: see the ``A2A*Error`` class hierarchy in
-                :mod:`philharmonica.adk.a2a.exceptions`.
+                ``philharmonica.adk.a2a.exceptions``.
         """
         checked = _check_a2a_agent(agent, "arun")
         if stream and background:
@@ -196,13 +196,13 @@ class A2ARunner:
         in a polling loop bounded by your own timeout / retry budget.
 
         Args:
-            agent: MUST be an :class:`A2AAgent` instance. Raises
-                :class:`TypeError` for any other primitive.
+            agent: MUST be an ``A2AAgent`` instance. Raises
+                ``TypeError`` for any other primitive.
             token: The continuation token returned by a prior
                 ``arun(background=True)`` call.
 
         Raises:
-            TypeError: If ``agent`` is not an :class:`A2AAgent`.
+            TypeError: If ``agent`` is not an ``A2AAgent``.
             A2ATransportError: Network failure polling the task.
             A2AProtocolError: Server-side protocol violation.
         """
@@ -220,16 +220,16 @@ class A2ARunner:
 
         Returns once the cancellation request is acknowledged by the
         server. Does not wait for the task to actually transition to
-        ``cancelled``; caller can :meth:`poll_task` to confirm.
+        ``cancelled``; caller can ``poll_task`` to confirm.
 
         Args:
-            agent: MUST be an :class:`A2AAgent` instance. Raises
-                :class:`TypeError` for any other primitive.
+            agent: MUST be an ``A2AAgent`` instance. Raises
+                ``TypeError`` for any other primitive.
             token: The continuation token returned by a prior
                 ``arun(background=True)`` call.
 
         Raises:
-            TypeError: If ``agent`` is not an :class:`A2AAgent`.
+            TypeError: If ``agent`` is not an ``A2AAgent``.
             A2ATransportError: Network failure on the cancel request.
             A2AProtocolError: Server-side protocol violation.
         """

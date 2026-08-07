@@ -1,6 +1,6 @@
 """Session state with delta tracking and temp prefix support.
 
-The :class:`State` class is a dict-like object that tracks pending
+The ``State`` class is a dict-like object that tracks pending
 changes (delta) separately from committed data.  Keys prefixed with
 ``temp:`` are stored in-memory only and stripped before persistence.
 
@@ -73,7 +73,7 @@ class State:
                 base layer.
 
         Returns:
-            A new :class:`State` with *data* as its committed layer
+            A new ``State`` with *data* as its committed layer
             and an empty delta.
         """
         return cls(data=dict(data))
@@ -182,7 +182,7 @@ class State:
     def pending_delta(self) -> dict[str, Any]:
         """Return the raw pending changes, preserving the deletion sentinel.
 
-        Unlike :meth:`delta`, deleted keys keep the module-level ``_DELETED``
+        Unlike ``delta``, deleted keys keep the module-level ``_DELETED``
         sentinel (not ``None``) so a persistence layer can distinguish
         "delete this key" from "store ``None`` under this key". Returns a copy;
         mutating it does not affect the live delta.

@@ -1,9 +1,9 @@
 """OpenAI-specific exception classification + retry wrapper.
 
-Thin layer over :func:`philharmonica.adk.llms.retry.call_with_retry` that
+Thin layer over ``philharmonica.adk.llms.retry.call_with_retry`` that
 supplies the OpenAI SDK's exception classifier. The generic loop
 (backoff, jitter, budget accounting) lives in
-:mod:`philharmonica.adk.llms.retry` — this module only translates the
+``philharmonica.adk.llms.retry`` — this module only translates the
 ``openai`` SDK's exception hierarchy onto the framework's three
 retryable categories (``"rate_limit"`` / ``"timeout"`` /
 ``"server_error"``).
@@ -11,11 +11,11 @@ retryable categories (``"rate_limit"`` / ``"timeout"`` /
 Classification rules (match the OpenAI SDK's public exception types —
 https://github.com/openai/openai-python#handling-errors):
 
-- :class:`openai.RateLimitError` → ``"rate_limit"``
-- :class:`openai.APITimeoutError` → ``"timeout"``
-- :class:`openai.APIConnectionError` → ``"server_error"``
+- ``openai.RateLimitError`` → ``"rate_limit"``
+- ``openai.APITimeoutError`` → ``"timeout"``
+- ``openai.APIConnectionError`` → ``"server_error"``
   (network-level — TCP reset, TLS handshake failure, etc.)
-- :class:`openai.APIStatusError` — classified by HTTP status:
+- ``openai.APIStatusError`` — classified by HTTP status:
 
   =====================  =====================
   Status code            Kind
@@ -80,8 +80,8 @@ async def call_with_retry[T](
 ) -> T:
     """Thin OpenAI-specific shim over the generic retry loop.
 
-    See :func:`philharmonica.adk.llms.retry.call_with_retry` for the loop
-    contract; this wrapper only injects :func:`openai_exception_to_kind`
+    See ``philharmonica.adk.llms.retry.call_with_retry`` for the loop
+    contract; this wrapper only injects ``openai_exception_to_kind``
     as the classifier so provider code can stay classifier-agnostic.
     """
     return await _generic_call_with_retry(

@@ -1,6 +1,6 @@
 """Shared fixtures for serving-layer tests.
 
-A scripted, network-free :class:`LLM` exposed through ``Agent`` fixtures
+A scripted, network-free ``LLM`` exposed through ``Agent`` fixtures
 so the REST/SSE surfaces can be exercised end-to-end without touching a
 provider.
 """

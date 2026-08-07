@@ -2,9 +2,9 @@
 
 (A) Gate-expression + factory unit tests — verify that
     ``RunConfig(metrics_enabled=True, tracing_enabled=False)`` produces a
-    live span that a :class:`MetricsTracer` records instruments for.
+    live span that a ``MetricsTracer`` records instruments for.
 
-(B) Integration test — run a real :class:`Runner` with a mocked LLM and
+(B) Integration test — run a real ``Runner`` with a mocked LLM and
     confirm the generation + agent-turn metric instruments fire when
     ``metrics_enabled=True`` and ``tracing_enabled=False``.
 """

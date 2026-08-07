@@ -68,7 +68,7 @@ def setup_logging() -> None:
     The YAML config at configs/logging/default_logger.yaml (project root)
     routes records to a rotating ``.log`` file only — console display is
     disabled by default so the terminal belongs to the ``VerboseConfig``
-    event stream (see :mod:`philharmonica.adk.verbose`). When the config is
+    event stream (see ``philharmonica.adk.verbose``). When the config is
     absent or unloadable, the package stays silent behind the
     ``NullHandler`` — standard library practice; the application owns
     handler installation.

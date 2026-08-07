@@ -68,11 +68,11 @@ def _split_fields(block: LLMConfigBlock) -> tuple[dict[str, Any], dict[str, Any]
     """Split a config block's set fields into agnostic vs provider-specific.
 
     Returns ``(agnostic, provider_specific)`` where ``agnostic`` maps to
-    base :class:`LLMConfig` constructor kwargs and ``provider_specific`` to
+    base ``LLMConfig`` constructor kwargs and ``provider_specific`` to
     the extra kwargs of a provider config subclass (callers building an
     agnostic config discard the latter). ``mode="python"`` keeps enums
     (``ToolExecutionMode``) intact. The agnostic ``retry_policy`` (dumped to
-    a dict) is reconstructed into a runtime :class:`LLMRetryPolicy` with
+    a dict) is reconstructed into a runtime ``LLMRetryPolicy`` with
     ``retry_on`` back as a frozenset; an omitted ``retry_on`` is left off the
     constructor call so the dataclass default (rate-limit only) applies
     rather than ``None``, which would broaden the scope to every transient

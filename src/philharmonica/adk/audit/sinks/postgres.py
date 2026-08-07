@@ -43,7 +43,7 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
 class PostgresAuditSink:
     """ACID append-only audit sink. Pool opened lazily on first use.
 
-    The caller owns the lifecycle — call :meth:`close` at shutdown.
+    The caller owns the lifecycle — call ``close`` at shutdown.
 
     Attributes:
         conninfo: libpq connection string used to open the pool.
@@ -55,7 +55,7 @@ class PostgresAuditSink:
         Args:
             conninfo: libpq connection string (e.g.
                 ``"postgresql://user:pass@host/dbname"``). The pool is
-                opened lazily on the first :meth:`record` call.
+                opened lazily on the first ``record`` call.
         """
         self.conninfo = conninfo
         self._pool: AsyncConnectionPool | None = None

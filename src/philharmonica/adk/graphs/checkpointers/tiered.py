@@ -1,24 +1,24 @@
 """``TieredCheckpointer`` — hot/cold composite with read-through fallback and archive.
 
-Wraps two :class:`~philharmonica.adk.graphs.checkpointer.Checkpointer` backends:
+Wraps two ``Checkpointer`` backends:
 
 - **Hot tier**: low-latency store (Redis, in-memory) for active runs.
 - **Cold tier**: archival store (S3, Postgres, SQLite) for long-term retention.
 
 Write path: all saves go to the hot tier. Read path: hot is consulted first;
 on a miss the cold tier is read and the result is re-warmed into hot.
-Age-based archival: :meth:`archive` migrates hot entries older than
+Age-based archival: ``archive`` migrates hot entries older than
 ``archive_after_seconds`` to the cold tier (measured in-process from the
 last save or re-warm through this composite).
 
-Hook path: :meth:`register` installs the composite itself as the hook target,
+Hook path: ``register`` installs the composite itself as the hook target,
 so hook-driven auto-saves (``on_node_end`` / ``on_graph_end``) call the
-composite's :meth:`save`, which writes to the hot tier AND records the
-timestamp for :meth:`archive`.
+composite's ``save``, which writes to the hot tier AND records the
+timestamp for ``archive``.
 
 Concurrency semantics are inherited from the hot store. The age used by
-:meth:`archive` is tracked in-memory by this composite (reset on process
-restart), not read from the backends — so :meth:`archive` only considers
+``archive`` is tracked in-memory by this composite (reset on process
+restart), not read from the backends — so ``archive`` only considers
 threads saved or loaded through this instance since it was created.
 """
 
@@ -49,20 +49,20 @@ logger = logging.getLogger(__name__)
 
 class TieredCheckpointer(Checkpointer):
     """Hot+cold composite: writes go to hot; reads fall through hot→cold and
-    re-warm hot; :meth:`archive` migrates aged entries hot→cold.
+    re-warm hot; ``archive`` migrates aged entries hot→cold.
 
-    Hook-driven auto-saves (via :meth:`register`) go through the composite's
-    own :meth:`save`, so both the hot tier and the archive-eligibility table
+    Hook-driven auto-saves (via ``register``) go through the composite's
+    own ``save``, so both the hot tier and the archive-eligibility table
     (``_saved_at``) are updated on every hook-triggered write. An entry in
-    that table persists until the thread is removed via :meth:`delete` or
-    migrated by a successful :meth:`archive` — completing a run does not by
+    that table persists until the thread is removed via ``delete`` or
+    migrated by a successful ``archive`` — completing a run does not by
     itself drop it. Callers handling many distinct, short-lived ``thread_id``
-    s should call :meth:`delete` on completion or run :meth:`archive`
+    s should call ``delete`` on completion or run ``archive``
     periodically so the table does not grow with the total number of runs.
 
     Concurrency semantics are inherited from the hot store. The age used by
-    :meth:`archive` is tracked in-memory by this composite (reset on process
-    restart), not read from the backends — so :meth:`archive` only considers
+    ``archive`` is tracked in-memory by this composite (reset on process
+    restart), not read from the backends — so ``archive`` only considers
     threads saved or loaded through this instance since it was created.
     """
 
@@ -78,14 +78,14 @@ class TieredCheckpointer(Checkpointer):
         Args:
             hot: Low-latency checkpointer used for all writes and
                 primary reads (e.g.
-                :class:`~philharmonica.adk.graphs.checkpointers.redis.RedisCheckpointer`,
-                :class:`~philharmonica.adk.graphs.checkpointers.in_memory.InMemoryCheckpointer`).
+                ``RedisCheckpointer``,
+                ``InMemoryCheckpointer``).
             cold: Archival checkpointer consulted on hot misses and used
                 as the archive destination (e.g.
-                :class:`~philharmonica.adk.graphs.checkpointers.s3.S3Checkpointer`,
-                :class:`~philharmonica.adk.graphs.checkpointers.postgres.PostgresCheckpointer`).
+                ``S3Checkpointer``,
+                ``PostgresCheckpointer``).
             archive_after_seconds: Minimum age in seconds before a hot
-                entry is eligible for :meth:`archive`. The age is
+                entry is eligible for ``archive``. The age is
                 measured from the last save or re-warm recorded in-memory
                 by this composite.
 
@@ -155,7 +155,7 @@ class TieredCheckpointer(Checkpointer):
     async def save(self, checkpoint: GraphCheckpoint) -> None:
         """Persist ``checkpoint`` to the hot tier and record its save time.
 
-        Serialised per thread against :meth:`archive` migration so the
+        Serialised per thread against ``archive`` migration so the
         write cannot land inside a migration's load→delete window and be
         discarded by the trailing hot delete.
         """
@@ -184,11 +184,11 @@ class TieredCheckpointer(Checkpointer):
 
         Args:
             thread_id: The logical run key.
-            graph: The :class:`Graph` the checkpoint belongs to. Passed
+            graph: The ``Graph`` the checkpoint belongs to. Passed
                 through to both backends for ``graph_id`` validation.
 
         Returns:
-            A rehydrated :class:`GraphState`, or ``None`` when neither
+            A rehydrated ``GraphState``, or ``None`` when neither
             tier has a checkpoint for ``thread_id``.
         """
         state = await self._hot.load(thread_id, graph)
@@ -264,7 +264,7 @@ class TieredCheckpointer(Checkpointer):
         logged and the tracking entry is dropped.
 
         Args:
-            graph: The :class:`Graph` whose checkpoints should be archived.
+            graph: The ``Graph`` whose checkpoints should be archived.
                 Used to rehydrate the hot state before writing to cold.
 
         Returns:
@@ -283,7 +283,7 @@ class TieredCheckpointer(Checkpointer):
         """Attempt to move one hot entry to cold. Returns 1 on success, 0 on skip/error.
 
         Holds the per-thread guard across load→cold-save→hot-delete, so a
-        concurrent :meth:`save` cannot land inside the window and be
+        concurrent ``save`` cannot land inside the window and be
         discarded by the trailing delete — the save waits and re-creates
         the hot entry after the migration completes.
         """

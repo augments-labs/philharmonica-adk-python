@@ -1,10 +1,10 @@
-"""Tests for :func:`philharmonica.adk.tracing.flush_traces`.
+"""Tests for ``philharmonica.adk.tracing.flush_traces``.
 
 Verifies that:
 - ``flush_traces()`` is a no-op when the installed tracer is not Flushable.
 - ``flush_traces()`` calls ``flush()`` on a Flushable tracer.
-- :class:`~philharmonica.adk.tracing.MultiTracer` fans ``flush()`` to Flushable children.
-- :class:`~philharmonica.adk.tracing.otel.OTelTracer` implements :class:`~philharmonica.adk.tracing.Flushable`
+- ``MultiTracer`` fans ``flush()`` to Flushable children.
+- ``OTelTracer`` implements ``Flushable``
   and its ``flush()`` calls ``force_flush`` on the provider.
 """
 
@@ -115,11 +115,11 @@ class TestFlushTracesFlushable:
         assert tracer.flush_call_count == 2
 
     def test_flushable_protocol_satisfied(self) -> None:
-        """``_FlushableTracer`` is recognised as :class:`Flushable` at runtime."""
+        """``_FlushableTracer`` is recognised as ``Flushable`` at runtime."""
         assert isinstance(_FlushableTracer(), Flushable)
 
     def test_noop_tracer_not_flushable(self) -> None:
-        """``NoOpTracer`` does not satisfy :class:`Flushable`."""
+        """``NoOpTracer`` does not satisfy ``Flushable``."""
         assert not isinstance(NoOpTracer(), Flushable)
 
 
@@ -167,7 +167,7 @@ class TestMultiTracerFlush:
         assert good.flush_call_count == 1
 
     def test_multi_tracer_implements_flushable(self) -> None:
-        """``MultiTracer`` is itself recognised as :class:`Flushable`."""
+        """``MultiTracer`` is itself recognised as ``Flushable``."""
         multi = MultiTracer([_FlushableTracer()])
         assert isinstance(multi, Flushable)
 
@@ -209,7 +209,7 @@ class TestOTelTracerFlush:
         assert finished[0].name == "test-span"
 
     def test_otel_tracer_implements_flushable(self) -> None:
-        """``OTelTracer`` satisfies the :class:`Flushable` protocol."""
+        """``OTelTracer`` satisfies the ``Flushable`` protocol."""
         from opentelemetry.sdk.trace import TracerProvider
 
         from philharmonica.adk.tracing.otel import OTelTracer

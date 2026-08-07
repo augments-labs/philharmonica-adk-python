@@ -12,7 +12,7 @@ Two rendering back-ends ship:
    unknown colour names degrade to plain text without error.
 
 Soft-importing ``rich`` follows the same pattern as
-:mod:`philharmonica.adk.tracing.otel` — the framework has
+``philharmonica.adk.tracing.otel`` — the framework has
 no hard dependency on Rich; it just gets prettier output when the
 user opts in.
 """
@@ -76,7 +76,7 @@ def redact_secrets(value: Any, _depth: int = 0) -> Any:
     dicts are walked recursively, but non-dict/list containers are
     left alone to avoid breaking representations of custom objects.
 
-    Descent is bounded by :data:`_MAX_REDACT_DEPTH`: tool outputs are
+    Descent is bounded by ``_MAX_REDACT_DEPTH``: tool outputs are
     arbitrary objects, so a self-referential container or one nested
     deeper than the interpreter's recursion limit must not raise
     ``RecursionError`` out of the verbose hooks. Beyond that depth the
@@ -165,7 +165,7 @@ class VerboseRenderer:
         """Bind the renderer to *config*.
 
         Args:
-            config: The :class:`VerboseConfig` that owns this renderer.
+            config: The ``VerboseConfig`` that owns this renderer.
                 Style lookups, colour resolution, and the output stream
                 are all read from *config* at render time.
         """
@@ -233,12 +233,12 @@ class VerboseRenderer:
 
         Args:
             event: Dotted event name used to look up the
-                :class:`~philharmonica.adk.verbose.config.EventStyle`
+                ``EventStyle``
                 (colour, icon, prefix).
             headline: Short one-line description always shown
                 regardless of payload visibility.
             payload: Optional body text. Shown only when the resolved
-                :class:`~philharmonica.adk.verbose.config.EventStyle` has
+                ``EventStyle`` has
                 ``show_payload=True`` and this string is non-empty.
         """
         if not self._config.enabled:
@@ -330,7 +330,7 @@ def format_payload(value: Any, *, max_chars: int = 1000) -> str:
     Guards against three failure modes before truncation:
 
     1. Objects whose shallow size (``sys.getsizeof``) exceeds
-       :data:`_MAX_REPR_OBJECT_BYTES` are rendered as a placeholder
+       ``_MAX_REPR_OBJECT_BYTES`` are rendered as a placeholder
        instead of calling ``repr`` — avoids OOM on large in-memory
        structures (Pydantic models, NumPy arrays) that a tool may
        return.

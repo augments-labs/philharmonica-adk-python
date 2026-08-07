@@ -3,7 +3,7 @@
 Covers the operator-visible callback path: when a node raises
 ``InterruptException`` (HITL `request_human_input`, nested-agent tool
 deferral, etc.), the graph driver invokes ``on_node_interrupt`` on every
-attached :class:`GraphHooks` before the superstep ends.
+attached ``GraphHooks`` before the superstep ends.
 
 The hook complements the existing ``NodeInterruptEvent`` stream emission
 — streaming subscribers receive the event; hook subscribers receive a

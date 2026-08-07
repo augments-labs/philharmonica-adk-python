@@ -1,23 +1,23 @@
-"""Visualisation emitters for :class:`Flow` and :class:`Graph` topologies.
+"""Visualisation emitters for ``Flow`` and ``Graph`` topologies.
 
 Pure-function emitters producing Mermaid or Graphviz DOT diagram strings
-from the frozen topology of a :class:`~philharmonica.adk.flows.flow.Flow` or
-:class:`~philharmonica.adk.graphs.graph.Graph`. No side effects, no I/O —
+from the frozen topology of a ``Flow`` or
+``Graph``. No side effects, no I/O —
 callers print, paste, save, or embed the returned string themselves.
 
 Public functions:
 
-- :func:`flow_to_mermaid` — Mermaid ``flowchart`` from a Flow.
-- :func:`flow_to_dot` — Graphviz DOT from a Flow.
-- :func:`graph_to_mermaid` — Mermaid ``flowchart`` from a Graph.
-- :func:`graph_to_dot` — Graphviz DOT from a Graph.
-- :func:`render_dot` / :func:`render_mermaid` — turn the emitter
+- ``flow_to_mermaid`` — Mermaid ``flowchart`` from a Flow.
+- ``flow_to_dot`` — Graphviz DOT from a Flow.
+- ``graph_to_mermaid`` — Mermaid ``flowchart`` from a Graph.
+- ``graph_to_dot`` — Graphviz DOT from a Graph.
+- ``render_dot`` / ``render_mermaid`` — turn the emitter
   strings into image files on disk via the optional ``viz`` /
   ``mermaid`` extras (graceful fallback to raw source on missing
   CLI / network).
 
-The ergonomic instance methods :meth:`Flow.to_mermaid` /
-:meth:`Flow.to_dot` / :meth:`Graph.to_mermaid` / :meth:`Graph.to_dot`
+The ergonomic instance methods ``Flow.to_mermaid`` /
+``Flow.to_dot`` / ``Graph.to_mermaid`` / ``Graph.to_dot``
 delegate to the emitter functions.
 """
 

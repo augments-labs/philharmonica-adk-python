@@ -1,6 +1,6 @@
-"""Unit tests for :meth:`RunHooks.on_task_start` / :meth:`on_task_end`.
+"""Unit tests for ``RunHooks.on_task_start`` / ``on_task_end``.
 
-The lifecycle hooks MUST fire exactly once per :meth:`Runner.arun_task`
+The lifecycle hooks MUST fire exactly once per ``Runner.arun_task``
 invocation — start before inner arun, end after (in both success and
 exception paths).
 """

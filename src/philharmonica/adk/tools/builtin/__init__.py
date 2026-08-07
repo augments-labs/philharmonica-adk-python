@@ -7,18 +7,18 @@ define what "builtin" means.
 
 Public surface:
 
-- :class:`BuiltinTool` — abstract dataclass base for any tool the
+- ``BuiltinTool`` — abstract dataclass base for any tool the
   framework or developer environment runs (the ABC shared by
   ``MemoryTool``, ``JITContextAwareTool``, ``ShellTool``, and
   ``ApplyPatchTool``).
-- :class:`ExecutableBuiltinTool` — extends ``BuiltinTool`` with
+- ``ExecutableBuiltinTool`` — extends ``BuiltinTool`` with
   ``description`` / ``schema`` / ``on_invoke`` so the LLM layer
   exposes the tool to the model directly.
-- :class:`MemoryTool` (and decomposed variants
-  :class:`RememberMemoryTool`, :class:`RecallMemoryTool`,
-  :class:`ForgetMemoryTool`) — local memory store backed by the
-  framework's :class:`MemoryStore` Protocol.
-- :class:`JITContextAwareTool` — active context-management tool that
+- ``MemoryTool`` (and decomposed variants
+  ``RememberMemoryTool``, ``RecallMemoryTool``,
+  ``ForgetMemoryTool``) — local memory store backed by the
+  framework's ``MemoryStore`` Protocol.
+- ``JITContextAwareTool`` — active context-management tool that
   expands into multiple framework-handled function tools at build
   time (``save_note``, ``recall_notes``, ``manage_context``, …).
 

@@ -1,9 +1,9 @@
-"""End-to-end tests for :meth:`Runner.arun_task_streamed`.
+"""End-to-end tests for ``Runner.arun_task_streamed``.
 
 Exercises the streamed Task entry point against the real agent loop
 with a stubbed LLM. The streamed path is structurally different from
-the non-streamed :meth:`Runner.arun_task` — it returns a
-:class:`RunResultStreaming` whose ``stream_events()`` async iterator
+the non-streamed ``Runner.arun_task`` — it returns a
+``RunResultStreaming`` whose ``stream_events()`` async iterator
 yields events as they happen, and whose background task fires the
 ``on_task_*`` lifecycle hooks in its ``finally`` arm so they also
 fire on cancellation paths.
@@ -12,11 +12,11 @@ Covered:
 
 - Happy path: stream drains; ``on_task_start`` fires before the
   returned handle is observable; ``on_task_end`` fires with a success
-  :class:`TaskOutput` carrying ``final_output``, ``new_items``,
+  ``TaskOutput`` carrying ``final_output``, ``new_items``,
   ``usage``.
 - Error path: an exception inside the streamed turn surfaces via
   ``stream_events()`` (re-raised after the queue drains); the
-  ``on_task_end`` hook fires with the failure :class:`TaskOutput`.
+  ``on_task_end`` hook fires with the failure ``TaskOutput``.
 - Cancel path: ``RunResultStreaming.cancel(mode="immediate")`` issued
   mid-stream still triggers ``on_task_end`` so observers see the
   termination.

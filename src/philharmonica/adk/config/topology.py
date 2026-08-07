@@ -335,10 +335,10 @@ def _build_node(node: AgentNodeConfig, source_dir: Path | None) -> Agent:
 
 
 def build_topology(config: TopologyConfig, base_dir: Path | None = None) -> AgentTopology:
-    """Build an :class:`AgentTopology` from a validated config.
+    """Build an ``AgentTopology`` from a validated config.
 
     Args:
-        config: A validated :class:`TopologyConfig`.
+        config: A validated ``TopologyConfig``.
         base_dir: Directory the topology file was loaded from, used to resolve
             ``config_path`` agent entries (and to make each agent's sibling tool
             modules importable). ``None`` when building from an in-memory model;
@@ -406,7 +406,7 @@ def load_topology(path: str | Path, *, document: dict[str, Any] | None = None) -
             where the file changes between the two reads.
 
     Returns:
-        The built :class:`AgentTopology`.
+        The built ``AgentTopology``.
 
     Raises:
         FileNotFoundError: If ``path`` does not exist.

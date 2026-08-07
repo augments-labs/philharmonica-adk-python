@@ -35,7 +35,7 @@ class BuiltinTool(ABC):
     - Plain ``BuiltinTool`` — wraps framework behaviour that the loop
       converts into a ``FunctionTool`` via a dedicated builder before
       reaching the LLM layer (``ShellTool``, ``ApplyPatchTool``).
-    - :class:`ExecutableBuiltinTool` — has ``description``, ``schema``,
+    - ``ExecutableBuiltinTool`` — has ``description``, ``schema``,
       and ``on_invoke`` so the LLM layer can expose it directly as a
       function tool (``MemoryTool``, ``JITContextAwareTool``).
     """

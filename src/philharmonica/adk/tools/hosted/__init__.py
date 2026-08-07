@@ -5,26 +5,26 @@ server-side (web search, code execution, file search, image
 generation, URL context). The framework forwards typed config to
 each provider's wire format via the matching converter's
 ``isinstance`` dispatch — when a provider does not support a
-variant, the converter raises :class:`UnsupportedHostedToolError`
+variant, the converter raises ``UnsupportedHostedToolError``
 rather than silently dropping.
 
 Public exports:
 
-- :class:`HostedTool` — the abstract base every concrete hosted
+- ``HostedTool`` — the abstract base every concrete hosted
   tool inherits from.
-- :class:`UnsupportedHostedToolError` — raised by a provider's
+- ``UnsupportedHostedToolError`` — raised by a provider's
   converter when it does not support the hosted-tool variant.
-- :class:`WebSearchTool` — Anthropic + OpenAI Responses + Gemini.
-- :class:`CodeExecutionTool` — OpenAI Responses + Gemini.
-- :class:`FileSearchTool` — OpenAI Responses only.
-- :class:`ImageGenerationTool` — OpenAI Responses only.
-- :class:`URLContextTool` — Gemini only.
-- :class:`HostedMCPTool` — OpenAI Responses only (provider-side MCP).
-- :class:`ComputerTool` — OpenAI Responses only (hybrid: the provider
-  declares the tool, the developer's :class:`Computer` callable
+- ``WebSearchTool`` — Anthropic + OpenAI Responses + Gemini.
+- ``CodeExecutionTool`` — OpenAI Responses + Gemini.
+- ``FileSearchTool`` — OpenAI Responses only.
+- ``ImageGenerationTool`` — OpenAI Responses only.
+- ``URLContextTool`` — Gemini only.
+- ``HostedMCPTool`` — OpenAI Responses only (provider-side MCP).
+- ``ComputerTool`` — OpenAI Responses only (hybrid: the provider
+  declares the tool, the developer's ``Computer`` callable
   executes each action locally).
-- :class:`Computer` / :class:`SafetyCheck` — typed protocol + safety
-  payload supporting :class:`ComputerTool`.
+- ``Computer`` / ``SafetyCheck`` — typed protocol + safety
+  payload supporting ``ComputerTool``.
 """
 
 from philharmonica.adk.tools.hosted.code_execution_tool import CodeExecutionTool

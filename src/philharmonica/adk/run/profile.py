@@ -75,10 +75,10 @@ def _copy_run_config(config: RunConfig) -> RunConfig:
 class RunnerProfile:
     """Reusable immutable defaults for ``Runner`` execution.
 
-    A profile is target-agnostic: it stores a :class:`RunConfig` and optional
-    user context. Bind a target via :meth:`agent`, :meth:`swarm`,
-    :meth:`graph`, :meth:`task`, :meth:`pipeline`, :meth:`task_group`, or
-    :meth:`flow` to get an executable runner.
+    A profile is target-agnostic: it stores a ``RunConfig`` and optional
+    user context. Bind a target via ``agent``, ``swarm``,
+    ``graph``, ``task``, ``pipeline``, ``task_group``, or
+    ``flow`` to get an executable runner.
     """
 
     _config: RunConfig = field(repr=False)
@@ -337,7 +337,7 @@ class RunnerProfile:
         return TaskPipelineRunner(pipeline=pipeline, profile=self)
 
     def task_pipeline(self, pipeline: TaskPipeline[TContext]) -> TaskPipelineRunner[TContext]:
-        """Alias for :meth:`pipeline`."""
+        """Alias for ``pipeline``."""
         return self.pipeline(pipeline)
 
     def task_group(self, group: TaskGroup[TContext]) -> TaskGroupRunner[TContext]:

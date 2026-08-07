@@ -229,7 +229,7 @@ class Agent(BaseAgent, Generic[TContext]):
     guardrails: AgentGuardrails = dataclasses.field(default_factory=AgentGuardrails)
     """Per-phase agent-level guardrails registered on this agent.
 
-    A single :class:`~philharmonica.adk.agents.agent_guardrails.AgentGuardrails`
+    A single ``AgentGuardrails``
     config object holds two phase-typed lists:
 
     - ``guardrails.input``: validates input before (or in parallel with)
@@ -283,21 +283,21 @@ class Agent(BaseAgent, Generic[TContext]):
     middleware: Middleware = dataclasses.field(default_factory=Middleware)
     """Per-layer middleware lists registered on this agent.
 
-    A single :class:`~philharmonica.adk.agents.middleware.Middleware` config
+    A single ``Middleware`` config
     object holds typed lists for each execution layer the framework
     supports. Three slots are wired:
 
     - ``tools`` — wraps each ``tool.on_invoke`` call with
       ``(ctx, tool, args, next) -> result``. See
-      :class:`~philharmonica.adk.tools.tool_middleware.ToolMiddleware`.
+      ``ToolMiddleware``.
     - ``agents`` — wraps each per-agent block in the run loop with
       ``(agent, messages, ctx, next) -> AgentBlockOutcome``. The
       chain re-fires on every handoff / swarm transition. See
-      :class:`~philharmonica.adk.run.agent_middleware.AgentMiddleware`.
+      ``AgentMiddleware``.
     - ``llms`` — wraps each ``LLM.acomplete()`` call the runner
       issues with ``(agent, messages, llm_config, ctx, next)
       -> LLMResponse``. See
-      :class:`~philharmonica.adk.llms.llm_middleware.LLMMiddleware`.
+      ``LLMMiddleware``.
 
     All three lists are composed outer-to-inner: the first entry
     runs first (outermost), the last entry runs last (innermost,

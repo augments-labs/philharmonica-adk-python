@@ -103,7 +103,7 @@ class InMemoryVectorStore:
             filter: Optional metadata filters.
 
         Returns:
-            List of :class:`VectorQueryResult` ordered by descending score.
+            List of ``VectorQueryResult`` ordered by descending score.
 
         Raises:
             ValueError: If the query vector dimension differs from the
@@ -134,7 +134,7 @@ class InMemoryVectorStore:
             record_id: The unique record identifier.
 
         Returns:
-            The matching :class:`VectorRecord`, or ``None`` if not found.
+            The matching ``VectorRecord``, or ``None`` if not found.
         """
         with self._lock:
             return self._records.get(record_id)

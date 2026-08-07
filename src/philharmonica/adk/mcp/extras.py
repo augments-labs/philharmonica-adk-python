@@ -99,7 +99,7 @@ async def build_prompt_tools(server: MCPServer, *, requires_approval: ApprovalPo
     Args:
         server: The MCP server whose prompts to convert.
         requires_approval: HITL approval policy applied to every
-            converted prompt tool (see :func:`build_resource_tool`).
+            converted prompt tool (see ``build_resource_tool``).
 
     Returns:
         A list of ``FunctionTool`` instances, one per prompt returned

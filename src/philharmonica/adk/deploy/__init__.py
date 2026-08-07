@@ -3,7 +3,7 @@
 ``philharmonica deploy init`` renders a Dockerfile and per-target manifests;
 the ship commands build and deploy by driving the operator's installed
 CLIs (docker / gcloud / kubectl / aws / helm) through the
-:class:`CommandRunner` seam. No cloud SDK is imported — the deploy path
+``CommandRunner`` seam. No cloud SDK is imported — the deploy path
 runs the same commands an operator would by hand, so it adds no runtime
 dependencies. Everything here is stdlib + click only.
 """

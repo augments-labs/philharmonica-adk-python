@@ -6,7 +6,7 @@ Both types accept exactly one of three carrier shapes — ``data``
 core schema is a plain string so JSON-schema-driven tool calling
 sees a URI parameter; a custom validator constructs the instance
 from either a string (the LLM-provided shape) or an existing
-:class:`File` / :class:`Image` (the developer-supplied shape).
+``File`` / ``Image`` (the developer-supplied shape).
 
 See ``types/multimodal/__init__.py`` for the usage walkthrough.
 """
@@ -64,7 +64,7 @@ class File:
             URL or filename when both are present.
     """
 
-    # Subclasses (notably :class:`Image`) narrow this set if a stricter
+    # Subclasses (notably ``Image``) narrow this set if a stricter
     # contract makes sense. ``File`` itself accepts any non-empty MIME.
     ALLOWED_MIME_PREFIXES: ClassVar[tuple[str, ...] | None] = None
 
@@ -278,7 +278,7 @@ class File:
     ) -> dict[str, Any]:
         """Override the JSON schema to advertise a URI string.
 
-        ``handler`` is :class:`pydantic.json_schema.GetJsonSchemaHandler`;
+        ``handler`` is ``pydantic.json_schema.GetJsonSchemaHandler``;
         we ignore the inferred ``CoreSchema`` because the validator
         accepts any object — the LLM-facing contract is a URI string.
         """
@@ -299,7 +299,7 @@ class Image(File):
     """A multimodal image argument.
 
     Narrows the parent ``File`` contract: when ``mime_type`` is set,
-    it MUST start with ``image/``. Otherwise identical to :class:`File`.
+    it MUST start with ``image/``. Otherwise identical to ``File``.
     """
 
     ALLOWED_MIME_PREFIXES: ClassVar[tuple[str, ...] | None] = ("image/",)

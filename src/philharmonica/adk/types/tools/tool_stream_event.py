@@ -1,8 +1,8 @@
 """Streaming event yielded by a streaming function tool.
 
-A *streaming function tool* is a :class:`FunctionTool` whose
+A *streaming function tool* is a ``FunctionTool`` whose
 ``on_invoke`` returns ``AsyncIterator[ToolStreamEvent]`` instead of a
-single value. Yielding :class:`ToolStreamEvent` instances exposes
+single value. Yielding ``ToolStreamEvent`` instances exposes
 incremental progress to consumers of ``Runner.arun(stream=True)``
 (surfaced as ``RunItemType.TOOL_PARTIAL_OUTPUT`` events) while the
 LLM still sees exactly one tool-result message — the value carried

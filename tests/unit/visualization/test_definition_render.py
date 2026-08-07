@@ -1,4 +1,4 @@
-"""Unit tests for :func:`definition_to_mermaid` and :func:`definition_to_dot`.
+"""Unit tests for ``definition_to_mermaid`` and ``definition_to_dot``.
 
 Stage 3 acceptance criteria:
 - A FlowDefinition renders to Mermaid / DOT without constructing or running

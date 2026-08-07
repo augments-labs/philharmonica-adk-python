@@ -1,7 +1,7 @@
-"""Tests for :class:`VerboseHooks` lifecycle rendering.
+"""Tests for ``VerboseHooks`` lifecycle rendering.
 
-These tests wire :class:`VerboseHooks` directly (bypassing the
-:class:`~philharmonica.adk.run.runner.Runner`) and invoke lifecycle methods
+These tests wire ``VerboseHooks`` directly (bypassing the
+``Runner``) and invoke lifecycle methods
 to verify events land on the configured stream with the right prefix/
 icon, and that the per-agent override mechanism wins over the
 run-level default.

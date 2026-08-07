@@ -1,9 +1,9 @@
 """Gemini-specific exception classification + retry wrapper.
 
-Thin layer over :func:`philharmonica.adk.llms.retry.call_with_retry` that
+Thin layer over ``philharmonica.adk.llms.retry.call_with_retry`` that
 supplies the Gemini SDK's exception classifier. The generic loop
 (backoff, jitter, budget accounting) lives in
-:mod:`philharmonica.adk.llms.retry` — this module only translates the
+``philharmonica.adk.llms.retry`` — this module only translates the
 ``google.genai.errors`` exception hierarchy onto the framework's
 three retryable categories (``"rate_limit"`` / ``"timeout"`` /
 ``"server_error"``).
@@ -11,10 +11,10 @@ three retryable categories (``"rate_limit"`` / ``"timeout"`` /
 Classification rules (per the Gemini API troubleshooting doc —
 https://ai.google.dev/gemini-api/docs/troubleshooting):
 
-- :class:`google.genai.errors.ClientError` with HTTP 429 → ``"rate_limit"``
-- :class:`google.genai.errors.ClientError` with other 4xx → ``None`` (permanent)
-- :class:`google.genai.errors.ServerError` with HTTP 504 → ``"timeout"``
-- :class:`google.genai.errors.ServerError` with other 5xx → ``"server_error"``
+- ``google.genai.errors.ClientError`` with HTTP 429 → ``"rate_limit"``
+- ``google.genai.errors.ClientError`` with other 4xx → ``None`` (permanent)
+- ``google.genai.errors.ServerError`` with HTTP 504 → ``"timeout"``
+- ``google.genai.errors.ServerError`` with other 5xx → ``"server_error"``
 
 Any other exception maps to ``None`` — the caller lets it propagate.
 """
@@ -64,9 +64,9 @@ async def call_with_retry[T](
 ) -> T:
     """Thin Gemini-specific shim over the generic retry loop.
 
-    See :func:`philharmonica.adk.llms.retry.call_with_retry` for the loop
+    See ``philharmonica.adk.llms.retry.call_with_retry`` for the loop
     contract; this wrapper only injects
-    :func:`gemini_exception_to_kind` as the classifier so provider
+    ``gemini_exception_to_kind`` as the classifier so provider
     code can stay classifier-agnostic.
     """
     return await _generic_call_with_retry(

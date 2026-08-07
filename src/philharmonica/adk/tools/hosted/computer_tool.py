@@ -3,7 +3,7 @@
 ``ComputerTool`` is a hybrid hosted/local primitive: the LLM provider
 knows it as a tool type so the model can emit structured actions
 (click, type, screenshot, …), but execution runs in the developer's
-environment via a user-supplied :class:`Computer` callable.
+environment via a user-supplied ``Computer`` callable.
 
 ``SafetyCheck`` lets the developer approve / reject individual
 actions before they reach the executor — useful for sandboxes,
@@ -28,7 +28,7 @@ class SafetyCheck:
     """A pending action plus rationale, passed to ``on_safety_check``.
 
     The framework constructs one of these before invoking the user's
-    :class:`Computer` callable. The ``on_safety_check`` callback
+    ``Computer`` callable. The ``on_safety_check`` callback
     returns ``True`` to approve the action, ``False`` to reject — a
     rejection skips execution and surfaces a rejection message to the
     LLM so it can choose differently.
@@ -169,11 +169,11 @@ The runtime dispatch supplies ``(ToolContext, SafetyCheck)`` and
 expects ``bool`` or ``Awaitable[bool]`` back; the variadic form
 accommodates one-arg callbacks too. ``ToolContext`` is intentionally
 not in the typing chain to avoid a circular import — its concrete
-type is documented on :attr:`ComputerTool.on_safety_check`."""
+type is documented on ``ComputerTool.on_safety_check``."""
 
 
 type ApprovalRequiredCallback = Callable[[SafetyCheck], MaybeAwaitable[bool]]
-"""Type for the callable form of :attr:`ComputerTool.requires_approval`.
+"""Type for the callable form of ``ComputerTool.requires_approval``.
 
 Returns ``True`` when the action needs HITL approval, ``False`` for
 auto-approve."""
@@ -185,29 +185,29 @@ class ComputerTool(HostedTool, Generic[ComputerT]):
 
     Declares the computer-use capability to the LLM provider so the
     model can emit structured actions (``computer_call`` items), and
-    carries the local :class:`Computer` callable plus optional
+    carries the local ``Computer`` callable plus optional
     safety + approval gates.
 
     Provider matrix:
     - **OpenAI Responses**: native via the ``computer_use_preview``
       tool type. Honours every attribute below.
     - All other providers raise
-      :class:`UnsupportedHostedToolError` when the converter encounters
+      ``UnsupportedHostedToolError`` when the converter encounters
       a ``ComputerTool``. Anthropic computer-use is not supported here:
       its action vocabulary (e.g. ``triple_click``, ``hold_key``,
-      ``cursor_position``) requires :class:`Computer` Protocol extensions
+      ``cursor_position``) requires ``Computer`` Protocol extensions
       this ADK does not implement.
 
     Treat instances as immutable after construction: mutating
     ``.computer`` post-construction bypasses the Protocol check and
-    the dispatch wiring. Use :func:`dataclasses.replace` to swap
+    the dispatch wiring. Use ``dataclasses.replace`` to swap
     executors. (The dataclass cannot be marked ``frozen=True``
-    because the parent :class:`HostedTool` is non-frozen — Python
+    because the parent ``HostedTool`` is non-frozen — Python
     forbids frozen subclasses of non-frozen parents.)
 
     Attributes:
         computer: User-supplied execution backend conforming to the
-            :class:`Computer` protocol.
+            ``Computer`` protocol.
         display_width: Reported display width in pixels.
             **OpenAI Responses only.**
         display_height: Reported display height in pixels.
@@ -229,7 +229,7 @@ class ComputerTool(HostedTool, Generic[ComputerT]):
     SUPPORTED_PROVIDERS: ClassVar[tuple[str, ...]] = ("openai-responses",)
 
     computer: ComputerT
-    """The user-supplied :class:`Computer` executor."""
+    """The user-supplied ``Computer`` executor."""
 
     display_width: int = 1024
     """Reported display width in pixels. **OpenAI Responses only.**"""
@@ -252,7 +252,7 @@ class ComputerTool(HostedTool, Generic[ComputerT]):
     Cost-and-safety-conservative default: ``True``. Computer-use
     actions can mutate the developer's environment (open apps, click
     links, type into forms); requiring opt-out is the right default.
-    A callable receives the :class:`SafetyCheck` and returns
+    A callable receives the ``SafetyCheck`` and returns
     ``True`` for "needs approval", ``False`` for "auto-approve".
     **Applies to all supported providers.**
     """

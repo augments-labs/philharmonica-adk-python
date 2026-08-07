@@ -1,10 +1,10 @@
-"""Tests for :mod:`philharmonica.adk.tracing.spans` contextvars parent tracking.
+"""Tests for ``philharmonica.adk.tracing.spans`` contextvars parent tracking.
 
-Verifies that the :data:`philharmonica_current_span` ContextVar correctly
+Verifies that the ``philharmonica_current_span`` ContextVar correctly
 tracks nested parent-child relationships across ``with`` blocks,
-``await`` boundaries, and concurrent :func:`asyncio.gather` tasks.
+``await`` boundaries, and concurrent ``asyncio.gather`` tasks.
 
-Also verifies the zero-cost invariant: :class:`NoOpSpan` must never
+Also verifies the zero-cost invariant: ``NoOpSpan`` must never
 touch the ContextVar so disabled-tracing paths stay free.
 """
 
@@ -37,7 +37,7 @@ from philharmonica.adk.types.tracing import (
 
 
 class _RecordingTracer:
-    """Minimal tracer that returns real :class:`Span` instances so
+    """Minimal tracer that returns real ``Span`` instances so
     parent tracking works via the framework ContextVar."""
 
     def __init__(self) -> None:

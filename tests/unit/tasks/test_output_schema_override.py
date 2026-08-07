@@ -1,4 +1,4 @@
-"""Unit tests for :attr:`Task.output_schema` per-call override.
+"""Unit tests for ``Task.output_schema`` per-call override.
 
 The runner MUST build a transient agent via
 ``dataclasses.replace(agent, output_schema=task.output_schema)`` for

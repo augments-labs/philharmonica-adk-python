@@ -103,7 +103,7 @@ class _BlockAccumulator:
     One instance per ``content_block_start`` event, keyed on the
     block's index. Buffers all text / tool-input / thinking /
     signature deltas until ``content_block_stop`` finalises the
-    block into an :class:`LLMResponsePart`.
+    block into an ``LLMResponsePart``.
     """
 
     block_type: str
@@ -132,7 +132,7 @@ class AnthropicLLM(LLM):
         max_retries: SDK-level retries inside the anthropic client
             (default 0 — disabled). Set to a positive value to enable
             SDK-level retries for transient errors. This is distinct from
-            :attr:`LLMConfig.retry_policy`, which runs *outside* the
+            ``LLMConfig.retry_policy``, which runs *outside* the
             SDK with explicit backoff and category filters.
     """
 
@@ -220,7 +220,7 @@ class AnthropicLLM(LLM):
         parse / stream.
 
         When ``output_schema`` is supplied AND streaming is on, raises
-        :class:`NotImplementedError` — structured output relies on
+        ``NotImplementedError`` — structured output relies on
         post-hoc validation of the synthetic tool's input, which is
         only available once the full response is in hand.
 
@@ -456,7 +456,7 @@ class AnthropicLLM(LLM):
 
         The return type matches the SDK's overload union for the
         ``stream: bool`` fallback signature exactly. Callers narrow
-        via :func:`isinstance` after passing a Literal ``stream``
+        via ``isinstance`` after passing a Literal ``stream``
         value — pre-narrowing here would silence a downstream warning
         but mask SDK-side variant changes on upgrade.
         """
@@ -572,11 +572,11 @@ class AnthropicLLM(LLM):
         message: Message,
         structured_schema: AgentOutputSchemaBase | None,
     ) -> LLMResponse:
-        """Build the framework :class:`LLMResponse` from a Message.
+        """Build the framework ``LLMResponse`` from a Message.
 
         When *structured_schema* is provided, the synthetic tool's
         ``ToolUseBlock.input`` is JSON-serialised, validated through
-        the schema, and surfaced as an :class:`LLMResponseText` part
+        the schema, and surfaced as an ``LLMResponseText`` part
         carrying that JSON. This matches the Runner's expectation that
         structured output arrives as JSON text on a text part —
         identical to the litellm path's ``json_schema`` response
@@ -647,7 +647,7 @@ class AnthropicLLM(LLM):
 
         Yields:
             ``LLMStreamEvent`` objects ending with a ``"done"`` event
-            carrying the assembled :class:`LLMResponse`.
+            carrying the assembled ``LLMResponse``.
         """
         stream_iter = await self._call_messages(
             stream=True,
@@ -686,13 +686,13 @@ class AnthropicLLM(LLM):
     ) -> AsyncIterator[LLMStreamEvent]:
         """Consume the Anthropic event stream into ``LLMStreamEvent`` yields.
 
-        Split from :meth:`_stream` so the caller can guarantee the SDK
+        Split from ``_stream`` so the caller can guarantee the SDK
         stream is closed in a ``finally`` regardless of how iteration ends
         (normal completion, early consumer break, or mid-stream error).
 
         Yields:
             ``LLMStreamEvent`` objects ending with a ``"done"`` event
-            carrying the assembled :class:`LLMResponse`.
+            carrying the assembled ``LLMResponse``.
         """
         accumulators: dict[int, _BlockAccumulator] = {}
         block_order: list[int] = []
@@ -916,7 +916,7 @@ class AnthropicLLM(LLM):
         cache_creation: int,
         thinking_tokens: int = 0,
     ) -> LLMUsage:
-        """Construct the per-stream :class:`LLMUsage`.
+        """Construct the per-stream ``LLMUsage``.
 
         Anthropic streaming splits usage across two events:
 

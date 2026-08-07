@@ -1,7 +1,7 @@
 """AND-gate flow example — fan-in via ``method_a & method_b``.
 
 Demonstrates how an AND gate built fluently with the ``&`` operator on
-:class:`FlowStep` instances fires its listener exactly once after every
+``FlowStep`` instances fires its listener exactly once after every
 required trigger has arrived in the run.
 
 Run: ``python examples/flows/and_join_flow.py``
@@ -44,7 +44,7 @@ class ReportFlow(Flow[ReportState]):
 
     @flow_start
     async def gather_quotes(self) -> None:
-        """Second parallel branch — fires alongside :meth:`gather_numbers`."""
+        """Second parallel branch — fires alongside ``gather_numbers``."""
         await asyncio.sleep(0)
         self.state.quotes_section = "'The future is decentralized.'"
         logger.info("gather_quotes: done")

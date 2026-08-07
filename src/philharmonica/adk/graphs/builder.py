@@ -1,4 +1,4 @@
-"""``GraphBuilder`` — fluent, opinionated API for constructing a :class:`Graph`.
+"""``GraphBuilder`` — fluent, opinionated API for constructing a ``Graph``.
 
 Design goals, in priority order:
 
@@ -17,27 +17,27 @@ Design goals, in priority order:
      no ``Annotated`` magic.
 
 2. **Single routing mechanism.** Every routing decision is one
-   :meth:`edge` call with an optional ``when=`` predicate. No
+   ``edge`` call with an optional ``when=`` predicate. No
    ``Command(goto=)`` duality, no ``path_map`` dicts, no LLM routing
    tokens baked into the graph layer — those belong to
-   :class:`Swarm` / :class:`StructuredRoutingPolicy`.
+   ``Swarm`` / ``StructuredRoutingPolicy``.
 
-3. **Fail at compile time, not at run time.** :meth:`compile`
+3. **Fail at compile time, not at run time.** ``compile``
    validates the graph shape (entry exists, terminals exist, every
    edge references a known node, no duplicate node ids, entry has no
    incoming edges, terminals have no outgoing edges, the graph is
    non-empty). Pipelines that would crash mid-run surface as
    ``ValueError`` at build time.
 
-4. **Zero adapter boilerplate.** :meth:`node` auto-wraps
+4. **Zero adapter boilerplate.** ``node`` auto-wraps
    ``Agent``/``Swarm``/``Graph``/``Callable`` via
-   :func:`to_executable`. Users never write
+   ``to_executable``. Users never write
    ``AgentExecutable(agent=...)`` unless they want to pass a
    non-default ``max_turns``.
 
 The builder is mutable during construction and frozen-at-compile. It
-does not share state with the compiled :class:`Graph`; mutating a
-builder after :meth:`compile` has no effect on the produced graph.
+does not share state with the compiled ``Graph``; mutating a
+builder after ``compile`` has no effect on the produced graph.
 """
 
 from __future__ import annotations
@@ -67,35 +67,35 @@ TContext = TypeVar("TContext")
 
 @dataclass
 class GraphBuilder[TContext]:
-    """Mutable, fluent builder producing a frozen :class:`Graph`.
+    """Mutable, fluent builder producing a frozen ``Graph``.
 
-    Every method except :meth:`compile` returns ``self`` so callers
-    can chain. Construction order matters only for :meth:`pipe` — the
+    Every method except ``compile`` returns ``self`` so callers
+    can chain. Construction order matters only for ``pipe`` — the
     first argument is the upstream node, subsequent arguments each
     receive an edge from the prior.
 
-    **Node defaults**: :meth:`set_node_defaults` sets fallback values for
+    **Node defaults**: ``set_node_defaults`` sets fallback values for
     ``retry``, ``timeout``, ``metadata``, and ``on_error`` that apply to
     all *subsequently* added nodes.  Explicit per-node arguments always
     win — layering is field-by-field, not dict-merge overwrite.  Defaults
-    only apply to nodes added AFTER the :meth:`set_node_defaults` call;
+    only apply to nodes added AFTER the ``set_node_defaults`` call;
     nodes added before that call retain their original values.
 
     Attributes:
-        id: Target :attr:`Graph.id`.
-        description: Target :attr:`Graph.description`.
-        metadata: Target :attr:`Graph.metadata`.
-        _nodes_by_id: Working set of :class:`GraphNode`\\ s keyed by
+        id: Target ``Graph.id``.
+        description: Target ``Graph.description``.
+        metadata: Target ``Graph.metadata``.
+        _nodes_by_id: Working set of ``GraphNode``\\ s keyed by
             id. Rejects duplicates on insert to catch typos early.
         _edges: Working edge list. Validated at compile time.
-        _entry: Working entry id. Set via :meth:`entry`; must be set
-            before :meth:`compile`.
-        _terminals: Working terminal id set. Set via :meth:`terminal`;
-            at least one must be set before :meth:`compile`.
-        _config: Working :class:`GraphConfig`. Defaults to
-            ``GraphConfig()`` — mutate via :meth:`with_config`.
-        _hooks: Working tuple of :class:`GraphHooks` attached via
-            :meth:`with_hooks`.
+        _entry: Working entry id. Set via ``entry``; must be set
+            before ``compile``.
+        _terminals: Working terminal id set. Set via ``terminal``;
+            at least one must be set before ``compile``.
+        _config: Working ``GraphConfig``. Defaults to
+            ``GraphConfig()`` — mutate via ``with_config``.
+        _hooks: Working tuple of ``GraphHooks`` attached via
+            ``with_hooks``.
         _default_retry: Default retry policy for subsequently added nodes.
         _default_timeout: Default per-attempt timeout for subsequently
             added nodes.
@@ -106,7 +106,7 @@ class GraphBuilder[TContext]:
     """
 
     id: str
-    """Graph id (non-empty; pre-set by :meth:`Graph.new`)."""
+    """Graph id (non-empty; pre-set by ``Graph.new``)."""
 
     description: str | None = None
     """Optional description."""
@@ -127,10 +127,10 @@ class GraphBuilder[TContext]:
     """Working terminal ids."""
 
     _config: GraphConfig = field(default_factory=GraphConfig)
-    """Working :class:`GraphConfig`."""
+    """Working ``GraphConfig``."""
 
     _hooks: tuple[GraphHooks[Any], ...] = field(default_factory=tuple)
-    """Attached :class:`GraphHooks` observers."""
+    """Attached ``GraphHooks`` observers."""
 
     _default_retry: NodeRetryPolicy | None = None
     """Default retry policy; applied to subsequently added nodes when
@@ -167,36 +167,36 @@ class GraphBuilder[TContext]:
 
         The ``executable`` can be any of:
 
-        - an :class:`~philharmonica.adk.orchestration.executable.Executable`
-          (including a :class:`Graph`) — used as-is,
-        - an :class:`~philharmonica.adk.agents.agent.Agent` — auto-wrapped in
-          :class:`~philharmonica.adk.graphs.adapters.AgentExecutable`,
-        - a :class:`~philharmonica.adk.swarms.swarm.Swarm` — auto-wrapped in
-          :class:`~philharmonica.adk.graphs.adapters.SwarmExecutable`,
+        - an ``Executable``
+          (including a ``Graph``) — used as-is,
+        - an ``Agent`` — auto-wrapped in
+          ``AgentExecutable``,
+        - a ``Swarm`` — auto-wrapped in
+          ``SwarmExecutable``,
         - a plain callable — auto-wrapped in
-          :class:`~philharmonica.adk.graphs.adapters.CallableExecutable`.
+          ``CallableExecutable``.
 
         Per-node arguments always win over builder-level node defaults set
-        via :meth:`set_node_defaults`.  Metadata is merged field-by-field:
+        via ``set_node_defaults``.  Metadata is merged field-by-field:
         the per-node dict shadows individual keys from the default.
 
         Args:
             node_id: Unique id for this node within the graph. MUST
                 match the node-id pattern (alphanumerics, ``_``,
-                ``-``); validated on :class:`GraphNode` construction.
+                ``-``); validated on ``GraphNode`` construction.
             executable: The object to run when this node fires. See
                 the list above for auto-wrap behaviour.
             merge: Optional override for the default
-                :mod:`philharmonica.adk.graphs.merge` strategy. Applied when
+                ``philharmonica.adk.graphs.merge`` strategy. Applied when
                 multiple upstream edges feed this node.
             join: Optional override for the fan-in semantics.
-                Defaults to :attr:`JoinSemantics.AND`.
+                Defaults to ``JoinSemantics.AND``.
             description: Optional human-readable blurb.
             metadata: Optional free-form tag dict. Merged with the
                 builder-level default metadata; per-node keys win.
             retry: Optional per-node retry policy. When ``None``,
                 inherits the builder-level default set via
-                :meth:`set_node_defaults`.
+                ``set_node_defaults``.
             timeout: Optional per-node per-attempt timeout in seconds.
                 When ``None``, inherits the builder-level default.
             on_error: Optional per-node error handler. When ``None``,
@@ -254,14 +254,14 @@ class GraphBuilder[TContext]:
 
         Args:
             source: Upstream node id. MUST already be registered via
-                :meth:`node`.
+                ``node``.
             target: Downstream node id. MUST already be registered
-                via :meth:`node`.
+                via ``node``.
             when: Optional pure predicate on the upstream
-                :class:`NodeResult`. When ``None`` the edge always
+                ``NodeResult``. When ``None`` the edge always
                 fires.
             label: Optional label propagated to
-                :attr:`ExecutableInput.edge_label`.
+                ``ExecutableInput.edge_label``.
             priority: Higher-first ordering; advisory until
                 non-concurrent scheduling is implemented.
 
@@ -270,7 +270,7 @@ class GraphBuilder[TContext]:
 
         Raises:
             ValueError: When either endpoint is unknown. Self-loops
-                are rejected inside :class:`GraphEdge.__post_init__`.
+                are rejected inside ``GraphEdge.__post_init__``.
         """
         if source not in self._nodes_by_id:
             raise ValueError(
@@ -331,7 +331,7 @@ class GraphBuilder[TContext]:
     def entry(self, node_id: str) -> GraphBuilder[TContext]:
         """Declare ``node_id`` as the graph's entry node.
 
-        Exactly one entry is allowed. Calling :meth:`entry` twice
+        Exactly one entry is allowed. Calling ``entry`` twice
         with different ids raises ``ValueError``; calling it twice
         with the same id is idempotent.
 
@@ -361,7 +361,7 @@ class GraphBuilder[TContext]:
 
         Terminals are nodes whose completion finishes the graph run.
         A graph may have multiple terminals — when it does,
-        :attr:`GraphRunResult.final_output` becomes a dict keyed by
+        ``GraphRunResult.final_output`` becomes a dict keyed by
         terminal id.
 
         Returns:
@@ -404,7 +404,7 @@ class GraphBuilder[TContext]:
         affected; only nodes added AFTER inherit the defaults.
 
         Args:
-            retry: Default :class:`~philharmonica.adk.graphs.config.NodeRetryPolicy`.
+            retry: Default ``NodeRetryPolicy``.
                 Applied when a node's ``retry`` argument is ``None``.
             timeout: Default per-attempt timeout in seconds. Applied
                 when a node's ``timeout`` argument is ``None``.
@@ -435,7 +435,7 @@ class GraphBuilder[TContext]:
         return self
 
     def with_config(self, config: GraphConfig) -> GraphBuilder[TContext]:
-        """Attach a :class:`GraphConfig` to the graph.
+        """Attach a ``GraphConfig`` to the graph.
 
         Overrides the default ``GraphConfig()``. Returns ``self`` for
         chaining.
@@ -447,7 +447,7 @@ class GraphBuilder[TContext]:
         self,
         *hooks: GraphHooks[Any],
     ) -> GraphBuilder[TContext]:
-        """Attach one or more :class:`GraphHooks` observers.
+        """Attach one or more ``GraphHooks`` observers.
 
         Multiple calls accumulate. Returns ``self`` for chaining.
         """
@@ -457,18 +457,18 @@ class GraphBuilder[TContext]:
     # -- Terminal --------------------------------------------------
 
     def compile(self) -> Graph[TContext]:
-        """Validate and return an immutable :class:`Graph`.
+        """Validate and return an immutable ``Graph``.
 
         Validation errors raise ``ValueError`` with an actionable
-        message. After :meth:`compile` returns, further builder
+        message. After ``compile`` returns, further builder
         mutations do NOT affect the returned graph (node / edge /
         terminal lists are copied into the frozen dataclass).
 
         Validation performed:
 
         1. At least one node is registered.
-        2. :meth:`entry` has been called.
-        3. :meth:`terminal` has been called at least once.
+        2. ``entry`` has been called.
+        3. ``terminal`` has been called at least once.
         4. The entry node exists.
         5. Every terminal node exists.
         6. The entry node has no incoming edges (would loop forever).
@@ -478,7 +478,7 @@ class GraphBuilder[TContext]:
            entry and can reach at least one terminal.
 
         Returns:
-            A frozen :class:`Graph` ready for execution.
+            A frozen ``Graph`` ready for execution.
         """
         if len(self._nodes_by_id) == 0:
             raise ValueError(f"GraphBuilder(id={self.id!r}).compile: graph has no nodes.")
@@ -576,7 +576,7 @@ def _reachable_from(
 ) -> set[str]:
     """Return the set of node ids reachable from ``start`` via ``edges``.
 
-    Forward reachability used by :meth:`compile` to flag unreachable
+    Forward reachability used by ``compile`` to flag unreachable
     nodes. Ignores edge predicates — a conditionally-firing edge
     still contributes to structural reachability; predicate-always-false
     edges are a runtime concern, not a compile concern.
@@ -603,7 +603,7 @@ def _reverse_reachable(
     """Return the set of node ids that can reach ``start``.
 
     Takes edges already flipped to ``(target, source)`` so the same
-    DFS works. Used by :meth:`compile` to flag dead-end nodes.
+    DFS works. Used by ``compile`` to flag dead-end nodes.
     """
     adj: dict[str, list[str]] = {}
     for src, dst in reversed_edges:

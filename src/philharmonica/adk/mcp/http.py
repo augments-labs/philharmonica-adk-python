@@ -343,11 +343,11 @@ class MCPServerStreamableHttp(MCPServerWithClientSession):
         ``headers`` / ``timeout`` / ``auth`` derived from the
         ``streamablehttp_client(...)`` call. We install the dynamic
         header event hook so per-request headers from
-        :data:`active_header_provider` apply on every outbound call —
+        ``active_header_provider`` apply on every outbound call —
         a single client handles per-call token rotation without
         forcing a reconnect.
 
-        When :attr:`MCPServerStreamableHttpParams.idle_timeout` is set,
+        When ``MCPServerStreamableHttpParams.idle_timeout`` is set,
         an ``httpx.Limits`` object is passed with ``keepalive_expiry`` equal
         to that duration.  When ``idle_timeout`` is ``None`` (the default),
         the ``limits`` kwarg is omitted entirely so httpx applies its own

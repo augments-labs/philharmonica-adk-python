@@ -2,15 +2,15 @@
 
 Calls ``openai.AsyncOpenAI().chat.completions.create()`` directly — no
 litellm layer. Input items and output items round-trip through
-``openai.types.chat.*`` via :class:`OpenAIChatCompletionsConverter`;
+``openai.types.chat.*`` via ``OpenAIChatCompletionsConverter``;
 wire types never leak outside this module's call sites.
 
 Provider-native hosted capabilities (web_search, file_search,
 code_interpreter, image generation, hosted MCP servers, …) are NOT
 wrapped in framework tool classes — pass the raw provider JSON through
-:attr:`LLMConfig.extra_body` / :attr:`LLMConfig.extra_args`. The Chat
+``LLMConfig.extra_body`` / ``LLMConfig.extra_args``. The Chat
 Completions API also offers ``web_search_options`` as a first-class
-parameter on :class:`OpenAIChatCompletionsConfig`.
+parameter on ``OpenAIChatCompletionsConfig``.
 
 Usage::
 
@@ -102,8 +102,8 @@ class OpenAIChatCompletionsLLM(LLM):
     (``audio``, ``web_search_options``, ``prediction``, ``modalities``,
     ``store``, ``service_tier``, ``prompt_cache_key``,
     ``prompt_cache_retention``, ``verbosity``) are routed verbatim when
-    an :class:`OpenAIChatCompletionsConfig` instance is supplied; the
-    generic :class:`LLMConfig` base provides ``temperature`` / ``top_p``
+    an ``OpenAIChatCompletionsConfig`` instance is supplied; the
+    generic ``LLMConfig`` base provides ``temperature`` / ``top_p``
     / ``max_output_tokens`` → ``max_completion_tokens`` /
     ``top_logprobs`` / ``stop_sequences`` → ``stop`` /
     ``frequency_penalty`` / ``presence_penalty`` / ``seed`` /
@@ -116,7 +116,7 @@ class OpenAIChatCompletionsLLM(LLM):
     When ``stream=True`` the wrapper always injects
     ``stream_options={"include_usage": True}`` so the final
     ``ChatCompletionChunk`` carries ``CompletionUsage``. Set
-    :attr:`LLMConfig.include_usage` to ``False`` to opt out.
+    ``LLMConfig.include_usage`` to ``False`` to opt out.
 
     Args:
         model: OpenAI model ID (e.g., ``"gpt-4o"``, ``"gpt-5.1"``). Do
@@ -128,7 +128,7 @@ class OpenAIChatCompletionsLLM(LLM):
         project: Optional OpenAI project ID.
         max_retries: SDK-level retries for transient errors (default 0 —
             disabled). Set to a positive value to enable SDK-level retries.
-            Independent of :attr:`LLMConfig.retry_policy`, which runs
+            Independent of ``LLMConfig.retry_policy``, which runs
             one layer up with framework-owned classification.
     """
 
@@ -222,7 +222,7 @@ class OpenAIChatCompletionsLLM(LLM):
 
         Orchestrates: convert → resolve params → API call →
         parse/stream. Non-streaming calls route through
-        :func:`call_with_retry` when :attr:`LLMConfig.retry_policy` is
+        ``call_with_retry`` when ``LLMConfig.retry_policy`` is
         set; streaming calls are never retried (mid-stream reconnect
         would silently drop or double-emit tokens).
         """
@@ -426,7 +426,7 @@ class OpenAIChatCompletionsLLM(LLM):
         subsequent delta, and emit ``part_end`` for each active part
         when the choice's ``finish_reason`` arrives. The terminal
         ``"done"`` event carries the fully reconstructed
-        :class:`LLMResponse`.
+        ``LLMResponse``.
         """
         response_id: str = ""
         model: str = self._model
@@ -590,7 +590,7 @@ class OpenAIChatCompletionsLLM(LLM):
 
 
 class _ToolCallAccumulator:
-    """Per-tool-call-index scratch state used by :meth:`_stream`."""
+    """Per-tool-call-index scratch state used by ``_stream``."""
 
     __slots__ = ("arguments", "call_id", "name", "part_index")
 

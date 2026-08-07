@@ -1,4 +1,4 @@
-"""Tests for :mod:`philharmonica.adk.tracing.multi_tracer`.
+"""Tests for ``philharmonica.adk.tracing.multi_tracer``.
 
 Covers fan-out semantics: every wrapped tracer receives the same
 factory call, and the composite span propagates ``start`` / ``finish``
@@ -35,10 +35,10 @@ from philharmonica.adk.types.tracing import (
 
 class _TrackedSpan(Span[Any]):
     """Span subclass whose lifecycle hooks flip flags instead of touching
-    the framework :class:`~contextvars.ContextVar`.
+    the framework ``ContextVar``.
 
-    Keeps :class:`MultiTracer` tests isolated: real :class:`Span` children
-    would stack on :data:`_current_span` and their LIFO tokens would leak
+    Keeps ``MultiTracer`` tests isolated: real ``Span`` children
+    would stack on ``_current_span`` and their LIFO tokens would leak
     state across sibling tests. Fan-out semantics are still fully
     observable via ``started`` / ``finished`` / ``errors_recorded``.
     """
@@ -66,7 +66,7 @@ class _TrackedSpan(Span[Any]):
 
 class _RecordingTracer:
     """Minimal tracer that logs every factory call and returns
-    :class:`_TrackedSpan` instances so lifecycle hooks are observable
+    ``_TrackedSpan`` instances so lifecycle hooks are observable
     without any shared-state side effects."""
 
     def __init__(self, label: str = "rec") -> None:
@@ -138,13 +138,13 @@ class _ExplodingSpan(Span[CustomSpanData]):
 
 
 class _RealSpanTracer:
-    """Tracer returning real :class:`Span` instances.
+    """Tracer returning real ``Span`` instances.
 
-    Unlike :class:`_RecordingTracer` (which returns ContextVar-free
-    :class:`_TrackedSpan`), these children install themselves on the
-    framework :data:`_current_span` ContextVar in ``start`` and restore it
-    in ``finish`` — so :class:`CompositeSpan`'s finish ordering is
-    observable via :func:`current_span`.
+    Unlike ``_RecordingTracer`` (which returns ContextVar-free
+    ``_TrackedSpan``), these children install themselves on the
+    framework ``_current_span`` ContextVar in ``start`` and restore it
+    in ``finish`` — so ``CompositeSpan``'s finish ordering is
+    observable via ``current_span``.
     """
 
     def agent_span(self, data: AgentSpanData) -> Span[AgentSpanData]:
@@ -170,7 +170,7 @@ class _RealSpanTracer:
 
 
 class _ExplodingTracer:
-    """Tracer whose ``custom_span`` returns an :class:`_ExplodingSpan`."""
+    """Tracer whose ``custom_span`` returns an ``_ExplodingSpan``."""
 
     def __init__(self, *, explode_on: str) -> None:
         self.explode_on = explode_on
@@ -204,7 +204,7 @@ def _reset_tracer() -> Any:
 
 
 def test_empty_tracer_list_returns_noop_span() -> None:
-    """An empty :class:`MultiTracer` must short-circuit to :class:`NoOpSpan`
+    """An empty ``MultiTracer`` must short-circuit to ``NoOpSpan``
     so callers still get a valid span without paying to iterate."""
     multi = MultiTracer([])
     span = multi.custom_span(CustomSpanData(name="x", data={}))
@@ -312,9 +312,9 @@ def test_broken_child_set_error_does_not_break_siblings() -> None:
 
 
 def test_fans_out_across_every_span_kind() -> None:
-    """Every :class:`Tracer` factory method must fan out identically.
+    """Every ``Tracer`` factory method must fan out identically.
     Regression guard against a new span kind landing on the protocol
-    without a matching :class:`MultiTracer` method."""
+    without a matching ``MultiTracer`` method."""
     a = _RecordingTracer("a")
     b = _RecordingTracer("b")
     multi = MultiTracer([a, b])
@@ -384,7 +384,7 @@ def test_composite_finish_restores_contextvar_lifo() -> None:
 
 def test_composite_span_records_exception_on_every_child() -> None:
     """When the ``with`` body raises, every child span must receive
-    ``set_error`` via :meth:`Span.__exit__`."""
+    ``set_error`` via ``Span.__exit__``."""
     a = _RecordingTracer("a")
     b = _RecordingTracer("b")
     multi = MultiTracer([a, b])

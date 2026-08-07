@@ -1,22 +1,22 @@
 """``VerboseHooks`` — runtime bridge from lifecycle events to a renderer.
 
-Implements :class:`~philharmonica.adk.hooks.RunHooks`. Wired automatically by
-the runner when ``RunConfig.verbose`` is a :class:`VerboseConfig` with
+Implements ``RunHooks``. Wired automatically by
+the runner when ``RunConfig.verbose`` is a ``VerboseConfig`` with
 ``enabled=True``.
 
 Resolution order at each event: the current agent's
 ``Agent.verbose`` takes precedence over the run-level
-``RunConfig.verbose``. A per-agent :class:`VerboseConfig` can therefore
+``RunConfig.verbose``. A per-agent ``VerboseConfig`` can therefore
 silence or recolour one agent in a handoff chain without touching the
 run-level config.
 
-Two backends are dispatched via :func:`philharmonica.adk.verbose.mode.resolve_mode`:
+Two backends are dispatched via ``philharmonica.adk.verbose.mode.resolve_mode``:
 
-* **line** — :class:`~philharmonica.adk.verbose.renderer.VerboseRenderer`,
+* **line** — ``VerboseRenderer``,
   stateless, one line per event. Today's behaviour, preserved bit-
   for-bit. This is also the safe fallback in non-TTY, CI, or
   Rich-missing environments.
-* **panel** — :class:`~philharmonica.adk.verbose.panel_renderer.PanelRenderer`,
+* **panel** — ``PanelRenderer``,
   stateful. Paired ``*_start`` / ``*_end`` events open and close
   bordered Rich panels; atomic events (handoff, skill activation)
   flush standalone panels.
@@ -108,7 +108,7 @@ logger = logging.getLogger(__name__)
 # Without access to a run identifier at hook-dispatch time we use
 # agent-name-scoped keys — sufficient because each ``RunContext`` owns
 # its own ``VerboseHooks`` instance (and therefore its own block tree),
-# so concurrent runs of the same :class:`VerboseConfig` never share
+# so concurrent runs of the same ``VerboseConfig`` never share
 # keyspace at the renderer level.
 
 
@@ -236,7 +236,7 @@ def _agent_capabilities(agent: Agent) -> tuple[str | None, list[str], list[str],
     """Extract ``(description, tool names, skill names, handoff names)``.
 
     Verbose output is telemetry: the agent-start banner must render for
-    any object that quacks like an :class:`Agent` (tests drive the hooks
+    any object that quacks like an ``Agent`` (tests drive the hooks
     with lightweight stand-ins), so missing attributes degrade to empty
     values instead of raising.
     """
@@ -258,14 +258,14 @@ class VerboseHooks(RunHooks):
     enabled. Not intended to be attached directly by users — set
     ``RunConfig.verbose=VerboseConfig(...)`` instead.
 
-    Caches a :class:`VerboseRenderer` *and* a :class:`PanelRenderer`
-    per :class:`VerboseConfig` so that a mode switch across
+    Caches a ``VerboseRenderer`` *and* a ``PanelRenderer``
+    per ``VerboseConfig`` so that a mode switch across
     per-agent configs does not repay the cost of building a console
     or importing Rich.
     """
 
     def __init__(self, run_config_verbose: VerboseConfig | None) -> None:
-        """Bind to a run-wide :class:`VerboseConfig` default.
+        """Bind to a run-wide ``VerboseConfig`` default.
 
         Args:
             run_config_verbose: The ``RunConfig.verbose`` instance, or
@@ -317,7 +317,7 @@ class VerboseHooks(RunHooks):
     ) -> VerboseRenderer | PanelRenderer | None:
         """Return a lazily-cached renderer for *config*.
 
-        Resolves the mode via :func:`resolve_mode`, returns the matching
+        Resolves the mode via ``resolve_mode``, returns the matching
         renderer instance, or ``None`` when mode is ``"off"`` — the
         caller short-circuits without touching a console.
         """
@@ -413,7 +413,7 @@ class VerboseHooks(RunHooks):
           internal markers (``llm.start``, ``turn.start``) that would
           otherwise render as empty bordered boxes.
         * Otherwise → open a block on the tree; the panel renders when
-          :meth:`_dispatch_close` flushes it (kept for ADK-only paired
+          ``_dispatch_close`` flushes it (kept for ADK-only paired
           events where the open→close pairing is meaningful).
         """
         config = self._resolve_config(agent)
@@ -476,14 +476,14 @@ class VerboseHooks(RunHooks):
                 style = config.get_style(event)
                 # Hook payloads are plain text; escape Rich-markup
                 # metacharacters before the panel backend parses them as
-                # markup (see :meth:`_dispatch_open`).
+                # markup (see ``_dispatch_open``).
                 panel_payload = escape_markup(payload) if payload is not None else None
                 if len(style.panel_title) > 0:
                     # Titled close events render atomically — a
                     # standalone panel rather than a retroactive flush
                     # of an open block. (The duplicate final-answer
                     # suppression after a streamed answer lives in
-                    # :meth:`on_agent_end`, which owns the panel-mode
+                    # ``on_agent_end``, which owns the panel-mode
                     # agent-end rendering.)
                     backend.render_atomic(event, headline, payload=panel_payload, verdict=verdict)
                     return
@@ -505,8 +505,8 @@ class VerboseHooks(RunHooks):
     ) -> None:
         """Emit an atomic event (handoff, skill activated, warning).
 
-        Panel-mode policy mirrors :meth:`_dispatch_open` /
-        :meth:`_dispatch_close`: events with ``show_payload=False`` and
+        Panel-mode policy mirrors ``_dispatch_open`` /
+        ``_dispatch_close``: events with ``show_payload=False`` and
         no payload AND no ``panel_title`` are silenced (otherwise they
         render as empty bordered boxes — uninformative noise). The
         line backend always emits.
@@ -535,7 +535,7 @@ class VerboseHooks(RunHooks):
                     payload = headline
                 # Hook payloads are plain text; escape Rich-markup
                 # metacharacters before the panel backend parses them as
-                # markup (see :meth:`_dispatch_open`).
+                # markup (see ``_dispatch_open``).
                 panel_payload = escape_markup(payload) if payload is not None else None
                 backend.render_atomic(event, headline, panel_payload, verdict=verdict)
             else:
@@ -560,7 +560,7 @@ class VerboseHooks(RunHooks):
             if isinstance(backend, PanelRenderer):
                 # Plain-text payload — escape Rich-markup metacharacters
                 # before the panel backend parses them as markup (see
-                # :meth:`_dispatch_open`).
+                # ``_dispatch_open``).
                 panel_payload = escape_markup(payload) if payload is not None else None
                 backend.render_atomic(event, headline, panel_payload)
             else:
@@ -879,7 +879,7 @@ class VerboseHooks(RunHooks):
     # renderer shows one block per guardrail scoped by
     # ``(tool_name, guardrail_name)``. Verdicts map from
     # ``ToolGuardrailFunctionOutput.behavior["type"]`` via
-    # :func:`_tool_guardrail_verdict`.
+    # ``_tool_guardrail_verdict``.
 
     @override
     async def on_tool_input_guardrail_start(
@@ -1106,7 +1106,7 @@ class VerboseHooks(RunHooks):
         Args:
             agent: The agent whose turn just ended.
             turn_number: 1-based turn counter matching the
-                corresponding :meth:`emit_turn_start` call.
+                corresponding ``emit_turn_start`` call.
             verdict: Close state (``"ok"``, ``"error"``, etc.).
                 Defaults to ``"ok"``.
         """
@@ -1192,14 +1192,14 @@ class VerboseHooks(RunHooks):
         runs with fresh hooks where no such block exists.
 
         ``reason`` is operator-supplied free text and is truncated
-        through :func:`format_payload` so a malformed audit string
+        through ``format_payload`` so a malformed audit string
         cannot blow the panel or log stream.
 
         Args:
             agent: The agent that owns the pending approval gate.
             tool_name: The tool that was approved for execution.
             call_id: Unique identifier matching the corresponding
-                :meth:`emit_hitl_approval_requested` call.
+                ``emit_hitl_approval_requested`` call.
             approver_id: Optional identifier of the human or system
                 that granted approval (e.g. a user ID or service
                 account name).
@@ -1235,17 +1235,17 @@ class VerboseHooks(RunHooks):
 
         Panel mode renders a standalone red panel (the rejected style
         carries a ``panel_title``) for the same resume-safety reason as
-        :meth:`emit_hitl_approval_granted`.
+        ``emit_hitl_approval_granted``.
 
         ``message`` is operator-supplied free text (shown to the LLM
-        to guide retry) and is truncated through :func:`format_payload`
+        to guide retry) and is truncated through ``format_payload``
         for the same reason as ``reason`` on the grant path.
 
         Args:
             agent: The agent that owns the pending approval gate.
             tool_name: The tool whose execution was rejected.
             call_id: Unique identifier matching the corresponding
-                :meth:`emit_hitl_approval_requested` call.
+                ``emit_hitl_approval_requested`` call.
             approver_id: Optional identifier of the human or system
                 that rejected the request.
             message: Optional rejection message forwarded to the LLM
@@ -1409,9 +1409,9 @@ class VerboseHooks(RunHooks):
     def emit_stream_start(self, agent: Agent, call_type: str = "text") -> None:
         """Open the streaming Live panel (panel mode) or emit a marker line.
 
-        Panel backend: opens a :class:`rich.live.Live` widget via
-        :meth:`PanelRenderer.open_stream_panel`. The widget will receive
-        per-chunk updates from :meth:`emit_stream_chunk`.
+        Panel backend: opens a ``rich.live.Live`` widget via
+        ``PanelRenderer.open_stream_panel``. The widget will receive
+        per-chunk updates from ``emit_stream_chunk``.
         Line backend: emits one atomic line for CI log compatibility.
 
         Args:
@@ -1447,12 +1447,12 @@ class VerboseHooks(RunHooks):
         """Update the running Live panel with the latest accumulated text.
 
         Panel backend: delegates to
-        :meth:`PanelRenderer.update_stream_panel`.
+        ``PanelRenderer.update_stream_panel``.
         Line backend: no-op (line renderer cannot live-update).
 
         This is the only hook method called per LLM stream chunk so it
         is on a hot path. ``CompositeRunHooks`` does NOT fan it out —
-        the module-level :func:`emit_stream_chunk` walks the chain
+        the module-level ``emit_stream_chunk`` walks the chain
         directly to ``VerboseHooks``, keeping user hooks unwoken on
         every token.
 
@@ -1481,7 +1481,7 @@ class VerboseHooks(RunHooks):
         """Close the streaming Live panel (panel mode) or emit a marker line.
 
         Panel backend: stops the Live via
-        :meth:`PanelRenderer.close_stream_panel` and sets the
+        ``PanelRenderer.close_stream_panel`` and sets the
         ``_just_streamed_final_answer`` flag so a subsequent
         ``agent.finish`` block close suppresses its duplicate panel.
         Line backend: emits one atomic line for CI log compatibility.
@@ -1512,17 +1512,17 @@ class VerboseHooks(RunHooks):
     ) -> tuple[VerboseConfig | None, str]:
         """Resolve the effective verbose config + debug label for *scope*.
 
-        Task panels bracket whole-run scopes (an :class:`Agent`, a
-        :class:`Swarm`, or a :class:`Graph`). Each type carries the
+        Task panels bracket whole-run scopes (an ``Agent``, a
+        ``Swarm``, or a ``Graph``). Each type carries the
         verbose toggle differently:
 
-        * :class:`Agent` — delegates to :meth:`_resolve_config`, which
+        * ``Agent`` — delegates to ``_resolve_config``, which
           honours the per-instance ``agent.verbose`` override.
-        * :class:`Swarm` — delegates to :meth:`_resolve_config` on the
+        * ``Swarm`` — delegates to ``_resolve_config`` on the
           entry agent. There is no swarm-level toggle, and the first
           turn renders through that agent, so its config is the right
           proxy.
-        * :class:`Graph` — no per-graph toggle exists; falls back to
+        * ``Graph`` — no per-graph toggle exists; falls back to
           the run-config value.
 
         The returned label is used only in the ``logger.debug`` error
@@ -1530,12 +1530,12 @@ class VerboseHooks(RunHooks):
 
         Args:
             scope: The whole-run unit whose verbose config should be
-                resolved. May be an :class:`Agent`, :class:`Swarm`,
-                or :class:`Graph`.
+                resolved. May be an ``Agent``, ``Swarm``,
+                or ``Graph``.
 
         Returns:
             A 2-tuple of ``(config_or_none, debug_label)`` where
-            *config_or_none* is the effective :class:`VerboseConfig`
+            *config_or_none* is the effective ``VerboseConfig``
             (``None`` when none is configured) and *debug_label* is
             a short string used only in error log lines.
         """
@@ -1560,18 +1560,18 @@ class VerboseHooks(RunHooks):
         streamed-run entry points before the agent loop runs. Line
         backend emits a single descriptive line; panel backend renders
         the bordered CrewAI-style panel via
-        :meth:`PanelRenderer.render_task_start`.
+        ``PanelRenderer.render_task_start``.
 
         *scope* is the whole-run unit bracketed by the panel — an
-        :class:`Agent`, :class:`Swarm`, or :class:`Graph`. The widened
+        ``Agent``, ``Swarm``, or ``Graph``. The widened
         union lets graph runs (which lack an entry-Agent) participate
         in the same panel lifecycle as single-agent and swarm runs;
-        see :meth:`_resolve_task_panel_config` for how the effective
-        :class:`VerboseConfig` is selected per scope type.
+        see ``_resolve_task_panel_config`` for how the effective
+        ``VerboseConfig`` is selected per scope type.
 
         Args:
             scope: The whole-run unit bracketed by the panel. May be
-                an :class:`Agent`, :class:`Swarm`, or :class:`Graph`.
+                an ``Agent``, ``Swarm``, or ``Graph``.
             task_name: Human-readable task name shown in the panel
                 body.
             task_id: Full task identifier shown truncated in the panel
@@ -1609,12 +1609,12 @@ class VerboseHooks(RunHooks):
         Called from the success / exception arms of ``Runner.arun``,
         ``arun_swarm``, and ``arun_graph``. *error* (when *success* is
         False) is appended to the panel as a red row. See
-        :meth:`emit_task_start` for the *scope* contract.
+        ``emit_task_start`` for the *scope* contract.
 
         Args:
             scope: The whole-run unit whose verbose config is resolved
-                via :meth:`_resolve_task_panel_config`. Same value
-                passed to the corresponding :meth:`emit_task_start`.
+                via ``_resolve_task_panel_config``. Same value
+                passed to the corresponding ``emit_task_start``.
             task_name: Human-readable task name.
             task_id: Full task identifier.
             success: ``True`` emits a green "Task Completed" panel;
@@ -1664,7 +1664,7 @@ class VerboseHooks(RunHooks):
         """Reset Live state after the HITL prompt completes.
 
         Subsequent ``emit_stream_chunk`` calls on a new stream will
-        construct a fresh Live via :meth:`PanelRenderer.open_stream_panel`.
+        construct a fresh Live via ``PanelRenderer.open_stream_panel``.
         """
         config = self._resolve_config(agent)
         if config is None or not config.enabled:
@@ -1722,7 +1722,7 @@ class VerboseHooks(RunHooks):
     ) -> None:
         """Atomic info panel — cumulative token usage after an LLM call.
 
-        Reads the framework-canonical :class:`LLMUsage` field names
+        Reads the framework-canonical ``LLMUsage`` field names
         (``input_tokens`` / ``output_tokens`` / ``total_tokens``); uses
         ``getattr`` with zero-defaults so providers that populate a
         subset (or a mock for tests) degrade gracefully.
@@ -1751,9 +1751,9 @@ class VerboseHooks(RunHooks):
 
 
 def find_verbose_hooks(hooks: Any) -> list[VerboseHooks]:
-    """Return every :class:`VerboseHooks` reachable from *hooks*.
+    """Return every ``VerboseHooks`` reachable from *hooks*.
 
-    Understands :class:`CompositeRunHooks`' public ``members`` list so
+    Understands ``CompositeRunHooks``' public ``members`` list so
     a run with both a user hook and a framework-installed verbose hook
     emits once per event (the verbose member is still called even when
     nested behind the composite).
@@ -1774,7 +1774,7 @@ def find_verbose_hooks(hooks: Any) -> list[VerboseHooks]:
 
 
 def _for_each_verbose(hooks: Any, label: str, action: Callable[[VerboseHooks], None]) -> None:
-    """Run *action* on every reachable :class:`VerboseHooks`.
+    """Run *action* on every reachable ``VerboseHooks``.
 
     Silent no-op when no verbose hooks are installed. Per-instance
     errors are caught and logged at DEBUG (or WARNING for HITL emit
@@ -1799,11 +1799,11 @@ def _for_each_verbose(hooks: Any, label: str, action: Callable[[VerboseHooks], N
 
 
 def emit_turn_start(hooks: Any, agent: Agent, turn_number: int) -> None:
-    """Open a per-turn block on every reachable :class:`VerboseHooks`.
+    """Open a per-turn block on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain (may be a
-            ``CompositeRunHooks`` or a bare :class:`VerboseHooks`).
+            ``CompositeRunHooks`` or a bare ``VerboseHooks``).
         agent: The agent whose turn is starting.
         turn_number: 1-based turn counter within the current agent
             loop invocation.
@@ -1817,13 +1817,13 @@ def emit_turn_end(
     turn_number: int,
     verdict: str = "ok",
 ) -> None:
-    """Close a per-turn block on every reachable :class:`VerboseHooks`.
+    """Close a per-turn block on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
         agent: The agent whose turn just ended.
         turn_number: 1-based turn counter matching the corresponding
-            :func:`emit_turn_start` call.
+            ``emit_turn_start`` call.
         verdict: Close state (``"ok"``, ``"error"``, etc.). Defaults
             to ``"ok"``.
     """
@@ -1843,7 +1843,7 @@ def emit_hitl_approval_requested(
     tool_input: dict[str, Any] | None = None,
     nested_path: list[str] | None = None,
 ) -> None:
-    """Open a pending HITL approval panel on every reachable :class:`VerboseHooks`.
+    """Open a pending HITL approval panel on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
@@ -1877,14 +1877,14 @@ def emit_hitl_approval_granted(
     approver_id: str | None = None,
     reason: str | None = None,
 ) -> None:
-    """Close the HITL gate with an approved verdict on every reachable :class:`VerboseHooks`.
+    """Close the HITL gate with an approved verdict on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
         agent: The agent that owns the approval gate.
         tool_name: The tool that was approved.
         call_id: Identifier matching the corresponding
-            :func:`emit_hitl_approval_requested` call.
+            ``emit_hitl_approval_requested`` call.
         approver_id: Optional identifier of the approver.
         reason: Optional free-text rationale. Truncated before display.
     """
@@ -1910,14 +1910,14 @@ def emit_hitl_approval_rejected(
     approver_id: str | None = None,
     message: str | None = None,
 ) -> None:
-    """Close the HITL gate with a rejected verdict on every reachable :class:`VerboseHooks`.
+    """Close the HITL gate with a rejected verdict on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
         agent: The agent that owns the approval gate.
         tool_name: The tool whose execution was rejected.
         call_id: Identifier matching the corresponding
-            :func:`emit_hitl_approval_requested` call.
+            ``emit_hitl_approval_requested`` call.
         approver_id: Optional identifier of the rejector.
         message: Optional rejection message forwarded to the LLM.
             Truncated before display.
@@ -1941,7 +1941,7 @@ def emit_budget_warning(
     percent_used: float,
     limit_type: str,
 ) -> None:
-    """Emit a budget-approaching warning panel on every reachable :class:`VerboseHooks`.
+    """Emit a budget-approaching warning panel on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
@@ -1957,7 +1957,7 @@ def emit_budget_warning(
 
 
 def emit_budget_exceeded(hooks: Any, agent: Agent, limit_type: str) -> None:
-    """Emit a budget-exceeded error panel on every reachable :class:`VerboseHooks`.
+    """Emit a budget-exceeded error panel on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
@@ -1972,7 +1972,7 @@ def emit_budget_exceeded(hooks: Any, agent: Agent, limit_type: str) -> None:
 
 
 def emit_cache_hit(hooks: Any, agent: Agent, tool_name: str) -> None:
-    """Emit a cache-hit panel on every reachable :class:`VerboseHooks`.
+    """Emit a cache-hit panel on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
@@ -1983,7 +1983,7 @@ def emit_cache_hit(hooks: Any, agent: Agent, tool_name: str) -> None:
 
 
 def emit_cache_miss(hooks: Any, agent: Agent, tool_name: str) -> None:
-    """Emit a cache-miss panel on every reachable :class:`VerboseHooks`.
+    """Emit a cache-miss panel on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
@@ -1999,7 +1999,7 @@ def emit_context_compacted(
     original_tokens: int,
     final_tokens: int,
 ) -> None:
-    """Emit a context-compacted panel on every reachable :class:`VerboseHooks`.
+    """Emit a context-compacted panel on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
@@ -2015,7 +2015,7 @@ def emit_context_compacted(
 
 
 def emit_context_edited(hooks: Any, agent: Agent, reason: str) -> None:
-    """Emit a context-edited panel on every reachable :class:`VerboseHooks`.
+    """Emit a context-edited panel on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
@@ -2032,7 +2032,7 @@ def emit_retry(
     attempt: int,
     reason: str,
 ) -> None:
-    """Emit a retry panel on every reachable :class:`VerboseHooks`.
+    """Emit a retry panel on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
@@ -2078,7 +2078,7 @@ def emit_stream_chunk(
     """Per-chunk Live update during LLM streaming.
 
     Called from ``run/llm_calls.py`` on every ``part_delta`` event of the
-    streaming iterator. Routed directly to :class:`VerboseHooks` (NOT
+    streaming iterator. Routed directly to ``VerboseHooks`` (NOT
     fan-out through ``CompositeRunHooks``) so user hooks are not woken
     on every token.
 
@@ -2117,12 +2117,12 @@ def emit_task_start(
     Called from ``Runner.arun`` / ``Runner.arun_swarm`` /
     ``Runner.arun_graph`` / the streamed-run entry point before the
     agent loop runs. *scope* is the whole-run unit bracketed by the
-    panel — see :meth:`VerboseHooks.emit_task_start` for the contract.
+    panel — see ``VerboseHooks.emit_task_start`` for the contract.
 
     Args:
         hooks: The active ``RunHooks`` chain.
         scope: The whole-run unit bracketed by the panel. May be an
-            :class:`Agent`, :class:`Swarm`, or :class:`Graph`.
+            ``Agent``, ``Swarm``, or ``Graph``.
         task_name: Human-readable task name.
         task_id: Full task identifier.
     """
@@ -2146,11 +2146,11 @@ def emit_task_end(
 
     Called from the success / exception arms of ``Runner.arun`` /
     ``arun_swarm`` / ``arun_graph``. *scope* is the same value passed
-    to :func:`emit_task_start` for the open of this bracket.
+    to ``emit_task_start`` for the open of this bracket.
 
     Args:
         hooks: The active ``RunHooks`` chain.
-        scope: The whole-run unit passed to :func:`emit_task_start`.
+        scope: The whole-run unit passed to ``emit_task_start``.
         task_name: Human-readable task name.
         task_id: Full task identifier.
         success: ``True`` emits a green "Task Completed" panel;
@@ -2191,7 +2191,7 @@ def emit_tool_error(
     tool_name: str,
     error: BaseException,
 ) -> None:
-    """Close the tool block with an error verdict on every reachable :class:`VerboseHooks`.
+    """Close the tool block with an error verdict on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
@@ -2208,12 +2208,12 @@ def emit_tool_error(
 
 
 def emit_usage_recorded(hooks: Any, agent: Agent, usage: LLMUsage) -> None:
-    """Emit cumulative token-usage info on every reachable :class:`VerboseHooks`.
+    """Emit cumulative token-usage info on every reachable ``VerboseHooks``.
 
     Args:
         hooks: The active ``RunHooks`` chain.
         agent: The agent attributed with the token usage.
-        usage: The :class:`~philharmonica.adk.types.tokens.llm_usage.LLMUsage`
+        usage: The ``LLMUsage``
             instance populated by the LLM provider after the call.
     """
     _for_each_verbose(hooks, "emit_usage_recorded", lambda vh: vh.emit_usage_recorded(agent, usage))

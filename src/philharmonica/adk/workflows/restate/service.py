@@ -1,7 +1,7 @@
 """Philharmonica Restate service helpers and human-in-the-loop support.
 
-Provides :class:`PhilharmonicaRestateService` — a mixin/base class with helpers
-for common Restate service patterns — and :class:`RestateHumanReply` — a
+Provides ``PhilharmonicaRestateService`` — a mixin/base class with helpers
+for common Restate service patterns — and ``RestateHumanReply`` — a
 frozen dataclass carrying a human-provided reply resolved via a Restate
 promise.
 
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 class RestateHumanReply:
     """A human-provided reply received via a Restate durable promise.
 
-    Constructed by :meth:`PhilharmonicaRestateService.wait_for_human_reply` from
+    Constructed by ``PhilharmonicaRestateService.wait_for_human_reply`` from
     the value resolved by ``ctx.promise(promise_name).value()``.
 
     Attributes:
@@ -60,7 +60,7 @@ class PhilharmonicaRestateService:
     Durable promises (``ctx.promise``) are a **workflow-only** primitive:
     the ``restate.WorkflowContext`` / ``restate.WorkflowSharedContext`` expose
     ``promise()``; the plain ``restate.Context`` of a service handler does
-    not.  :meth:`wait_for_human_reply` must therefore run inside a
+    not.  ``wait_for_human_reply`` must therefore run inside a
     ``restate.Workflow`` handler that receives a ``WorkflowContext``.
 
     Example::
@@ -103,7 +103,7 @@ class PhilharmonicaRestateService:
                 Defaults to ``"human_reply"``.
 
         Returns:
-            A :class:`RestateHumanReply` constructed from the promise payload.
+            A ``RestateHumanReply`` constructed from the promise payload.
             The payload must be a dict with at least ``"node_id"`` and
             ``"value"`` keys.
 

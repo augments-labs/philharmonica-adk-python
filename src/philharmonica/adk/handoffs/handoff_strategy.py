@@ -8,7 +8,7 @@ class HandoffStrategy(StrEnum):
 
     - ``FULL``: Include the entire conversation history.
     - ``LAST_N``: Include the last N messages (requires ``window`` on
-      :class:`HandoffConfig`).
+      ``HandoffConfig``).
     - ``INTENT_ONLY``: Include only the detected intent.
     - ``SUMMARY``: Include a summarized version of the conversation
       (routes through the LLM — accumulates usage).

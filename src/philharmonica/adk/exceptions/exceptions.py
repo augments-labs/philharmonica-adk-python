@@ -387,7 +387,7 @@ class HandoffRejection(PhilharmonicaError):
       handoff's ``HandoffConfig.on_error`` is ``"reject_with_message"``.
 
     The runner catches this exception in the LLM-orch dispatch path,
-    emits a tool-result item carrying :attr:`tool_message`, and lets
+    emits a tool-result item carrying ``tool_message``, and lets
     the loop continue so the LLM can react.
 
     With ``on_error="halt"`` (the default), filter / callback errors
@@ -593,7 +593,7 @@ class ToolsetNameConflictError(PhilharmonicaError):
 class TracingDependencyError(PhilharmonicaError):
     """Raised when the OpenTelemetry extra is required but not installed.
 
-    The OTel bridge (:mod:`philharmonica.adk.tracing.otel`) performs a soft
+    The OTel bridge (``philharmonica.adk.tracing.otel``) performs a soft
     import of the ``opentelemetry`` packages at construction time. When
     they are missing, the bridge raises this error with the install
     command the user needs, rather than surfacing a low-level
@@ -625,7 +625,7 @@ class TracingDependencyError(PhilharmonicaError):
 class QuotaExceeded(PhilharmonicaError):
     """Raised when cumulative usage exceeds a configured quota.
 
-    Checked by :class:`~philharmonica.adk.status.hooks.StatusTrackingHooks`
+    Checked by ``StatusTrackingHooks``
     in ``on_agent_start`` before any LLM call is made.
 
     Attributes:

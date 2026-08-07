@@ -534,7 +534,7 @@ async def run_output_guardrails(
     """Run output guardrails, re-validating after each transform or remediation.
 
     Config guardrails run first, then the agent's, all in parallel. A halting
-    verdict is resolved by :func:`_resolve_output_verdict`: substitute
+    verdict is resolved by ``_resolve_output_verdict``: substitute
     (``on_transform``), re-prompt (``on_remediate``), or raise. The substituted or
     re-prompted output is re-validated until every guardrail passes or one raises.
 

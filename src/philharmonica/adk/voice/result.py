@@ -1,19 +1,19 @@
 """Streamed audio result — turns agent text into ordered speech events.
 
-A :class:`StreamedAudioResult` is the object a caller iterates to hear an
+A ``StreamedAudioResult`` is the object a caller iterates to hear an
 agent speak. It sits between the producer (the pipeline, feeding agent
 text turn by turn) and the consumer (the caller, playing audio):
 
-1. The producer pushes text deltas via :meth:`add_text`, bracketed by
-   :meth:`start_turn` / :meth:`end_turn`, and finally :meth:`complete`.
+1. The producer pushes text deltas via ``add_text``, bracketed by
+   ``start_turn`` / ``end_turn``, and finally ``complete``.
 2. Text accumulates and is cut into synthesis-ready segments by the
    configured splitter; whole segments and turn/session markers flow
    through one internal queue.
 3. A single background synthesis task drains that queue **in order**,
    calling the TTS model per segment and forwarding lifecycle markers,
    so audio never interleaves across segments.
-4. The caller reads the resulting :class:`~philharmonica.adk.voice.events.VoiceStreamEvent`
-   stream via :meth:`stream`.
+4. The caller reads the resulting ``VoiceStreamEvent``
+   stream via ``stream``.
 
 The output queue is bounded, so a slow consumer back-pressures synthesis
 rather than letting audio accumulate without limit. ``turn_started`` and
@@ -64,9 +64,9 @@ _OutputItem = VoiceStreamEvent | _StreamDone
 class StreamedAudioResult:
     """Ordered speech-event stream produced from streamed agent text.
 
-    Construct one per pipeline run, call :meth:`start` to launch
+    Construct one per pipeline run, call ``start`` to launch
     synthesis, drive it with the producer methods, and let the caller
-    consume :meth:`stream`.
+    consume ``stream``.
     """
 
     def __init__(self, tts_model: TTSModel, tts_settings: TTSModelSettings) -> None:
@@ -137,7 +137,7 @@ class StreamedAudioResult:
         """Yield speech events until the session ends.
 
         Yields:
-            Each :class:`~philharmonica.adk.voice.events.VoiceStreamEvent` in
+            Each ``VoiceStreamEvent`` in
             order: lifecycle markers, audio chunks, and a terminal error
             if one occurred.
         """
@@ -158,7 +158,7 @@ class StreamedAudioResult:
         """Drain pending segments in order, synthesizing audio per segment.
 
         Lifecycle and error markers pass through verbatim; text segments
-        are synthesized to audio. A :class:`_StreamDone` ends the loop.
+        are synthesized to audio. A ``_StreamDone`` ends the loop.
         This is the sole writer to the output queue, so audio never
         interleaves across segments.
         """

@@ -1,4 +1,4 @@
-"""Tests for :class:`PostgresTaskStore` against a live ephemeral Postgres."""
+"""Tests for ``PostgresTaskStore`` against a live ephemeral Postgres."""
 
 from __future__ import annotations
 

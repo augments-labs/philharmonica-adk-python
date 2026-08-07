@@ -1,8 +1,8 @@
 """FlowStepRateLimit — per-step sliding-window rate limit.
 
-Mirrors :class:`philharmonica.adk.types.tools.tool_rate_limit.ToolRateLimit`
+Mirrors ``philharmonica.adk.types.tools.tool_rate_limit.ToolRateLimit``
 at the Flow step layer. Each step with a non-``None``
-:attr:`FlowStep.__flow_rate_limit__` carries its own 60-second
+``FlowStep.__flow_rate_limit__`` carries its own 60-second
 sliding window: the executor maintains a per-step deque of monotonic
 timestamps, admits each step invocation when ``len(deque) < rpm``,
 and either waits (``behavior="wait"``) or raises
@@ -14,7 +14,7 @@ share a single helper or compose a future middleware once that
 lands.
 
 **Distributed-execution caveat**: enforcement is per-executor
-(per-batch claim under :class:`FlowWorkerBackend`). When the
+(per-batch claim under ``FlowWorkerBackend``). When the
 same step fires across batches claimed by different workers,
 the bucket resets between claims — the documented ``rpm`` cap
 applies *per batch window* in that mode, not globally across
@@ -34,8 +34,8 @@ FlowStepRateLimitBehavior = Literal["wait", "error"]
 - ``"wait"``: the executor sleeps until a slot opens, then proceeds.
   Cost-conservative default — keeps the flow advancing without
   surfacing the saturation to the developer.
-- ``"error"``: the executor raises :class:`FlowStepRateLimitExceeded`
-  which routes through :attr:`FlowConfig.error_policy` exactly like
+- ``"error"``: the executor raises ``FlowStepRateLimitExceeded``
+  which routes through ``FlowConfig.error_policy`` exactly like
   any other step exception. Set this when downstream consumers want
   to observe rate-limit failures.
 """
@@ -46,10 +46,10 @@ class FlowStepRateLimit:
     """Per-step sliding-window rate limit.
 
     Identical surface to
-    :class:`philharmonica.adk.types.tools.tool_rate_limit.ToolRateLimit`,
+    ``philharmonica.adk.types.tools.tool_rate_limit.ToolRateLimit``,
     re-typed for the Flow step layer so cross-layer type confusion
     is impossible. The 60-second window is fixed; the cap is
-    :attr:`rpm`.
+    ``rpm``.
 
     Attributes:
         rpm: Step invocations allowed in any 60-second sliding window.

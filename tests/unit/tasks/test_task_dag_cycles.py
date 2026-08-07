@@ -1,6 +1,6 @@
-"""Negative-path tests for :class:`TaskPipeline` DAG validation.
+"""Negative-path tests for ``TaskPipeline`` DAG validation.
 
-Covers the four failure modes :meth:`TaskPipeline.topological_levels`
+Covers the four failure modes ``TaskPipeline.topological_levels``
 detects at construction time: missing ``task_id`` on a task with
 ``depends_on``, duplicate ``task_id``s, references to unknown IDs,
 and cycles.

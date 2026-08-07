@@ -1,12 +1,12 @@
 """Restate handler for durable LLM invocation.
 
-Provides :func:`invoke_model_handler` — an async function intended to be
+Provides ``invoke_model_handler`` — an async function intended to be
 registered as a Restate handler that executes an LLM call inside a durable
 context.
 
-Reuses :func:`~philharmonica.adk.workflows.temporal.activity.get_model` from the
+Reuses ``get_model`` from the
 Temporal activity module so that both engines share a single model registry.
-Register models once with :func:`~philharmonica.adk.workflows.temporal.activity.register_model`
+Register models once with ``register_model``
 and they are available to both the Temporal and Restate backends::
 
     from philharmonica.adk.workflows.temporal.activity import register_model
@@ -48,9 +48,9 @@ async def invoke_model_handler(
     """Restate handler that executes a durable LLM call.
 
     Looks up the LLM from the shared model registry, builds an
-    :class:`~philharmonica.adk.llms.llm_config.LLMConfig` from *config* when
-    provided, delegates to :meth:`~philharmonica.adk.llms.llm.LLM.acomplete`,
-    and returns the response serialized via :func:`dataclasses.asdict`.
+    ``LLMConfig`` from *config* when
+    provided, delegates to ``acomplete``,
+    and returns the response serialized via ``dataclasses.asdict``.
 
     The handler is intentionally not decorated with ``@restate.handler``
     here so that callers control registration (service class, decorator
@@ -61,14 +61,14 @@ async def invoke_model_handler(
             this function but required by the Restate handler signature
             convention.
         model_name: Registry key to look up the
-            :class:`~philharmonica.adk.llms.llm.LLM` via
-            :func:`~philharmonica.adk.workflows.temporal.activity.get_model`.
+            ``LLM`` via
+            ``get_model``.
         messages: Conversation messages as a list of provider-agnostic
             content items (already deserialized from JSON by the caller
             or Restate's serde layer).
         config: Optional LLM configuration fields dict.  When not
             ``None``, passed as keyword arguments to
-            :class:`~philharmonica.adk.llms.llm_config.LLMConfig`.
+            ``LLMConfig``.
         tools_json: JSON-serialized list of tool schema dicts produced by
             the Temporal serialization helpers.  Empty string means no
             tools — the LLM receives an unconstrained turn.  Forwarding
@@ -78,13 +78,13 @@ async def invoke_model_handler(
             Empty string means no schema — the model is unconstrained.
 
     Returns:
-        The LLM response serialized via :func:`dataclasses.asdict`,
+        The LLM response serialized via ``dataclasses.asdict``,
         suitable for JSON transport through the Restate journal.
 
     Raises:
         KeyError: When *model_name* is not in the registry.
         TypeError: When the LLM returns a type other than
-            :class:`~philharmonica.adk.types.responses.llm_response.LLMResponse`
+            ``LLMResponse``
             (e.g. a streaming iterator).
 
     References:

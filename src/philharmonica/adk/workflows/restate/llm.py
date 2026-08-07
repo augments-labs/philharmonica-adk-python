@@ -1,7 +1,7 @@
 """RestateLLM — routes LLM calls through Restate's ctx.run() for journaled replay.
 
-Wraps any :class:`~philharmonica.adk.llms.llm.LLM` implementation and transparently
-routes :meth:`acomplete` through ``ctx.run()`` when called from inside a
+Wraps any ``LLM`` implementation and transparently
+routes ``acomplete`` through ``ctx.run()`` when called from inside a
 Restate handler.  Outside a handler the call is forwarded directly to the
 wrapped LLM, making ``RestateLLM`` safe to use in both durable and
 non-durable contexts.
@@ -82,7 +82,7 @@ class RestateLLM(LLM):
     """LLM bridge that routes ``acomplete`` through Restate's ``ctx.run()`` for journaled replay.
 
     When called from inside a Restate handler (detected via
-    :func:`get_restate_context`), each LLM call is executed inside
+    ``get_restate_context``), each LLM call is executed inside
     ``ctx.run()`` so that the result is journaled.  On replay, Restate
     returns the recorded result without re-executing the LLM call.
 
@@ -90,10 +90,10 @@ class RestateLLM(LLM):
     added in non-durable paths.
 
     Attributes:
-        wrapped: The real :class:`~philharmonica.adk.llms.llm.LLM` instance that
+        wrapped: The real ``LLM`` instance that
             handles provider communication.
         activity_config: Timeout and retry policy carried for compatibility
-            with the :class:`~philharmonica.adk.workflows.engine.DurableEngine`
+            with the ``DurableEngine``
             Protocol.  Restate's retry behaviour is configured on the
             service/handler level, not per ``ctx.run()`` call.
 
@@ -118,7 +118,7 @@ class RestateLLM(LLM):
     def cost(self, model: str, usage: LLMUsage) -> float | None:
         """Delegate USD costing to the wrapped LLM.
 
-        Without this override the base :meth:`~philharmonica.adk.llms.llm.LLM.cost`
+        Without this override the base ``cost``
         returns ``None`` for every call, so a durable run's tenant dollar
         budget would silently never be charged.  Forwarding to the wrapped
         provider preserves the underlying cost table.
@@ -143,7 +143,7 @@ class RestateLLM(LLM):
     ) -> CostEstimate:
         """Delegate the pre-call cost estimate to the wrapped LLM.
 
-        Symmetric with :meth:`cost`: the wrapped provider owns token counting
+        Symmetric with ``cost``: the wrapped provider owns token counting
         and pricing, so pre-call dollar gating stays correct under durable
         execution.
 
@@ -153,7 +153,7 @@ class RestateLLM(LLM):
             max_output_tokens: Optional output-side bound for the estimate.
 
         Returns:
-            The wrapped LLM's :class:`~philharmonica.adk.llms.cost.CostEstimate`.
+            The wrapped LLM's ``CostEstimate``.
         """
         return self.wrapped.estimate_cost(messages, model, max_output_tokens=max_output_tokens)
 

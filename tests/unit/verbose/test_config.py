@@ -1,4 +1,4 @@
-"""Tests for :class:`VerboseConfig`.
+"""Tests for ``VerboseConfig``.
 
 Covers style resolution, registration, ``NO_COLOR`` compliance, and the
 stream default.

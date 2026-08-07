@@ -14,9 +14,9 @@ class ImageGenerationTool(HostedTool):
 
     Provider matrix:
     - **OpenAI Responses**: native via the ``image_generation`` tool
-      type. Honours :attr:`model`, :attr:`quality`, :attr:`size`,
-      :attr:`output_format`.
-    - All other providers raise :class:`UnsupportedHostedToolError`.
+      type. Honours ``model``, ``quality``, ``size``,
+      ``output_format``.
+    - All other providers raise ``UnsupportedHostedToolError``.
 
     Refs:
         - OpenAI Responses: https://platform.openai.com/docs/guides/tools-image-generation

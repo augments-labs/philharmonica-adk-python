@@ -496,8 +496,8 @@ class AnthropicConverter:
         """Convert one tool-result content part to a tool_result block.
 
         Only text and image blocks are valid inside a ``tool_result``;
-        text-shaped parts become :class:`TextBlockParam`, image parts
-        become :class:`ImageBlockParam`. An unknown dict shape is
+        text-shaped parts become ``TextBlockParam``, image parts
+        become ``ImageBlockParam``. An unknown dict shape is
         preserved as text rather than dropped.
         """
         if isinstance(part, str):
@@ -604,8 +604,8 @@ class AnthropicConverter:
         - ``FunctionTool`` → ``ToolParam`` (custom function)
         - ``ExecutableBuiltinTool`` → ``ToolParam`` (function format)
         - ``HostedTool`` subclass → provider-native tool param.
-          Anthropic supports :class:`WebSearchTool`. Other variants
-          raise :class:`UnsupportedHostedToolError`.
+          Anthropic supports ``WebSearchTool``. Other variants
+          raise ``UnsupportedHostedToolError``.
 
         ``ShellTool`` / ``ApplyPatchTool`` with a local executor/editor
         are wrapped as ``FunctionTool`` upstream (in
@@ -685,7 +685,7 @@ class AnthropicConverter:
 
     @classmethod
     def _convert_web_search(cls, tool: WebSearchTool) -> WebSearchTool20250305Param:
-        """Translate a framework :class:`WebSearchTool` to Anthropic's wire shape.
+        """Translate a framework ``WebSearchTool`` to Anthropic's wire shape.
 
         Reads the Anthropic-honoured attributes (``max_uses``,
         ``allowed_domains``, ``blocked_domains``, ``user_location``)
@@ -874,7 +874,7 @@ class AnthropicConverter:
                 short-circuit before invoking this method.
 
         Returns:
-            A single :class:`ToolParam` named ``structured_output``.
+            A single ``ToolParam`` named ``structured_output``.
         """
         schema_json = output_schema.json_schema()
         return ToolParam(
@@ -905,7 +905,7 @@ class AnthropicConverter:
 
         Walks ``message.content`` for the first ``ToolUseBlock`` named
         ``structured_output``, JSON-encodes its ``input`` dict, and runs
-        it through :meth:`AgentOutputSchemaBase.validate_json` so the
+        it through ``AgentOutputSchemaBase.validate_json`` so the
         same wrapping / unwrapping / strict-mode rules apply as on the
         litellm and OpenAI paths.
 
@@ -920,7 +920,7 @@ class AnthropicConverter:
             ValueError: If no matching ``ToolUseBlock`` is present, or
                 if its input fails schema validation, or if the
                 serialised payload exceeds
-                :data:`MAX_STRUCTURED_OUTPUT_BYTES` (defence-in-depth
+                ``MAX_STRUCTURED_OUTPUT_BYTES`` (defence-in-depth
                 cap before ``validate_json`` parses).
         """
         for block in message.content:

@@ -1,4 +1,4 @@
-"""Middleware configuration object for an :class:`~philharmonica.adk.agents.agent.Agent`.
+"""Middleware configuration object for an ``Agent``.
 
 Holds typed lists of middleware grouped by execution layer. Four slots
 are wired today:
@@ -12,7 +12,7 @@ are wired today:
   ``LLM.acomplete(stream=True)`` invocation. Sibling Protocol with a
   non-overlapping return type (``AsyncIterator[LLMStreamEvent]``
   rather than ``LLMResponse``); see
-  :class:`~philharmonica.adk.llms.llm_stream_middleware.LLMStreamMiddleware`.
+  ``LLMStreamMiddleware``.
 
 All four layers share the same plumbing-only contract — see the
 Protocol docstrings under ``philharmonica.adk.tools.tool_middleware``,
@@ -58,21 +58,21 @@ class Middleware:
             ``tool.on_invoke`` call. Composed outer-to-inner: the first
             entry runs first (outermost), the last entry runs last
             (innermost, just before the tool's own invoker). See
-            :class:`~philharmonica.adk.tools.tool_middleware.ToolMiddleware` for
+            ``ToolMiddleware`` for
             the forbidden-vs-allowed contract.
         agents: Agent-turn middleware applied around each per-agent
             block in the loop (re-fires on every handoff / swarm
             transition). Same outer-to-inner composition. Applies on
             streaming and non-streaming runs alike. See
-            :class:`~philharmonica.adk.run.agent_middleware.AgentMiddleware`.
+            ``AgentMiddleware``.
         llms: Non-streaming LLM-call middleware applied around each
             ``LLM.acomplete()`` call the runner issues for this
             agent. Same outer-to-inner composition. See
-            :class:`~philharmonica.adk.llms.llm_middleware.LLMMiddleware`.
+            ``LLMMiddleware``.
         stream_llms: Streaming LLM-call middleware applied around each
             ``LLM.acomplete(stream=True)`` call. Sibling Protocol with
             a non-overlapping return type (``AsyncIterator[LLMStreamEvent]``).
-            Use :func:`~philharmonica.adk.llms.llm_stream_middleware.make_logging_middlewares`
+            Use ``make_logging_middlewares``
             to register one paired logger across both LLM paths.
     """
 
@@ -99,6 +99,6 @@ class Middleware:
     exist because Protocol satisfaction depends on ``__call__``'s
     return-type identity — a single class cannot structurally
     satisfy both. See
-    :func:`~philharmonica.adk.llms.llm_stream_middleware.make_logging_middlewares`
+    ``make_logging_middlewares``
     for the paired-registration helper.
     """

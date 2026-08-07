@@ -1,6 +1,6 @@
 """End-to-end integration test for the Task abstraction.
 
-Drives :meth:`Runner.arun_task` and :meth:`Runner.arun_task_pipeline`
+Drives ``Runner.arun_task`` and ``Runner.arun_task_pipeline``
 against the real agent loop with a stubbed LLM. Verifies:
 
 - Two-call explicit chaining: the developer feeds the upstream task's

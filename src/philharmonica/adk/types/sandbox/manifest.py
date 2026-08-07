@@ -62,7 +62,7 @@ class EnvEntry(BaseModel):
     async def resolve(self) -> str:
         """Resolve this entry to a literal string value.
 
-        Concrete subclasses (e.g. :class:`StrEnvValue`, or a vault /
+        Concrete subclasses (e.g. ``StrEnvValue``, or a vault /
         secret-store integration) override this. The base raises so an entry
         type with no resolution logic fails loudly at sandbox start rather
         than silently injecting nothing.

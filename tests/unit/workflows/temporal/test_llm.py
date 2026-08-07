@@ -1,4 +1,4 @@
-"""Tests for :class:`~philharmonica.adk.workflows.temporal.llm.TemporalLLM`.
+"""Tests for ``TemporalLLM``.
 
 Covers:
 - Outside-workflow path: ``acomplete`` delegates directly to the wrapped LLM.

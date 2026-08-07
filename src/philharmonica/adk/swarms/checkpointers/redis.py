@@ -4,7 +4,7 @@ Each checkpoint is a Redis hash under ``swarm:ckpt:<thread_id>`` holding a
 JSON ``payload``, a ``lock_token`` fencing token, and ``updated_at``.
 Optimistic locking compares and rotates the token atomically with a Lua
 script; a stale token (concurrent writer) raises
-:class:`~philharmonica.adk.exceptions.CheckpointConflictError`.
+``CheckpointConflictError``.
 
 TTL is opt-in (``ttl_seconds``); the default keeps checkpoints until they
 are explicitly deleted. An expired or evicted key reads back as ``None``
@@ -80,7 +80,7 @@ class RedisSwarmCheckpointer:
     atomic Lua compare-and-set against the token cached from the prior
     ``load`` or ``save``; a concurrent writer that rotates the token
     causes the losing ``save`` to raise
-    :class:`~philharmonica.adk.exceptions.CheckpointConflictError`.
+    ``CheckpointConflictError``.
 
     Supply either a configured ``client`` or a ``url``. The caller owns
     the client lifecycle when ``client=`` is used.
@@ -105,7 +105,7 @@ class RedisSwarmCheckpointer:
             ttl_seconds: Optional per-key expiry in seconds. ``None`` (the
                 default) keeps checkpoints until explicitly deleted; the
                 developer opts in to eviction.
-            thread_id: Identifier used by :meth:`register`'s auto-save hook.
+            thread_id: Identifier used by ``register``'s auto-save hook.
                 Defaults to ``"default"`` when the caller does not supply an
                 explicit id.
 
@@ -143,7 +143,7 @@ class RedisSwarmCheckpointer:
             logger.debug("RedisSwarmCheckpointer: client closed.")
 
     def register(self, registry: SwarmHookRegistry) -> None:
-        """Subscribe a :class:`SwarmCheckpointerHooks` to ``registry``."""
+        """Subscribe a ``SwarmCheckpointerHooks`` to ``registry``."""
         from philharmonica.adk.swarms.checkpointers.hooks import SwarmCheckpointerHooks
 
         registry.add(SwarmCheckpointerHooks(self, self._thread_id))
@@ -155,7 +155,7 @@ class RedisSwarmCheckpointer:
         The first save for a ``thread_id`` (no cached token) requires the
         key to be absent; subsequent saves require the stored token to
         match the one cached from the prior ``load`` / ``save``. A losing
-        race raises :class:`CheckpointConflictError`.
+        race raises ``CheckpointConflictError``.
 
         Args:
             checkpoint: The snapshot to persist.
@@ -197,19 +197,19 @@ class RedisSwarmCheckpointer:
         """Rehydrate the checkpoint for ``thread_id`` (``None`` if absent).
 
         A missing, expired, or evicted key returns ``None``. The observed
-        ``lock_token`` is cached so a subsequent :meth:`save` can verify it.
+        ``lock_token`` is cached so a subsequent ``save`` can verify it.
         The ``swarm`` parameter is accepted for protocol parity; member-name
-        resolution in :meth:`SwarmState.from_dict` is the de-facto integrity
+        resolution in ``SwarmState.from_dict`` is the de-facto integrity
         check at rehydration time.
 
         Args:
             thread_id: The logical run key.
-            swarm: The :class:`Swarm` the checkpoint belongs to. Accepted
+            swarm: The ``Swarm`` the checkpoint belongs to. Accepted
                 for protocol parity; member validation happens at
-                :meth:`SwarmState.from_dict` call time.
+                ``SwarmState.from_dict`` call time.
 
         Returns:
-            A :class:`SwarmCheckpoint`, or ``None`` when no live
+            A ``SwarmCheckpoint``, or ``None`` when no live
             checkpoint exists for ``thread_id``.
         """
         del swarm

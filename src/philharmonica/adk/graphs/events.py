@@ -73,7 +73,7 @@ class GraphStartEvent(GraphStreamEvent):
     """Emitted once at the top of a graph run, before the first superstep.
 
     Keys:
-        type: Always :data:`GRAPH_START`.
+        type: Always ``GRAPH_START``.
         graph_path: Single-element tuple ``(graph_id,)`` identifying
             the emitting graph.
         graph_id: Id of the graph that is starting.
@@ -105,10 +105,10 @@ class GraphEndEvent(GraphStreamEvent):
     """Emitted exactly once at the end of a graph run.
 
     Keys:
-        type: Always :data:`GRAPH_END`.
-        graph_path: Same as on :class:`GraphStartEvent`.
+        type: Always ``GRAPH_END``.
+        graph_path: Same as on ``GraphStartEvent``.
         graph_id: Id of the graph that is ending.
-        status: The terminal :class:`GraphRunStatus`.
+        status: The terminal ``GraphRunStatus``.
         final_output: Aggregate graph output.
         total_supersteps: Number of supersteps executed.
     """
@@ -136,7 +136,7 @@ class SuperstepStartEvent(GraphStreamEvent):
     """Emitted at the top of each superstep.
 
     Keys:
-        type: Always :data:`SUPERSTEP_START`.
+        type: Always ``SUPERSTEP_START``.
         graph_path: Enclosing graph path.
         superstep: 1-indexed superstep counter.
         ready_nodes: Node ids about to fire in this superstep (sorted).
@@ -161,7 +161,7 @@ class SuperstepEndEvent(GraphStreamEvent):
     """Emitted after a superstep completes.
 
     Keys:
-        type: Always :data:`SUPERSTEP_END`.
+        type: Always ``SUPERSTEP_END``.
         graph_path: Enclosing graph path.
         superstep: 1-indexed superstep counter.
         fired_nodes: Node ids that fired successfully this superstep.
@@ -188,10 +188,10 @@ class SuperstepEndEvent(GraphStreamEvent):
 
 
 class NodeStartEvent(GraphStreamEvent):
-    """Emitted before a node's :meth:`Executable.invoke`.
+    """Emitted before a node's ``Executable.invoke``.
 
     Keys:
-        type: Always :data:`NODE_START`.
+        type: Always ``NODE_START``.
         graph_path: Enclosing graph path.
         node_id: Id of the node about to fire.
         superstep: Current superstep counter.
@@ -221,14 +221,14 @@ class NodeStartEvent(GraphStreamEvent):
 
 
 class NodeEndEvent(GraphStreamEvent):
-    """Emitted after a node's :meth:`Executable.invoke` returns cleanly.
+    """Emitted after a node's ``Executable.invoke`` returns cleanly.
 
     Keys:
-        type: Always :data:`NODE_END`.
+        type: Always ``NODE_END``.
         graph_path: Enclosing graph path.
         node_id: Id of the node that just fired.
         superstep: Current superstep counter.
-        result: The produced :class:`NodeResult`.
+        result: The produced ``NodeResult``.
     """
 
     def __init__(
@@ -252,7 +252,7 @@ class NodeErrorEvent(GraphStreamEvent):
     """Emitted when a node raises an exception.
 
     Keys:
-        type: Always :data:`NODE_ERROR`.
+        type: Always ``NODE_ERROR``.
         graph_path: Enclosing graph path.
         node_id: Id of the node that raised.
         superstep: Current superstep counter.
@@ -282,14 +282,14 @@ class NodeErrorEvent(GraphStreamEvent):
 class NodeStreamEvent(GraphStreamEvent):
     """Wrapper around a streamed event bubbling up from a node.
 
-    When a node's :meth:`Executable.stream_async` yields an event, the
+    When a node's ``Executable.stream_async`` yields an event, the
     graph loop re-emits it wrapped in this envelope with ``graph_path``
     and ``node_id`` prepended. This is used primarily for agents
     forwarding per-token deltas; nested graphs currently run
     non-streaming and do not emit interior events.
 
     Keys:
-        type: Always :data:`NODE_STREAM`.
+        type: Always ``NODE_STREAM``.
         graph_path: Enclosing graph path.
         node_id: Id of the node whose inner stream produced this event.
         inner: The original event yielded by the inner executable.
@@ -313,17 +313,17 @@ class NodeStreamEvent(GraphStreamEvent):
 class NodeInterruptEvent(GraphStreamEvent):
     """A node raised InterruptException; the run is suspending.
 
-    The pending :class:`~philharmonica.adk.graphs.interrupt.Interrupt` is carried
+    The pending ``Interrupt`` is carried
     so consumers can prompt the human and resume via
-    :class:`~philharmonica.adk.graphs.interrupt.GraphResume` and the
+    ``GraphResume`` and the
     checkpoint-resume surface.
 
     Keys:
-        type: Always :data:`NODE_INTERRUPT`.
+        type: Always ``NODE_INTERRUPT``.
         graph_path: Identifies the emitting graph (single-element tuple
             ``(graph.id,)``).
         node_id: Id of the node that requested the interrupt.
-        interrupt: The :class:`~philharmonica.adk.graphs.interrupt.Interrupt`
+        interrupt: The ``Interrupt``
             describing the pending decision.
     """
 

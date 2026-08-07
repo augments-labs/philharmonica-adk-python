@@ -1,13 +1,13 @@
 """Pre-call cost estimation with LLM.estimate_cost.
 
 Demonstrates how to estimate the cost of an LLM call before making it,
-using the :meth:`LLM.estimate_cost` method. No real API call is made —
+using the ``LLM.estimate_cost`` method. No real API call is made —
 estimation is pure token counting combined with the provider's cost table.
 
 Two cases are shown:
 
 1. **Bounded estimate** — ``max_output_tokens`` is provided; the returned
-   :class:`CostEstimate` reflects both input tokens and the upper-bound
+   ``CostEstimate`` reflects both input tokens and the upper-bound
    output tokens, and ``output_bounded`` is ``True``.
 2. **Unbounded estimate** — no ``max_output_tokens``; the estimate is an
    input-only floor (the developer has not declared a cap) and

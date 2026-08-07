@@ -1,6 +1,6 @@
 """CrewAI-faithful Rich-Panel backend for verbose output.
 
-:class:`PanelRenderer` emits Rich Panels that match CrewAI's
+``PanelRenderer`` emits Rich Panels that match CrewAI's
 ``ConsoleFormatter`` visual grammar 1:1:
 
 * full-terminal-width panels (``Console(width=None)``);
@@ -18,15 +18,15 @@ Surfaces
   ``close_block`` / ``render_atomic``) — kept for ADK-only events that
   have no CrewAI counterpart (HITL approval gates, budget warnings,
   prompt-cache hits, context compaction, MCP lifecycle). Those panels
-  still flow through :class:`~philharmonica.adk.verbose.state.RunTree` and
+  still flow through ``RunTree`` and
   render with the same CrewAI visual chrome.
 * **Task boundary** (``render_task_start`` / ``render_task_end``) —
   one-shot ``📋 Task`` panels emitted from
-  :meth:`philharmonica.adk.run.runner.Runner.arun` entry / exit.
+  ``philharmonica.adk.run.runner.Runner.arun`` entry / exit.
 * **Live streaming** (``open_stream_panel`` / ``update_stream_panel`` /
   ``close_stream_panel``) — Rich ``Live`` widget driven by per-chunk
   LLM stream emission via the
-  :mod:`philharmonica.adk.verbose.run_bridge` ``ContextVar`` bridge.
+  ``philharmonica.adk.verbose.run_bridge`` ``ContextVar`` bridge.
 * **HITL coordination** (``pause_live_updates`` /
   ``resume_live_updates``) — temporarily stop the ``Live`` so an HITL
   approval prompt's stdin read does not race the refresh loop.
@@ -96,7 +96,7 @@ _EVENT_BORDER: dict[str, str] = {
     EVENT_TOOL_ERROR: "red",
 }
 """Border colour per canonical CrewAI event. Unknown events fall back
-to :attr:`EventStyle.color` so ADK-only enrichments (HITL, budget,
+to ``EventStyle.color`` so ADK-only enrichments (HITL, budget,
 cache, context, MCP) keep their configured palette."""
 
 
@@ -112,18 +112,18 @@ First alternative: a tag-shaped bracket (``[bold]``, ``[/]``) together
 with the backslash run preceding it — the shape ``rich.markup.escape``
 matches, where the parser *halves* the run. Second alternative: any
 other ``[`` (``[1]``, ``[1, 2, 3]``), where the parser consumes exactly
-one preceding backslash. :func:`escape_markup` substitutes each shape
+one preceding backslash. ``escape_markup`` substitutes each shape
 accordingly."""
 
 
 class PanelRenderer:
     """CrewAI-faithful Rich-Panel renderer.
 
-    One instance per :class:`VerboseConfig` (cached on
-    :class:`~philharmonica.adk.verbose.hooks.VerboseHooks`). Owns its own
-    :class:`RunTree` so concurrent runs stay isolated.
+    One instance per ``VerboseConfig`` (cached on
+    ``VerboseHooks``). Owns its own
+    ``RunTree`` so concurrent runs stay isolated.
 
-    The per-tool iteration counter (:attr:`_tool_usage_counts`) is
+    The per-tool iteration counter (``_tool_usage_counts``) is
     class-level — CrewAI does the same so ``(#N)`` keeps incrementing
     across multiple agents inside one swarm. Tests MUST clear it in
     ``setup_method`` / ``teardown_method``.
@@ -136,25 +136,25 @@ class PanelRenderer:
         _tool_usage_counts: Per-tool invocation counter keyed by tool
             name. Class-level so the ``(#N)`` suffix matches CrewAI's
             cross-agent counting. Concurrent access is guarded by
-            :attr:`_tool_count_lock`.
+            ``_tool_count_lock``.
         _tool_count_lock: ``threading.Lock`` protecting
-            :attr:`_tool_usage_counts` against concurrent increments
+            ``_tool_usage_counts`` against concurrent increments
             from swarm agents running on different threads.
     """
 
     _tool_usage_counts: ClassVar[dict[str, int]] = {}
     """Per-tool invocation counter. Class-level so ``(#N)`` matches
     CrewAI's cross-agent counting. Concurrent access guarded by
-    :attr:`_tool_count_lock`."""
+    ``_tool_count_lock``."""
 
     _tool_count_lock: ClassVar[threading.Lock] = threading.Lock()
-    """Lock guarding :attr:`_tool_usage_counts`."""
+    """Lock guarding ``_tool_usage_counts``."""
 
     def __init__(self, config: VerboseConfig) -> None:
         """Bind the renderer to *config*.
 
         Args:
-            config: The :class:`VerboseConfig` that owns this renderer.
+            config: The ``VerboseConfig`` that owns this renderer.
                 Style lookups go through ``config.get_style(event)``.
                 The output stream is resolved from
                 ``config.resolve_output()`` on first Console
@@ -213,20 +213,20 @@ class PanelRenderer:
     ) -> BlockNode:
         """Open a new block.
 
-        Returns the new :class:`BlockNode`. *payload*, if given, is
+        Returns the new ``BlockNode``. *payload*, if given, is
         appended immediately as one Rich-markup line.
 
         Args:
             event: Dotted event name for the opening event
                 (e.g. ``"tool.start"``).
             key: Identity tuple used to match this block on a later
-                :meth:`close_block` call.
+                ``close_block`` call.
             headline: Short one-line header for the panel title area.
             payload: Optional initial payload line. Appended to the
                 new node's buffer immediately when non-empty.
 
         Returns:
-            The newly-created :class:`BlockNode`.
+            The newly-created ``BlockNode``.
         """
         node = self._tree.open(event, key, headline)
         if payload is not None and len(payload) > 0:
@@ -261,7 +261,7 @@ class PanelRenderer:
     def consume_just_streamed_flag(self) -> bool:
         """Return the just-streamed-final-answer flag and clear it.
 
-        Used by :class:`VerboseHooks` to suppress the duplicate
+        Used by ``VerboseHooks`` to suppress the duplicate
         ``agent.end`` / ``agent.finish`` panel when the streaming Live
         widget already painted the final answer. One-shot semantics:
         next caller sees ``False``.
@@ -298,12 +298,12 @@ class PanelRenderer:
     ) -> BlockNode | None:
         """Close the block matching *key* and flush its panel.
 
-        Returns the closed :class:`BlockNode`, or ``None`` if no block
-        matched (stale close — logged at DEBUG by :class:`RunTree`).
+        Returns the closed ``BlockNode``, or ``None`` if no block
+        matched (stale close — logged at DEBUG by ``RunTree``).
 
-        When the block's event is :data:`EVENT_AGENT_FINISH` and the
+        When the block's event is ``EVENT_AGENT_FINISH`` and the
         streaming Live widget already painted the final answer
-        (:attr:`_just_streamed_final_answer` is True), the panel is
+        (``_just_streamed_final_answer`` is True), the panel is
         suppressed to avoid the duplicate-final-answer regression.
 
         Args:
@@ -314,7 +314,7 @@ class PanelRenderer:
                 payload buffer before flushing.
 
         Returns:
-            The closed :class:`BlockNode`, or ``None`` on a stale
+            The closed ``BlockNode``, or ``None`` on a stale
             close.
         """
         node = self._tree.close(key, verdict=verdict)
@@ -323,7 +323,7 @@ class PanelRenderer:
         if final_payload is not None and len(final_payload) > 0:
             node.append_payload(final_payload)
         # The streaming-flag suppression lives on the dispatch path
-        # (:meth:`VerboseHooks._dispatch_close`) so it runs even for
+        # (``VerboseHooks._dispatch_close``) so it runs even for
         # CrewAI-canonical events that bypass the block tree.
         self._flush_panel(node)
         return node
@@ -350,8 +350,8 @@ class PanelRenderer:
 
         Composes a single Panel with the event's title, border, and
         payload — no entry on the block tree. Tool lifecycle events
-        have dedicated methods (:meth:`render_tool_started`,
-        :meth:`render_tool_finished`, :meth:`render_tool_error`) that
+        have dedicated methods (``render_tool_started``,
+        ``render_tool_finished``, ``render_tool_error``) that
         carry the tool name for the ``(#N)`` counter; this generic
         path renders whatever style the event resolves to.
 
@@ -380,7 +380,7 @@ class PanelRenderer:
         Body shape matches CrewAI's ``handle_task_started``: bold
         "Task Started" line followed by labeled "Name:" and "ID:" rows.
 
-        The task identity stored in :class:`TaskOutput` / hook callbacks
+        The task identity stored in ``TaskOutput`` / hook callbacks
         is a full ``str(uuid.uuid4())`` (36 chars); the panel truncates
         to the first 8 characters so the bordered display row stays
         compact. Truncation is presentation-only — the underlying
@@ -411,14 +411,14 @@ class PanelRenderer:
         """Emit the ``📋 Task Completed`` or ``❌ Task Failed`` panel.
 
         The task ID is truncated to its first 8 characters for the
-        display row, mirroring :meth:`render_task_start`. The full
-        identity remains addressable on :class:`TaskOutput.task_id`
+        display row, mirroring ``render_task_start``. The full
+        identity remains addressable on ``TaskOutput.task_id``
         and via the ``on_task_end`` hook callback.
 
         Args:
             task_name: Same task name passed to
-                :meth:`render_task_start`.
-            task_id: Same task ID passed to :meth:`render_task_start`.
+                ``render_task_start``.
+            task_id: Same task ID passed to ``render_task_start``.
             success: True → green "Task Completed"; False → red
                 "Task Failed".
             error: Optional error string; appended as a red row when
@@ -720,12 +720,12 @@ class PanelRenderer:
         """Update the running Live panel with the latest accumulated text.
 
         No-op when no Live is running (Rich unavailable, non-TTY, or
-        :meth:`pause_live_updates` is in effect).
+        ``pause_live_updates`` is in effect).
 
         Args:
             accumulated_text: Full text accumulated since the stream
                 opened, not just the latest delta. The last
-                :data:`_STREAM_MAX_LINES` lines are displayed; earlier
+                ``_STREAM_MAX_LINES`` lines are displayed; earlier
                 lines are replaced by ``"...\\n"``.
             call_type: ``"text"`` → green panel; ``"tool_call"`` →
                 yellow panel. Defaults to ``"text"``.
@@ -756,8 +756,8 @@ class PanelRenderer:
     def close_stream_panel(self) -> None:
         """Stop the running Live panel and clear streaming state.
 
-        Sets :attr:`_just_streamed_final_answer` so a subsequent
-        :data:`EVENT_AGENT_FINISH` block close suppresses its duplicate
+        Sets ``_just_streamed_final_answer`` so a subsequent
+        ``EVENT_AGENT_FINISH`` block close suppresses its duplicate
         panel — only when the last call_type was ``"text"`` (i.e. the
         Live actually showed the final answer; a tool-call stream does
         not count).
@@ -774,8 +774,8 @@ class PanelRenderer:
         """Stop the running Live widget so an HITL prompt can read stdin.
 
         Idempotent; safe to call when no Live is active. Subsequent
-        :meth:`update_stream_panel` calls become no-ops until the next
-        :meth:`open_stream_panel` reopens a fresh Live.
+        ``update_stream_panel`` calls become no-ops until the next
+        ``open_stream_panel`` reopens a fresh Live.
         """
         if self._streaming_live is None:
             return
@@ -786,8 +786,8 @@ class PanelRenderer:
 
         We do not preserve the paused panel because the streaming text
         accumulator lives on the streaming emit path
-        (:mod:`philharmonica.adk.run.llm_calls`). The next chunk emission will
-        construct a fresh Live via :meth:`open_stream_panel`.
+        (``philharmonica.adk.run.llm_calls``). The next chunk emission will
+        construct a fresh Live via ``open_stream_panel``.
         """
         return
 
@@ -796,10 +796,10 @@ class PanelRenderer:
     # ------------------------------------------------------------------
 
     def tree(self) -> RunTree:
-        """Return the underlying :class:`RunTree` (read-only use).
+        """Return the underlying ``RunTree`` (read-only use).
 
         Returns:
-            The :class:`RunTree` instance owned by this renderer.
+            The ``RunTree`` instance owned by this renderer.
         """
         return self._tree
 
@@ -818,7 +818,7 @@ class PanelRenderer:
     def _find_open(self, key: BlockKey) -> BlockNode | None:
         """Locate the most recent open block with matching *key*.
 
-        Delegates to :meth:`RunTree.find_open` — no cross-module
+        Delegates to ``RunTree.find_open`` — no cross-module
         access to the tree's private stack.
         """
         return self._tree.find_open(key)
@@ -841,10 +841,10 @@ class PanelRenderer:
 
         Visual rules (CrewAI parity):
 
-        * Title from :attr:`EventStyle.panel_title` when set, else
+        * Title from ``EventStyle.panel_title`` when set, else
           ``f"{icon} ({prefix})"`` (ADK-only events without an explicit
           CrewAI counterpart).
-        * Border from :data:`_EVENT_BORDER`, falling back to the
+        * Border from ``_EVENT_BORDER``, falling back to the
           ``EventStyle.color`` for unmapped events.
         * Content parsed as Rich markup so callers can embed
           ``[white]Label:[/]`` rows for CrewAI-style content shape.
@@ -874,8 +874,8 @@ class PanelRenderer:
         """Resolve the border style for *event*.
 
         Canonical CrewAI events use the fixed per-event colours in
-        :data:`_EVENT_BORDER`; other events fall back to their
-        :attr:`EventStyle.color`. ``use_color=False`` (or ``NO_COLOR``)
+        ``_EVENT_BORDER``; other events fall back to their
+        ``EventStyle.color``. ``use_color=False`` (or ``NO_COLOR``)
         degrades every border to ``"dim"``.
         """
         if self._config.resolve_use_color() is False:
@@ -959,7 +959,7 @@ def escape_markup(value: str) -> str:
 
     Task and tool panel bodies are composed with Rich markup, and the
     panel renderer parses every payload line through
-    :meth:`rich.text.Text.from_markup`. Plain-text payloads (tool args,
+    ``rich.text.Text.from_markup``. Plain-text payloads (tool args,
     tool results, agent final answers, exception messages) routinely
     contain ``[`` characters — a Python ``repr`` of a dict with list
     values, a path like ``C:[temp]``, or markdown footnotes like
@@ -1007,7 +1007,7 @@ def escape_markup(value: str) -> str:
 
 
 def _escape_bracket_match(match: re.Match[str]) -> str:
-    """Substitution callback for one :data:`_MARKUP_BRACKET_RE` match."""
+    """Substitution callback for one ``_MARKUP_BRACKET_RE`` match."""
     backslashes = match.group(1)
     tag = match.group(2)
     if tag is not None:
@@ -1026,7 +1026,7 @@ def format_tool_payload(tool_input: Any, tool_output: Any = None) -> str:
         [white]Output:[/] [bright_green]<truncated output>[/]
 
     Secret-looking keys in BOTH *tool_input* and *tool_output* are
-    redacted via :func:`philharmonica.adk.verbose.renderer.redact_secrets`
+    redacted via ``philharmonica.adk.verbose.renderer.redact_secrets``
     before display — tool results commonly echo credentials back in
     "user record retrieved" / OAuth refresh response shapes, so the
     output side MUST sanitize identically to the input side.

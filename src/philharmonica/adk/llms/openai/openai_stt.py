@@ -1,6 +1,6 @@
 """Native OpenAI speech-to-text model.
 
-Implements the framework-owned :class:`~philharmonica.adk.voice.stt.STTModel`
+Implements the framework-owned ``STTModel``
 ABC against the ``openai`` SDK (buffered transcription) and the OpenAI
 realtime transcription websocket (continuous, turn-by-turn). The
 ``openai`` SDK and the realtime websocket are confined to this provider
@@ -154,7 +154,7 @@ class OpenAISTTSession(StreamedTranscriptionSession):
     Audio is base64-PCM streamed to the server, which segments speech by
     voice-activity detection and returns one transcript per turn. The
     session ends when the audio stream closes and no further transcript
-    arrives within :data:`EVENT_INACTIVITY_TIMEOUT`.
+    arrives within ``EVENT_INACTIVITY_TIMEOUT``.
     """
 
     def __init__(

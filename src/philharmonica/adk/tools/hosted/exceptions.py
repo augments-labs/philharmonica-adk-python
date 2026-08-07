@@ -7,7 +7,7 @@ class UnsupportedHostedToolError(NotImplementedError):
     """Raised when a hosted tool is not supported by the active provider.
 
     Each provider's converter dispatches over the
-    :class:`HostedTool` subclass set. When a converter encounters
+    ``HostedTool`` subclass set. When a converter encounters
     a variant it does not support, it raises this error rather than
     silently dropping the tool. The error message names the tool class,
     the active provider, and the providers that DO support the tool —

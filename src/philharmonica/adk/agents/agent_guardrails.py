@@ -711,7 +711,7 @@ class AgentGuardrails:
             execution. They validate the user prompt and can detect PII,
             jailbreak attempts, prompt injection, off-topic requests,
             and so on. Each entry returns an
-            :class:`AgentGuardrailFunctionOutput` verdict.
+            ``AgentGuardrailFunctionOutput`` verdict.
         output: Guardrails that run after agent execution completes.
             They validate the final output and can detect PII in the
             response, hallucinations, schema violations, and so on.

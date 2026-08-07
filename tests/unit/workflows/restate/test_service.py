@@ -1,5 +1,5 @@
-"""Tests for :class:`~philharmonica.adk.workflows.restate.service.PhilharmonicaRestateService`
-and :class:`~philharmonica.adk.workflows.restate.service.RestateHumanReply`.
+"""Tests for ``PhilharmonicaRestateService``
+and ``RestateHumanReply``.
 
 Covers:
 - ``RestateHumanReply`` is a frozen dataclass with the expected fields.

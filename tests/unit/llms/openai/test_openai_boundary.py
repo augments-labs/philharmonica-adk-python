@@ -1,4 +1,4 @@
-"""Tests for :mod:`philharmonica.adk.llms.openai.openai_boundary`.
+"""Tests for ``philharmonica.adk.llms.openai.openai_boundary``.
 
 Focus: ``sanitize_for_log`` must neutralize every Unicode line terminator so a
 model name echoed back by the API cannot forge log lines (CWE-117). Parity with

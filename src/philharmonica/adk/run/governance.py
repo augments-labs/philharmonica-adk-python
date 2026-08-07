@@ -131,7 +131,7 @@ async def enforce_tenant_allowlist(
 
     Returns ``None`` when permitted. On denial, emits a ``"denied"`` audit
     event, then either returns a denial message (soft mode) or raises
-    :class:`ToolNotPermittedForTenant` (hard mode, the default).
+    ``ToolNotPermittedForTenant`` (hard mode, the default).
     """
     from philharmonica.adk.exceptions import ToolNotPermittedForTenant
     from philharmonica.adk.run.config import get_messages

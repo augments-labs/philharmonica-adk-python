@@ -1,4 +1,4 @@
-"""Tests for :class:`~philharmonica.adk.workflows.restate.llm.RestateLLM`.
+"""Tests for ``RestateLLM``.
 
 All tests skip when ``restate`` is not installed.
 See test_get_restate_context.py for the narrowed-RuntimeError tests

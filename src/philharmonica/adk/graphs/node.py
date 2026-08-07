@@ -1,14 +1,14 @@
 """``GraphNode`` and ``GraphEdge`` — the basic structural units of a graph.
 
-A :class:`GraphNode` is a named wrapper around an
-:class:`~philharmonica.adk.orchestration.executable.Executable`. A
-:class:`GraphEdge` describes a directed connection between two nodes
+A ``GraphNode`` is a named wrapper around an
+``Executable``. A
+``GraphEdge`` describes a directed connection between two nodes
 and carries the optional predicate that decides whether the edge
 fires.
 
 Both are frozen dataclasses. Mutable per-run data (who arrived, what
-result did the node produce) lives on :class:`GraphState` and
-:class:`JoinBarrier` — the nodes themselves are read-only at runtime.
+result did the node produce) lives on ``GraphState`` and
+``JoinBarrier`` — the nodes themselves are read-only at runtime.
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ class NodeErrorHandler(Protocol):
 
     Invoked by the graph loop when a node's execution fails after all
     retry attempts are exhausted. A handler MAY return a fallback
-    :class:`~philharmonica.adk.orchestration.executable.NodeResult` to substitute
+    ``NodeResult`` to substitute
     for the failed node's output; returning ``None`` causes the original
     exception to propagate unchanged.
 
@@ -62,7 +62,7 @@ class NodeErrorHandler(Protocol):
             exc: The exception raised after all retry attempts were exhausted.
 
         Returns:
-            A fallback :class:`~philharmonica.adk.orchestration.executable.NodeResult`
+            A fallback ``NodeResult``
             to substitute for the failed output, or ``None`` to let the
             original exception propagate.
         """
@@ -79,7 +79,7 @@ NodeErrorHandlerFn = Callable[
 """Callable type alias for a per-node error handler.
 
 Accepts the failing node id and the exhausted exception; returns a fallback
-:class:`~philharmonica.adk.orchestration.executable.NodeResult` or ``None`` to
+``NodeResult`` or ``None`` to
 propagate.  May be sync or async — the loop awaits when the return value is
 awaitable.
 """
@@ -92,11 +92,11 @@ _NODE_ID_PATTERN = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_\-]*$")
 
 
 # Predicate signature for a conditional edge. Takes the upstream
-# :class:`NodeResult` and returns ``True`` iff the edge should fire.
+# ``NodeResult`` and returns ``True`` iff the edge should fire.
 # Can be sync or async — the graph loop awaits if needed. Pure function
 # — MUST NOT mutate the result or produce side effects.
 EdgeCondition = Callable[["NodeResult"], "bool | Any"]
-"""Predicate called on an upstream :class:`NodeResult` to decide edge firing.
+"""Predicate called on an upstream ``NodeResult`` to decide edge firing.
 
 The ``Any`` in the return union accommodates awaitables (``Coroutine[Any,
 Any, bool]``). The graph loop does ``result = predicate(...); if
@@ -106,42 +106,42 @@ inspect.isawaitable(result): result = await result`` — see
 
 @dataclass(frozen=True)
 class GraphNode:
-    """A named node wrapping an :class:`Executable`.
+    """A named node wrapping an ``Executable``.
 
     Attributes:
         id: Unique node id within the owning graph. MUST match
             ``[a-zA-Z0-9][a-zA-Z0-9_-]*``. Used as the label on
-            :meth:`Merge.concat_text` chunks, as the source id in
-            :class:`JoinBarrier` arrivals, and as the
-            :attr:`GraphStreamEvent.node_id` on every emitted event.
-        executable: The :class:`Executable` the graph loop invokes
+            ``Merge.concat_text`` chunks, as the source id in
+            ``JoinBarrier`` arrivals, and as the
+            ``GraphStreamEvent.node_id`` on every emitted event.
+        executable: The ``Executable`` the graph loop invokes
             when this node fires. Usually one of the adapters from
-            :mod:`philharmonica.adk.graphs.adapters` (``AgentExecutable``,
+            ``philharmonica.adk.graphs.adapters`` (``AgentExecutable``,
             ``SwarmExecutable``, ``CallableExecutable``) or a nested
-            :class:`~philharmonica.adk.graphs.graph.Graph` itself.
-        merge: How to fold multiple upstream :class:`NodeResult`
-            values into this node's :class:`ExecutableInput`.
-            Defaults to :data:`Merge.concat_text` — the readable
+            ``Graph`` itself.
+        merge: How to fold multiple upstream ``NodeResult``
+            values into this node's ``ExecutableInput``.
+            Defaults to ``Merge.concat_text`` — the readable
             fan-in default.
         join: AND (default) or OR semantics for the fan-in barrier
             when this node has multiple incoming edges. Ignored when
             the node has zero or one incoming edges.
         description: Optional human-readable blurb. Emitted on
-            :class:`GraphStreamEvent`\\ s and OTel spans for richer
+            ``GraphStreamEvent``\\ s and OTel spans for richer
             observability.
         metadata: Free-form dict — escape hatch for attaching tags
             (cost-center, owner team) to a node.
             Surfaced on events and hooks.
-        retry: Optional per-node :class:`NodeRetryPolicy`. ``None``
-            inherits the graph-level :attr:`GraphConfig.default_retry`.
+        retry: Optional per-node ``NodeRetryPolicy``. ``None``
+            inherits the graph-level ``GraphConfig.default_retry``.
         timeout: Optional per-node per-attempt timeout in seconds.
-            ``None`` inherits :attr:`GraphConfig.per_node_timeout`.
+            ``None`` inherits ``GraphConfig.per_node_timeout``.
         on_error: Optional error handler called when the node's execution
             fails AFTER all retry attempts are exhausted. The handler
-            MAY return a fallback :class:`~philharmonica.adk.orchestration.executable.NodeResult`
+            MAY return a fallback ``NodeResult``
             to substitute for the failed output, or ``None`` to propagate
             the original exception. ``None`` ⇒ inherit
-            :attr:`GraphConfig.default_error_handler`, then raise if
+            ``GraphConfig.default_error_handler``, then raise if
             both are ``None``. Exceptions raised inside the handler
             propagate immediately — no silent double-failure.
     """
@@ -150,7 +150,7 @@ class GraphNode:
     """Unique node id within the graph."""
 
     executable: Executable[Any]
-    """The :class:`Executable` the graph loop runs when this node fires."""
+    """The ``Executable`` the graph loop runs when this node fires."""
 
     merge: MergeFn = DEFAULT_MERGE
     """Fan-in strategy. Ignored when this node has ≤1 upstream edges."""
@@ -166,15 +166,15 @@ class GraphNode:
 
     retry: NodeRetryPolicy | None = None
     """Per-node retry override. ``None`` ⇒ inherit
-    :attr:`GraphConfig.default_retry`."""
+    ``GraphConfig.default_retry``."""
 
     timeout: float | None = None
     """Per-node per-attempt timeout (seconds) override. ``None`` ⇒
-    inherit :attr:`GraphConfig.per_node_timeout`."""
+    inherit ``GraphConfig.per_node_timeout``."""
 
     on_error: NodeErrorHandlerFn | None = None
     """Per-node error handler. ``None`` ⇒ inherit
-    :attr:`GraphConfig.default_error_handler`, then raise if both are
+    ``GraphConfig.default_error_handler``, then raise if both are
     ``None``."""
 
     def __post_init__(self) -> None:
@@ -195,15 +195,15 @@ class GraphEdge:
 
     Attributes:
         source: Upstream node id. MUST refer to a node in the same
-            :class:`~philharmonica.adk.graphs.graph.Graph`.
+            ``Graph``.
         target: Downstream node id. MUST refer to a node in the same
             graph.
-        when: Optional predicate on the upstream :class:`NodeResult`.
+        when: Optional predicate on the upstream ``NodeResult``.
             When ``None`` the edge always fires. Otherwise the graph
             loop calls the predicate (awaiting if coroutine) and
             fires only on truthy return. The predicate MUST be pure.
         label: Optional label propagated to
-            :attr:`ExecutableInput.edge_label`. Useful when the
+            ``ExecutableInput.edge_label``. Useful when the
             downstream adapter wants to know which branch fired
             (e.g. "approved" vs "rejected").
         priority: When two edges from the same source could fire in

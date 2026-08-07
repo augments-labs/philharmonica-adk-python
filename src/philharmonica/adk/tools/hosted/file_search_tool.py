@@ -15,8 +15,8 @@ class FileSearchTool(HostedTool):
     Provider matrix:
     - **OpenAI Responses**: native via the ``file_search`` tool type.
       Requires at least one vector store ID. Honours
-      :attr:`max_num_results` and :attr:`ranking_options`.
-    - All other providers raise :class:`UnsupportedHostedToolError`.
+      ``max_num_results`` and ``ranking_options``.
+    - All other providers raise ``UnsupportedHostedToolError``.
       The Anthropic / Gemini equivalents (Anthropic's
       ``file_search``, Gemini's RAG retrieval via Vertex) have
       different shapes and are not unified here. Use

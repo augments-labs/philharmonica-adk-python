@@ -86,7 +86,7 @@ class AgentOutputSchemaBase(ABC):
 
     Subclass this to provide custom JSON schema generation and
     validation logic.  The default implementation is
-    :class:`AgentOutputSchema`.
+    ``AgentOutputSchema``.
 
     Methods:
         is_plain_text: Whether the output is unstructured text.
@@ -114,7 +114,7 @@ class AgentOutputSchemaBase(ABC):
             parameter when calling an LLM API.
 
         Raises:
-            ValueError: If called when :meth:`is_plain_text` is ``True``.
+            ValueError: If called when ``is_plain_text`` is ``True``.
         """
 
     @abstractmethod
@@ -301,11 +301,11 @@ class AgentOutputSchema(AgentOutputSchemaBase):
                 ``SchemaEnforcement.STRICT``.
 
                 - ``STRICT``: Full OpenAI strict-mode compliance via
-                  :func:`ensure_strict_schema`.
+                  ``ensure_strict_schema``.
                 - ``COMPACT``: Strict-mode compliance plus metadata
                   stripping for cost optimization.
                 - ``NORMALIZED``: Provider-agnostic normalization via
-                  :func:`normalize_schema`.
+                  ``normalize_schema``.
                 - ``NONE``: Raw schema as-is, no transformation.
         """
         self.output_schema: type[Any] | None = output_schema
@@ -386,7 +386,7 @@ class AgentOutputSchema(AgentOutputSchemaBase):
 
         Raises:
             ValueError: If the JSON is invalid, does not match, or
-                exceeds :data:`MAX_SCHEMA_BYTES` (256 KiB). The
+                exceeds ``MAX_SCHEMA_BYTES`` (256 KiB). The
                 size guard runs BEFORE ``json.loads`` so a
                 pathological payload cannot trigger deserialization
                 cost; it is a defence-in-depth bound on top of any
@@ -449,7 +449,7 @@ class AgentOutputSchema(AgentOutputSchemaBase):
     def schema_enforcement(self) -> SchemaEnforcement:
         """The configured enforcement level (``none``/``normalized``/``strict``/``compact``).
 
-        Distinct from :meth:`is_strict_json_schema`, which collapses
+        Distinct from ``is_strict_json_schema``, which collapses
         ``STRICT`` and ``COMPACT`` to a single boolean; this preserves the
         exact level so it can be round-tripped (e.g. by ``dump_agent``).
         """

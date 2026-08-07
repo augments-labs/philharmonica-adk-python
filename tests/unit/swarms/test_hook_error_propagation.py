@@ -1,14 +1,14 @@
-"""Unit tests for ``propagate_errors`` on :class:`SwarmHooks`.
+"""Unit tests for ``propagate_errors`` on ``SwarmHooks``.
 
 Covers:
 - A hook with ``propagate_errors=True`` causes the registry fan-out to
   re-raise, so the error reaches the caller.
 - A hook with ``propagate_errors=False`` (the default) has its error
   logged and swallowed — the registry call completes normally.
-- :class:`SwarmCheckpointerHooks` declares ``propagate_errors = True``
+- ``SwarmCheckpointerHooks`` declares ``propagate_errors = True``
   so a failed checkpointer save propagates to the caller.
 - End-to-end path: a fake checkpointer whose ``save`` raises is
-  registered on a :class:`HookRegistry`; firing ``on_swarm_turn_end``
+  registered on a ``HookRegistry``; firing ``on_swarm_turn_end``
   propagates the error.
 """
 

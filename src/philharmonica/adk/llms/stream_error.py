@@ -3,7 +3,7 @@
 When a provider stream errors mid-stream, a consumer awaiting the terminal
 ``done`` event (usage flush, transcript finalization) must not be left
 hanging while the exception surfaces elsewhere.
-:func:`stream_with_error_contract` wraps a provider ``_stream`` generator so a
+``stream_with_error_contract`` wraps a provider ``_stream`` generator so a
 mid-stream error emits a terminal ``done`` event with ``finish_reason="error"``
 and THEN re-raises — the error is never swallowed.
 

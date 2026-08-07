@@ -151,7 +151,7 @@ class Skill:
     guardrails: ToolGuardrails | None = None
     """Per-phase tool-level guardrails applied to every tool in this skill.
 
-    A single :class:`~philharmonica.adk.tools.tool_guardrails.ToolGuardrails`
+    A single ``ToolGuardrails``
     config object holds ``input`` and ``output`` phase-typed lists.
     ``None`` (default) means the skill adds no guardrails — each
     contained tool's own ``guardrails`` still applies.

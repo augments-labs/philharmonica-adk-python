@@ -51,7 +51,7 @@ class ToolContext[TContext]:
 
     _run_config: RunConfig | None = None
     """Framework-internal parent ``RunConfig``, reachable only via
-    :meth:`get_run_config`.
+    ``get_run_config``.
 
     Threaded by the runner so the agent-as-tool machinery can let a
     sub-agent inherit the parent's execution config. It is intentionally
@@ -146,7 +146,7 @@ class ExecutionAwareToolContext(ToolContext[TContext]):
     tokens: int = 0
     """Estimated token count of the current message history.
 
-    Computed by :class:`TokenCounter` before tool execution.
+    Computed by ``TokenCounter`` before tool execution.
     Useful for tools that want to adjust output verbosity based
     on how much context window is already consumed.
     """

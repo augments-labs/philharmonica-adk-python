@@ -2,9 +2,11 @@ name: Release — open PR
 
 # Step 1 of the release flow (see RELEASING.md). A maintainer triggers this
 # and picks the SemVer increment; commitizen rewrites both version locations
-# (pyproject.toml + src/philharmonica/adk/__init__.py) and folds the CHANGELOG
-# [Unreleased] section into a dated heading, then this opens a release PR.
-# Merging that PR fires release-tag.yml. Nothing is published to PyPI.
+# (pyproject.toml + src/philharmonica/adk/__init__.py), then this opens a
+# release PR. update_changelog_on_bump is off, so CHANGELOG.md is NOT touched
+# here — fold [Unreleased] into its dated heading on main first (RELEASING.md).
+# Merging that PR fires release-tag.yml, which tags AND publishes to PyPI.
+# This workflow itself publishes nothing.
 
 on:
   workflow_dispatch:
@@ -55,10 +57,13 @@ jobs:
           Automated release PR for **v${version}**.
 
           - Version bumped in \`pyproject.toml\` and \`src/philharmonica/adk/__init__.py\`.
-          - \`CHANGELOG.md\` \`[Unreleased]\` folded into the dated heading.
+          - \`CHANGELOG.md\` is untouched by this workflow; confirm \`main\` already carries the \`[${version}]\` heading.
 
           Review the version and changelog, confirm CI is green, then **merge as a merge commit**.
-          Merging tags \`v${version}\` and creates the GitHub Release with the built wheel + sdist attached.
+
+          > **Merging publishes.** It tags \`v${version}\`, creates the GitHub Release with the
+          > wheel + sdist attached, and uploads those same artifacts to PyPI. No approval is
+          > requested, and a version once on PyPI can never be reused.
           EOF
           )
           gh pr create --base main --head "$branch" \

@@ -16,8 +16,11 @@ release is a git tag `vX.Y.Z` on `main` plus a GitHub Release whose notes
 come from `CHANGELOG.md`. The release workflow builds the wheel and sdist,
 verifies them (twine check, clean-venv install, import + CLI smoke), and
 publishes to PyPI via **OIDC trusted publishing** — no long-lived API token.
-Publication requires the `pypi` GitHub Environment's required-reviewer
-approval (the owner): it is the point of no return.
+
+The `pypi` GitHub Environment restricts deployment to `release/v*` branches,
+so only a merged release PR can mint the OIDC token. There is no manual
+approval step: **merging the release PR publishes**, and a version number
+once uploaded to PyPI can never be reused. Merging is the point of no return.
 
 ## Choosing the version
 
@@ -143,32 +146,36 @@ by the maintainer, through the release workflow. A PR that edits the
 dated `CHANGELOG.md` heading, will be asked to drop it — two parallel PRs
 cannot both own the next number.
 
-Contributors *do* add `CHANGELOG.md` entries under `[Unreleased]`. The
-release folds those under the new dated heading.
+Contributors *do* add `CHANGELOG.md` entries under `[Unreleased]`.
 
 ## How a release is cut
 
 The flow is workflow-driven. [Commitizen](https://commitizen-tools.github.io/commitizen/)
-performs the atomic version bump — it keeps `pyproject.toml:version` and
-`src/philharmonica/adk/__init__.py:__version__` in lockstep and updates the
-CHANGELOG — and two GitHub Actions workflows orchestrate the rest.
+performs the atomic version bump, keeping `pyproject.toml:version` and
+`src/philharmonica/adk/__init__.py:__version__` in lockstep, and two GitHub
+Actions workflows orchestrate the rest.
 
-1. Decide the tier (above) for everything on `main` since the last tag.
-2. Run the **"Release — open PR"** workflow (Actions → that workflow → *Run
+`update_changelog_on_bump` is off, because the CHANGELOG is hand-maintained in
+Keep a Changelog form. Commitizen therefore does **not** touch `CHANGELOG.md`
+— step 1 below is not optional, and skipping it ships a release with no entry.
+
+1. Fold `[Unreleased]` into a dated `## [X.Y.Z] - YYYY-MM-DD` heading on `main`
+   and merge that first, so the release PR bumps a changelog that is already
+   correct.
+2. Decide the tier (above) for everything on `main` since the last tag.
+3. Run the **"Release — open PR"** workflow (Actions → that workflow → *Run
    workflow*) and choose the increment (`patch` / `minor` / `major`). It runs
    `cz bump --files-only --increment <tier>`, pushes a `release/vX.Y.Z`
    branch, and opens a PR against `main`.
-3. Review the PR: confirm the version, the CHANGELOG heading, and that CI is
-   green. Edit the CHANGELOG narrative if needed, then merge it as a normal
-   merge commit.
-4. Merging fires the **"Release — tag & publish artifacts"** workflow, which
-   verifies the merged `pyproject.toml` version matches the branch suffix,
-   tags `vX.Y.Z` on `main`, builds the wheel + sdist, and creates the GitHub
-   Release with those assets attached.
+4. Review the PR: confirm the version and that CI is green.
+5. Merging it as a normal merge commit fires the **"Release — tag & publish
+   artifacts"** workflow, which verifies the merged `pyproject.toml` version
+   matches the branch suffix, tags `vX.Y.Z` on `main`, builds the wheel +
+   sdist, and creates the GitHub Release with those assets attached.
 
-The wheel and sdist are published to PyPI via OIDC trusted publishing after
-the owner's `pypi` Environment approval; the GitHub Release references the
-published version.
+That same merge publishes the wheel and sdist to PyPI via OIDC trusted
+publishing — no approval is requested and the upload cannot be undone. Treat
+merging the release PR, not any later step, as the irreversible act.
 
 ## Local dry run
 

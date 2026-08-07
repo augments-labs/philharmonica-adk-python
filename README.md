@@ -2,14 +2,8 @@
 
 **Where language becomes action.**
 
-[![CI](https://github.com/augments-labs/philharmonica-adk-python/actions/workflows/ci.yml/badge.svg)](https://github.com/augments-labs/philharmonica-adk-python/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/augments-labs/philharmonica-adk-python/branch/main/graph/badge.svg)](https://codecov.io/gh/augments-labs/philharmonica-adk-python)
-
 A lightweight, provider-agnostic Python framework for orchestrating complex
 systems of agents that perform real-world actions, across 100+ LLMs via litellm.
-
-> [!NOTE]
-> The JavaScript/TypeScript version of this ADK will be released soon. Stay tuned!
 
 ## The concept
 

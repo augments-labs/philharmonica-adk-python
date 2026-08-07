@@ -5,8 +5,9 @@ name: Release — open PR
 # (pyproject.toml + src/philharmonica/adk/__init__.py), then this opens a
 # release PR. update_changelog_on_bump is off, so CHANGELOG.md is NOT touched
 # here — fold [Unreleased] into its dated heading on main first (RELEASING.md).
-# Merging that PR fires release-tag.yml, which tags AND publishes to PyPI.
-# This workflow itself publishes nothing.
+# Merging that PR fires release-tag.yml, which tags and builds; its success
+# then chains into release-publish.yml, which uploads to PyPI. This workflow
+# itself publishes nothing.
 
 on:
   workflow_dispatch:

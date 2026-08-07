@@ -8,8 +8,8 @@ holds typed config plus a user-supplied callable (``ShellTool.executor``,
 
 Public exports:
 
-- :class:`ShellTool` / :class:`ShellExecutor` — local shell-command tool.
-- :class:`ApplyPatchTool` / :class:`ApplyPatchEditor` — local
+- ``ShellTool`` / ``ShellExecutor`` — local shell-command tool.
+- ``ApplyPatchTool`` / ``ApplyPatchEditor`` — local
   file-patch editor.
 
 Tools NOT in this folder:

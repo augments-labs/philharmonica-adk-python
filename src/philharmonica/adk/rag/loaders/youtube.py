@@ -1,7 +1,7 @@
 """YouTube loaders — index video transcripts.
 
-:class:`YoutubeVideoLoader` loads a single video's transcript;
-:class:`YoutubeChannelLoader` enumerates a channel's uploads (via pytube) and
+``YoutubeVideoLoader`` loads a single video's transcript;
+``YoutubeChannelLoader`` enumerates a channel's uploads (via pytube) and
 loads each transcript, skipping videos with none. Transcripts come from
 ``youtube-transcript-api``; channel enumeration from ``pytube``. Install the
 ``rag-youtube`` extra. ``max_videos`` bounds channel ingestion.

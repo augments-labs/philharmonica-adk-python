@@ -6,17 +6,17 @@ standardises how an agent talks to its tools.
 
 This package ships two halves of the same protocol:
 
-* **Client side** — :class:`A2AAgent` is a ``BaseAgent`` peer-class
+* **Client side** — ``A2AAgent`` is a ``BaseAgent`` peer-class
   that wraps a remote A2A endpoint as **pure config**. Execute via
-  :class:`A2ARunner` for direct peer-style orchestration, or use
-  :meth:`A2AAgent.as_tool` to plug the remote into a local Agent's
+  ``A2ARunner`` for direct peer-style orchestration, or use
+  ``A2AAgent.as_tool`` to plug the remote into a local Agent's
   ``tools`` list (the same dual surface ``Agent`` itself has).
-* **Server side** — :class:`A2AServer` wraps a local Agent +
+* **Server side** — ``A2AServer`` wraps a local Agent +
   developer-authored ``AgentCard`` into a config object that
-  :func:`build_starlette_app` turns into an ASGI app the developer's
+  ``build_starlette_app`` turns into an ASGI app the developer's
   own ``uvicorn`` (or hypercorn / granian) instance serves.
 
-Long-running tasks are first-class via :class:`A2AContinuationToken`:
+Long-running tasks are first-class via ``A2AContinuationToken``:
 ``await A2ARunner.arun(agent, prompt, background=True)`` returns the
 typed token; ``await A2ARunner.arun(agent, prompt, continuation_token=token)``
 resumes from any process, and ``await A2ARunner.poll_task(agent, token)``
@@ -28,7 +28,7 @@ The ``a2a-sdk`` package is an optional extra. Install with::
 
 When the extra is missing, every public name in this module is ``None``;
 downstream code can branch on ``A2AAgent is None`` to skip A2A wiring
-gracefully. The mechanism mirrors :mod:`philharmonica.adk.mcp` exactly.
+gracefully. The mechanism mirrors ``philharmonica.adk.mcp`` exactly.
 """
 
 from typing import TYPE_CHECKING

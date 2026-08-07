@@ -126,14 +126,14 @@ class ToolSearchState:
 
     Created by ``build_tool_search()`` and stored on the returned
     FunctionTool's ``_search_state`` slot. Other modules access it via
-    :meth:`FunctionTool.get_search_state`.
+    ``FunctionTool.get_search_state``.
 
     Attributes:
         deferred: Tools the search tool can match against, keyed by
             their ``name``.
         _revealed_var: ``ContextVar`` holding the per-run revealed
             ``set``.  The ContextVar stores a *mutable* set that
-            :meth:`reset` binds fresh at the start of each run; reveals
+            ``reset`` binds fresh at the start of each run; reveals
             then mutate that set in place (``set.add``) rather than
             rebinding the ContextVar.  In-place mutation is what makes
             reveals survive a parallel tool batch: ``asyncio.gather``
@@ -141,16 +141,16 @@ class ToolSearchState:
             ``ContextVar.set`` inside a gather task would be lost to the
             parent — but mutating the shared set object the parent
             already bound is visible to the parent once the batch
-            completes.  Per-run isolation is still exact: :meth:`reset`
+            completes.  Per-run isolation is still exact: ``reset``
             binds a brand-new set into the current context at the start
             of every run, and concurrent ``Runner.arun()`` calls each
             run in their own task whose copied context carries its own
             binding.  Sequential ``await Runner.arun()`` calls share one
-            context, so the ``Runner`` calls :meth:`reset` to rebind a
+            context, so the ``Runner`` calls ``reset`` to rebind a
             fresh set before each run.
 
-    Use :meth:`revealed` to read the current run's set,
-    :meth:`reveal` to add a name to it, and :meth:`reset` to clear
+    Use ``revealed`` to read the current run's set,
+    ``reveal`` to add a name to it, and ``reset`` to clear
     the set at the start of a new run.
     """
 
@@ -247,7 +247,7 @@ def build_tool_search(
 
     Returns:
         A ``FunctionTool``. The framework's ``build_tools()`` reads the
-        attached :class:`ToolSearchState` via ``get_search_state()`` to
+        attached ``ToolSearchState`` via ``get_search_state()`` to
         find the per-run ``revealed`` set.
 
     Example::

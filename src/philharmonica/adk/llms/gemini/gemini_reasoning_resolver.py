@@ -2,7 +2,7 @@
 
 Reads from two sources, in priority order:
 
-1. :attr:`GeminiConfig.thinking_config` — typed
+1. ``GeminiConfig.thinking_config`` — typed
    ``google.genai.types.ThinkingConfig``. Highest priority.
 2. ``LLMConfig.extra_args["thinking_config"]`` — passthrough escape
    hatch for callers using a plain ``LLMConfig`` instance.
@@ -46,9 +46,9 @@ def resolve_thinking(config: LLMConfig) -> ThinkingConfig | None:
     """Resolve a thinking config from the LLMConfig.
 
     Args:
-        config: The LLM configuration. Either a :class:`GeminiConfig`
+        config: The LLM configuration. Either a ``GeminiConfig``
             with a typed ``thinking_config`` field, or a plain
-            :class:`LLMConfig` carrying the value under
+            ``LLMConfig`` carrying the value under
             ``extra_args["thinking_config"]``.
 
     Returns:

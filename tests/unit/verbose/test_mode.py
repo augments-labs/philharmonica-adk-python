@@ -1,6 +1,6 @@
-"""Tests for :mod:`philharmonica.adk.verbose.mode`.
+"""Tests for ``philharmonica.adk.verbose.mode``.
 
-Covers the full precedence ladder of :func:`resolve_mode` — explicit
+Covers the full precedence ladder of ``resolve_mode`` — explicit
 developer override, ``NO_COLOR`` / ``FORCE_COLOR`` envs, CI detection,
 TTY detection, and Rich-availability fallback — plus the individual
 environment probes.
@@ -44,7 +44,7 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
 class _TTYStream(io.StringIO):
     """Minimal TTY-looking stream for mode-resolution tests.
 
-    Inherits :class:`io.StringIO` (itself a ``TextIO``) and overrides
+    Inherits ``io.StringIO`` (itself a ``TextIO``) and overrides
     ``isatty`` so the stream looks like an interactive terminal. This
     avoids a ``cast(TextIO, ...)`` at call sites — the type is correct
     by inheritance.

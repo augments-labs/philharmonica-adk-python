@@ -1,4 +1,4 @@
-"""Tests for :mod:`philharmonica.adk.verbose.panel_renderer`.
+"""Tests for ``philharmonica.adk.verbose.panel_renderer``.
 
 Validates the CrewAI-faithful Rich-Panel backend using
 ``rich.console.Console(record=True)`` so assertions run against
@@ -6,7 +6,7 @@ captured text rather than real stdout. Covers:
 
 * block lifecycle (open → append → close → flush);
 * atomic one-shot rendering;
-* cleanup on interrupt via :meth:`PanelRenderer.close_all`;
+* cleanup on interrupt via ``PanelRenderer.close_all``;
 * event-kind border colours (cyan crew, yellow task / tool, magenta
   agent, green completion, red failure) — verdict-driven borders are
   no longer used for the canonical CrewAI events;
@@ -499,7 +499,7 @@ class TestToolUsageCounter:
 class TestJustStreamedFlagConsumption:
     """The just-streamed-final-answer flag is consumed by the
     ``VerboseHooks._dispatch_close`` path. The renderer exposes
-    :meth:`consume_just_streamed_flag` so the dispatch layer can read
+    ``consume_just_streamed_flag`` so the dispatch layer can read
     and reset it in one call.
     """
 
@@ -579,7 +579,7 @@ class TestEscapeMarkup:
 
 
 class _StubAgent:
-    """Minimal stand-in for :class:`Agent` for dispatch-path tests.
+    """Minimal stand-in for ``Agent`` for dispatch-path tests.
 
     ``VerboseHooks`` dispatch reads ``verbose`` (config override) and
     ``name`` off the agent — plus the optional capability attributes

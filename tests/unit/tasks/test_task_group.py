@@ -1,4 +1,4 @@
-"""Unit tests for :class:`TaskGroup` + :meth:`Runner.arun_task_group`.
+"""Unit tests for ``TaskGroup`` + ``Runner.arun_task_group``.
 
 Covers:
 

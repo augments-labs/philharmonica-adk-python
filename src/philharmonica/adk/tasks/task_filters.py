@@ -1,7 +1,7 @@
-"""Built-in :data:`TaskInputFilter` callables for common forwarding patterns.
+"""Built-in ``TaskInputFilter`` callables for common forwarding patterns.
 
-Mirrors :mod:`philharmonica.adk.handoffs.handoff_filters` for the
-task-dependency surface. Compose these via :func:`compose` to chain
+Mirrors ``philharmonica.adk.handoffs.handoff_filters`` for the
+task-dependency surface. Compose these via ``compose`` to chain
 multiple transforms; write a custom callable when you need richer
 control over what flows into a downstream task.
 
@@ -25,18 +25,18 @@ def forward_final_output(data: TaskInputData) -> TaskInputData:
     """Forward only the upstream task's ``final_output`` as a user message.
 
     The most common pattern: the downstream task receives just the
-    upstream's final answer, rendered as a single :class:`UserItem`.
+    upstream's final answer, rendered as a single ``UserItem``.
     Discards intermediate tool calls, reasoning, and message-output
     chunks.
 
     Args:
-        data: The :class:`TaskInputData` supplied by the runner for
+        data: The ``TaskInputData`` supplied by the runner for
             one upstream task's completion.
 
     Returns:
-        A clone of ``data`` with :attr:`TaskInputData.forwarded` set
+        A clone of ``data`` with ``TaskInputData.forwarded`` set
         to a single-element tuple containing the ``final_output``
-        rendered as a :class:`UserItem`, or an empty tuple when
+        rendered as a ``UserItem``, or an empty tuple when
         ``final_output`` is ``None``.
     """
     if data.output.final_output is None:
@@ -47,18 +47,18 @@ def forward_final_output(data: TaskInputData) -> TaskInputData:
 
 
 def forward_new_items(data: TaskInputData) -> TaskInputData:
-    """Forward the upstream's entire :attr:`TaskInputData.items` stream.
+    """Forward the upstream's entire ``TaskInputData.items`` stream.
 
     The downstream task sees the full upstream conversation —
     system / user / assistant / tool messages — as prepended input.
     Use when context fidelity matters more than token cost.
 
     Args:
-        data: The :class:`TaskInputData` supplied by the runner for
+        data: The ``TaskInputData`` supplied by the runner for
             one upstream task's completion.
 
     Returns:
-        A clone of ``data`` with :attr:`TaskInputData.forwarded` set
+        A clone of ``data`` with ``TaskInputData.forwarded`` set
         to the full ``items`` tuple.
     """
     return data.clone(forwarded=data.items)
@@ -69,17 +69,17 @@ def forward_messages_only(data: TaskInputData) -> TaskInputData:
 
     Strips system / user / tool-call / tool-result items, keeping
     just the agent's final answer chunks. Cheaper than
-    :func:`forward_new_items` when the downstream agent doesn't need
+    ``forward_new_items`` when the downstream agent doesn't need
     to see tool internals.
 
     Args:
-        data: The :class:`TaskInputData` supplied by the runner for
+        data: The ``TaskInputData`` supplied by the runner for
             one upstream task's completion.
 
     Returns:
-        A clone of ``data`` with :attr:`TaskInputData.forwarded` set
+        A clone of ``data`` with ``TaskInputData.forwarded`` set
         to the subset of ``items`` that are
-        :class:`~philharmonica.adk.types.items.items.MessageOutputItem`
+        ``MessageOutputItem``
         instances.
     """
     kept = tuple(item for item in data.items if isinstance(item, MessageOutputItem))
@@ -94,10 +94,10 @@ def keep_last_n(n: int) -> TaskInputFilter:
 
     Args:
         n: Number of trailing items to keep. Negative values raise
-            :class:`ValueError`.
+            ``ValueError``.
 
     Returns:
-        A :data:`TaskInputFilter` that slices the upstream's items.
+        A ``TaskInputFilter`` that slices the upstream's items.
     """
     if n < 0:
         raise ValueError(f"keep_last_n requires n >= 0, got {n}.")
@@ -116,14 +116,14 @@ def compose(*filters: TaskInputFilter) -> TaskInputFilter:
     stage. The result is the final stage's output.
 
     Args:
-        *filters: One or more :data:`TaskInputFilter` instances. An
+        *filters: One or more ``TaskInputFilter`` instances. An
             empty tuple is acceptable: the result is a passthrough
-            that returns the input :class:`TaskInputData` unchanged,
+            that returns the input ``TaskInputData`` unchanged,
             leaving ``forwarded`` at its incoming value (``None`` when
             called by the runner, so nothing flows downstream).
 
     Returns:
-        A single :data:`TaskInputFilter` running the stages in order.
+        A single ``TaskInputFilter`` running the stages in order.
     """
 
     def _filter(data: TaskInputData) -> TaskInputData:

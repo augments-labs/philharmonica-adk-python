@@ -1,4 +1,4 @@
-"""Unit tests for :class:`FlowDefinition` and :func:`build_flow_definition`.
+"""Unit tests for ``FlowDefinition`` and ``build_flow_definition``.
 
 Stage 1 acceptance criteria:
 - Definition derived from a representative flow matches the decorator topology.
@@ -147,7 +147,7 @@ class TestBuildFlowDefinitionTopology:
         (they could never execute), but ``build_flow_definition`` silently
         accepted them — producing a ``FlowDefinition`` for an unrunnable
         flow. Both build paths now reject with the same
-        :class:`FlowDefinitionError`.
+        ``FlowDefinitionError``.
         """
         reg = _reg(
             frozenset({"a", "b"}),

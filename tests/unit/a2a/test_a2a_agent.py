@@ -1,7 +1,7 @@
 """Tests for ``A2AAgent`` — peer-agent class for remote A2A endpoints.
 
 ``A2AAgent`` is pure config — execution lives on
-:class:`philharmonica.adk.a2a.a2a_runner.A2ARunner` (covered by
+``philharmonica.adk.a2a.a2a_runner.A2ARunner`` (covered by
 ``test_a2a_runner.py``). This module verifies:
 
 * ``A2AAgent`` is a ``BaseAgent`` subclass with the expected inherited

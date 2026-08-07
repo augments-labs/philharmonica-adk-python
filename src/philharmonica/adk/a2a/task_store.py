@@ -1,13 +1,13 @@
 """Persistent and in-memory task stores for the A2A executor.
 
-:class:`TaskStore` is the narrow protocol all stores satisfy. Two
+``TaskStore`` is the narrow protocol all stores satisfy. Two
 implementations ship out of the box:
 
-* :class:`InMemoryTaskStore` — identical to the original in-memory dict
+* ``InMemoryTaskStore`` — identical to the original in-memory dict
   behavior of ``A2AExecutor``. Zero new dependencies; chosen automatically
   when no ``task_store`` argument is supplied.
-* :class:`SQLiteTaskStore` — durable store backed by
-  :class:`~philharmonica.adk.databases.connections.sqlite.SQLiteDatabaseConnection`.
+* ``SQLiteTaskStore`` — durable store backed by
+  ``SQLiteDatabaseConnection``.
   Enables restart recovery and bounded retention (TTL and/or max-rows).
 
 Wire types (``a2a.types.Task``) are serialized via
@@ -17,8 +17,8 @@ never imports ``a2a.types``.
 
 Startup recovery
 ----------------
-On construction, :class:`SQLiteTaskStore` (and any caller that uses it)
-should call :meth:`SQLiteTaskStore.recover_on_startup` once.  It scans rows
+On construction, ``SQLiteTaskStore`` (and any caller that uses it)
+should call ``SQLiteTaskStore.recover_on_startup`` once.  It scans rows
 whose status is not a terminal state (COMPLETED / FAILED / CANCELED /
 REJECTED) and rewrites them to ``TASK_STATE_FAILED``.
 
@@ -33,7 +33,7 @@ explicit checkpoint/replay logic that this executor does not implement.
 
 Bounded retention (R3)
 -----------------------
-:class:`SQLiteTaskStore` accepts two optional retention bounds (both
+``SQLiteTaskStore`` accepts two optional retention bounds (both
 default to conservative values):
 
 * ``ttl_seconds`` — terminal tasks older than this many seconds are swept
@@ -43,7 +43,7 @@ default to conservative values):
   Default: 1 000.
 
 Both values can be disabled by passing ``0`` (or ``None``).  The sweep
-runs on :meth:`save` to amortize cost across writes without a background
+runs on ``save`` to amortize cost across writes without a background
 thread.
 """
 
@@ -106,18 +106,18 @@ class TaskStore(Protocol):
     """
 
     async def get(self, task_id: str) -> Task | None:
-        """Return the stored :class:`~a2a.types.Task`, or ``None``.
+        """Return the stored ``Task``, or ``None``.
 
         Args:
             task_id: The A2A task identifier.
 
         Returns:
-            The :class:`~a2a.types.Task` if found, otherwise ``None``.
+            The ``Task`` if found, otherwise ``None``.
         """
         ...
 
     async def save(self, task: Task) -> None:
-        """Upsert a :class:`~a2a.types.Task` by its ``id`` field.
+        """Upsert a ``Task`` by its ``id`` field.
 
         Args:
             task: The task to persist.  The ``id`` field acts as the
@@ -144,7 +144,7 @@ class TaskStore(Protocol):
                 INPUT_REQUIRED / AUTH_REQUIRED / UNSPECIFIED).
 
         Returns:
-            A list of matching :class:`~a2a.types.Task` objects in
+            A list of matching ``Task`` objects in
             unspecified order.
         """
         ...
@@ -160,10 +160,10 @@ _DEFAULT_MAX_TASKS = 1_000
 
 
 class InMemoryTaskStore:
-    """In-memory :class:`TaskStore` backed by a plain dict.
+    """In-memory ``TaskStore`` backed by a plain dict.
 
     This is the default when no ``task_store`` is passed to
-    :class:`~philharmonica.adk.a2a.executor.A2AExecutor`.  A typed dict wrapper
+    ``A2AExecutor``.  A typed dict wrapper
     with no dependencies beyond the ``a2a`` extra and no I/O cost.
 
     Bounded retention (R3)
@@ -200,7 +200,7 @@ class InMemoryTaskStore:
             task_id: The A2A task identifier.
 
         Returns:
-            The stored :class:`~a2a.types.Task`, or ``None`` if not found.
+            The stored ``Task``, or ``None`` if not found.
         """
         return self._tasks.get(task_id)
 
@@ -267,9 +267,9 @@ _DEFAULT_MAX_TERMINAL_ROWS = 1_000
 
 
 class SQLiteTaskStore:
-    """Durable :class:`TaskStore` backed by a SQLite database.
+    """Durable ``TaskStore`` backed by a SQLite database.
 
-    Uses :class:`~philharmonica.adk.databases.connections.sqlite.SQLiteDatabaseConnection`
+    Uses ``SQLiteDatabaseConnection``
     (including its ``0o600`` file-hardening).  Each method opens a
     short-lived connection via the context manager, matching the
     session/memory module pattern.
@@ -284,11 +284,11 @@ class SQLiteTaskStore:
     Retention
     ---------
     ``ttl_seconds`` and ``max_terminal_rows`` bound how many terminal-task
-    rows accumulate.  The sweep runs on every :meth:`save` call.
+    rows accumulate.  The sweep runs on every ``save`` call.
 
     Args:
         db: An already-constructed
-            :class:`~philharmonica.adk.databases.connections.sqlite.SQLiteDatabaseConnection`.
+            ``SQLiteDatabaseConnection``.
             The caller owns its lifetime.
         ttl_seconds: Delete terminal tasks older than this many seconds.
             Pass ``0`` to disable TTL sweeps.  Default: 86 400 (24 h).
@@ -339,7 +339,7 @@ class SQLiteTaskStore:
             task_id: The A2A task identifier.
 
         Returns:
-            The deserialized :class:`~a2a.types.Task`, or ``None`` if not
+            The deserialized ``Task``, or ``None`` if not
             found.
         """
         await self._ensure_ready()
@@ -401,7 +401,7 @@ class SQLiteTaskStore:
                 ``False`` return non-terminal tasks.
 
         Returns:
-            A list of :class:`~a2a.types.Task` objects.
+            A list of ``Task`` objects.
         """
         await self._ensure_ready()
         terminal_states = tuple(_TERMINAL_STATES)
@@ -499,7 +499,7 @@ def _serialize(task: Task) -> str:
     via ParseDict works without extra configuration.
 
     Args:
-        task: The :class:`~a2a.types.Task` to serialize.
+        task: The ``Task`` to serialize.
 
     Returns:
         A JSON string representation of the task.
@@ -511,10 +511,10 @@ def _deserialize(task_json: str) -> Task:
     """Deserialize a JSON string back to a protobuf Task.
 
     Args:
-        task_json: JSON string previously produced by :func:`_serialize`.
+        task_json: JSON string previously produced by ``_serialize``.
 
     Returns:
-        A :class:`~a2a.types.Task` with fields populated from the JSON.
+        A ``Task`` with fields populated from the JSON.
     """
     return ParseDict(json.loads(task_json), Task())
 

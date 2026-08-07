@@ -8,18 +8,18 @@ by ``thread_id``. Useful for:
 - Single-process demos where a crash recovery story isn't needed.
 
 For durable, multi-process or crash-recoverable runs use
-:class:`~philharmonica.adk.graphs.checkpointers.sqlite.SQLiteCheckpointer`.
+``SQLiteCheckpointer``.
 
-Design mirrors :class:`~philharmonica.adk.session.sqlite_session.SQLiteSession`
+Design mirrors ``SQLiteSession``
 in structure (``save`` / ``load`` / ``list`` / ``delete``) so users who
 graduate to the SQLite implementation swap one import and nothing
 else.
 
-The checkpointer subscribes to :meth:`GraphHooks.on_node_end` and
-:meth:`GraphHooks.on_graph_end` via the hook-provider pattern (through
-:class:`~philharmonica.adk.graphs.checkpointers.hooks.CheckpointerHooks`).
-Every node completion persists the current :class:`GraphState`. The
-graph loop itself never calls :meth:`save` — it just fires hooks.
+The checkpointer subscribes to ``GraphHooks.on_node_end`` and
+``GraphHooks.on_graph_end`` via the hook-provider pattern (through
+``CheckpointerHooks``).
+Every node completion persists the current ``GraphState``. The
+graph loop itself never calls ``save`` — it just fires hooks.
 """
 
 from __future__ import annotations
@@ -43,15 +43,15 @@ logger = logging.getLogger(__name__)
 
 
 class InMemoryCheckpointer(Checkpointer):
-    """In-process, dict-backed :class:`Checkpointer` implementation.
+    """In-process, dict-backed ``Checkpointer`` implementation.
 
-    Every checkpoint lives in :attr:`_store` keyed by ``thread_id``.
+    Every checkpoint lives in ``_store`` keyed by ``thread_id``.
     Thread-safe for async callers inside one event loop because all
     ops are effectively synchronous; multi-thread use requires the
     caller to add its own lock.
 
     Attributes:
-        _store: Per-``thread_id`` latest :class:`GraphCheckpoint`.
+        _store: Per-``thread_id`` latest ``GraphCheckpoint``.
             Only one checkpoint is retained per thread — time-travel
             (replay from any superstep) is not supported and would
             require a list-per-thread shape.
@@ -87,7 +87,7 @@ class InMemoryCheckpointer(Checkpointer):
         thread_id: str,
         graph: Graph[Any],
     ) -> GraphState[Any] | None:
-        """Return the rehydrated :class:`GraphState` for ``thread_id``.
+        """Return the rehydrated ``GraphState`` for ``thread_id``.
 
         Returns ``None`` when no checkpoint exists. Raises ``ValueError``
         when the checkpoint's ``graph_id`` doesn't match ``graph.id``.

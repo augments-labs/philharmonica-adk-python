@@ -1,13 +1,13 @@
 """Fluent helpers for wiring an OpenTelemetry pipeline.
 
-:func:`setup_otel` installs a ``TracerProvider`` with a
+``setup_otel`` installs a ``TracerProvider`` with a
 ``BatchSpanProcessor(OTLPSpanExporter)`` (and an optional
-``ConsoleSpanExporter``) and returns an :class:`OTelTracer` ready to be
-handed to :func:`philharmonica.adk.tracing.set_tracer`. It reads
+``ConsoleSpanExporter``) and returns an ``OTelTracer`` ready to be
+handed to ``philharmonica.adk.tracing.set_tracer``. It reads
 ``OTEL_EXPORTER_OTLP_ENDPOINT`` when ``endpoint`` is ``None`` so users
 following the upstream conventions need zero keyword arguments.
 
-:func:`setup_otel_from_env` is a thin convenience wrapper driven by the
+``setup_otel_from_env`` is a thin convenience wrapper driven by the
 standard ``OTEL_*`` environment variables
 (``OTEL_EXPORTER_OTLP_ENDPOINT``, ``OTEL_EXPORTER_OTLP_HEADERS``,
 ``OTEL_SERVICE_NAME``).  Endpoint and headers are read natively by the
@@ -18,7 +18,7 @@ explicitly — the framework never invokes it automatically.
 The helpers are intentionally thin: advanced configurations (multiple
 processors, custom resource attributes, sampler tuning) should
 construct the ``TracerProvider`` directly and pass it to
-:class:`OTelTracer`.
+``OTelTracer``.
 
 Example::
 
@@ -54,7 +54,7 @@ def setup_otel(
     headers: dict[str, str] | None = None,
     convention: TracingConvention = TracingConvention.DEFAULT,
 ) -> OTelTracer:
-    """Install an OTel :class:`TracerProvider` and return an :class:`OTelTracer`.
+    """Install an OTel ``TracerProvider`` and return an ``OTelTracer``.
 
     Args:
         endpoint: OTLP collector endpoint (e.g. ``http://localhost:4317``).
@@ -82,7 +82,7 @@ def setup_otel(
             Phoenix/Arize).
 
     Returns:
-        An :class:`OTelTracer` bound to the new provider.
+        An ``OTelTracer`` bound to the new provider.
 
     Raises:
         TracingDependencyError: When the ``opentelemetry`` packages are
@@ -142,14 +142,14 @@ def setup_otel_from_env(
 ) -> OTelTracer:
     """Set up an OTel pipeline driven entirely by standard ``OTEL_*`` env vars.
 
-    This is a convenience wrapper around :func:`setup_otel` driven by the
+    This is a convenience wrapper around ``setup_otel`` driven by the
     standard ``OTEL_*`` environment variables.  Endpoint and headers are read
     natively by the OpenTelemetry SDK; ``OTEL_SERVICE_NAME`` is resolved
     explicitly and threaded into the ``service.name`` resource attribute.
     The relevant variables are:
 
     * ``OTEL_EXPORTER_OTLP_ENDPOINT`` — collector endpoint (e.g.
-      ``http://localhost:4317``).  **Required** (or the signal-specific ``OTEL_EXPORTER_OTLP_TRACES_ENDPOINT``) — raises :class:`ValueError`
+      ``http://localhost:4317``).  **Required** (or the signal-specific ``OTEL_EXPORTER_OTLP_TRACES_ENDPOINT``) — raises ``ValueError``
       when unset or empty so the misconfiguration is immediately visible
       rather than silently shipping spans to a default address.
     * ``OTEL_EXPORTER_OTLP_HEADERS`` — comma-separated ``key=value`` pairs
@@ -171,7 +171,7 @@ def setup_otel_from_env(
             Defaults to ``TracingConvention.DEFAULT``.
 
     Returns:
-        An :class:`OTelTracer` bound to the new provider.
+        An ``OTelTracer`` bound to the new provider.
 
     Raises:
         ValueError: When ``OTEL_EXPORTER_OTLP_ENDPOINT`` is not set or is

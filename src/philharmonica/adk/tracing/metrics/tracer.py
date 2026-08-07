@@ -40,7 +40,7 @@ class MetricSpan[TData: SpanData](Span[TData]):
 
         Args:
             data: Typed span-data payload.
-            on_finish: Callable invoked at :meth:`finish` with
+            on_finish: Callable invoked at ``finish`` with
                 ``(data, duration_ms, error)``. Pass ``None`` for span
                 kinds that have no associated instrument.
         """
@@ -72,7 +72,7 @@ class MetricsTracer:
         """Construct a metrics tracer backed by the given instruments.
 
         Args:
-            instruments: The :class:`~philharmonica.adk.tracing.metrics.instruments.Instruments`
+            instruments: The ``Instruments``
                 instance that owns the OTel histogram and counter handles.
         """
         self._inst = instruments
@@ -84,7 +84,7 @@ class MetricsTracer:
             data: Span data for the agent turn.
 
         Returns:
-            A :class:`MetricSpan` that records ``philharmonica.agent.turn.duration_ms``
+            A ``MetricSpan`` that records ``philharmonica.agent.turn.duration_ms``
             at finish.
         """
         return MetricSpan(data, self._record_agent)
@@ -96,7 +96,7 @@ class MetricsTracer:
             data: Span data for the function tool call.
 
         Returns:
-            A :class:`MetricSpan` that increments ``philharmonica.agent.tool.calls``
+            A ``MetricSpan`` that increments ``philharmonica.agent.tool.calls``
             at finish.
         """
         return MetricSpan(data, self._record_function)
@@ -108,7 +108,7 @@ class MetricsTracer:
             data: Span data for the LLM generation turn.
 
         Returns:
-            A :class:`MetricSpan` that records token histograms and the
+            A ``MetricSpan`` that records token histograms and the
             ``philharmonica.llm.requests`` counter at finish.
         """
         return MetricSpan(data, self._record_generation)
@@ -120,7 +120,7 @@ class MetricsTracer:
             data: Span data for the provider response.
 
         Returns:
-            A :class:`MetricSpan` with no ``on_finish`` callback.
+            A ``MetricSpan`` with no ``on_finish`` callback.
         """
         return MetricSpan(data, None)
 
@@ -131,7 +131,7 @@ class MetricsTracer:
             data: Span data for the handoff.
 
         Returns:
-            A :class:`MetricSpan` with no ``on_finish`` callback.
+            A ``MetricSpan`` with no ``on_finish`` callback.
         """
         return MetricSpan(data, None)
 
@@ -142,7 +142,7 @@ class MetricsTracer:
             data: Span data for the guardrail evaluation.
 
         Returns:
-            A :class:`MetricSpan` with no ``on_finish`` callback.
+            A ``MetricSpan`` with no ``on_finish`` callback.
         """
         return MetricSpan(data, None)
 
@@ -158,7 +158,7 @@ class MetricsTracer:
             data: Span data for the custom span.
 
         Returns:
-            A :class:`MetricSpan` bound to the appropriate instrument
+            A ``MetricSpan`` bound to the appropriate instrument
             callback, or a no-record span when the type has no instrument.
         """
         inner = data.data.get("type")

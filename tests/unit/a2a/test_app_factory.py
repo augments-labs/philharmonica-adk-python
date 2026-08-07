@@ -1,7 +1,7 @@
 """Tests for ``build_starlette_app`` executor / task-store wiring.
 
 Covers the contract that ``A2AServer.executor_task_store`` is forwarded to
-the :class:`A2AExecutor` the factory builds, so a developer can inject a
+the ``A2AExecutor`` the factory builds, so a developer can inject a
 framework ``TaskStore`` (e.g. ``SQLiteTaskStore``) for executor-level
 restart recovery. Without forwarding, the executor always falls back to an
 in-memory store and ``recover_on_startup`` is unreachable.

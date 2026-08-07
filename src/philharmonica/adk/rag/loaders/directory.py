@@ -1,7 +1,7 @@
 """Directory loader — fans every recognised file out to its format loader.
 
 Walks a directory, routes each file with a supported extension through
-:func:`resolve_loader`, and aggregates the results. Files with an unsupported
+``resolve_loader``, and aggregates the results. Files with an unsupported
 extension are skipped silently; files whose loader needs a missing optional
 package, or that fail to parse, are skipped with a logged warning so one bad
 file never aborts indexing the rest of the corpus.

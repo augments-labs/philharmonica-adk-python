@@ -8,16 +8,16 @@ A graph run layers hook scopes the same way a swarm run does:
    swarm, unchanged.
 4. ``GraphHooks`` (new, this file) — graph-wide lifecycle callbacks.
 
-The key architectural insight is that the :class:`Checkpointer`
-protocol extends :class:`HookProvider`. The graph loop never calls
+The key architectural insight is that the ``Checkpointer``
+protocol extends ``HookProvider``. The graph loop never calls
 ``checkpointer.save()`` directly — it just fires hooks, and the
-checkpointer implements :meth:`GraphHooks.on_node_end` /
-:meth:`GraphHooks.on_graph_end` to persist state. This keeps the
+checkpointer implements ``GraphHooks.on_node_end`` /
+``GraphHooks.on_graph_end`` to persist state. This keeps the
 loop code pure of persistence concerns and makes checkpointers
 swappable without touching the loop. Strands pioneered this
 pattern; LangGraph bakes checkpointing into the engine.
 
-:class:`HookRegistry` aggregates multiple hook providers and
+``HookRegistry`` aggregates multiple hook providers and
 collects interrupt exceptions (for human-in-the-loop pauses).
 Multiple hooks on the same event can each request interrupts; the
 registry gathers them all rather than short-circuiting on the first
@@ -52,17 +52,17 @@ class GraphHooks[TContext]:
     All methods are async and optional — override only what you need.
     The graph driver calls these at well-defined boundaries:
 
-    - :meth:`on_graph_start` — once, before the first superstep.
-    - :meth:`on_superstep_start` — before each superstep.
-    - :meth:`on_node_start` — before each node invocation.
-    - :meth:`on_node_end` — after each node invocation.
-    - :meth:`on_node_error` — on node exception (when fail_fast=False).
-    - :meth:`on_node_interrupt` — when a node raises
+    - ``on_graph_start`` — once, before the first superstep.
+    - ``on_superstep_start`` — before each superstep.
+    - ``on_node_start`` — before each node invocation.
+    - ``on_node_end`` — after each node invocation.
+    - ``on_node_error`` — on node exception (when fail_fast=False).
+    - ``on_node_interrupt`` — when a node raises
       ``InterruptException`` to suspend (HITL or nested-agent defer).
-    - :meth:`on_superstep_end` — after each superstep, including the
+    - ``on_superstep_end`` — after each superstep, including the
       list of node ids that fired.
-    - :meth:`on_graph_end` — once, after the last superstep, before
-      :class:`GraphRunResult` is returned.
+    - ``on_graph_end`` — once, after the last superstep, before
+      ``GraphRunResult`` is returned.
 
     The base-class methods are no-ops that ``del`` their parameters
     to silence linters — same pattern as ``SwarmHooks``.
@@ -88,7 +88,7 @@ class GraphHooks[TContext]:
 
         Args:
             context: Run context for the graph run.
-            state: Initial :class:`GraphState` (``superstep == 0``).
+            state: Initial ``GraphState`` (``superstep == 0``).
         """
         del context, state
 
@@ -115,13 +115,13 @@ class GraphHooks[TContext]:
         node_id: str,
         input: ExecutableInput,
     ) -> None:
-        """Called before a node's :meth:`Executable.invoke`.
+        """Called before a node's ``Executable.invoke``.
 
         Args:
             context: Run context.
             state: Current graph state.
             node_id: Id of the node about to fire.
-            input: The :class:`ExecutableInput` being passed in.
+            input: The ``ExecutableInput`` being passed in.
         """
         del context, state, node_id, input
 
@@ -132,9 +132,9 @@ class GraphHooks[TContext]:
         node_id: str,
         result: NodeResult,
     ) -> None:
-        """Called after a node's :meth:`Executable.invoke` returns cleanly.
+        """Called after a node's ``Executable.invoke`` returns cleanly.
 
-        This is where :class:`Checkpointer` persists state — it
+        This is where ``Checkpointer`` persists state — it
         overrides this method to call ``self.save(state)``.
 
         Args:
@@ -142,7 +142,7 @@ class GraphHooks[TContext]:
             state: Current graph state (``result`` is already
                 recorded on the state).
             node_id: Id of the node that just fired.
-            result: Its :class:`NodeResult`.
+            result: Its ``NodeResult``.
         """
         del context, state, node_id, result
 
@@ -155,14 +155,14 @@ class GraphHooks[TContext]:
     ) -> None:
         """Called when a node raises.
 
-        Fires even when :attr:`GraphConfig.fail_fast` is ``True`` —
+        Fires even when ``GraphConfig.fail_fast`` is ``True`` —
         ``fail_fast`` controls sibling cancellation, not hook
         emission. An observability hook may still want to record
         the error.
 
         ``InterruptException`` is NOT delivered here — it is a
         cooperative pause, not a failure. See
-        :meth:`on_node_interrupt`.
+        ``on_node_interrupt``.
 
         Args:
             context: Run context.
@@ -185,8 +185,8 @@ class GraphHooks[TContext]:
         captures the interrupt and before the superstep ends. The
         concrete ``Interrupt`` subclass distinguishes the cause:
 
-        - :class:`Interrupt` — HITL ``request_human_input``.
-        - :class:`NestedAgentInterrupt` — an inner agent deferred a
+        - ``Interrupt`` — HITL ``request_human_input``.
+        - ``NestedAgentInterrupt`` — an inner agent deferred a
           tool call; the outer graph node is parking for the reply.
 
         Siblings in the same superstep still run; the run as a whole
@@ -196,7 +196,7 @@ class GraphHooks[TContext]:
             context: Run context.
             state: Current graph state.
             node_id: Id of the node that suspended.
-            interrupt: The :class:`Interrupt` payload (subclassed for
+            interrupt: The ``Interrupt`` payload (subclassed for
                 nested-agent suspends).
         """
         del context, state, node_id, interrupt
@@ -214,7 +214,7 @@ class GraphHooks[TContext]:
             context: Run context.
             state: Current graph state.
             fired_nodes: Node ids that fired this superstep (same
-                order as :meth:`on_superstep_start.ready_nodes`
+                order as ``on_superstep_start.ready_nodes``
                 except for nodes that errored).
             items: Layer 3 items produced during this superstep.
         """
@@ -235,7 +235,7 @@ class GraphHooks[TContext]:
         Args:
             context: Run context.
             state: Final graph state.
-            status: Terminal :class:`GraphRunStatus`.
+            status: Terminal ``GraphRunStatus``.
             final_output: Aggregate graph output.
         """
         del context, state, status, final_output
@@ -243,9 +243,9 @@ class GraphHooks[TContext]:
 
 @runtime_checkable
 class HookProvider(Protocol):
-    """Objects that can attach themselves to a :class:`HookRegistry`.
+    """Objects that can attach themselves to a ``HookRegistry``.
 
-    A :class:`Checkpointer` implements this Protocol and uses it to
+    A ``Checkpointer`` implements this Protocol and uses it to
     subscribe to the hooks it cares about (``on_node_end``,
     ``on_graph_end``). User code implements it to attach arbitrary
     observers to a graph run.
@@ -258,19 +258,19 @@ class HookProvider(Protocol):
     def register(self, registry: HookRegistry) -> None:
         """Register this provider's callbacks on the supplied registry.
 
-        Called once at the start of :func:`run_graph_loop` for every
+        Called once at the start of ``run_graph_loop`` for every
         attached provider.
         """
         ...
 
 
 class HookRegistry:
-    """Aggregates multiple :class:`GraphHooks` and :class:`HookProvider`\\ s.
+    """Aggregates multiple ``GraphHooks`` and ``HookProvider``\\ s.
 
     The graph loop calls ``registry.on_*`` exactly once per event;
     the registry fans out to every attached hook. This lets a graph
-    run attach both a :class:`GraphHooks` (the plain lifecycle
-    observer) and one or more :class:`Checkpointer` instances
+    run attach both a ``GraphHooks`` (the plain lifecycle
+    observer) and one or more ``Checkpointer`` instances
     without the loop needing to know about either.
 
     Errors from observer hooks (``propagate_errors=False``) are logged
@@ -284,15 +284,15 @@ class HookRegistry:
         self._hooks: list[GraphHooks[Any]] = []
 
     def add(self, hooks: GraphHooks[Any]) -> None:
-        """Attach a :class:`GraphHooks` instance."""
+        """Attach a ``GraphHooks`` instance."""
         self._hooks.append(hooks)
 
     def add_provider(self, provider: HookProvider) -> None:
-        """Attach a :class:`HookProvider`.
+        """Attach a ``HookProvider``.
 
         The provider is asked to register itself on this registry —
-        most providers will call :meth:`add` with their own
-        :class:`GraphHooks` implementation.
+        most providers will call ``add`` with their own
+        ``GraphHooks`` implementation.
         """
         provider.register(self)
 

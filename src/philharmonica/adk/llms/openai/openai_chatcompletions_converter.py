@@ -403,8 +403,8 @@ class OpenAIChatCompletionsConverter:
         the Chat Completions function-tool shape. The Chat Completions
         ``tools=`` array does NOT accept hosted tool params — for web
         search and similar capabilities, use the ``web_search_options``
-        config field on :class:`OpenAIChatCompletionsConfig` instead.
-        Hosted-tool variants raise :class:`UnsupportedHostedToolError`
+        config field on ``OpenAIChatCompletionsConfig`` instead.
+        Hosted-tool variants raise ``UnsupportedHostedToolError``
         with a message pointing at the alternative path.
         """
         from pydantic import BaseModel
@@ -507,7 +507,7 @@ class OpenAIChatCompletionsConverter:
     ) -> Optional[ResponseFormatJSONSchema]:
         """Build a Chat Completions ``response_format`` value.
 
-        Returns a :class:`ResponseFormatJSONSchema` TypedDict (the
+        Returns a ``ResponseFormatJSONSchema`` TypedDict (the
         ``type: "json_schema"`` variant of the SDK's
         ``completion_create_params.ResponseFormat`` union). Capability
         downgrade to ``json_object`` / ``text`` is the caller's

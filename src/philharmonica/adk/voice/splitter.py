@@ -39,7 +39,7 @@ def sentence_splitter(min_sentence_length: int = DEFAULT_MIN_SENTENCE_LENGTH) ->
             it is spoken. Must be positive.
 
     Returns:
-        A :data:`TextSplitter` callable.
+        A ``TextSplitter`` callable.
 
     Raises:
         ValueError: When ``min_sentence_length`` is not positive.

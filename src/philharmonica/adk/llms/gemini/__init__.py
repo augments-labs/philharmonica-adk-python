@@ -3,7 +3,7 @@
 Calls the Gemini API directly via the ``google-genai`` SDK
 — no litellm indirection. Supports both the public Gemini Developer
 API (api_key auth) and Vertex AI (project + location + credentials)
-in a single :class:`GeminiLLM` class via the SDK's built-in dispatch.
+in a single ``GeminiLLM`` class via the SDK's built-in dispatch.
 
 Provider-hosted capabilities (Google Search grounding, code execution,
 URL context) are wired via the typed framework hosted-tool classes

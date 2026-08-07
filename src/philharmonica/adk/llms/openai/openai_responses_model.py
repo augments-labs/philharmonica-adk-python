@@ -3,13 +3,13 @@
 Calls ``openai.AsyncOpenAI().responses.create()`` directly — no litellm
 layer. Input items and output items round-trip through
 ``openai.types.responses.*`` via
-:class:`OpenAIResponsesConverter`; wire types never leak outside this
+``OpenAIResponsesConverter``; wire types never leak outside this
 module's call sites.
 
 Provider-native hosted capabilities (web_search, file_search,
 computer_use, image_generation, code_interpreter, hosted MCP servers,
 …) are NOT wrapped in framework tool classes — pass the raw provider
-JSON through :attr:`LLMConfig.extra_body` or :attr:`LLMConfig.extra_args`.
+JSON through ``LLMConfig.extra_body`` or ``LLMConfig.extra_args``.
 
 Usage::
 
@@ -88,8 +88,8 @@ class OpenAIResponsesLLM(LLM):
     ``truncation``, ``service_tier``, ``prompt_cache_key``,
     ``prompt_cache_retention``, ``max_tool_calls``, ``background``)
     are routed verbatim onto the corresponding SDK parameters when an
-    :class:`OpenAIResponsesConfig` instance is supplied; the generic
-    :class:`LLMConfig` base provides ``temperature`` / ``top_p`` /
+    ``OpenAIResponsesConfig`` instance is supplied; the generic
+    ``LLMConfig`` base provides ``temperature`` / ``top_p`` /
     ``max_output_tokens`` / ``top_logprobs`` / ``tool_choice`` /
     ``tool_execution_mode`` and the ``extra_*`` escape hatches.
 
@@ -103,7 +103,7 @@ class OpenAIResponsesLLM(LLM):
         project: Optional OpenAI project ID.
         max_retries: SDK-level retries for transient errors (default 0 —
             disabled). Set to a positive value to enable SDK-level retries.
-            Independent of :attr:`LLMConfig.retry_policy`, which runs
+            Independent of ``LLMConfig.retry_policy``, which runs
             one layer up with framework-owned classification.
     """
 
@@ -200,7 +200,7 @@ class OpenAIResponsesLLM(LLM):
 
         Orchestrates: convert → resolve params → API call →
         parse/stream. Non-streaming calls route through
-        :func:`call_with_retry` when :attr:`LLMConfig.retry_policy` is
+        ``call_with_retry`` when ``LLMConfig.retry_policy`` is
         set; streaming calls are never retried (mid-stream reconnect
         would silently drop or double-emit tokens).
         """
@@ -407,7 +407,7 @@ class OpenAIResponsesLLM(LLM):
         - text/reasoning/function-arg delta events → ``"part_delta"``
         - ``ResponseOutputItemDoneEvent`` → ``"part_end"``
         - ``ResponseCompletedEvent`` → ``"done"`` (carries the full
-          converted :class:`LLMResponse`)
+          converted ``LLMResponse``)
 
         Unrecognised variants (audio, image-gen progress, MCP status,
         etc.) are ignored — hosted-tool outputs still land in the final

@@ -475,7 +475,7 @@ class TestConsumeUntilTerminalFreshness:
     mutating the SDK-vended ``Task`` (via ``CopyFrom`` / ``artifacts.append``)
     — that mutates objects whose lifetime the SDK iterator owns. Instead it
     tracks id / context_id / status / artifacts as plain locals on a typed
-    ``_StreamAccumulator`` and constructs a **fresh** :class:`Task` at return
+    ``_StreamAccumulator`` and constructs a **fresh** ``Task`` at return
     time; protobuf-python copies sub-messages at constructor time, so the
     returned Task does not alias any SDK-vended sub-message.
     """

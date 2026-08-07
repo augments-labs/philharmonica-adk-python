@@ -4,7 +4,7 @@ Provides built-in tools that give agents explicit access to
 long-term memory: ``RememberMemoryTool``, ``RecallMemoryTool``,
 and ``ForgetMemoryTool``.
 
-Each is an :class:`ExecutableBuiltinTool` with its own schema and
+Each is an ``ExecutableBuiltinTool`` with its own schema and
 ``on_invoke`` callback.
 """
 
@@ -185,7 +185,7 @@ class RememberMemoryTool(MemoryTool):
     Attributes:
         name: Tool name shown to the LLM (``"remember"``).
         description: Tool description shown to the LLM.
-        schema: Input schema (:class:`RememberInput`).
+        schema: Input schema (``RememberInput``).
         memory: The memory backend to use (inherited).
         namespace: Default namespace for memory operations (inherited).
     """
@@ -210,7 +210,7 @@ class RecallMemoryTool(MemoryTool):
     Attributes:
         name: Tool name shown to the LLM (``"recall"``).
         description: Tool description shown to the LLM.
-        schema: Input schema (:class:`RecallInput`).
+        schema: Input schema (``RecallInput``).
         memory: The memory backend to use (inherited).
         namespace: Default namespace for memory operations (inherited).
     """
@@ -234,7 +234,7 @@ class ForgetMemoryTool(MemoryTool):
     Attributes:
         name: Tool name shown to the LLM (``"forget"``).
         description: Tool description shown to the LLM.
-        schema: Input schema (:class:`ForgetInput`).
+        schema: Input schema (``ForgetInput``).
         memory: The memory backend to use (inherited).
         namespace: Default namespace for memory operations (inherited).
     """

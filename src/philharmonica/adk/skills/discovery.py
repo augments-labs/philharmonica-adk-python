@@ -179,10 +179,10 @@ def build_script_env(script_args: dict[str, Any]) -> dict[str, str]:
     """Build a safe subprocess env from the allowlist + sanitised args.
 
     The parent ``os.environ`` is filtered through
-    :data:`_ENV_INHERIT_ALLOWLIST`; keys supplied by the LLM are
-    validated against :data:`_ENV_KEY_PATTERN`, rejected if they are in
-    :data:`_ENV_INJECTION_BLOCKLIST`, and truncated to
-    :data:`_ENV_VALUE_MAX_LEN` chars.
+    ``_ENV_INHERIT_ALLOWLIST``; keys supplied by the LLM are
+    validated against ``_ENV_KEY_PATTERN``, rejected if they are in
+    ``_ENV_INJECTION_BLOCKLIST``, and truncated to
+    ``_ENV_VALUE_MAX_LEN`` chars.
 
     Args:
         script_args: Key-value pairs provided by the LLM to pass as

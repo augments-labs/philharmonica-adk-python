@@ -128,12 +128,12 @@ def wrap_hooks_with_verbose(
 ) -> RunHooks[TContext]:
     """Return the effective ``RunHooks`` for a run, layering verbose if enabled.
 
-    When ``config.verbose`` is a :class:`VerboseConfig` with ``enabled=True``,
-    a :class:`VerboseHooks` instance is composed with any user-provided hooks
-    via :func:`compose_run_hooks`. Otherwise the user hooks are returned as-is
-    (or a no-op :class:`RunHooks` when ``user_hooks`` is ``None``).
+    When ``config.verbose`` is a ``VerboseConfig`` with ``enabled=True``,
+    a ``VerboseHooks`` instance is composed with any user-provided hooks
+    via ``compose_run_hooks``. Otherwise the user hooks are returned as-is
+    (or a no-op ``RunHooks`` when ``user_hooks`` is ``None``).
 
-    Idempotent: when ``user_hooks`` already carries a :class:`VerboseHooks`
+    Idempotent: when ``user_hooks`` already carries a ``VerboseHooks``
     layer (e.g. a streamed swarm member turn whose hooks the driver
     pre-wrapped), the chain is returned unchanged rather than stacking a
     second layer that would fire every verbose panel twice.
@@ -150,7 +150,7 @@ def wrap_hooks_with_verbose(
 def _sweep_verbose_panels(hooks: RunHooks[Any]) -> None:
     """Close verbose panels left open when a run ends by exception.
 
-    Walks the effective hooks chain for :class:`VerboseHooks` layers and
+    Walks the effective hooks chain for ``VerboseHooks`` layers and
     flushes each one's still-open generic block-tree panels (verdict
     ``"interrupted"``). A clean run closes its own blocks, so this is wired
     only into the exception teardown arms; a no-op when no verbose layer is
@@ -280,17 +280,17 @@ class _GraphBracket:
     """Mutable handle for a graph-run verbose/trace bracket.
 
     The body may record a non-exception failure (e.g. a FAILED
-    :class:`~philharmonica.adk.graphs.result.GraphRunStatus`) so the Task panel
+    ``GraphRunStatus``) so the Task panel
     closes as failed even when no exception propagates.
 
     Attributes:
-        error: Populated by :meth:`mark_failed` or by the context
+        error: Populated by ``mark_failed`` or by the context
             manager's exception handler. ``None`` means the run
             succeeded.
     """
 
     error: str | None = None
-    """Populated by :meth:`mark_failed` or by the context manager on exception."""
+    """Populated by ``mark_failed`` or by the context manager on exception."""
 
     def mark_failed(self, message: str) -> None:
         """Record a non-exception failure reason for the Task panel."""
@@ -308,7 +308,7 @@ async def _graph_run_bracket(
 
     On an exception the span is marked errored and the panel closes
     failed, then the exception propagates. A non-exception failure is
-    reported by the body via :meth:`_GraphBracket.mark_failed`.
+    reported by the body via ``_GraphBracket.mark_failed``.
     """
     from philharmonica.adk.verbose.hooks import emit_task_end, emit_task_start
 
@@ -366,12 +366,12 @@ def _resolve_error_handler(
 
 
 class _HookEventEmitter(RunHooks[Any]):
-    """Wraps a :class:`~philharmonica.adk.run.stream.RunResultStreaming` to fan hook
+    """Wraps a ``RunResultStreaming`` to fan hook
     lifecycle moments into the event stream.
 
-    Installed by :meth:`Runner._run_streamed_impl` when
-    :attr:`~philharmonica.adk.run.config.RunConfig.include_hook_events` is ``True``.
-    Emits a :class:`~philharmonica.adk.run.stream.HookLifecycleEvent` to the queue
+    Installed by ``Runner._run_streamed_impl`` when
+    ``include_hook_events`` is ``True``.
+    Emits a ``HookLifecycleEvent`` to the queue
     at each tool and guardrail hook call site.  All other hook methods
     delegate to the no-op base.
     """
@@ -984,43 +984,43 @@ class Runner:
     ) -> SwarmRunResult:
         """Execute a swarm asynchronously.
 
-        Orchestrates :class:`~philharmonica.adk.swarms.swarm.Swarm` execution
-        end-to-end. Delegates to :func:`run_swarm_loop` for the driver
-        loop, which in turn delegates to :func:`run_agent_loop` for each
+        Orchestrates ``Swarm`` execution
+        end-to-end. Delegates to ``run_swarm_loop`` for the driver
+        loop, which in turn delegates to ``run_agent_loop`` for each
         member turn. Swarms do not resume from
-        :class:`~philharmonica.adk.run.state.RunState` — pause/resume
+        ``RunState`` — pause/resume
         semantics go through
-        :class:`~philharmonica.adk.swarms.result.SwarmRunResult.state`
+        ``state``
         (serializable via ``to_json()``) instead.
 
         Session handling: when ``session`` is supplied *and*
         ``user_prompt`` is a string, the session's persisted history is
         loaded and prepended to the swarm's opening turn, mirroring
-        :meth:`Runner.arun`. Subsequent turns use the swarm's own
-        :class:`~philharmonica.adk.swarms.shared_context_strategy.SharedContextStrategy`.
+        ``Runner.arun``. Subsequent turns use the swarm's own
+        ``SharedContextStrategy``.
 
         Args:
             swarm: The swarm configuration (roster, policy, termination,
                 budgets).
             user_prompt: Input passed to the entry agent (string or
-                Layer 1 :class:`LLMInputContentItem` list).
+                Layer 1 ``LLMInputContentItem`` list).
             context: Optional user context passed to every member.
-            hooks: Optional :class:`RunHooks`. Swarm-level
-                :class:`~philharmonica.adk.swarms.hooks.SwarmHooks` attached to
+            hooks: Optional ``RunHooks``. Swarm-level
+                ``SwarmHooks`` attached to
                 ``swarm.hooks`` fire in addition.
-            run_config: Optional :class:`RunConfig`. ``max_total_turns``
+            run_config: Optional ``RunConfig``. ``max_total_turns``
                 is the absolute LLM-call safety net; swarm-specific
-                budgets live on :attr:`Swarm.config`.
-            session: Optional :class:`~philharmonica.adk.types.session.SessionStore` for conversation
+                budgets live on ``Swarm.config``.
+            session: Optional ``SessionStore`` for conversation
                 persistence.
-            checkpointer: Optional :class:`SwarmCheckpointer`. When
+            checkpointer: Optional ``SwarmCheckpointer``. When
                 supplied, auto-saves the run state after each completed
                 turn and on interrupt via the swarm hook registry. The
                 checkpointer's own ``thread_id`` (set at construction)
                 is used as the logical run key.
 
         Returns:
-            A :class:`SwarmRunResult` with the terminal output and
+            A ``SwarmRunResult`` with the terminal output and
             serializable final state.
 
         Raises:
@@ -1181,13 +1181,13 @@ class Runner:
     ) -> SwarmRunResult:
         """Execute a swarm synchronously. Blocks until the run completes.
 
-        Sync wrapper around :meth:`arun_swarm`. Uses the same strategy as
-        :meth:`Runner.run`: when invoked inside a running event loop, the
+        Sync wrapper around ``arun_swarm``. Uses the same strategy as
+        ``Runner.run``: when invoked inside a running event loop, the
         call is offloaded to a worker thread via
-        :class:`concurrent.futures.ThreadPoolExecutor`; otherwise
-        :func:`asyncio.run` drives the coroutine.
+        ``concurrent.futures.ThreadPoolExecutor``; otherwise
+        ``asyncio.run`` drives the coroutine.
 
-        See :meth:`arun_swarm` for argument and return semantics.
+        See ``arun_swarm`` for argument and return semantics.
         """
         try:
             loop = asyncio.get_running_loop()
@@ -1240,20 +1240,20 @@ class Runner:
     ) -> SwarmRunResultStreaming[TContext]:
         """Execute a swarm with real-time event streaming.
 
-        Returns a :class:`SwarmRunResultStreaming` immediately; events
+        Returns a ``SwarmRunResultStreaming`` immediately; events
         are produced in the background and consumed via
-        :meth:`SwarmRunResultStreaming.stream_events`. Cancellation is
-        available via :meth:`SwarmRunResultStreaming.cancel`.
+        ``SwarmRunResultStreaming.stream_events``. Cancellation is
+        available via ``SwarmRunResultStreaming.cancel``.
 
         Args:
-            swarm: The compiled :class:`Swarm` to execute.
+            swarm: The compiled ``Swarm`` to execute.
             user_prompt: Input passed to the entry member.
             context: Optional user context threaded to every member.
-            hooks: Optional :class:`RunHooks`.
-            run_config: Optional :class:`RunConfig`.
+            hooks: Optional ``RunHooks``.
+            run_config: Optional ``RunConfig``.
             session: Unused — accepted for signature parity with
-                :meth:`arun_swarm`.
-            initial_state: Optional restored :class:`SwarmState` for
+                ``arun_swarm``.
+            initial_state: Optional restored ``SwarmState`` for
                 resume. Threaded into ``run_swarm_loop_streamed``; the
                 same deep-resume splice from ``swarm_resume.py`` fires
                 inside the streamed loop when ``resume`` is also supplied.
@@ -1265,18 +1265,18 @@ class Runner:
                 matches the new root span's id. Callers that hold a
                 reference to ``initial_state`` after this call will see
                 the regenerated id rather than ``None``.
-            resume: Optional :class:`SwarmResume` carrying per-member
+            resume: Optional ``SwarmResume`` carrying per-member
                 replies. Applied at the splice point inside
                 ``run_swarm_loop_streamed`` exactly as in the synchronous
                 ``arun_swarm_from_checkpoint``.
-            checkpointer: Optional :class:`SwarmCheckpointer`. When
+            checkpointer: Optional ``SwarmCheckpointer``. When
                 supplied, auto-saves the run state after each completed
                 turn and on interrupt via the swarm hook registry. The
                 checkpointer's own ``thread_id`` (set at construction)
                 is used as the logical run key.
 
         Returns:
-            :class:`SwarmRunResultStreaming` whose ``stream_events()``
+            ``SwarmRunResultStreaming`` whose ``stream_events()``
             yields events until the run completes or is cancelled.
         """
         # Local imports — deferred to avoid circular dependencies
@@ -1368,10 +1368,10 @@ class Runner:
         initial_state: GraphState[Any] | None,
         resume: GraphResume | None = None,
     ) -> GraphRunResult[Any]:
-        """Run :func:`run_graph_loop` wrapped in the verbose Task panel
+        """Run ``run_graph_loop`` wrapped in the verbose Task panel
         and OTel root span, mapping a FAILED graph result to a failed
-        panel close. Shared by :meth:`arun_graph` and
-        :meth:`arun_graph_from_checkpoint`."""
+        panel close. Shared by ``arun_graph`` and
+        ``arun_graph_from_checkpoint``."""
         from philharmonica.adk.graphs.result import GraphRunStatus
         from philharmonica.adk.run.graph_loop import run_graph_loop
 
@@ -1401,15 +1401,15 @@ class Runner:
         run_config: RunConfig | None = None,
         thread_id: str | None = None,
     ) -> GraphRunResult[Any]:
-        """Execute a :class:`Graph` asynchronously.
+        """Execute a ``Graph`` asynchronously.
 
         Orchestrates end-to-end graph execution. Delegates to
-        :func:`run_graph_loop` for the BSP superstep driver, which in
-        turn delegates per-node execution to :class:`Executable.invoke`
-        — so an :class:`~philharmonica.adk.agents.agent.Agent` node runs through
-        :func:`run_agent_loop`, a :class:`~philharmonica.adk.swarms.swarm.Swarm`
-        node runs through :func:`run_swarm_loop`, and a nested
-        :class:`Graph` node runs through this same driver (one level
+        ``run_graph_loop`` for the BSP superstep driver, which in
+        turn delegates per-node execution to ``Executable.invoke``
+        — so an ``Agent`` node runs through
+        ``run_agent_loop``, a ``Swarm``
+        node runs through ``run_swarm_loop``, and a nested
+        ``Graph`` node runs through this same driver (one level
         deeper).
 
         Graphs do NOT auto-load session history. Each node with an
@@ -1419,34 +1419,34 @@ class Runner:
         Args:
             graph: The compiled graph to execute.
             user_prompt: Input passed to the entry node (string or
-                Layer 1 :class:`LLMInputContentItem` list).
+                Layer 1 ``LLMInputContentItem`` list).
             context: Optional user context threaded to every node.
-            hooks: Optional list of :class:`GraphHooks` and/or
-                :class:`HookProvider`\\ s. Providers register via
-                :meth:`HookProvider.register`; plain :class:`GraphHooks`
-                are added directly. :class:`Checkpointer`\\ s are
-                :class:`HookProvider`\\ s — attach them here.
-            run_config: Optional :class:`RunConfig`. ``tracing_enabled``
+            hooks: Optional list of ``GraphHooks`` and/or
+                ``HookProvider``\\ s. Providers register via
+                ``HookProvider.register``; plain ``GraphHooks``
+                are added directly. ``Checkpointer``\\ s are
+                ``HookProvider``\\ s — attach them here.
+            run_config: Optional ``RunConfig``. ``tracing_enabled``
                 / ``metrics_enabled`` / ``tracing_metadata`` flow through to the
                 ``graph:<id>`` root span; per-node config is threaded
-                to the inner :func:`run_agent_loop` / :func:`run_swarm_loop`
+                to the inner ``run_agent_loop`` / ``run_swarm_loop``
                 calls.
             thread_id: Optional checkpointer thread id. When omitted
-                and a :class:`Checkpointer` is in ``hooks``, the driver
+                and a ``Checkpointer`` is in ``hooks``, the driver
                 auto-generates a ``thread-XXXX`` id.
 
         Returns:
-            A :class:`GraphRunResult` with the terminal output, status,
+            A ``GraphRunResult`` with the terminal output, status,
             per-node usage attribution, and the full
-            :class:`GraphState`.
+            ``GraphState``.
 
         Raises:
             MaxTurnsExceeded: From inner agent loops when
                 ``config.max_total_turns`` is exceeded inside a node.
             Exception: Any exception raised by a node with
-                :attr:`GraphConfig.fail_fast` enabled; siblings are
+                ``GraphConfig.fail_fast`` enabled; siblings are
                 cancelled and the error surfaces on the
-                :class:`GraphRunResult.error` field (and is re-raised).
+                ``GraphRunResult.error`` field (and is re-raised).
         """
         config = _snapshot_run_config(run_config)
         validate_budget_config(config.tenant_budget, config.cost_ledger)
@@ -1474,13 +1474,13 @@ class Runner:
     ) -> GraphRunResult[Any]:
         """Execute a graph synchronously. Blocks until the run completes.
 
-        Sync wrapper around :meth:`arun_graph`. Uses the same strategy as
-        :meth:`Runner.run`: when invoked inside a running event loop,
+        Sync wrapper around ``arun_graph``. Uses the same strategy as
+        ``Runner.run``: when invoked inside a running event loop,
         the call is offloaded to a worker thread via
-        :class:`concurrent.futures.ThreadPoolExecutor`; otherwise
-        :func:`asyncio.run` drives the coroutine.
+        ``concurrent.futures.ThreadPoolExecutor``; otherwise
+        ``asyncio.run`` drives the coroutine.
 
-        See :meth:`arun_graph` for argument and return semantics.
+        See ``arun_graph`` for argument and return semantics.
         """
         try:
             loop = asyncio.get_running_loop()
@@ -1530,10 +1530,10 @@ class Runner:
     ) -> SwarmRunResult:
         """Resume a swarm run from a persisted checkpoint.
 
-        Loads :class:`SwarmState` via ``checkpointer.load``, rehydrates
+        Loads ``SwarmState`` via ``checkpointer.load``, rehydrates
         the state against ``swarm``, clears any
-        :attr:`SwarmState.pending_interrupts` parked at suspend time,
-        and re-enters :func:`run_swarm_loop` with the carried-over
+        ``SwarmState.pending_interrupts`` parked at suspend time,
+        and re-enters ``run_swarm_loop`` with the carried-over
         ``total_turns`` / ``shared_history`` / ``per_agent_scratch``.
         The checkpointer continues auto-saving after each turn during
         the resumed run via the swarm hook registry.
@@ -1541,7 +1541,7 @@ class Runner:
         Args:
             swarm: Compiled swarm the checkpoint was produced from
                 (matching member names).
-            checkpointer: The :class:`SwarmCheckpointer` holding the run.
+            checkpointer: The ``SwarmCheckpointer`` holding the run.
                 Also passed into the resumed loop so auto-saving continues
                 for the duration of the resumed run.
             thread_id: Logical run key to resume.
@@ -1549,12 +1549,12 @@ class Runner:
                 On resume the swarm carries shared history forward, so
                 this is usually empty.
             context: Optional user context threaded to every member.
-            hooks: Optional :class:`RunHooks`.
-            run_config: Optional :class:`RunConfig`.
-            resume: Optional :class:`SwarmResume` carrying per-member
-                replies. Threaded into :func:`run_swarm_loop`'s
+            hooks: Optional ``RunHooks``.
+            run_config: Optional ``RunConfig``.
+            resume: Optional ``SwarmResume`` carrying per-member
+                replies. Threaded into ``run_swarm_loop``'s
                 splice at step 7: a nested-agent-defer reply is applied
-                via :meth:`AgentExecutable.resume_from_snapshot`, and a
+                via ``AgentExecutable.resume_from_snapshot``, and a
                 pure-HITL reply is seeded onto the run context for the
                 parked member's tool to consume on its re-fire. When
                 ``None`` the loop falls back to the clear-and-restart
@@ -1569,12 +1569,12 @@ class Runner:
             from one key and save to a different one.
 
         Returns:
-            A :class:`SwarmRunResult` from resume to halt.
+            A ``SwarmRunResult`` from resume to halt.
 
         Raises:
             ValueError: No checkpoint for ``thread_id``.
         """
-        # Deferred import: see :meth:`arun_swarm` for the circular-dep
+        # Deferred import: see ``arun_swarm`` for the circular-dep
         # rationale that keeps this lookup local to the call site.
         from philharmonica.adk.run.swarm_loop import run_swarm_loop
         from philharmonica.adk.swarms.state import SwarmState, SwarmStateDict
@@ -1660,29 +1660,29 @@ class Runner:
     ) -> GraphRunResult[Any]:
         """Resume a graph run from a persisted checkpoint.
 
-        Loads :class:`GraphState` via ``checkpointer.load``; only nodes
+        Loads ``GraphState`` via ``checkpointer.load``; only nodes
         with unconsumed upstream output re-fire. Budgets are cumulative.
 
         Args:
             graph: Compiled graph the checkpoint was produced from
                 (matching id / node ids). Id mismatch raises in
                 ``checkpointer.load``.
-            checkpointer: The :class:`Checkpointer` holding the run.
+            checkpointer: The ``Checkpointer`` holding the run.
             thread_id: Logical run key to resume.
             user_prompt: Entry-node input; used only if the entry node
                 re-fires (uncommon on resume).
             context: Optional user context threaded to every node.
             hooks: Hooks/providers; ``checkpointer`` is appended
                 automatically if absent.
-            run_config: Optional :class:`RunConfig`.
+            run_config: Optional ``RunConfig``.
             resume: Optional human replies for pending interrupt nodes.
                 Each entry in ``replies`` or ``rejected`` is injected
                 into the matching node's input on the first superstep
                 where that node is ready, then cleared from
-                :attr:`GraphState.pending_interrupts`.
+                ``GraphState.pending_interrupts``.
 
         Returns:
-            A :class:`GraphRunResult` from resume to halt.
+            A ``GraphRunResult`` from resume to halt.
 
         Raises:
             ValueError: No checkpoint for ``thread_id``, or the stored
@@ -1728,10 +1728,10 @@ class Runner:
         run_config: RunConfig | None = None,
         resume: GraphResume | None = None,
     ) -> GraphRunResult[Any]:
-        """Synchronous wrapper around :meth:`arun_graph_from_checkpoint`.
+        """Synchronous wrapper around ``arun_graph_from_checkpoint``.
 
         Same running-loop / ``ThreadPoolExecutor`` strategy as
-        :meth:`run_graph`.
+        ``run_graph``.
         """
         try:
             loop = asyncio.get_running_loop()
@@ -1785,31 +1785,31 @@ class Runner:
     ) -> GraphRunResultStreaming:
         """Execute a graph with real-time event streaming.
 
-        Returns a :class:`GraphRunResultStreaming` immediately. Events are
+        Returns a ``GraphRunResultStreaming`` immediately. Events are
         produced in the background and consumed via
-        :meth:`GraphRunResultStreaming.stream_events`. Cancellation is
-        available via :meth:`GraphRunResultStreaming.cancel`.
+        ``GraphRunResultStreaming.stream_events``. Cancellation is
+        available via ``GraphRunResultStreaming.cancel``.
 
         Args:
             graph: The compiled graph to execute.
             user_prompt: Input passed to the entry node.
             context: Optional user context threaded to every node.
-            hooks: Optional list of :class:`GraphHooks` and/or
-                :class:`HookProvider` instances.
-            run_config: Optional :class:`RunConfig`.
+            hooks: Optional list of ``GraphHooks`` and/or
+                ``HookProvider`` instances.
+            run_config: Optional ``RunConfig``.
             thread_id: Optional checkpointer thread id.
-            initial_state: Optional restored :class:`GraphState` for resume.
-                Passed through to :func:`run_graph_loop_streamed` so that
-                :func:`_seed_barriers_from_checkpoint` can reconstruct
+            initial_state: Optional restored ``GraphState`` for resume.
+                Passed through to ``run_graph_loop_streamed`` so that
+                ``_seed_barriers_from_checkpoint`` can reconstruct
                 barriers for selective node re-fire.
             resume: Optional human replies for pending interrupt nodes.
-                Threaded to :func:`run_graph_loop_streamed` which injects
-                each reply into the matching node's :class:`ExecutableInput`
+                Threaded to ``run_graph_loop_streamed`` which injects
+                each reply into the matching node's ``ExecutableInput``
                 metadata on the first superstep where that node is ready.
 
         Returns:
-            :class:`GraphRunResultStreaming` whose ``stream_events()`` yields
-            :class:`GraphStreamEvent` instances until the run completes or
+            ``GraphRunResultStreaming`` whose ``stream_events()`` yields
+            ``GraphStreamEvent`` instances until the run completes or
             is cancelled.
         """
         from philharmonica.adk.graphs.result import GraphRunResultStreaming, GraphRunStatus
@@ -1862,26 +1862,26 @@ class Runner:
         session: SessionStore | None = None,
         memory: MemoryConfig | None = None,
     ) -> TaskOutput:
-        """Execute a :class:`Task` asynchronously.
+        """Execute a ``Task`` asynchronously.
 
-        Additive convenience over :meth:`Runner.arun` for developers
+        Additive convenience over ``Runner.arun`` for developers
         who want a named, documented unit of work with explicit
         per-call overrides (output schema, guardrails, budgets) and
         first-class ``on_task_*`` lifecycle hooks. Every classic
         ``Runner.arun(...)`` call continues to work unchanged.
 
         The runner builds a transient effective ``Agent`` (via
-        ``dataclasses.replace`` when :attr:`Task.output_schema` is set)
-        and a transient :class:`RunConfig` whose
-        :attr:`RunConfig.guardrails` extends the caller-supplied
+        ``dataclasses.replace`` when ``Task.output_schema`` is set)
+        and a transient ``RunConfig`` whose
+        ``RunConfig.guardrails`` extends the caller-supplied
         config with the task's input/output guardrails — run-scope
-        guardrails run first, task-scope second. :attr:`Task.max_turns`
+        guardrails run first, task-scope second. ``Task.max_turns``
         is passed as the ``max_turns`` kwarg to the inner ``arun``,
         NOT folded into the transient ``RunConfig`` (consistent with
         ``Runner.arun``'s signature).
 
-        Fires :meth:`RunHooks.on_task_start` before the inner ``arun``
-        and :meth:`RunHooks.on_task_end` after — in both success and
+        Fires ``RunHooks.on_task_start`` before the inner ``arun``
+        and ``RunHooks.on_task_end`` after — in both success and
         exception paths. The existing verbose Task panel continues to
         render via ``emit_task_start`` / ``emit_task_end`` inside the
         inner ``arun`` path.
@@ -1889,29 +1889,29 @@ class Runner:
         Args:
             task: The task to execute.
             context: Optional user context. Threaded into the inner
-                ``arun`` and into the synthetic :class:`RunContext`
+                ``arun`` and into the synthetic ``RunContext``
                 passed to the task hooks.
-            hooks: Optional :class:`RunHooks`. Receives the new
+            hooks: Optional ``RunHooks``. Receives the new
                 ``on_task_start`` / ``on_task_end`` callbacks in
                 addition to all existing run-level events.
-            run_config: Optional base :class:`RunConfig`. The runner
+            run_config: Optional base ``RunConfig``. The runner
                 builds a transient extension that adds the task's
                 guardrails and (when set) ``usage_limits``.
-            session: Optional :class:`~philharmonica.adk.types.session.SessionStore` for conversation
+            session: Optional ``SessionStore`` for conversation
                 persistence — flows through unchanged.
-            memory: Optional :class:`MemoryConfig` for memory
+            memory: Optional ``MemoryConfig`` for memory
                 injection / extraction — flows through unchanged.
 
         Returns:
-            A :class:`TaskOutput` whose :attr:`TaskOutput.error` is
+            A ``TaskOutput`` whose ``TaskOutput.error`` is
             ``None`` on success and a stringified exception on failure.
-            On failure, :meth:`on_task_end` fires with the error-set
-            :class:`TaskOutput` before the exception is re-raised.
+            On failure, ``on_task_end`` fires with the error-set
+            ``TaskOutput`` before the exception is re-raised.
 
         Raises:
             Exception: Any exception raised by the inner ``arun``
-                (after :meth:`on_task_end` has fired with the failure
-                :class:`TaskOutput`). :class:`BaseException` subclasses
+                (after ``on_task_end`` has fired with the failure
+                ``TaskOutput``). ``BaseException`` subclasses
                 like ``KeyboardInterrupt`` / ``asyncio.CancelledError``
                 propagate untouched and bypass the hook side-effects —
                 cooperative cancellation is preserved.
@@ -1997,54 +1997,54 @@ class Runner:
         session: SessionStore | None = None,
         memory: MemoryConfig | None = None,
     ) -> RunResultStreaming:
-        """Execute a :class:`Task` with real-time event streaming.
+        """Execute a ``Task`` with real-time event streaming.
 
         Streams events from a single-task execution. Lets developers
         observe a Task's run incrementally (raw LLM tokens, tool calls,
         tool outputs) without losing the Task abstraction or its
         ``on_task_*`` lifecycle hooks.
 
-        Fires :meth:`RunHooks.on_task_start` synchronously before
-        returning — the returned :class:`RunResultStreaming` is
+        Fires ``RunHooks.on_task_start`` synchronously before
+        returning — the returned ``RunResultStreaming`` is
         observable only after that callback has completed. Fires
-        :meth:`RunHooks.on_task_end` from the background impl's
-        ``finally`` arm with a :class:`TaskOutput` built from
+        ``RunHooks.on_task_end`` from the background impl's
+        ``finally`` arm with a ``TaskOutput`` built from
         ``result.final_output`` / ``result.new_items`` /
         ``result.context.usage`` — so the hook also fires on early
         cancellation or error paths.
 
-        The return value is a raw :class:`RunResultStreaming` (NOT a
+        The return value is a raw ``RunResultStreaming`` (NOT a
         Task-specific wrapper). Consume events with
         ``async for event in result.stream_events()``. Cancellation
-        semantics match :meth:`RunResultStreaming.cancel` exactly.
+        semantics match ``RunResultStreaming.cancel`` exactly.
 
         Args:
             task: The task to execute.
             context: Optional user context. Threaded into the inner
                 streamed impl and into the synthetic
-                :class:`RunContext` passed to the task hooks.
-            hooks: Optional :class:`RunHooks`. Receives the new
+                ``RunContext`` passed to the task hooks.
+            hooks: Optional ``RunHooks``. Receives the new
                 ``on_task_start`` / ``on_task_end`` callbacks in
                 addition to all existing run-level events.
-            run_config: Optional base :class:`RunConfig`. The runner
+            run_config: Optional base ``RunConfig``. The runner
                 builds a transient extension that adds the task's
                 guardrails and (when set) ``usage_limits``.
-            session: Optional :class:`~philharmonica.adk.types.session.SessionStore` for conversation
+            session: Optional ``SessionStore`` for conversation
                 persistence — flows through unchanged.
-            memory: Optional :class:`MemoryConfig` for memory
+            memory: Optional ``MemoryConfig`` for memory
                 injection / extraction — flows through unchanged.
 
         Returns:
-            A :class:`RunResultStreaming` whose ``stream_events()``
+            A ``RunResultStreaming`` whose ``stream_events()``
             async iterator yields the run's events in real time and
             whose ``final_output`` populates after the stream drains.
 
         Raises:
             Exception: Any exception raised during execution surfaces
-                via :meth:`RunResultStreaming.stream_events` (the
+                via ``RunResultStreaming.stream_events`` (the
                 stream re-raises the stored exception after the event
-                queue drains). :meth:`on_task_end` has already fired
-                with the failure :class:`TaskOutput` by that point.
+                queue drains). ``on_task_end`` has already fired
+                with the failure ``TaskOutput`` by that point.
         """
         from dataclasses import replace
 
@@ -2218,14 +2218,14 @@ class Runner:
         session: SessionStore | None = None,
         memory: MemoryConfig | None = None,
     ) -> TaskOutput:
-        """Execute a :class:`Task` synchronously.
+        """Execute a ``Task`` synchronously.
 
-        Sync wrapper around :meth:`arun_task`. Uses the same event-loop
-        strategy as :meth:`Runner.run`: when invoked inside a running
+        Sync wrapper around ``arun_task``. Uses the same event-loop
+        strategy as ``Runner.run``: when invoked inside a running
         loop, offloads to a worker thread; otherwise drives the
-        coroutine with :func:`asyncio.run`.
+        coroutine with ``asyncio.run``.
 
-        See :meth:`arun_task` for argument and return semantics.
+        See ``arun_task`` for argument and return semantics.
         """
         try:
             loop = asyncio.get_running_loop()
@@ -2271,28 +2271,28 @@ class Runner:
         session: SessionStore | None = None,
         memory: MemoryConfig | None = None,
     ) -> TaskPipelineResult[TContext]:
-        """Execute a :class:`TaskPipeline` asynchronously.
+        """Execute a ``TaskPipeline`` asynchronously.
 
         Iterates the pipeline's tasks in order, calling
-        :meth:`arun_task` for each. The pipeline maintains an
-        accumulating :class:`RunContext` whose ``usage`` field is
-        summed from each executed task — :attr:`TaskPipelineResult.context.usage`
+        ``arun_task`` for each. The pipeline maintains an
+        accumulating ``RunContext`` whose ``usage`` field is
+        summed from each executed task — ``TaskPipelineResult.context.usage``
         equals the cumulative LLM usage across all non-skipped tasks.
 
-        Conditional skip: when :attr:`Task.skip_if` is supplied and
+        Conditional skip: when ``Task.skip_if`` is supplied and
         returns ``True`` against the tuple of prior outputs (including
         previously skipped ones), the runner inserts a
         ``TaskOutput(skipped=True, …)`` slot and continues — slots are
         NEVER silently dropped, so positional indexing matches the
         input pipeline.
 
-        Each task's :attr:`Task.description` is fed verbatim as the
+        Each task's ``Task.description`` is fed verbatim as the
         agent's user prompt — the pipeline does NOT transform prompts
         at runtime. To forward an upstream task's output into a
-        downstream task's prompt, call :meth:`Runner.arun_task` for
+        downstream task's prompt, call ``Runner.arun_task`` for
         the upstream first, then construct the downstream
-        :class:`Task` with a description that embeds the prior
-        output, then call :meth:`Runner.arun_task` again. The
+        ``Task`` with a description that embeds the prior
+        output, then call ``Runner.arun_task`` again. The
         pipeline is the right abstraction when you want sequential
         execution with conditional skip and usage aggregation; it is
         NOT the abstraction for runtime prompt rewriting.
@@ -2300,26 +2300,26 @@ class Runner:
         Error handling: if a task raises, the runner captures the
         exception into a ``TaskOutput(error=…)`` slot and HALTS the
         pipeline — no retries, no subsequent tasks. The partial
-        :class:`TaskPipelineResult` is returned (NOT raised) so the
+        ``TaskPipelineResult`` is returned (NOT raised) so the
         developer always sees the work that did complete.
 
         Args:
-            task_pipeline: The :class:`TaskPipeline` to execute.
+            task_pipeline: The ``TaskPipeline`` to execute.
             context: Optional user context shared across every task.
-            hooks: Optional :class:`RunHooks` shared across every task.
-            run_config: Optional base :class:`RunConfig` shared across
+            hooks: Optional ``RunHooks`` shared across every task.
+            run_config: Optional base ``RunConfig`` shared across
                 every task. Each task's overrides extend it.
-            session: Optional :class:`~philharmonica.adk.types.session.SessionStore`. Shared across every
+            session: Optional ``SessionStore``. Shared across every
                 task — events from each task append to the same
                 session.
-            memory: Optional :class:`MemoryConfig`. Shared across
+            memory: Optional ``MemoryConfig``. Shared across
                 every task. Note: when ``memory.inject=True``,
                 memories are re-injected for each task — the
                 developer can disable injection per-pipeline if
                 undesired.
 
         Returns:
-            A :class:`TaskPipelineResult` whose ``task_outputs`` tuple
+            A ``TaskPipelineResult`` whose ``task_outputs`` tuple
             has one slot per pipeline task (skipped tasks present
             with ``skipped=True``). ``final_output`` is the last
             non-skipped task's ``final_output``, or ``None`` if every
@@ -2375,21 +2375,21 @@ class Runner:
         session: SessionStore | None = None,
         memory: MemoryConfig | None = None,
     ) -> TaskPipelineResult[TContext]:
-        """Resume a :class:`TaskPipeline` from a persisted state.
+        """Resume a ``TaskPipeline`` from a persisted state.
 
         Continues execution from ``state.resume_index`` onwards. The
         slots in ``state.slots`` cover the tasks that completed before
         the checkpoint — they are returned verbatim in the result's
         ``task_outputs`` tuple. Tasks at and after the resume index
-        run via :meth:`arun_task` exactly as the fresh pipeline path
+        run via ``arun_task`` exactly as the fresh pipeline path
         does, with the prior slots threaded into each task's
         ``skip_if`` evaluation.
 
         Contract: the developer is responsible for reconstructing the
-        same :class:`TaskPipeline` definition (same number of tasks,
+        same ``TaskPipeline`` definition (same number of tasks,
         same agent identities) on the resuming side. The framework
-        does not serialize :attr:`Task.agent`, :attr:`Task.skip_if`,
-        or :attr:`Task.metadata`; the resume relies on the
+        does not serialize ``Task.agent``, ``Task.skip_if``,
+        or ``Task.metadata``; the resume relies on the
         reconstruction to provide them. Mismatched pipelines produce
         undefined behaviour (the wrong agent for the wrong slot
         position).
@@ -2404,23 +2404,23 @@ class Runner:
                 Length MUST be at least ``state.resume_index +
                 len(remaining_tasks)`` — typically equal to the
                 original pipeline's length.
-            state: The :class:`TaskPipelineState` to resume from.
+            state: The ``TaskPipelineState`` to resume from.
                 Required-field presence is enforced by
-                :meth:`TaskPipelineState.from_json` (loud raise on a
+                ``TaskPipelineState.from_json`` (loud raise on a
                 truncated payload); this method trusts the state
                 object passed in.
             context: Optional user context shared across the
                 remaining tasks.
-            hooks: Optional :class:`RunHooks` shared across the
+            hooks: Optional ``RunHooks`` shared across the
                 remaining tasks. The pre-state tasks did NOT fire
                 their hooks during this resume (they fired in the
                 originating run).
-            run_config: Optional base :class:`RunConfig`.
-            session: Optional shared :class:`~philharmonica.adk.types.session.SessionStore`.
-            memory: Optional shared :class:`MemoryConfig`.
+            run_config: Optional base ``RunConfig``.
+            session: Optional shared ``SessionStore``.
+            memory: Optional shared ``MemoryConfig``.
 
         Returns:
-            A :class:`TaskPipelineResult` whose ``task_outputs``
+            A ``TaskPipelineResult`` whose ``task_outputs``
             concatenates the recorded prior slots with the freshly
             executed slots. ``final_output`` is the last non-skipped
             task's final output across the whole pipeline.
@@ -2546,12 +2546,12 @@ class Runner:
         session: SessionStore | None = None,
         memory: MemoryConfig | None = None,
     ) -> TaskPipelineResult[TContext]:
-        """Execute a :class:`TaskPipeline` synchronously.
+        """Execute a ``TaskPipeline`` synchronously.
 
-        Sync wrapper around :meth:`arun_task_pipeline`. Same event-loop
-        strategy as :meth:`Runner.run`.
+        Sync wrapper around ``arun_task_pipeline``. Same event-loop
+        strategy as ``Runner.run``.
 
-        See :meth:`arun_task_pipeline` for argument and return semantics.
+        See ``arun_task_pipeline`` for argument and return semantics.
         """
         try:
             loop = asyncio.get_running_loop()
@@ -2597,7 +2597,7 @@ class Runner:
         session: SessionStore | None = None,
         memory: MemoryConfig | None = None,
     ) -> AsyncIterator[tuple[int, RunResultStreaming | None]]:
-        """Stream a :class:`TaskPipeline` task-by-task.
+        """Stream a ``TaskPipeline`` task-by-task.
 
         Returns an async iterator that yields one
         ``(task_index, RunResultStreaming | None)`` pair per pipeline
@@ -2614,14 +2614,14 @@ class Runner:
                     process(event)
 
         Skip slots yield ``(index, None)`` so positional indexing
-        matches :attr:`TaskPipeline.tasks` exactly — silent skips
+        matches ``TaskPipeline.tasks`` exactly — silent skips
         would lose observability of skip_if firings during a stream.
 
-        Per-task semantics mirror :meth:`Runner.arun_task_streamed`:
+        Per-task semantics mirror ``Runner.arun_task_streamed``:
         ``on_task_start`` fires synchronously before each inner stream
         is yielded; ``on_task_end`` fires from the background impl's
         ``finally`` arm. The pipeline does NOT aggregate inner outputs
-        into a :class:`TaskPipelineResult` — consumers read
+        into a ``TaskPipelineResult`` — consumers read
         ``task_stream.final_output`` / ``task_stream.usage`` per task.
         An aggregated streamed-result type is tracked as a follow-up.
 
@@ -2629,7 +2629,7 @@ class Runner:
         responsibility: ``break`` out of the outer iterator when a
         task's ``stream_events()`` re-raises an exception. The
         pipeline iterator does NOT inspect inner-stream state — that
-        would require touching :class:`RunResultStreaming` private
+        would require touching ``RunResultStreaming`` private
         attributes across module boundaries.
 
         Cancellation:
@@ -2645,15 +2645,15 @@ class Runner:
             task_pipeline: The pipeline to stream.
             context: Optional user context. Threaded into every task's
                 inner streaming impl.
-            hooks: Optional :class:`RunHooks`. Receives
+            hooks: Optional ``RunHooks``. Receives
                 ``on_task_start`` / ``on_task_end`` per non-skipped
                 task. Hooks observers see the same lifecycle they get
-                from :meth:`arun_task_streamed`.
-            run_config: Optional base :class:`RunConfig` shared by
+                from ``arun_task_streamed``.
+            run_config: Optional base ``RunConfig`` shared by
                 every task; per-task overrides still apply.
-            session: Optional shared :class:`~philharmonica.adk.types.session.SessionStore`. Events from
+            session: Optional shared ``SessionStore``. Events from
                 every task accumulate in the same store.
-            memory: Optional :class:`MemoryConfig`. Memory injection /
+            memory: Optional ``MemoryConfig``. Memory injection /
                 extraction runs per-task identically to the
                 non-streamed pipeline path.
 
@@ -2682,19 +2682,19 @@ class Runner:
         session: SessionStore | None = None,
         memory: MemoryConfig | None = None,
     ) -> TaskGroupResult[TContext]:
-        """Execute a :class:`TaskGroup` asynchronously (parallel fan-out).
+        """Execute a ``TaskGroup`` asynchronously (parallel fan-out).
 
         Schedules every task in the group concurrently under
-        :func:`asyncio.gather` semantics, optionally bounded by an
-        :class:`asyncio.Semaphore` when
-        :attr:`TaskGroup.max_concurrent` is set. Each task runs through
-        :meth:`Runner.arun_task` unchanged — so per-task hooks,
+        ``asyncio.gather`` semantics, optionally bounded by an
+        ``asyncio.Semaphore`` when
+        ``TaskGroup.max_concurrent`` is set. Each task runs through
+        ``Runner.arun_task`` unchanged — so per-task hooks,
         guardrails, output schemas, ``max_turns``, and
         ``usage_limits`` continue to apply.
 
-        The :class:`TaskGroup.error_policy` controls failure handling:
+        The ``TaskGroup.error_policy`` controls failure handling:
         ``"collect_all"`` (default) runs every task to completion and
-        surfaces failures via :attr:`TaskOutput.error` slots;
+        surfaces failures via ``TaskOutput.error`` slots;
         ``"halt_on_first"`` cancels still-running siblings on the
         first failure (cancelled slots carry an explanatory
         ``error`` field so positional indexing stays stable).
@@ -2704,7 +2704,7 @@ class Runner:
         - ``on_task_start`` / ``on_task_end`` callbacks fire
           **concurrently** across tasks. Hooks holding shared mutable
           state MUST lock — the framework does not synchronise.
-        - Shared :class:`~philharmonica.adk.types.session.SessionStore`: events from concurrent tasks
+        - Shared ``SessionStore``: events from concurrent tasks
           interleave. If event ordering matters, supply per-task
           sessions instead.
         - LLM client cancellation is provider-dependent. The cancel
@@ -2713,31 +2713,31 @@ class Runner:
           as cancelled.
 
         Args:
-            task_group: The :class:`TaskGroup` to execute.
+            task_group: The ``TaskGroup`` to execute.
             context: Optional user context threaded through every
-                task. Each task receives its own :class:`RunContext`
+                task. Each task receives its own ``RunContext``
                 derived from this value (no shared mutation between
                 tasks).
-            hooks: Optional :class:`RunHooks`. Receives
+            hooks: Optional ``RunHooks``. Receives
                 ``on_task_start`` / ``on_task_end`` for every task in
                 the group, fired concurrently — see contract above.
-            run_config: Optional base :class:`RunConfig` shared by
+            run_config: Optional base ``RunConfig`` shared by
                 every task. Each task's own per-task overrides
                 (``output_schema``, guardrails, ``usage_limits``)
                 still apply on top.
-            session: Optional shared :class:`~philharmonica.adk.types.session.SessionStore`. When set, all
+            session: Optional shared ``SessionStore``. When set, all
                 tasks write to the same store; events interleave.
-            memory: Optional shared :class:`MemoryConfig`. Memory
+            memory: Optional shared ``MemoryConfig``. Memory
                 injection / extraction runs per-task identically to
                 the non-group path.
 
         Returns:
-            A :class:`TaskGroupResult` whose
-            :attr:`task_outputs` preserves the input order from
-            :attr:`TaskGroup.tasks`. Cumulative LLM usage across every
+            A ``TaskGroupResult`` whose
+            ``task_outputs`` preserves the input order from
+            ``TaskGroup.tasks``. Cumulative LLM usage across every
             task that produced one is aggregated into
-            :attr:`TaskGroupResult.context.usage` via the commutative
-            :meth:`LLMUsage.__add__`.
+            ``TaskGroupResult.context.usage`` via the commutative
+            ``LLMUsage.__add__``.
         """
         from philharmonica.adk.tasks.task_group import TaskGroupResult
 
@@ -2807,14 +2807,14 @@ class Runner:
         session: SessionStore | None = None,
         memory: MemoryConfig | None = None,
     ) -> TaskGroupResult[TContext]:
-        """Execute a :class:`TaskGroup` synchronously.
+        """Execute a ``TaskGroup`` synchronously.
 
-        Sync wrapper around :meth:`arun_task_group`. Same event-loop
-        strategy as :meth:`Runner.run`: when invoked inside a running
+        Sync wrapper around ``arun_task_group``. Same event-loop
+        strategy as ``Runner.run``: when invoked inside a running
         loop, offloads to a worker thread; otherwise drives the
-        coroutine with :func:`asyncio.run`.
+        coroutine with ``asyncio.run``.
 
-        See :meth:`arun_task_group` for argument and return semantics.
+        See ``arun_task_group`` for argument and return semantics.
         """
         try:
             loop = asyncio.get_running_loop()
@@ -3157,10 +3157,10 @@ class Runner:
         config: FlowConfig | None = None,
         context: Any = None,
     ) -> FlowRunResult[Any]:
-        """Execute a :class:`Flow` asynchronously.
+        """Execute a ``Flow`` asynchronously.
 
-        Constructs a :class:`FlowExecutor` for the flow, attaches a
-        :class:`RunContext` so step bodies that opt into shared usage
+        Constructs a ``FlowExecutor`` for the flow, attaches a
+        ``RunContext`` so step bodies that opt into shared usage
         tracking (``await Runner.arun(..., context=self.run_context)``
         from inside a step) accumulate into the same ``LLMUsage``,
         and drives the executor to completion.
@@ -3171,10 +3171,10 @@ class Runner:
         sharing.
 
         Args:
-            flow: The :class:`Flow` instance to execute. MUST have a
+            flow: The ``Flow`` instance to execute. MUST have a
                 non-``None`` ``__flow_registry__`` (i.e., be a concrete
                 subclass with at least one ``@flow_start`` method).
-            config: Optional :class:`FlowConfig` carrying ``max_steps``,
+            config: Optional ``FlowConfig`` carrying ``max_steps``,
                 error policy, and fan-out cap. ``None`` uses defaults
                 (``max_steps=100``, ``error_policy="halt"``,
                 ``max_listeners_per_step=20``).
@@ -3183,7 +3183,7 @@ class Runner:
                 read ``self.run_context.context`` see this value.
 
         Returns:
-            A :class:`FlowRunResult` whose ``status`` reflects the
+            A ``FlowRunResult`` whose ``status`` reflects the
             terminating condition: ``"completed"`` for clean termination,
             ``"failed"`` for an unrecoverable step exception,
             ``"halted_max_steps"`` on cap overflow.
@@ -3210,22 +3210,22 @@ class Runner:
         config: FlowConfig | None = None,
         context: Any = None,
     ) -> FlowRunResult[Any]:
-        """Execute a :class:`Flow` synchronously.
+        """Execute a ``Flow`` synchronously.
 
-        Sync wrapper around :meth:`arun_flow`. Same event-loop strategy
-        as :meth:`Runner.run` / :meth:`Runner.run_task_pipeline`: when
+        Sync wrapper around ``arun_flow``. Same event-loop strategy
+        as ``Runner.run`` / ``Runner.run_task_pipeline``: when
         invoked inside a running loop, offloads to a worker thread;
-        otherwise drives the coroutine with :func:`asyncio.run`.
+        otherwise drives the coroutine with ``asyncio.run``.
 
-        See :meth:`arun_flow` for argument and return semantics.
+        See ``arun_flow`` for argument and return semantics.
 
         Args:
-            flow: The :class:`Flow` instance to execute.
-            config: Optional :class:`FlowConfig`. See :meth:`arun_flow`.
+            flow: The ``Flow`` instance to execute.
+            config: Optional ``FlowConfig``. See ``arun_flow``.
             context: Optional developer-supplied ``TContext``.
 
         Returns:
-            The :class:`FlowRunResult` from the underlying async run.
+            The ``FlowRunResult`` from the underlying async run.
         """
         try:
             loop = asyncio.get_running_loop()
@@ -3254,7 +3254,7 @@ class Runner:
         context: Any = None,
         agent_resolutions: Mapping[str, str] | None = None,
     ) -> FlowRunResult[Any]:
-        """Resume a Flow run from a serialized :class:`FlowCheckpoint`.
+        """Resume a Flow run from a serialized ``FlowCheckpoint``.
 
         See ``docs/flows/flows.md`` for the full resumption contract.
         Summary:
@@ -3263,39 +3263,39 @@ class Runner:
           the originating run and the state rehydrated from
           ``checkpoint.state_data``.
         - Step-level approvals already live on ``checkpoint.decisions``
-          (recorded via :meth:`FlowCheckpoint.approve` /
-          :meth:`FlowCheckpoint.reject`); the runner forwards them to
+          (recorded via ``FlowCheckpoint.approve`` /
+          ``FlowCheckpoint.reject``); the runner forwards them to
           the flow before the executor starts.
         - Agent-bridge deferrals (caused by inner agents whose tools
           required approval) are resumed via ``agent_resolutions`` —
-          a mapping from :attr:`FlowDeferredStep.defer_key` to the
-          :class:`RunState` JSON the consumer recorded decisions on
-          (via :meth:`RunState.approve` / :meth:`RunState.reject` then
-          :meth:`RunState.to_dict` ``+`` ``json.dumps``).
+          a mapping from ``FlowDeferredStep.defer_key`` to the
+          ``RunState`` JSON the consumer recorded decisions on
+          (via ``RunState.approve`` / ``RunState.reject`` then
+          ``RunState.to_dict`` ``+`` ``json.dumps``).
 
         Security: ``checkpoint.pending_steps`` is treated as untrusted
-        input by :meth:`FlowExecutor._invoke_step` — every name is
+        input by ``FlowExecutor._invoke_step`` — every name is
         validated against the Flow's registry before invocation, so a
         tampered checkpoint cannot trigger arbitrary methods on the
         Flow subclass. Callers loading checkpoints from shared / public
         stores SHOULD still authenticate / sign the JSON.
 
         Args:
-            flow: The :class:`Flow` instance to resume.
-            checkpoint: The :class:`FlowCheckpoint` produced by an
+            flow: The ``Flow`` instance to resume.
+            checkpoint: The ``FlowCheckpoint`` produced by an
                 earlier run.
-            config: Optional :class:`FlowConfig` for the resumed run.
-                Defaults to a fresh :class:`FlowConfig` if not
+            config: Optional ``FlowConfig`` for the resumed run.
+                Defaults to a fresh ``FlowConfig`` if not
                 supplied; bounds reset at resume.
             context: Optional developer-supplied ``TContext`` value.
             agent_resolutions: Optional mapping
                 ``defer_key → RunState JSON`` used by
-                :func:`arun_flow_agent` on the agent-bridge resume
+                ``arun_flow_agent`` on the agent-bridge resume
                 path. Empty / ``None`` for runs that did not defer
                 via an inner agent.
 
         Returns:
-            A :class:`FlowRunResult` representing the run from resume
+            A ``FlowRunResult`` representing the run from resume
             to completion (or another halt).
 
         Raises:
@@ -3329,33 +3329,33 @@ class Runner:
     ) -> FlowRunResult[Any]:
         """Resume a Flow run by looking up a checkpoint from a backend by id.
 
-        Convenience wrapper over :meth:`arun_flow_from_checkpoint` for
+        Convenience wrapper over ``arun_flow_from_checkpoint`` for
         callers that hold only the string ``checkpoint_id`` (i.e. the
-        :attr:`~philharmonica.adk.flows.checkpoint.FlowCheckpoint.flow_id`) rather
-        than the full :class:`~philharmonica.adk.flows.checkpoint.FlowCheckpoint`
+        ``flow_id``) rather
+        than the full ``FlowCheckpoint``
         object.
 
         The call loads the checkpoint via
-        :meth:`~philharmonica.adk.flows.worker_backend.FlowWorkerBackend.load_checkpoint_by_id`,
-        then delegates to :meth:`arun_flow_from_checkpoint`.  Raises
-        :class:`~philharmonica.adk.flows.exceptions.FlowCheckpointNotFoundError`
+        ``load_checkpoint_by_id``,
+        then delegates to ``arun_flow_from_checkpoint``.  Raises
+        ``FlowCheckpointNotFoundError``
         when ``checkpoint_id`` is not found in the backend so the caller
         can distinguish "id not found" from "flow is complete".
 
         Args:
-            flow: The :class:`~philharmonica.adk.flows.flow.Flow` instance to
+            flow: The ``Flow`` instance to
                 resume.  MUST use the same class as the originating run.
-            checkpoint_id: The :attr:`~philharmonica.adk.flows.checkpoint.FlowCheckpoint.flow_id`
+            checkpoint_id: The ``flow_id``
                 stored in the backend.
-            backend: A :class:`~philharmonica.adk.flows.worker_backend.FlowWorkerBackend`
+            backend: A ``FlowWorkerBackend``
                 that persisted the checkpoint.
-            config: Optional :class:`~philharmonica.adk.flows.config.FlowConfig`.
+            config: Optional ``FlowConfig``.
             context: Optional developer-supplied ``TContext`` value.
             agent_resolutions: Optional agent-bridge resolution map
-                (see :meth:`arun_flow_from_checkpoint`).
+                (see ``arun_flow_from_checkpoint``).
 
         Returns:
-            A :class:`~philharmonica.adk.flows.result.FlowRunResult` from
+            A ``FlowRunResult`` from
             resume to completion (or another halt).
 
         Raises:
@@ -3386,13 +3386,13 @@ class Runner:
         context: Any = None,
         agent_resolutions: Mapping[str, str] | None = None,
     ) -> FlowRunResult[Any]:
-        """Run one batch of a flow under a shared :class:`FlowWorkerBackend`.
+        """Run one batch of a flow under a shared ``FlowWorkerBackend``.
 
         Cross-process distribution entry point. The worker claims the
         flow's next batch via ``backend.claim_batch``, runs every step
-        in that batch (in parallel via :func:`asyncio.gather` within
+        in that batch (in parallel via ``asyncio.gather`` within
         the worker process), writes the resulting checkpoint via
-        ``backend.release_batch``, and returns a :class:`FlowRunResult`.
+        ``backend.release_batch``, and returns a ``FlowRunResult``.
 
         A subsequent call by the same or another worker resumes from
         the persisted checkpoint and processes the next batch. The
@@ -3406,18 +3406,18 @@ class Runner:
         long-running worker is desired.
 
         Args:
-            flow: The :class:`Flow` instance to run one batch of.
+            flow: The ``Flow`` instance to run one batch of.
                 MUST have the same registry as the originating flow.
-            backend: A :class:`FlowWorkerBackend` instance.
+            backend: A ``FlowWorkerBackend`` instance.
             worker_id: Opaque identifier for this worker. ``None``
                 defaults to ``f"worker-{uuid4().hex[:8]}"``.
-            config: Optional :class:`FlowConfig`.
+            config: Optional ``FlowConfig``.
             context: Optional ``TContext``.
             agent_resolutions: Optional agent-bridge resolution map
-                (see :meth:`arun_flow_from_checkpoint`).
+                (see ``arun_flow_from_checkpoint``).
 
         Returns:
-            A :class:`FlowRunResult` for the executor that ran the
+            A ``FlowRunResult`` for the executor that ran the
             claimed batch. Status ``"completed"`` when no further
             batches remain; ``"deferred"`` when a HITL gate fired;
             otherwise the partial run terminates on a per-batch
@@ -3528,9 +3528,9 @@ class Runner:
         See ``docs/flows/flows.md`` for the full discussion of batch
         semantics, cancellation, and aliasing. Summary:
 
-        - One fresh :class:`Flow` per input via ``flow_factory(state)``;
+        - One fresh ``Flow`` per input via ``flow_factory(state)``;
           results aligned to input order.
-        - Per-item :class:`PhilharmonicaError` failures land on
+        - Per-item ``PhilharmonicaError`` failures land on
           ``FlowRunResult.status == "failed"`` rather than being raised
           — programmer errors (``NameError``, ``AttributeError``,
           ``TypeError``) and cancellation-class exceptions
@@ -3538,25 +3538,25 @@ class Runner:
           propagate; the batch is all-or-nothing under those.
         - ``concurrency=1`` (default) is the cost-conservative
           sequential path. ``concurrency>=2`` caps fan-out via
-          :class:`asyncio.Semaphore`.
+          ``asyncio.Semaphore``.
         - Caller-supplied state instances MAY be partially mutated by
           the factory before a failure surfaces — callers should not
           retry a failed item against the same state reference without
           first inspecting it.
 
         Args:
-            flow_factory: Callable that builds one :class:`Flow` from
+            flow_factory: Callable that builds one ``Flow`` from
                 one input state. Called once per element of
                 ``initial_states`` immediately before that item's run.
             initial_states: Sequence of state values; empty ⇒ ``()``.
             concurrency: Maximum concurrent runs (``>= 1``).
-            config: Optional :class:`FlowConfig`. Same instance applied
+            config: Optional ``FlowConfig``. Same instance applied
                 to every per-item executor; do not mutate from steps.
             context: Optional ``TContext`` attached to every per-item
                 ``RunContext``.
 
         Returns:
-            Tuple of :class:`FlowRunResult` aligned to
+            Tuple of ``FlowRunResult`` aligned to
             ``initial_states``. Per-item failures surface via
             ``result.status`` / ``result.error``; cancellation /
             programmer errors propagate.
@@ -3646,12 +3646,12 @@ class Runner:
         """Run one input through ``arun_flow`` and capture framework errors.
 
         Step-level exceptions are already routed through
-        :attr:`FlowConfig.error_policy` inside the executor — they
-        surface as :class:`FlowRunResult` with ``status="failed"``
+        ``FlowConfig.error_policy`` inside the executor — they
+        surface as ``FlowRunResult`` with ``status="failed"``
         without ever escaping. This guard catches framework-level
-        :class:`PhilharmonicaError` subclasses that can still bubble out
-        (e.g. :class:`FlowDefinitionError` from ``encode_state`` on
-        an unsupported state type, or a future :class:`PhilharmonicaError`
+        ``PhilharmonicaError`` subclasses that can still bubble out
+        (e.g. ``FlowDefinitionError`` from ``encode_state`` on
+        an unsupported state type, or a future ``PhilharmonicaError``
         raised by the framework boundary).
 
         Programmer errors (``NameError``, ``AttributeError``,
@@ -3665,7 +3665,7 @@ class Runner:
         ``logger.exception`` so the configured logging handler
         records it in addition to the synthesised error string on the
         returned ``FlowRunResult``. The result also preserves
-        ``cumulative_usage`` from the flow's :class:`RunContext` when
+        ``cumulative_usage`` from the flow's ``RunContext`` when
         available — partial token spend is not silently dropped from
         batch totals.
         """
@@ -3719,27 +3719,27 @@ class Runner:
         config: FlowConfig | None = None,
         context: Any = None,
     ) -> FlowRunResultStreaming[Any]:
-        """Execute a :class:`Flow` asynchronously with event streaming.
+        """Execute a ``Flow`` asynchronously with event streaming.
 
-        Returns a :class:`FlowRunResultStreaming` immediately. Consumers
+        Returns a ``FlowRunResultStreaming`` immediately. Consumers
         iterate via ``async for event in result.stream_events():`` to
-        receive :class:`FlowEvent` instances as steps progress. The
+        receive ``FlowEvent`` instances as steps progress. The
         final state and status populate on the result instance once the
         stream ends.
 
-        A background asyncio task (:func:`_drive_flow_stream`) drives the
-        :class:`FlowExecutor` whose ``on_event`` callback pushes events
+        A background asyncio task (``_drive_flow_stream``) drives the
+        ``FlowExecutor`` whose ``on_event`` callback pushes events
         into the result's queue. ``final_state`` / ``status`` populate
         when the stream ends.
 
         Args:
-            flow: The :class:`Flow` instance to execute.
-            config: Optional :class:`FlowConfig`. See :meth:`arun_flow`.
+            flow: The ``Flow`` instance to execute.
+            config: Optional ``FlowConfig``. See ``arun_flow``.
             context: Optional developer-supplied ``TContext``.
 
         Returns:
-            A :class:`FlowRunResultStreaming` whose ``stream_events()``
-            yields :class:`FlowEvent` instances as the run progresses.
+            A ``FlowRunResultStreaming`` whose ``stream_events()``
+            yields ``FlowEvent`` instances as the run progresses.
         """
         from philharmonica.adk.flows.config import FlowConfig
         from philharmonica.adk.flows.executor import FlowExecutor
@@ -4117,8 +4117,8 @@ async def _arun_task_pipeline_sequential(
 ) -> tuple[list[TaskOutput], Any]:
     """Run pipeline tasks in declaration order, halting on first error.
 
-    The original :class:`TaskPipeline` execution path. Used when no
-    task declares :attr:`Task.depends_on`. Skip / error / usage
+    The original ``TaskPipeline`` execution path. Used when no
+    task declares ``Task.depends_on``. Skip / error / usage
     handling unchanged from the prior implementation.
     """
     from dataclasses import replace
@@ -4188,14 +4188,14 @@ async def _arun_task_pipeline_dag(
     ``Session.add`` is not idempotent); no later level fires.
 
     ``skip_if`` receives the in-completion-order tuple of prior
-    :class:`TaskOutput` results (skipped + errored slots included).
+    ``TaskOutput`` results (skipped + errored slots included).
 
     The ``completed_task_ids`` set lets the resume path skip tasks
     that finished before a checkpoint — they appear in
     ``preloaded_outputs`` and are placed at their declaration-order
     positions in the returned list. An ID in ``completed_task_ids``
     that doesn't correspond to a task in the pipeline raises
-    :class:`TaskPipelineDefinitionError` so a renamed task doesn't
+    ``TaskPipelineDefinitionError`` so a renamed task doesn't
     silently re-run.
 
     Output ordering: the returned list is sorted to match
@@ -4282,7 +4282,7 @@ def _completion_order(
 ) -> tuple[TaskOutput, ...]:
     """Return the outputs seen so far in declaration order.
 
-    Same shape as :func:`_declaration_order` but typed as a tuple for
+    Same shape as ``_declaration_order`` but typed as a tuple for
     pass-through to ``skip_if`` predicates.
     """
     return tuple(_declaration_order(pipeline, by_id, identity_by_task))
@@ -4328,7 +4328,7 @@ async def _run_one_task_in_level(
 ) -> TaskOutput:
     """Run a single task inside a DAG level, returning an error / skip slot on failure.
 
-    Wraps :func:`Runner.arun_task` so exceptions surface as
+    Wraps ``Runner.arun_task`` so exceptions surface as
     ``TaskOutput.error`` slots rather than propagating up through
     ``asyncio.gather`` — siblings in the same level are allowed to
     finish; the DAG executor halts AFTER the level when any task in
@@ -4379,11 +4379,11 @@ def _compose_task_prompt(
     """Build the effective user prompt for ``task`` given prior outputs.
 
     For each upstream in ``task.depends_on``, the runner builds a
-    :class:`TaskInputData` snapshot of the upstream's completion and
+    ``TaskInputData`` snapshot of the upstream's completion and
     calls ``task.input_filter``. The filter sets
-    :attr:`TaskInputData.forwarded` — the :class:`RunItem` subset to
+    ``TaskInputData.forwarded`` — the ``RunItem`` subset to
     flow into this task's input. The runner converts the items to
-    Layer-1 ``LLMInputContentItem`` via :meth:`RunItem.to_param` and
+    Layer-1 ``LLMInputContentItem`` via ``RunItem.to_param`` and
     prepends them to the message(s) derived from ``task.description``.
 
     When ``task.input_filter`` is ``None`` or no upstream contributes
@@ -4393,9 +4393,9 @@ def _compose_task_prompt(
     Args:
         task: The downstream task whose prompt is being composed.
         prior_outputs_by_id: Map of completed upstream ``task_id`` →
-            :class:`TaskOutput`.
+            ``TaskOutput``.
         prior_items_by_id: Map of completed upstream ``task_id`` →
-            tuple of :class:`RunItem` produced during that task's run
+            tuple of ``RunItem`` produced during that task's run
             (``RunResult.new_items``).
 
     Returns:
@@ -4461,7 +4461,7 @@ def _resolve_task_identity(task: Task) -> tuple[str, str]:
 
     The verbose Task panel truncates the display to the first 8 chars
     inside the renderer; the full UUID propagates intact through
-    hooks, tracing, session events, and :class:`TaskOutput.task_id`.
+    hooks, tracing, session events, and ``TaskOutput.task_id``.
     """
     task_id = task.task_id if task.task_id is not None else str(uuid.uuid4())
     task_name = task.name if task.name is not None else _derive_task_name(task.description)
@@ -4480,10 +4480,10 @@ async def _run_task_as_agent(
     session: SessionStore | None,
     memory: MemoryConfig | None,
 ) -> TaskOutput:
-    """Dispatch a Task whose target is an :class:`Agent` via :meth:`Runner.arun`.
+    """Dispatch a Task whose target is an ``Agent`` via ``Runner.arun``.
 
-    Projects the resulting :class:`RunResult` into a
-    :class:`TaskOutput` shape (carrying the task identity, final
+    Projects the resulting ``RunResult`` into a
+    ``TaskOutput`` shape (carrying the task identity, final
     output, item trail, and run-context usage).
     """
     from philharmonica.adk.tasks.task_output import TaskOutput
@@ -4519,16 +4519,16 @@ async def _run_task_as_swarm(
     effective_config: RunConfig,
     session: SessionStore | None,
 ) -> TaskOutput:
-    """Dispatch a Task whose target is a :class:`Swarm`.
+    """Dispatch a Task whose target is a ``Swarm``.
 
-    ``Task.memory`` is NOT forwarded because :meth:`Runner.arun_swarm`
+    ``Task.memory`` is NOT forwarded because ``Runner.arun_swarm``
     does not accept ``memory`` — swarm-level memory wiring lives on
     member agents directly. ``hooks`` flow through unchanged (the
-    swarm path accepts :class:`RunHooks`).
+    swarm path accepts ``RunHooks``).
 
-    Projects :class:`SwarmRunResult` to :class:`TaskOutput` by reading
+    Projects ``SwarmRunResult`` to ``TaskOutput`` by reading
     ``final_output`` and the cumulative usage on the swarm's shared
-    :class:`RunContext`.
+    ``RunContext``.
     """
     from philharmonica.adk.tasks.task_output import TaskOutput
 
@@ -4563,19 +4563,19 @@ async def _run_task_as_graph(
     session: SessionStore | None,
     memory: MemoryConfig | None,
 ) -> TaskOutput:
-    """Dispatch a Task whose target is a :class:`Graph`.
+    """Dispatch a Task whose target is a ``Graph``.
 
     ``RunHooks`` are NOT propagated into the graph run because
-    :meth:`Runner.arun_graph` takes ``list[GraphHooks | HookProvider]``
+    ``Runner.arun_graph`` takes ``list[GraphHooks | HookProvider]``
     rather than ``RunHooks``. The outer ``on_task_start`` /
-    ``on_task_end`` still fire from :meth:`Runner.arun_task`; per-node
-    hooks must attach to the :class:`Graph` directly. A
+    ``on_task_end`` still fire from ``Runner.arun_task``; per-node
+    hooks must attach to the ``Graph`` directly. A
     ``GraphHookProvider`` adapter is a tracked follow-up.
 
     ``Task.max_turns``, ``Task.usage_limits``, ``session`` and
     ``memory`` have no graph-level analogue on
-    :meth:`Runner.arun_graph` (the graph layer's budgets live on
-    :class:`GraphConfig` and per-node configs). Supplying any of them
+    ``Runner.arun_graph`` (the graph layer's budgets live on
+    ``GraphConfig`` and per-node configs). Supplying any of them
     on a Graph-targeted task emits a single ``logger.warning`` so the
     disconnect is visible, then the values are dropped on the floor.
     """
@@ -4644,7 +4644,7 @@ def _effective_task_target(task: Task) -> Agent | Swarm | Graph:
     is validated at Task construction to require an Agent, so Swarm /
     Graph branches never enter the replace path.
 
-    For Agent targets: when :attr:`Task.output_schema` is ``None``,
+    For Agent targets: when ``Task.output_schema`` is ``None``,
     returns ``task.agent`` unchanged. When set, builds a transient
     agent via ``dataclasses.replace`` — the original agent definition
     is untouched. Tracing's ``_output_type_name_for_span`` and
@@ -4693,7 +4693,7 @@ def _format_task_error(exc: BaseException) -> str:
 
     Prevents leaking provider response bodies / credentials embedded
     in long exception messages into hook callbacks, logs, or session
-    persistence. The cap is :data:`_TASK_ERROR_MAX_LEN`.
+    persistence. The cap is ``_TASK_ERROR_MAX_LEN``.
     """
     text = f"{type(exc).__name__}: {exc}"
     if len(text) <= _TASK_ERROR_MAX_LEN:
@@ -4707,7 +4707,7 @@ def _build_task_error_slot(
     exc: BaseException,
     metadata: dict[str, Any],
 ) -> TaskOutput:
-    """Construct an error-set :class:`TaskOutput` slot for a halted pipeline task.
+    """Construct an error-set ``TaskOutput`` slot for a halted pipeline task.
 
     Centralises the truncation + metadata-copy contract so both
     pipeline error paths (predicate failure + inner-task failure)
@@ -4761,7 +4761,7 @@ async def _stream_task_pipeline_impl(
     session: SessionStore | None,
     memory: MemoryConfig | None,
 ) -> AsyncIterator[tuple[int, RunResultStreaming | None]]:
-    """Async generator backing :meth:`Runner.arun_task_pipeline_streamed`.
+    """Async generator backing ``Runner.arun_task_pipeline_streamed``.
 
     Iterates the pipeline tasks in order. Skip slots and error-stop
     slots both yield ``(index, None)``; executable slots yield
@@ -4771,7 +4771,7 @@ async def _stream_task_pipeline_impl(
     the error detail. A ``(index, None)`` yield followed by additional
     yields is a skipped task.
 
-    ``skip_if`` evaluation walks the prior :class:`TaskOutput` slots —
+    ``skip_if`` evaluation walks the prior ``TaskOutput`` slots —
     the generator records a ``streaming_placeholder=True`` slot for each
     non-skipped task after yielding it, because the consumer-driven inner
     stream may not have completed by the time the next ``skip_if`` fires.
@@ -4819,14 +4819,14 @@ def _collect_task_group_outputs(
     tasks: tuple[Task[Any], ...],
     aio_tasks: list[asyncio.Task[TaskOutput]],
 ) -> list[TaskOutput]:
-    """Build the per-task :class:`TaskOutput` slots for a TaskGroup run.
+    """Build the per-task ``TaskOutput`` slots for a TaskGroup run.
 
     Walks the asyncio task list in input order. Resolved tasks carry
-    their :class:`TaskOutput` directly. Cancelled tasks (under
-    ``halt_on_first``) surface as :class:`TaskOutput` slots with an
+    their ``TaskOutput`` directly. Cancelled tasks (under
+    ``halt_on_first``) surface as ``TaskOutput`` slots with an
     explanatory ``error`` field so positional indexing stays stable.
     Tasks that raised pass through the existing
-    :func:`_build_task_error_slot` helper so error formatting matches
+    ``_build_task_error_slot`` helper so error formatting matches
     the pipeline path.
     """
     from philharmonica.adk.tasks.task_output import TaskOutput
@@ -4871,9 +4871,9 @@ def _build_task_skip_slot(
     task_name: str,
     metadata: dict[str, Any],
 ) -> TaskOutput:
-    """Construct a ``skipped=True`` :class:`TaskOutput` slot.
+    """Construct a ``skipped=True`` ``TaskOutput`` slot.
 
-    Skipped tasks remain in :attr:`TaskPipelineResult.task_outputs`
+    Skipped tasks remain in ``TaskPipelineResult.task_outputs``
     so positional indexing stays stable across the pipeline.
     """
     from philharmonica.adk.tasks.task_output import TaskOutput
@@ -4889,7 +4889,7 @@ def _build_task_skip_slot(
 def _derive_task_name(user_prompt: UserPrompt) -> str:
     """Derive a short task name from the user prompt for the 📋 Task panel.
 
-    String prompts are truncated to :data:`_TASK_NAME_MAX_LEN` characters
+    String prompts are truncated to ``_TASK_NAME_MAX_LEN`` characters
     with an ellipsis suffix. Structured prompts (message lists) fall
     through to a generic label so we never call ``str()`` on a large
     list and inflate the panel.
@@ -4994,9 +4994,9 @@ async def _inject_memories(
 
 
 async def _drive_flow_stream(executor: Any, result: Any) -> None:
-    """Drive a :class:`FlowExecutor` in the background of a streamed run.
+    """Drive a ``FlowExecutor`` in the background of a streamed run.
 
-    Module-level helper used by :meth:`Runner.arun_flow_streamed` so the
+    Module-level helper used by ``Runner.arun_flow_streamed`` so the
     main classmethod stays compact. Pulls the executor to completion,
     then writes the final state /
     status / usage onto ``result``. Always calls ``result.complete()``
@@ -5010,8 +5010,8 @@ async def _drive_flow_stream(executor: Any, result: Any) -> None:
     propagate untouched so async cancellation works correctly.
 
     Args:
-        executor: The :class:`FlowExecutor` to drive.
-        result: The :class:`FlowRunResultStreaming` to finalize.
+        executor: The ``FlowExecutor`` to drive.
+        result: The ``FlowRunResultStreaming`` to finalize.
     """
     try:
         final = await executor.run()
@@ -5045,7 +5045,7 @@ async def _drive_flow_stream(executor: Any, result: Any) -> None:
 def _encode_flow_state(flow: Any) -> str:
     """Encode ``flow.state`` to JSON for cold-start checkpoint synthesis.
 
-    Routes through :func:`philharmonica.adk.flows.executor.encode_state` so
+    Routes through ``philharmonica.adk.flows.executor.encode_state`` so
     the supported state shapes (Pydantic ``BaseModel`` /
     ``@dataclass``) and the loud-failure semantics for everything else
     stay in one place.
@@ -5056,7 +5056,7 @@ def _encode_flow_state(flow: Any) -> str:
 
 
 def _build_lost_claim_result(flow: Any, batch_id: int, worker_id: str) -> FlowRunResult[Any]:
-    """Return a :class:`FlowRunResult` describing a lost claim attempt.
+    """Return a ``FlowRunResult`` describing a lost claim attempt.
 
     Lands when another worker already holds ``batch_id`` within its
     TTL window. The caller treats the result as a non-error
@@ -5077,9 +5077,9 @@ def _build_lost_claim_result(flow: Any, batch_id: int, worker_id: str) -> FlowRu
 
 
 def _validate_batch_inputs(concurrency: int) -> None:
-    """Boundary check for :meth:`Runner.arun_flow_for_each`.
+    """Boundary check for ``Runner.arun_flow_for_each``.
 
-    Raises :class:`ValueError` when ``concurrency < 1``. Extracted into a
+    Raises ``ValueError`` when ``concurrency < 1``. Extracted into a
     module-level helper so the public method stays under the function-length
     cap.
     """
@@ -5090,9 +5090,9 @@ def _validate_batch_inputs(concurrency: int) -> None:
 
 
 def _seed_executor_from_checkpoint(executor: Any, checkpoint: Any) -> None:
-    """Seed a fresh :class:`FlowExecutor` from a :class:`FlowCheckpoint`.
+    """Seed a fresh ``FlowExecutor`` from a ``FlowCheckpoint``.
 
-    Module-level helper used by :meth:`Runner.arun_flow_from_checkpoint`
+    Module-level helper used by ``Runner.arun_flow_from_checkpoint``
     so the main classmethod stays compact. Mutates ``executor`` in
     place by writing the
     checkpoint's recorded state into the executor's internal fields,
@@ -5100,15 +5100,15 @@ def _seed_executor_from_checkpoint(executor: Any, checkpoint: Any) -> None:
     pending queue.
 
     The ``step_count`` is reset to 0 — the resumed run's
-    :attr:`FlowConfig.max_steps` cap is independent of the prior run's
+    ``FlowConfig.max_steps`` cap is independent of the prior run's
     step count. Names from ``pending_steps`` flow through
-    :meth:`FlowExecutor._invoke_step` which validates each name against
+    ``FlowExecutor._invoke_step`` which validates each name against
     the Flow's registry before invocation; a tampered checkpoint
     cannot trigger arbitrary methods on the Flow subclass.
 
     Args:
-        executor: The newly-constructed :class:`FlowExecutor` to seed.
-        checkpoint: The :class:`FlowCheckpoint` providing the recorded
+        executor: The newly-constructed ``FlowExecutor`` to seed.
+        checkpoint: The ``FlowCheckpoint`` providing the recorded
             state.
     """
     from dataclasses import replace

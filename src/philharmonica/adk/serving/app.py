@@ -1,7 +1,7 @@
 """Compose the enabled HTTP surfaces into one ASGI app.
 
-:func:`build_app` mounts the plain-REST surface, the A2A surface, and/or
-the health routes onto a single :class:`starlette.applications.Starlette`
+``build_app`` mounts the plain-REST surface, the A2A surface, and/or
+the health routes onto a single ``starlette.applications.Starlette``
 app. Every surface is **off by default**: the caller enables exactly the
 ones it wants, so the framework never serves a route the developer did
 not ask for. The caller's own ASGI runtime (uvicorn, hypercorn, granian)
@@ -46,13 +46,13 @@ def build_app(
         agent: The agent the REST surface runs. (The A2A surface binds
             its own agent through ``a2a_server``.)
         rest: Mount ``POST /run`` and ``POST /run_sse``.
-        a2a_server: An :class:`A2AServer` config to mount the A2A
+        a2a_server: An ``A2AServer`` config to mount the A2A
             JSON-RPC + discovery routes; ``None`` leaves A2A off.
             Requires the ``a2a`` extra.
         health: Mount ``GET /healthz`` and ``GET /readyz``.
         max_turns: Default per-request agent-loop budget for the REST
             surface; ``None`` defers to the framework default.
-        run_config: Optional :class:`RunConfig` applied to every REST run.
+        run_config: Optional ``RunConfig`` applied to every REST run.
         session_factory: Optional ``(user_id, session_id) -> SessionStore``
             used when a REST request carries a ``session`` block.
         allow_client_max_turns_above_server_limit: When ``False`` (default),
@@ -61,7 +61,7 @@ def build_app(
         readiness_probe: Optional async predicate backing ``GET /readyz``.
 
     Returns:
-        A :class:`starlette.applications.Starlette` app for the caller's
+        A ``starlette.applications.Starlette`` app for the caller's
         ASGI runtime to serve.
 
     Raises:
@@ -95,7 +95,7 @@ def _a2a_routes(a2a_server: A2AServer) -> list[BaseRoute]:
     when an ``a2a_server`` is actually supplied.
 
     Args:
-        a2a_server: An :class:`A2AServer` config object.
+        a2a_server: An ``A2AServer`` config object.
 
     Returns:
         The route objects from the A2A Starlette app.

@@ -7,27 +7,27 @@ only when all expected names have written. The engine checks channel
 availability to decide what to schedule next.
 
 This module ports the idea as a standalone class the graph loop
-queries directly. A :class:`JoinBarrier` belongs to a single target
+queries directly. A ``JoinBarrier`` belongs to a single target
 node and tracks which upstream node ids have "arrived" (produced a
-:class:`NodeResult`) since the last time the target executed.
+``NodeResult``) since the last time the target executed.
 
 Why a first-class class instead of engine-level edge counting:
 
 - **Self-contained.** The barrier owns the decision "am I ready?".
-  The graph loop asks :meth:`is_ready`. No edge-counting / visited-set
+  The graph loop asks ``is_ready``. No edge-counting / visited-set
   bookkeeping leaks into the loop.
 
 - **Resettable.** A barrier in a cycle (node A → B → A) resets after
-  each firing. :meth:`consume` clears the arrival set so the next
+  each firing. ``consume`` clears the arrival set so the next
   loop iteration starts clean.
 
 - **Two semantics one class.** AND-join and OR-join differ only in
-  the :meth:`is_ready` predicate. Passing the semantics in via
-  :class:`JoinSemantics` avoids a class hierarchy.
+  the ``is_ready`` predicate. Passing the semantics in via
+  ``JoinSemantics`` avoids a class hierarchy.
 
 Only one-time-per-superstep arrivals are tracked. If the same
 upstream node re-fires before the target consumes, the second
-arrival overwrites the first in :attr:`arrivals` — correct here
+arrival overwrites the first in ``arrivals`` — correct here
 because a superstep cannot fire the same node twice. Dynamic
 fan-out (Send-equivalent), which would need per-arrival queues, is
 not supported.
@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 
 
 class JoinSemantics(StrEnum):
-    """How a :class:`JoinBarrier` decides it is ready to fire."""
+    """How a ``JoinBarrier`` decides it is ready to fire."""
 
     AND = "and"
     """Fire only when EVERY expected upstream has arrived.
@@ -73,7 +73,7 @@ class JoinSemantics(StrEnum):
 class JoinBarrier:
     """Fan-in barrier for a single target node.
 
-    A :class:`JoinBarrier` is owned by the graph loop — one per
+    A ``JoinBarrier`` is owned by the graph loop — one per
     graph node that has more than one incoming edge (single-parent
     nodes don't need a barrier; their input is the single upstream
     result).
@@ -84,23 +84,23 @@ class JoinBarrier:
         expected: Set of upstream node ids that this barrier waits
             on. Derived at compile time from the graph's edge set —
             every edge ``(u, target)`` contributes ``u`` to this set.
-        semantics: :class:`JoinSemantics.AND` (default) or
-            :class:`JoinSemantics.OR`.
-        arrivals: Map of arrived upstream id → the :class:`NodeResult`
-            they produced. Populated by :meth:`record` during a
-            superstep. Cleared by :meth:`consume` right before the
+        semantics: ``JoinSemantics.AND`` (default) or
+            ``JoinSemantics.OR``.
+        arrivals: Map of arrived upstream id → the ``NodeResult``
+            they produced. Populated by ``record`` during a
+            superstep. Cleared by ``consume`` right before the
             target executes.
         skipped: Upstream ids whose conditional edge predicate returned
             ``False`` this cycle. An AND-join treats ``arrivals ∪
             skipped == expected`` as satisfied (while requiring at
             least one real arrival) so that conditional edges don't
-            deadlock the barrier. Cleared by :meth:`consume`.
+            deadlock the barrier. Cleared by ``consume``.
         failed: Upstream ids whose conditional edge predicate raised an
-            exception this cycle. Distinct from :attr:`skipped`
+            exception this cycle. Distinct from ``skipped``
             (predicate returned ``False``) — a failed predicate
             indicates an error, not an intentional branch skip.
             An AND-join with any failed upstream is NOT considered ready
-            (fail-closed). Cleared by :meth:`consume`.
+            (fail-closed). Cleared by ``consume``.
     """
 
     target: str
@@ -113,7 +113,7 @@ class JoinBarrier:
     def record(self, source: str, result: NodeResult) -> None:
         """Record an upstream arrival.
 
-        Ignores arrivals from sources not in :attr:`expected` — this
+        Ignores arrivals from sources not in ``expected`` — this
         shouldn't happen in a well-formed graph but if it does
         (a conditional edge fires an unexpected path) we log a
         warning and drop the arrival rather than silently corrupting
@@ -121,7 +121,7 @@ class JoinBarrier:
 
         Args:
             source: Upstream node id that just produced a result.
-            result: The :class:`NodeResult` it produced.
+            result: The ``NodeResult`` it produced.
         """
         if source not in self.expected:
             logger.warning(
@@ -146,9 +146,9 @@ class JoinBarrier:
         skipped is a no-op).
 
         If the same source later arrives (cycles), ``record`` clears
-        it from :attr:`skipped`. A clean skip also clears a prior
-        :meth:`record_fail` mark for the same source — symmetric with
-        :meth:`record_fail`, which clears :attr:`skipped` — so a transient
+        it from ``skipped``. A clean skip also clears a prior
+        ``record_fail`` mark for the same source — symmetric with
+        ``record_fail``, which clears ``skipped`` — so a transient
         predicate error in an earlier superstep does not permanently lock
         the barrier once the upstream resolves to an intentional skip.
         """
@@ -162,13 +162,13 @@ class JoinBarrier:
     def record_fail(self, source: str) -> None:
         """Record that an upstream edge predicate raised an exception.
 
-        Distinct from :meth:`record_skip` (predicate returned ``False``):
+        Distinct from ``record_skip`` (predicate returned ``False``):
         a failed predicate is an error condition, not an intentional branch
         skip. An AND-join with any failed upstream is NOT ready (fail-closed)
         — the downstream node must not fire with potentially corrupt inputs.
 
         If the same source later arrives with a real result, it is cleared
-        from :attr:`failed` by :meth:`record`. The caller
+        from ``failed`` by ``record``. The caller
         (``graph_loop.py``) is responsible for logging the exception before
         calling this method.
 
@@ -207,7 +207,7 @@ class JoinBarrier:
 
         Returns:
             ``(results, sources)``: Parallel lists of arrived
-            :class:`NodeResult` values and their source node ids,
+            ``NodeResult`` values and their source node ids,
             both sorted by source id.
         """
         sorted_sources = sorted(self.arrivals.keys())

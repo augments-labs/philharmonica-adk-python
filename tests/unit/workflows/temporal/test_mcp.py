@@ -1,4 +1,4 @@
-"""Tests for :mod:`philharmonica.adk.workflows.temporal.mcp`.
+"""Tests for ``philharmonica.adk.workflows.temporal.mcp``.
 
 Covers:
 - ``TemporalMCPToolSet`` stores ``name`` and ``connection_params`` correctly.

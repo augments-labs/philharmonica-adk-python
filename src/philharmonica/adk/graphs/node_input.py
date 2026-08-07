@@ -1,23 +1,23 @@
-"""``prepare_node_input`` — build the :class:`ExecutableInput` a node
+"""``prepare_node_input`` — build the ``ExecutableInput`` a node
 receives at firing time.
 
 This is the graph-world equivalent of
-:func:`philharmonica.adk.swarms.shared_context.prepare_turn_input`. The graph
+``philharmonica.adk.swarms.shared_context.prepare_turn_input``. The graph
 loop calls it once per node per superstep, right before invoking
-:meth:`Executable.invoke`.
+``Executable.invoke``.
 
 Given:
 
-- The current :class:`GraphState`.
-- The target :class:`GraphNode` (carries the merge strategy).
-- The list of arrived upstream :class:`NodeResult`\\ s and the parallel
+- The current ``GraphState``.
+- The target ``GraphNode`` (carries the merge strategy).
+- The list of arrived upstream ``NodeResult``\\ s and the parallel
   list of their source ids (both already sorted by source id by
-  :meth:`JoinBarrier.consume`).
-- The :class:`NodeInputStrategy` from :class:`GraphConfig`.
+  ``JoinBarrier.consume``).
+- The ``NodeInputStrategy`` from ``GraphConfig``.
 - The original user prompt (used by the entry node on its first
   firing).
 
-This function returns the :class:`ExecutableInput` the node consumes.
+This function returns the ``ExecutableInput`` the node consumes.
 It encapsulates three independent concerns:
 
 1. **Merge** — fold multiple upstream values via the node's
@@ -25,17 +25,17 @@ It encapsulates three independent concerns:
    or a ``list[LLMInputContentItem]`` (use verbatim). This is LOCAL
    scope — only the direct upstream contributions.
 
-2. **Scope** — per :class:`NodeInputStrategy`:
+2. **Scope** — per ``NodeInputStrategy``:
    - ``LAST_OUTPUT`` (default) passes only the merged LOCAL payload.
    - ``MERGED_OUTPUTS`` prepends every completed node's ``final_text``
      as a running-document so the target sees "everything said so far".
-   - ``FULL_HISTORY`` prepends every Layer 3 :class:`RunItem` produced
+   - ``FULL_HISTORY`` prepends every Layer 3 ``RunItem`` produced
      anywhere in the run, converted to Layer 1 params.
 
 3. **Entry bootstrap** — the entry node has no upstreams on its first
    firing, so the caller passes the original ``user_prompt`` through
    ``initial_prompt`` and we normalise it via
-   :meth:`ItemHelpers.input_to_new_input_list`.
+   ``ItemHelpers.input_to_new_input_list``.
 
 Keeping all three knobs inside one function (not sprinkled across the
 loop) makes it easy to unit-test in isolation.
@@ -71,30 +71,30 @@ def prepare_node_input(
     edge_label: str | None,
     initial_prompt: UserPrompt | None,
 ) -> ExecutableInput:
-    """Build the :class:`ExecutableInput` a node should receive.
+    """Build the ``ExecutableInput`` a node should receive.
 
     The function is pure — all mutation happens through the returned
     value. Errors bubble up to the graph loop.
 
     Args:
-        state: Current :class:`GraphState` (read-only).
-        node: The target :class:`GraphNode`. Its ``merge`` callable
+        state: Current ``GraphState`` (read-only).
+        node: The target ``GraphNode``. Its ``merge`` callable
             folds ``arrived_results``.
-        arrived_results: Upstream :class:`NodeResult`\\ s in
+        arrived_results: Upstream ``NodeResult``\\ s in
             source-id sorted order. Empty on the entry node's first
             firing.
         arrived_sources: Parallel list of source node ids, same order
             as ``arrived_results``.
-        strategy: Graph-wide :class:`NodeInputStrategy`. A per-node
+        strategy: Graph-wide ``NodeInputStrategy``. A per-node
             override via ``node.metadata["input"]`` is not yet
             implemented.
         edge_label: Optional label of the triggering edge.
         initial_prompt: Original user prompt passed to
-            :meth:`Runner.arun_graph`. Used only on the entry node's
+            ``Runner.arun_graph``. Used only on the entry node's
             first firing (when ``arrived_results`` is empty).
 
     Returns:
-        A freshly constructed :class:`ExecutableInput`.
+        A freshly constructed ``ExecutableInput``.
     """
     # Case A: entry node, first firing. No upstreams yet.
     if len(arrived_results) == 0:

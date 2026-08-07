@@ -10,7 +10,7 @@ TypedDicts almost verbatim (``type: "input_text"`` / ``"input_image"`` /
 ``"reasoning"``), so conversion is largely a shape normalisation rather
 than a rewrite. Provider-native hosted tool items that do not fit the
 4 core part types (text, reasoning, function call, refusal) land in
-:class:`LLMResponseProviderItem` with ``raw`` carrying the verbatim
+``LLMResponseProviderItem`` with ``raw`` carrying the verbatim
 provider payload — replayed unchanged on the next turn.
 
 Refs:
@@ -299,12 +299,12 @@ class OpenAIResponsesConverter:
           hosted-tool param (``WebSearchToolParam``,
           ``CodeInterpreter``, ``FileSearchToolParam``,
           ``ImageGeneration``). Variants the Responses API does not
-          ship raise :class:`UnsupportedHostedToolError`.
+          ship raise ``UnsupportedHostedToolError``.
 
         Raises:
             UnsupportedHostedToolError: If a hosted-tool variant is
                 supplied that the Responses API does not support
-                (currently :class:`URLContextTool`, which is
+                (currently ``URLContextTool``, which is
                 Gemini-only).
         """
         from pydantic import BaseModel
@@ -398,7 +398,7 @@ class OpenAIResponsesConverter:
 
     @classmethod
     def _convert_web_search(cls, tool: WebSearchTool) -> WebSearchToolParam:
-        """Translate :class:`WebSearchTool` to ``WebSearchToolParam``.
+        """Translate ``WebSearchTool`` to ``WebSearchToolParam``.
 
         Reads OpenAI-honoured attributes (``search_context_size``,
         ``user_location``) and silently ignores Anthropic-only knobs
@@ -424,11 +424,11 @@ class OpenAIResponsesConverter:
 
     @classmethod
     def _convert_computer(cls, tool: ComputerTool[Any]) -> ComputerUsePreviewToolParam:
-        """Translate :class:`ComputerTool` to ``ComputerUsePreviewToolParam``.
+        """Translate ``ComputerTool`` to ``ComputerUsePreviewToolParam``.
 
         Emits the Responses-API ``computer_use_preview`` tool with the
         reported display geometry and environment hint. The local
-        :class:`Computer` executor and the safety / approval gates are
+        ``Computer`` executor and the safety / approval gates are
         runtime concerns handled by the Runner — they are not part of the
         wire tool definition.
         """
@@ -441,7 +441,7 @@ class OpenAIResponsesConverter:
 
     @classmethod
     def _convert_code_execution(cls, tool: CodeExecutionTool) -> CodeInterpreterToolParam:
-        """Translate :class:`CodeExecutionTool` to the ``code_interpreter`` param.
+        """Translate ``CodeExecutionTool`` to the ``code_interpreter`` param.
 
         Honours ``container``: when set, binds to a specific container
         resource; ``None`` lets OpenAI auto-provision.
@@ -454,7 +454,7 @@ class OpenAIResponsesConverter:
 
     @classmethod
     def _convert_file_search(cls, tool: FileSearchTool) -> FileSearchToolParam:
-        """Translate :class:`FileSearchTool` to ``FileSearchToolParam``.
+        """Translate ``FileSearchTool`` to ``FileSearchToolParam``.
 
         ``vector_store_ids`` is required by the API; an empty list is
         forwarded as-is so the API surfaces the validation error to
@@ -477,7 +477,7 @@ class OpenAIResponsesConverter:
         cls,
         tool: ImageGenerationTool,
     ) -> ImageGenerationToolParam:
-        """Translate :class:`ImageGenerationTool` to the ``image_generation`` param."""
+        """Translate ``ImageGenerationTool`` to the ``image_generation`` param."""
         param: ImageGenerationToolParam = {"type": "image_generation"}
         if tool.model is not None:
             param["model"] = tool.model  # type: ignore[typeddict-unknown-key]
@@ -491,7 +491,7 @@ class OpenAIResponsesConverter:
 
     @classmethod
     def _convert_hosted_mcp(cls, tool: HostedMCPTool) -> McpToolParam:
-        """Translate :class:`HostedMCPTool` to the Responses-API ``mcp`` param.
+        """Translate ``HostedMCPTool`` to the Responses-API ``mcp`` param.
 
         Validates the ``server_url`` / ``connector_id`` mutual-exclusion
         invariant the wire protocol enforces. Optional fields are
@@ -599,10 +599,10 @@ class OpenAIResponsesConverter:
 
         Core output items (``message`` / ``function_call`` /
         ``reasoning``) are mapped to the matching typed
-        :class:`LLMResponsePart`. Every other item type (hosted-tool
+        ``LLMResponsePart``. Every other item type (hosted-tool
         calls, hosted-tool outputs, MCP traffic, image generation,
         custom tool calls, compaction markers, …) lands in an
-        :class:`LLMResponseProviderItem` with the verbatim provider
+        ``LLMResponseProviderItem`` with the verbatim provider
         payload under ``raw`` so that replay round-trips losslessly.
         """
         parts: list[LLMResponsePart] = []
@@ -709,7 +709,7 @@ class OpenAIResponsesConverter:
         ``ResponseOutputText.annotations`` is a discriminated union of
         four variants — ``url_citation``, ``file_citation``,
         ``container_file_citation``, and ``file_path``. The framework's
-        :class:`LLMResponseAnnotation` models only URL citations
+        ``LLMResponseAnnotation`` models only URL citations
         (the primary web_search output); other variants are dropped
         here because the framework has no faithful representation for
         them. When that changes, extend this helper rather than adding
@@ -741,7 +741,7 @@ class OpenAIResponsesConverter:
 
         Populates ``cached_tokens`` from ``input_tokens_details`` and
         ``reasoning_tokens`` from ``output_tokens_details``. Callers
-        accumulate across turns via :meth:`LLMUsage.__add__`.
+        accumulate across turns via ``LLMUsage.__add__``.
         """
         input_details = InputTokensDetails(
             cached_tokens=usage.input_tokens_details.cached_tokens,

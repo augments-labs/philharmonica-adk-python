@@ -1,6 +1,6 @@
 """``TokenBudget`` — typed token cap with explicit drop policy.
 
-Used by :class:`HandoffConfig` to express the token-cap threshold
+Used by ``HandoffConfig`` to express the token-cap threshold
 AND the drop-policy when over-budget as one structured value
 instead of two implicitly-coupled fields.
 """

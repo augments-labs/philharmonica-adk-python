@@ -1,12 +1,12 @@
-"""``A2AExecutableAdapter`` — wrap :class:`A2AAgent` as a graph node.
+"""``A2AExecutableAdapter`` — wrap ``A2AAgent`` as a graph node.
 
 Lets a remote A2A agent slot directly into an
-:class:`philharmonica.adk.graphs.graph.Graph` alongside local :class:`Agent`,
-:class:`Swarm`, and callable nodes. The adapter is a thin shim: it
-extracts the prompt text from the upstream :class:`ExecutableInput`,
-dispatches via :meth:`A2ARunner.arun` (non-streaming), and projects
-the resulting :class:`A2ARunResult` into a framework
-:class:`NodeResult`.
+``philharmonica.adk.graphs.graph.Graph`` alongside local ``Agent``,
+``Swarm``, and callable nodes. The adapter is a thin shim: it
+extracts the prompt text from the upstream ``ExecutableInput``,
+dispatches via ``A2ARunner.arun`` (non-streaming), and projects
+the resulting ``A2ARunResult`` into a framework
+``NodeResult``.
 
 Usage::
 
@@ -22,12 +22,12 @@ Usage::
     builder.node("remote_research", A2AExecutableAdapter(agent=remote_research))
 
 The adapter is also auto-registered with the graph's ``to_executable()``
-factory: the dispatcher recognises :class:`A2AAgent` and wraps it
-without the developer importing :class:`A2AExecutableAdapter` by hand.
+factory: the dispatcher recognises ``A2AAgent`` and wraps it
+without the developer importing ``A2AExecutableAdapter`` by hand.
 
-Why an adapter and not making :class:`A2AAgent` extend
-:class:`Executable` directly? Same rationale as
-:class:`AgentExecutable`: keeping :class:`A2AAgent` config-only (free
+Why an adapter and not making ``A2AAgent`` extend
+``Executable`` directly? Same rationale as
+``AgentExecutable``: keeping ``A2AAgent`` config-only (free
 of execution methods). The adapter is the
 single place where the orchestration contract meets the network
 boundary.
@@ -55,7 +55,7 @@ logger = logging.getLogger(__name__)
 
 
 def _content_to_prompt_text(content: list[Any]) -> str:
-    """Extract a plain prompt string from an :class:`ExecutableInput.content` list.
+    """Extract a plain prompt string from an ``ExecutableInput.content`` list.
 
     A2A peers expect a string prompt (the protocol's ``Message`` is
     text-first; richer multi-modal parts can be added to the
@@ -67,7 +67,7 @@ def _content_to_prompt_text(content: list[Any]) -> str:
       (the entry-node normalised user prompt).
     * Layer-1 input items with a top-level ``text`` field
       (``{"type": "input_text", "text": "..."}``) — the case fed by
-      :class:`AgentExecutable` outputs that have been merged via the
+      ``AgentExecutable`` outputs that have been merged via the
       ``concat_text`` strategy.
 
     The extraction walks both shapes. Non-text items (images, tool
@@ -76,7 +76,7 @@ def _content_to_prompt_text(content: list[Any]) -> str:
     provider structure across the network boundary.
 
     Args:
-        content: The :attr:`ExecutableInput.content` list passed by
+        content: The ``ExecutableInput.content`` list passed by
             the graph orchestrator.
 
     Returns:
@@ -122,15 +122,15 @@ def _content_to_prompt_text(content: list[Any]) -> str:
 
 @dataclasses.dataclass
 class A2AExecutableAdapter(Executable[Any]):
-    """Wrap an :class:`A2AAgent` so it can sit inside a :class:`Graph` node.
+    """Wrap an ``A2AAgent`` so it can sit inside a ``Graph`` node.
 
-    Calling :meth:`invoke` extracts the upstream prompt text,
-    dispatches via :meth:`A2ARunner.arun` (blocking, non-streaming),
+    Calling ``invoke`` extracts the upstream prompt text,
+    dispatches via ``A2ARunner.arun`` (blocking, non-streaming),
     and packages the result. The remote agent's own ``task_id`` and
-    ``context_id`` are surfaced on :attr:`NodeResult.metadata` so
+    ``context_id`` are surfaced on ``NodeResult.metadata`` so
     downstream nodes / edge predicates can route on them.
 
-    **Fresh remote context per invocation.** Each :meth:`invoke`
+    **Fresh remote context per invocation.** Each ``invoke``
     call dispatches without a ``continuation_token`` or
     ``context_id``, so the remote endpoint allocates a fresh
     conversation context for every node firing. This is the
@@ -144,11 +144,11 @@ class A2AExecutableAdapter(Executable[Any]):
 
     The adapter does NOT propagate ``RunConfig`` to the remote agent
     — the remote endpoint has its own runner with its own config.
-    Per-remote tuning belongs on :class:`A2AAgent` itself
+    Per-remote tuning belongs on ``A2AAgent`` itself
     (``timeout``, ``max_stream_chunks``, etc.).
 
     Attributes:
-        agent: The :class:`A2AAgent` to invoke.
+        agent: The ``A2AAgent`` to invoke.
     """
 
     agent: A2AAgent
@@ -166,7 +166,7 @@ class A2AExecutableAdapter(Executable[Any]):
         Threads ``input.content`` text into the prompt; ignores
         ``context`` and ``config`` because the remote endpoint owns
         its own runtime. The remote's ``task_id`` and ``context_id``
-        surface on :attr:`NodeResult.metadata` for graph-level
+        surface on ``NodeResult.metadata`` for graph-level
         observability.
 
         ``NodeResult.usage`` is left at zero — the remote agent's
@@ -175,7 +175,7 @@ class A2AExecutableAdapter(Executable[Any]):
         graph only sees the network call as a single opaque step.
 
         Args:
-            input: The upstream :class:`ExecutableInput` carrying the
+            input: The upstream ``ExecutableInput`` carrying the
                 content list to extract the prompt from.
             context: The graph run context — not forwarded to the
                 remote agent (the remote endpoint owns its own runtime).
@@ -183,7 +183,7 @@ class A2AExecutableAdapter(Executable[Any]):
                 remote agent.
 
         Returns:
-            A :class:`NodeResult` whose ``output`` and ``final_text``
+            A ``NodeResult`` whose ``output`` and ``final_text``
             are the remote agent's response text and whose ``metadata``
             carries ``"task_id"``, ``"context_id"``, ``"agent_name"``,
             ``"remote_url"``, and ``"adapter": "a2a"``.

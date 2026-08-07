@@ -1,6 +1,6 @@
-"""``SwarmBuilder`` — fluent, opinionated API for constructing a :class:`Swarm`.
+"""``SwarmBuilder`` — fluent, opinionated API for constructing a ``Swarm``.
 
-Design goals (mirrors :mod:`philharmonica.adk.graphs.builder`):
+Design goals (mirrors ``philharmonica.adk.graphs.builder``):
 
 1. **Readability first.** A swarm definition should read top-to-bottom
    like a spec. Compare:
@@ -12,20 +12,20 @@ Design goals (mirrors :mod:`philharmonica.adk.graphs.builder`):
      The roster, the entry point, the routing strategy, and the stop
      rule each get exactly one line.
 
-2. **Fail at compile time, not at run time.** :meth:`compile`
-   constructs the :class:`Swarm`, so every ``__post_init__`` check
+2. **Fail at compile time, not at run time.** ``compile``
+   constructs the ``Swarm``, so every ``__post_init__`` check
    (non-empty roster, unique names, entry ∈ members, reserved names,
    tool shadowing, roster-aware termination validation) fires before
    the first LLM call is billed.
 
 3. **Defaults for the common case.** No policy call means
-   :class:`LLMHandoffPolicy`; no termination call means
-   :data:`~philharmonica.adk.swarms.swarm.DEFAULT_TERMINATION` (explicit
+   ``LLMHandoffPolicy``; no termination call means
+   ``DEFAULT_TERMINATION`` (explicit
    ``swarm_done`` or a 25-turn safety net). A single-member swarm needs
    no ``.entry()`` call.
 
-The builder is mutable during construction; :meth:`compile` returns the
-frozen :class:`Swarm`. Mutating the builder afterwards has no effect on
+The builder is mutable during construction; ``compile`` returns the
+frozen ``Swarm``. Mutating the builder afterwards has no effect on
 the compiled swarm.
 """
 
@@ -57,26 +57,26 @@ TContext = TypeVar("TContext")
 
 @dataclass
 class SwarmBuilder[TContext]:
-    """Mutable, fluent builder producing a frozen :class:`Swarm`.
+    """Mutable, fluent builder producing a frozen ``Swarm``.
 
-    Every method except :meth:`compile` returns ``self`` so callers can
-    chain. Nothing is validated until :meth:`compile` — at which point
-    the full :class:`Swarm` validation fires.
+    Every method except ``compile`` returns ``self`` so callers can
+    chain. Nothing is validated until ``compile`` — at which point
+    the full ``Swarm`` validation fires.
 
     Attributes:
         name: Optional human-readable swarm name (metadata only).
         description: Optional human-readable blurb (metadata only).
         _members: Working roster, in insertion order.
         _handoff_descriptions: Working per-member routing hints for
-            :class:`LLMHandoffPolicy` transfer tools.
+            ``LLMHandoffPolicy`` transfer tools.
         _entry: Working entry (agent object or member name). ``None``
-            until :meth:`entry` is called.
+            until ``entry`` is called.
         _policy: Working routing policy. ``None`` means "use the
-            default :class:`LLMHandoffPolicy`".
+            default ``LLMHandoffPolicy``".
         _termination: Working termination condition. ``None`` means
-            "use :data:`DEFAULT_TERMINATION`".
-        _config: Working :class:`SwarmConfig`.
-        _hooks: Working :class:`SwarmHooks`.
+            "use ``DEFAULT_TERMINATION``".
+        _config: Working ``SwarmConfig``.
+        _hooks: Working ``SwarmHooks``.
     """
 
     name: str | None = None
@@ -101,7 +101,7 @@ class SwarmBuilder[TContext]:
     """Working termination; ``None`` → ``DEFAULT_TERMINATION``."""
 
     _config: SwarmConfig = field(default_factory=SwarmConfig)
-    """Working :class:`SwarmConfig`."""
+    """Working ``SwarmConfig``."""
 
     _hooks: SwarmHooks[TContext] | None = None
     """Working swarm hooks."""
@@ -118,10 +118,10 @@ class SwarmBuilder[TContext]:
 
         Args:
             agent: The agent to add. Duplicate names are rejected at
-                :meth:`compile` time by :class:`Swarm` validation.
+                ``compile`` time by ``Swarm`` validation.
             handoff_description: Optional routing hint used as the
                 ``transfer_to_<name>`` tool description by
-                :class:`LLMHandoffPolicy` — tells the routing LLM
+                ``LLMHandoffPolicy`` — tells the routing LLM
                 *when* to pick this member (mirrors the OpenAI Agents
                 SDK ``handoff_description``).
 
@@ -154,7 +154,7 @@ class SwarmBuilder[TContext]:
         Args:
             agent_or_name: The entry agent, or its name. Names read
                 better in a chain (``entry="author"``) and are resolved
-                against the roster at :meth:`compile` time.
+                against the roster at ``compile`` time.
 
         Returns:
             ``self``, for chaining.
@@ -167,13 +167,13 @@ class SwarmBuilder[TContext]:
     def policy(self, policy: SwarmPolicy[TContext]) -> SwarmBuilder[TContext]:
         """Set an explicit routing policy (escape hatch).
 
-        Prefer the named shortcuts — :meth:`llm_handoff`,
-        :meth:`round_robin`, :meth:`routed`, :meth:`custom_policy` —
+        Prefer the named shortcuts — ``llm_handoff``,
+        ``round_robin``, ``routed``, ``custom_policy`` —
         which read better; use this when the policy needs constructor
         arguments the shortcuts do not expose.
 
         Args:
-            policy: The :class:`SwarmPolicy` to use.
+            policy: The ``SwarmPolicy`` to use.
 
         Returns:
             ``self``, for chaining.
@@ -207,7 +207,7 @@ class SwarmBuilder[TContext]:
         """Route via structured intent output (``HandoffRoute``).
 
         Args:
-            route: The :class:`HandoffRoute` mapping intent types to
+            route: The ``HandoffRoute`` mapping intent types to
                 members, e.g. ``HandoffRoute("s").when(X).to(agent)``.
 
         Returns:
@@ -241,7 +241,7 @@ class SwarmBuilder[TContext]:
         """Set the termination condition (composables with ``|`` / ``&``).
 
         Args:
-            condition: The :class:`TerminationCondition` tree, e.g.
+            condition: The ``TerminationCondition`` tree, e.g.
                 ``ExplicitDoneTermination() | MaxTurnsTermination(12)``.
 
         Returns:
@@ -256,7 +256,7 @@ class SwarmBuilder[TContext]:
         """Attach swarm-level budgets and shared-context strategy.
 
         Args:
-            config: The :class:`SwarmConfig` to use.
+            config: The ``SwarmConfig`` to use.
 
         Returns:
             ``self``, for chaining.
@@ -268,7 +268,7 @@ class SwarmBuilder[TContext]:
         """Attach swarm-level lifecycle hooks.
 
         Args:
-            hooks: The :class:`SwarmHooks` observer to attach.
+            hooks: The ``SwarmHooks`` observer to attach.
 
         Returns:
             ``self``, for chaining.
@@ -279,15 +279,15 @@ class SwarmBuilder[TContext]:
     # -- Terminal ----------------------------------------------------
 
     def compile(self) -> Swarm[TContext]:
-        """Validate and freeze into a :class:`Swarm`.
+        """Validate and freeze into a ``Swarm``.
 
         Returns:
-            The frozen, validated :class:`Swarm`.
+            The frozen, validated ``Swarm``.
 
         Raises:
             ValueError: If no members were added, if the entry was
                 never set for a multi-member roster, or if any
-                :class:`Swarm` validation fails (duplicate names,
+                ``Swarm`` validation fails (duplicate names,
                 unknown entry, reserved names, tool shadowing,
                 roster-aware termination errors).
         """

@@ -43,8 +43,8 @@ one mental model across all three layers (function / agent / LLM).
 
 ## Scope: non-streaming and streaming runs
 
-The chain composes inside both :func:`run_agent_loop` and
-:func:`run_agent_loop_streamed`. Each driver wraps the per-block
+The chain composes inside both ``run_agent_loop`` and
+``run_agent_loop_streamed``. Each driver wraps the per-block
 terminal (``run_agent_block`` non-streaming,
 ``run_agent_block_streamed`` streaming) with the same chain-builder
 (``compose_agent_middleware``). One mental model regardless of
@@ -419,7 +419,7 @@ class AgentMetricsMiddleware:
     specific metrics library.
 
     Attributes:
-        recorder: The metrics sink. See :class:`AgentMetricsRecorder`.
+        recorder: The metrics sink. See ``AgentMetricsRecorder``.
     """
 
     recorder: AgentMetricsRecorder

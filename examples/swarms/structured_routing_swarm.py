@@ -1,8 +1,8 @@
 """Structured-routing swarm: triage -> specialist, zero LLM routing tokens.
 
-The :class:`StructuredRoutingPolicy` wraps an existing
-:class:`~philharmonica.adk.handoffs.HandoffRoute`. The active agent's
-``output_schema`` produces an :class:`Intent` union; the policy reads
+The ``StructuredRoutingPolicy`` wraps an existing
+``HandoffRoute``. The active agent's
+``output_schema`` produces an ``Intent`` union; the policy reads
 the parsed intent off ``SwarmState.last_structured_output`` and
 dispatches via the ``.when(IntentType).to(agent)`` DSL.
 

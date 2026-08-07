@@ -8,10 +8,10 @@ schemas, scaffolding new agent projects, inspecting session stores, and
 serving an agent over the A2A protocol.
 
 The CLI is a consumer of the ADK's public API only — it loads through
-:func:`~philharmonica.adk.config.load_agent` / ``load_topology`` or a dotted
-reference, executes through :class:`~philharmonica.adk.run.runner.Runner`, and
+``load_agent`` / ``load_topology`` or a dotted
+reference, executes through ``Runner``, and
 persists through the session manager. Command results are written to
-stdout (pipeable); diagnostics go through :mod:`logging`. Every
+stdout (pipeable); diagnostics go through ``logging``. Every
 cost-affecting behavior (sessions, verbose rendering, tracing, env-file
 loading) is off until its flag is passed.
 """

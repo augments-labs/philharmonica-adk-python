@@ -1,4 +1,4 @@
-"""Unit tests for the :class:`TaskOutput` dataclass.
+"""Unit tests for the ``TaskOutput`` dataclass.
 
 Covers frozen invariants, default values, the
 ``skipped`` / ``error`` discriminators, and the
@@ -76,7 +76,7 @@ class _Item(BaseModel):
 class TestTaskOutputToDictSerialization:
     """``to_dict`` must not let a ``list`` / ``dict`` of non-JSON values slip
     through the JSON-native check and crash the ``json.dumps`` that
-    :class:`TaskPipelineState` runs over the produced dict.
+    ``TaskPipelineState`` runs over the produced dict.
     """
 
     def test_list_of_pydantic_models_serialized_to_str(self) -> None:

@@ -72,7 +72,7 @@ class HandoffConfig:
     budget: TokenBudget | int | None = 20_000
     """Maximum tokens of history to transfer to the target agent.
 
-    Accepts a :class:`TokenBudget` (exposes the drop-policy knob) or
+    Accepts a ``TokenBudget`` (exposes the drop-policy knob) or
     a bare ``int`` (normalized in ``__post_init__`` to
     ``TokenBudget(max_tokens=<int>, drop_policy="preserve_system")``).
     ``None`` disables the cap.
@@ -89,14 +89,14 @@ class HandoffConfig:
     Developers who want summarisation (paid LLM call) on the
     overflow MUST opt in explicitly by setting
     ``strategy=HandoffStrategy.SUMMARY``, which routes through
-    :meth:`LLM.acomplete` and accumulates usage in
-    :attr:`RunContext.usage`.
+    ``LLM.acomplete`` and accumulates usage in
+    ``RunContext.usage``.
     """
 
     collapse: HandoffCollapseMode | bool = HandoffCollapseMode.OFF
     """How to collapse transferred history.
 
-    Accepts a :class:`HandoffCollapseMode` (``OFF`` / ``SYSTEM_MESSAGE`` /
+    Accepts a ``HandoffCollapseMode`` (``OFF`` / ``SYSTEM_MESSAGE`` /
     ``USER_MESSAGE``) or a bare ``bool`` (normalized in
     ``__post_init__``: ``True`` → ``SYSTEM_MESSAGE``,
     ``False`` → ``OFF``).
@@ -213,7 +213,7 @@ def apply_callback_error_policy(
     Args:
         name: Identifier for the handoff (target agent name) used in logs and
             the rejection message.
-        config: The handoff's :class:`HandoffConfig` carrying ``on_error`` +
+        config: The handoff's ``HandoffConfig`` carrying ``on_error`` +
             ``error_message_builder``.
         exc: The exception the user callback raised.
         callback_kind: ``"input_filter"`` or ``"on_handoff"``.

@@ -1,4 +1,4 @@
-"""Tests for :class:`OpenAIResponsesConverter`.
+"""Tests for ``OpenAIResponsesConverter``.
 
 Covers the Layer 1 ↔ ``openai.types.responses.*`` wire-type bridge:
 
@@ -11,7 +11,7 @@ Covers the Layer 1 ↔ ``openai.types.responses.*`` wire-type bridge:
 - ``resolve_response_format`` — structured output via
   ``ResponseTextConfigParam``.
 - ``response_to_llm_response`` — the four core item types +
-  hosted-tool items landing in :class:`LLMResponseProviderItem`.
+  hosted-tool items landing in ``LLMResponseProviderItem``.
 - ``parse_usage`` — cached- / reasoning-token mapping.
 """
 
@@ -551,7 +551,7 @@ class TestResponseToLLMResponse:
 
     def test_hosted_tool_item_routes_to_provider_item(self) -> None:
         """A ``file_search_call`` (or any non-core item) must land in
-        :class:`LLMResponseProviderItem` with the verbatim payload."""
+        ``LLMResponseProviderItem`` with the verbatim payload."""
 
         class _FileSearchCall(BaseModel):
             type: str = "file_search_call"

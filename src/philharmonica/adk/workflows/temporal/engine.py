@@ -1,7 +1,7 @@
 """TemporalDurableEngine — concrete DurableEngine implementation for Temporal.
 
-Provides the :class:`TemporalDurableEngine` facade that satisfies the
-:class:`~philharmonica.adk.workflows.engine.DurableEngine` Protocol.
+Provides the ``TemporalDurableEngine`` facade that satisfies the
+``DurableEngine`` Protocol.
 
 References:
     Temporal Python SDK activity docs:
@@ -25,12 +25,12 @@ logger = logging.getLogger(__name__)
 
 
 class TemporalDurableEngine:
-    """Concrete :class:`~philharmonica.adk.workflows.engine.DurableEngine` for Temporal.
+    """Concrete ``DurableEngine`` for Temporal.
 
-    Wraps LLMs via :class:`~philharmonica.adk.workflows.temporal.llm.TemporalLLM` and
-    tools via :func:`~philharmonica.adk.workflows.temporal.tools.activity_tool`, and
+    Wraps LLMs via ``TemporalLLM`` and
+    tools via ``activity_tool``, and
     reports whether the current call stack is inside a Temporal workflow via
-    :func:`~temporalio.workflow.in_workflow`.
+    ``in_workflow``.
 
     References:
         Temporal Python SDK:
@@ -45,14 +45,14 @@ class TemporalDurableEngine:
         *,
         config: ModelActivityConfig,
     ) -> LLM:
-        """Wrap *llm* in a :class:`~philharmonica.adk.workflows.temporal.llm.TemporalLLM`.
+        """Wrap *llm* in a ``TemporalLLM``.
 
         Args:
-            llm: The :class:`~philharmonica.adk.llms.llm.LLM` instance to wrap.
+            llm: The ``LLM`` instance to wrap.
             config: Timeout and retry policy for the activity.
 
         Returns:
-            A :class:`~philharmonica.adk.workflows.temporal.llm.TemporalLLM` that
+            A ``TemporalLLM`` that
             routes calls through Temporal when inside a workflow.
 
         References:
@@ -72,16 +72,16 @@ class TemporalDurableEngine:
         """Wrap *tool* so it executes as a Temporal activity when inside a workflow.
 
         Delegates to
-        :func:`~philharmonica.adk.workflows.temporal.tools.to_durable_tool`, which
+        ``to_durable_tool``, which
         clones *tool* to preserve its real name and JSON schema and re-routes
-        invocation through :func:`~temporalio.workflow.execute_activity` **by
+        invocation through ``execute_activity`` **by
         the tool's name** when inside a workflow.  The worker must register an
         activity under ``tool.name`` for the dispatch to resolve — the same
         contract used by
-        :class:`~philharmonica.adk.workflows.temporal.mcp.TemporalMCPToolSet`.
+        ``TemporalMCPToolSet``.
 
         Args:
-            tool: The :class:`~philharmonica.adk.tools.function_tool.FunctionTool` to wrap.
+            tool: The ``FunctionTool`` to wrap.
             config: Timeout and retry policy for the activity.
 
         Returns:

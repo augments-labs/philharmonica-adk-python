@@ -1,9 +1,9 @@
 """PostgreSQL-backed session manager — shared sessions across replicas.
 
 ``PostgresMultiSessions`` is the manager/store: it owns an
-:class:`AsyncConnectionPool` and provides CRUD over a collection of
-sessions, each returned as a :class:`PostgresSession` the Runner can use.
-It mirrors :class:`~philharmonica.adk.session.sqlite_multi_sessions.SQLiteMultiSessions`
+``AsyncConnectionPool`` and provides CRUD over a collection of
+sessions, each returned as a ``PostgresSession`` the Runner can use.
+It mirrors ``SQLiteMultiSessions``
 but is backed by Postgres so every replica reads and writes the same
 conversation state.
 
@@ -73,14 +73,14 @@ class PostgresMultiSessions(MultiSessions):
 
     The pool opens lazily on first use and the schema is created then,
     serialized by an init lock. The caller owns the lifecycle — call
-    :meth:`close` at shutdown.
+    ``close`` at shutdown.
 
     Args:
         conninfo: libpq connection string (e.g.
             ``"postgresql://user:pass@host/db"`` or
             ``"host=... dbname=..."``).
         app_name: Application name for multi-tenant scoping.
-        settings: Default :class:`SessionSettings` applied when
+        settings: Default ``SessionSettings`` applied when
             ``create`` / ``get_or_create`` are called without explicit
             settings.
 
@@ -150,7 +150,7 @@ class PostgresMultiSessions(MultiSessions):
             settings: Per-session settings; falls back to the manager default.
 
         Returns:
-            A :class:`PostgresSession` bound to the new session.
+            A ``PostgresSession`` bound to the new session.
 
         Raises:
             ValueError: If a session with this id already exists for the
@@ -181,7 +181,7 @@ class PostgresMultiSessions(MultiSessions):
             user_id: User identifier.
 
         Returns:
-            A :class:`PostgresSession`, or ``None``.
+            A ``PostgresSession``, or ``None``.
         """
         pool = await self._get_pool()
         async with pool.connection() as conn:
@@ -210,7 +210,7 @@ class PostgresMultiSessions(MultiSessions):
             settings: Per-session settings for a new session.
 
         Returns:
-            A :class:`PostgresSession`.
+            A ``PostgresSession``.
         """
         pool = await self._get_pool()
         initial_state = state if state is not None else {}
@@ -235,7 +235,7 @@ class PostgresMultiSessions(MultiSessions):
             user_id: If provided, filter by user; otherwise list all for the app.
 
         Returns:
-            List of :class:`SessionInfo`.
+            List of ``SessionInfo``.
         """
         pool = await self._get_pool()
         select = "SELECT session_id, app_name, user_id, created_at, updated_at FROM agent_sessions WHERE app_name=%s"
@@ -333,7 +333,7 @@ class PostgresMultiSessions(MultiSessions):
             session_data: Session-scoped key/value pairs.
 
         Returns:
-            A :class:`State` with app data as base and session data applied.
+            A ``State`` with app data as base and session data applied.
         """
         async with pool.connection() as conn:
             app_state = await get_app_state(conn, self._app_name)

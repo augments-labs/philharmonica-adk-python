@@ -1,11 +1,11 @@
 """FlowStepContext — typed argument passed to step gate callables.
 
-Step-level gates on :class:`Flow` decorators (``requires_approval``,
+Step-level gates on ``Flow`` decorators (``requires_approval``,
 ``enabled``) accept either a bool or a callable. The callable form
-receives a :class:`FlowStepContext` describing the step about to fire
+receives a ``FlowStepContext`` describing the step about to fire
 and the current state of the run, and returns a bool.
 
-Mirrors the :class:`ToolContext` pattern on :class:`FunctionTool` —
+Mirrors the ``ToolContext`` pattern on ``FunctionTool`` —
 each gate evaluator gets a small, typed snapshot of the call site so
 the decision can be state-dependent without leaking framework
 internals.
@@ -28,12 +28,12 @@ type FlowStepGate = bool | Callable[[FlowStepContext[Any]], MaybeAwaitable[bool]
 """Typed alias for step-level gate values.
 
 A gate is either a literal ``bool`` or a callable that receives the
-:class:`FlowStepContext` for the step about to fire and returns a
+``FlowStepContext`` for the step about to fire and returns a
 bool (sync or async).
 
-Used as the typed shape for :attr:`FlowStep.__flow_requires_approval__`
-and :attr:`FlowStep.__flow_enabled__` (mirrors the
-:attr:`FunctionTool.requires_approval` and :attr:`FunctionTool.enabled`
+Used as the typed shape for ``FlowStep.__flow_requires_approval__``
+and ``FlowStep.__flow_enabled__`` (mirrors the
+``FunctionTool.requires_approval`` and ``FunctionTool.enabled``
 pattern at the step layer).
 """
 
@@ -43,7 +43,7 @@ class FlowStepContext[StateT]:
     """Snapshot of the call site passed to step-level gate callables.
 
     Generic over the flow's typed state so gate callables receive a
-    properly-narrowed :attr:`flow_state` (e.g. annotate the gate as
+    properly-narrowed ``flow_state`` (e.g. annotate the gate as
     ``def gate(ctx: FlowStepContext[MyState]) -> bool: ...`` and the
     type checker resolves ``ctx.flow_state`` to ``MyState``).
 
@@ -57,13 +57,13 @@ class FlowStepContext[StateT]:
         flow_state: The developer-typed shared state
             (``Flow.state``). Same object the step body would access
             via ``self.state``; typed via the ``StateT`` parameter.
-        context: The :class:`RunContext` attached by
+        context: The ``RunContext`` attached by
             ``Runner.arun_flow`` for the duration of the run, or
             ``None`` outside of a run.
         completed_steps: Tuple of step method names that have already
             run in this flow (in completion order). Empty before the
             first step fires.
-        triggers: Tuple of :class:`FlowTriggerEvent` instances that
+        triggers: Tuple of ``FlowTriggerEvent`` instances that
             caused this step to be scheduled. Cardinality reflects
             the listener shape:
 
@@ -94,10 +94,10 @@ class FlowStepContext[StateT]:
     """Developer-typed shared state (``Flow.state``)."""
 
     context: RunContext[Any] | None
-    """:class:`RunContext` for the run, or ``None`` outside a run."""
+    """``RunContext`` for the run, or ``None`` outside a run."""
 
     completed_steps: tuple[str, ...]
     """Step names that have already completed in this run."""
 
     triggers: tuple[FlowTriggerEvent, ...]
-    """:class:`FlowTriggerEvent`\\ s that scheduled this step (see class docstring)."""
+    """``FlowTriggerEvent``\\ s that scheduled this step (see class docstring)."""

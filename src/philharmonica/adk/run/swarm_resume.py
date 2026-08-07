@@ -2,26 +2,26 @@
 
 Two helpers dispatch on the kind of parked interrupt:
 
-- :func:`run_resumed_nested_turn` — nested-agent-defer path. Wraps the
-  parked member in an :class:`AgentExecutable` and calls
-  :meth:`AgentExecutable.resume_from_snapshot`, then converts the
-  returned :class:`NodeResult` into a :class:`RunResult`-shaped value
-  that :func:`run_swarm_loop`'s per-turn post-processing block can
+- ``run_resumed_nested_turn`` — nested-agent-defer path. Wraps the
+  parked member in an ``AgentExecutable`` and calls
+  ``AgentExecutable.resume_from_snapshot``, then converts the
+  returned ``NodeResult`` into a ``RunResult``-shaped value
+  that ``run_swarm_loop``'s per-turn post-processing block can
   consume uniformly.
-- :func:`run_resumed_hitl_turn` — pure-HITL path. Seeds the caller's
+- ``run_resumed_hitl_turn`` — pure-HITL path. Seeds the caller's
   reply onto the run context's HITL resume slot (consumed via
-  :func:`philharmonica.adk.swarms.interrupt.request_human_input_in_swarm`)
-  and re-fires the member via :func:`run_agent_loop` exactly as a
+  ``philharmonica.adk.swarms.interrupt.request_human_input_in_swarm``)
+  and re-fires the member via ``run_agent_loop`` exactly as a
   fresh turn would.
 
-Both helpers pop the parked entries from :class:`SwarmState` on
+Both helpers pop the parked entries from ``SwarmState`` on
 entry and rely on the swarm loop's existing
-:class:`InterruptException` / :class:`AgentToolDeferral` handlers to
+``InterruptException`` / ``AgentToolDeferral`` handlers to
 re-park on re-deferral.
 
 The split into a sibling module (rather than private underscored
-functions inside :mod:`philharmonica.adk.run.swarm_loop`) keeps the helpers
-unit-testable in isolation — :func:`run_swarm_loop` itself remains
+functions inside ``philharmonica.adk.run.swarm_loop``) keeps the helpers
+unit-testable in isolation — ``run_swarm_loop`` itself remains
 hard to unit-test because of its breadth, but the resume primitives
 have well-defined inputs and outputs.
 """
@@ -63,24 +63,24 @@ async def run_resumed_nested_turn(
 
     Validates the caller-supplied reply against the parked snapshot,
     pops both parked entries from ``state``, wraps the member in an
-    :class:`AgentExecutable`, calls
-    :meth:`AgentExecutable.resume_from_snapshot`, folds the resumed
+    ``AgentExecutable``, calls
+    ``AgentExecutable.resume_from_snapshot``, folds the resumed
     run's usage into ``ctx_wrapper`` (load-bearing — see the
-    discussion in the design spec) and synthesizes a :class:`RunResult`
+    discussion in the design spec) and synthesizes a ``RunResult``
     for the swarm loop's step-8 history-accumulation block.
 
-    On re-deferral, :meth:`AgentExecutable.resume_from_snapshot` deposits
+    On re-deferral, ``AgentExecutable.resume_from_snapshot`` deposits
     the fresh snapshot into ``state.nested_agent_snapshots`` and raises
-    :class:`InterruptException`. This helper does NOT catch it — re-park
-    is handled by :func:`run_swarm_loop`'s existing
+    ``InterruptException``. This helper does NOT catch it — re-park
+    is handled by ``run_swarm_loop``'s existing
     ``except InterruptException`` clause.
 
     Args:
         member: The parked swarm member to resume.
         swarm_resume: The caller-supplied resume payload; the
             ``replies[member.name]`` entry MUST be a
-            :class:`NestedAgentReply`.
-        state: The live :class:`SwarmState`. Modified in place:
+            ``NestedAgentReply``.
+        state: The live ``SwarmState``. Modified in place:
             ``pending_interrupts[member.name]`` and
             ``nested_agent_snapshots[member.name]`` are popped on
             entry. On re-deferral, the snapshot dict is repopulated
@@ -88,10 +88,10 @@ async def run_resumed_nested_turn(
         ctx_wrapper: The shared run context. ``ctx_wrapper.usage`` is
             advanced by the resumed run's token consumption so the
             swarm loop's per-member delta computation captures it.
-        config: The active :class:`RunConfig`.
+        config: The active ``RunConfig``.
 
     Returns:
-        A :class:`RunResult` with the resumed turn's items, the agent's
+        A ``RunResult`` with the resumed turn's items, the agent's
         final output, ``swarm_yield=None`` (the resumed run does not
         receive swarm-mode tools), and ``last_agent=member``. The
         swarm loop's step-9 dispatch routes via ``policy.select_next``
@@ -100,13 +100,13 @@ async def run_resumed_nested_turn(
     Raises:
         ValueError: When ``swarm_resume.replies`` has no entry for
             ``member.name`` or the entry is not a
-            :class:`NestedAgentReply`. The parked snapshot is left
+            ``NestedAgentReply``. The parked snapshot is left
             untouched so a corrected retry succeeds.
         NestedAgentResumeError: Propagated from
-            :meth:`AgentExecutable.resume_from_snapshot` on invalid
+            ``AgentExecutable.resume_from_snapshot`` on invalid
             ``tool_call_id`` in the reply.
         InterruptException: On re-deferral (caught upstream by
-            :func:`run_swarm_loop`).
+            ``run_swarm_loop``).
     """
     if member.name not in swarm_resume.replies:
         raise ValueError(
@@ -194,8 +194,8 @@ async def run_resumed_hitl_turn(
     """Resume a swarm member parked on a pure-HITL interrupt.
 
     Seeds the caller-supplied reply onto ``ctx_wrapper`` (consumed by
-    :func:`request_human_input_in_swarm` inside the member's tool
-    body) and re-fires the member via :func:`run_agent_loop` exactly
+    ``request_human_input_in_swarm`` inside the member's tool
+    body) and re-fires the member via ``run_agent_loop`` exactly
     as a fresh turn would. Pops the parked interrupt from ``state``
     on entry.
 
@@ -204,18 +204,18 @@ async def run_resumed_hitl_turn(
     is distinguishable from "no reply supplied". On re-park (the
     member's tool raises again because the reply was insufficient or
     a multi-stage HITL fired), the existing
-    ``InterruptException`` handler in :func:`run_swarm_loop`
+    ``InterruptException`` handler in ``run_swarm_loop``
     re-captures the fresh interrupt.
 
     Args:
         member: The parked swarm member to resume.
         swarm_resume: The caller-supplied resume payload.
-        state: The live :class:`SwarmState`. ``pending_interrupts[
+        state: The live ``SwarmState``. ``pending_interrupts[
             member.name]`` is popped on entry.
         ctx_wrapper: The shared run context. The reply is seeded onto
             its private slot and consumed during the member's run.
-        config: The active :class:`RunConfig`.
-        hooks: Forwarded to :func:`run_agent_loop`.
+        config: The active ``RunConfig``.
+        hooks: Forwarded to ``run_agent_loop``.
         user_prompt: The original user prompt (passed through for
             first-turn semantics if applicable).
         is_first_turn: Pass-through flag controlling the inner
@@ -228,7 +228,7 @@ async def run_resumed_hitl_turn(
         max_turns: Inner per-member turn cap.
 
     Returns:
-        The :class:`RunResult` produced by the inner agent run.
+        The ``RunResult`` produced by the inner agent run.
 
     Raises:
         ValueError: When ``swarm_resume.replies`` does not have a key

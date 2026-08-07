@@ -31,7 +31,7 @@ def handoff_route(
     """Build a HandoffRoute from intent-agent tuples.
 
     Convenience factory for code-orchestrated handoffs. For LLM-orchestrated
-    handoffs, use :func:`~philharmonica.adk.handoffs.handoff.handoff` or pass
+    handoffs, use ``handoff`` or pass
     a list of agents/Handoff objects directly to ``Agent.handoffs``.
 
     Args:
@@ -80,7 +80,7 @@ class RouteSealedError(RuntimeError):
 class HandoffPendingRoute(Generic[TAgent, TContext]):
     """Incomplete routing rule waiting for ``.to()`` to specify the target agent.
 
-    Created by :meth:`HandoffRoute.when` and holds the matched intent types
+    Created by ``HandoffRoute.when`` and holds the matched intent types
     until ``.to()`` is called to complete the rule with a target agent.
     """
 
@@ -186,8 +186,8 @@ class HandoffRoute(Generic[TAgent, TContext]):
         without reaching into the route's internal rule storage.
 
         Returns:
-            A list of :class:`HandoffTarget` instances; each
-            ``target.target`` is the destination :class:`Agent`.
+            A list of ``HandoffTarget`` instances; each
+            ``target.target`` is the destination ``Agent``.
         """
         targets: list[HandoffTarget[Any, TContext]] = [target for _, target in self._rules]
         if self._otherwise is not None:
@@ -318,7 +318,7 @@ class HandoffRoute(Generic[TAgent, TContext]):
     ) -> bool:
         """Check if a code-orchestrated route target is enabled.
 
-        Delegates to :func:`evaluate_enabled` so LLM-orch (Handoff) and
+        Delegates to ``evaluate_enabled`` so LLM-orch (Handoff) and
         code-orch (HandoffRoute) share one dispatch contract — same
         arity rules, same async + async-generator + non-bool guards,
         same missing-context error.

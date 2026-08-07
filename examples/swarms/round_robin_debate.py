@@ -1,12 +1,12 @@
 """Round-robin swarm: two agents debate a topic deterministically.
 
-:class:`RoundRobinPolicy` cycles through the roster in order. There
+``RoundRobinPolicy`` cycles through the roster in order. There
 are no ``transfer_to_<name>`` tools — the next speaker is chosen by
 position, not by the LLM. This saves routing tokens entirely: the
 policy injects **only** ``swarm_done`` so any debater can stop the
 run when convinced. Termination still requires an explicit signal:
 either an agent calls ``swarm_done`` or the
-:class:`MaxTurnsTermination` caps the exchange.
+``MaxTurnsTermination`` caps the exchange.
 
 Useful when:
 - You want deterministic turn order (debates, panel reviews, fixed

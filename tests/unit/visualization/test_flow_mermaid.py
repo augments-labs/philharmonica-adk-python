@@ -1,4 +1,4 @@
-"""Unit tests for :func:`flow_to_mermaid` and :meth:`Flow.to_mermaid`.
+"""Unit tests for ``flow_to_mermaid`` and ``Flow.to_mermaid``.
 
 Asserts the Mermaid output shape for each topology kind: direct
 trigger, AND gate, OR gate, router, custom step descriptions.

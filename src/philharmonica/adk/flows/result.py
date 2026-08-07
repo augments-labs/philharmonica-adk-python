@@ -1,24 +1,24 @@
 """Result types for Flow execution.
 
-:class:`FlowRunResult` is the eager, non-streaming result returned by
-:meth:`Runner.arun_flow`. :class:`FlowRunResultStreaming` is the
-streaming variant returned by :meth:`Runner.arun_flow_streamed`.
+``FlowRunResult`` is the eager, non-streaming result returned by
+``Runner.arun_flow``. ``FlowRunResultStreaming`` is the
+streaming variant returned by ``Runner.arun_flow_streamed``.
 
 The non-streaming result captures the final state, the cumulative LLM
 usage across every step, and per-step usage attribution (useful for
 cost analysis — analogous to ``GraphRunResult.per_node_usage``).
 
 HITL surface mirrors the tool layer exactly
-(:class:`philharmonica.adk.types.run.run_result.RunResult`):
+(``philharmonica.adk.types.run.run_result.RunResult``):
 
-- Both :class:`FlowRunResult` and :class:`FlowRunResultStreaming`
+- Both ``FlowRunResult`` and ``FlowRunResultStreaming``
   expose ``deferred_steps`` plus ``checkpoint`` and a
   ``requires_action`` property.
 - The streaming variant does NOT expose a live-inject
   ``send_approval`` channel — same contract as
-  :class:`RunResultStreaming`. Decisions are recorded on the
-  :class:`FlowCheckpoint` between stream end and the next
-  :meth:`Runner.arun_flow_from_checkpoint` call.
+  ``RunResultStreaming``. Decisions are recorded on the
+  ``FlowCheckpoint`` between stream end and the next
+  ``Runner.arun_flow_from_checkpoint`` call.
 """
 
 from __future__ import annotations
@@ -66,15 +66,15 @@ FlowRunStatus = Literal[
 - ``"completed"`` — every reachable step ran and the flow terminated
   cleanly with no pending listeners.
 - ``"failed"`` — a step raised under ``error_policy="halt"`` and the
-  flow stopped immediately. The :attr:`FlowRunResult.error` field
+  flow stopped immediately. The ``FlowRunResult.error`` field
   carries the message.
 - ``"deferred"`` — one or more steps with ``requires_approval`` gates
   fired and the run halted pending human decisions. The
-  :attr:`FlowRunResult.deferred_steps` field lists them and
-  :attr:`FlowRunResult.checkpoint` carries the resume payload.
-- ``"halted_max_steps"`` — the :attr:`FlowConfig.max_steps` cap was hit
+  ``FlowRunResult.deferred_steps`` field lists them and
+  ``FlowRunResult.checkpoint`` carries the resume payload.
+- ``"halted_max_steps"`` — the ``FlowConfig.max_steps`` cap was hit
   before the flow could terminate naturally.
-- ``"halted_max_tokens"`` — the :attr:`FlowConfig.max_total_tokens` cap
+- ``"halted_max_tokens"`` — the ``FlowConfig.max_total_tokens`` cap
   was hit before the flow could terminate naturally.
 """
 
@@ -84,28 +84,28 @@ class FlowRunResult[StateT]:
     """Result of a completed Flow run.
 
     Attributes:
-        final_state: The :class:`Flow` instance's ``state`` after every
+        final_state: The ``Flow`` instance's ``state`` after every
             step has run. Read-only from the consumer's perspective.
         flow_id: Stable identifier of the Flow instance.
-        status: Final status — see :data:`FlowRunStatus`.
+        status: Final status — see ``FlowRunStatus``.
         completed_steps: Tuple of step method names that ran, in
             completion order. Skip slots from listener gates that never
             fired are NOT included.
         cumulative_usage: Sum of LLM usage across every step's inner
-            :meth:`Runner.arun` calls. Equals
+            ``Runner.arun`` calls. Equals
             ``sum(per_step_usage.values())``.
         per_step_usage: Mapping from step name to LLM usage delta for
             that step's body. Useful for per-step cost attribution —
-            analogous to :attr:`philharmonica.adk.graphs.result.GraphRunResult.per_node_usage`.
-        new_items: Tuple of :class:`RunItem` instances produced by inner
-            :meth:`Runner.arun` calls inside step bodies. Order is the
+            analogous to ``philharmonica.adk.graphs.result.GraphRunResult.per_node_usage``.
+        new_items: Tuple of ``RunItem`` instances produced by inner
+            ``Runner.arun`` calls inside step bodies. Order is the
             order in which steps completed.
         error: Human-readable error description when ``status="failed"``;
             ``None`` otherwise.
         deferred_steps: Steps paused by a ``requires_approval`` gate.
             Populated when ``status="deferred"``; empty tuple otherwise.
         checkpoint: Resume payload when ``status="deferred"``. Pass to
-            :meth:`Runner.arun_flow_from_checkpoint` to continue.
+            ``Runner.arun_flow_from_checkpoint`` to continue.
             ``None`` when not deferred.
         metadata: Open-ended developer metadata dict. The framework
             never writes to it; useful for tracing tags carried alongside
@@ -172,7 +172,7 @@ class FlowRunResult[StateT]:
         """``True`` when at least one step is awaiting human approval.
 
         Exact mirror of
-        :attr:`philharmonica.adk.types.run.run_result.RunResult.requires_action`
+        ``philharmonica.adk.types.run.run_result.RunResult.requires_action``
         at the Flow layer. Equivalent to
         ``len(deferred_steps) > 0`` — true exactly when
         ``status == "deferred"``.
@@ -182,18 +182,18 @@ class FlowRunResult[StateT]:
 
 @dataclass
 class FlowRunResultStreaming[StateT]:
-    """Streaming variant of :class:`FlowRunResult`.
+    """Streaming variant of ``FlowRunResult``.
 
-    Wraps an :class:`asyncio.Queue` of :class:`FlowEvent` items produced
+    Wraps an ``asyncio.Queue`` of ``FlowEvent`` items produced
     by a background producer task (the streaming flow loop). Consumers
-    iterate via :meth:`stream_events` and inspect the final state /
+    iterate via ``stream_events`` and inspect the final state /
     status after the stream completes.
 
-    The result instance is created by :meth:`Runner.arun_flow_streamed`
+    The result instance is created by ``Runner.arun_flow_streamed``
     BEFORE the producer task starts running, so callers can register
     cancel handlers / inspect ``flow_id`` immediately. The producer is
-    scheduled lazily on the first :meth:`stream_events` call (same
-    pattern as :class:`philharmonica.adk.run.stream.RunResultStreaming`).
+    scheduled lazily on the first ``stream_events`` call (same
+    pattern as ``philharmonica.adk.run.stream.RunResultStreaming``).
 
     Attributes:
         flow_id: Stable identifier of the Flow instance being run.
@@ -205,16 +205,16 @@ class FlowRunResultStreaming[StateT]:
         cumulative_usage: Accumulated LLM usage delta as steps complete.
         per_step_usage: Per-step LLM usage attribution, accumulated as
             each step body returns.
-        new_items: :class:`RunItem` instances accumulated as inner
-            :meth:`Runner.arun` calls produce results.
+        new_items: ``RunItem`` instances accumulated as inner
+            ``Runner.arun`` calls produce results.
         error: Set when a step raises and ``error_policy="halt"``;
             ``None`` otherwise.
         deferred_steps: Set when ``status="deferred"``. Mirrors
-            :attr:`FlowRunResult.deferred_steps`.
+            ``FlowRunResult.deferred_steps``.
         checkpoint: Resume payload when ``status="deferred"``. The
             developer records decisions on this checkpoint off-stream
-            via :meth:`FlowCheckpoint.approve` / :meth:`FlowCheckpoint.reject`
-            and resumes via :meth:`Runner.arun_flow_from_checkpoint`.
+            via ``FlowCheckpoint.approve`` / ``FlowCheckpoint.reject``
+            and resumes via ``Runner.arun_flow_from_checkpoint``.
             There is no live-inject channel on this class.
     """
 
@@ -243,21 +243,21 @@ class FlowRunResultStreaming[StateT]:
     """Set when a step raises and ``error_policy="halt"``."""
 
     deferred_steps: tuple[FlowDeferredStep, ...] = ()
-    """Set when ``status="deferred"``. Mirrors :attr:`FlowRunResult.deferred_steps`."""
+    """Set when ``status="deferred"``. Mirrors ``FlowRunResult.deferred_steps``."""
 
     checkpoint: FlowCheckpoint | None = None
     """Resume payload when ``status="deferred"``.
 
-    The developer records :meth:`FlowCheckpoint.approve` /
-    :meth:`FlowCheckpoint.reject` decisions on this checkpoint off-stream,
-    then resumes via :meth:`Runner.arun_flow_from_checkpoint(flow, checkpoint)`.
+    The developer records ``FlowCheckpoint.approve`` /
+    ``FlowCheckpoint.reject`` decisions on this checkpoint off-stream,
+    then resumes via ``Runner.arun_flow_from_checkpoint(flow, checkpoint)``.
     There is intentionally no live-inject channel on this class — same
-    contract as :class:`RunResultStreaming`.
+    contract as ``RunResultStreaming``.
     """
 
     guardrail_audit: tuple[GuardrailAuditRecord, ...] = ()
     """Per-action guardrail audit trail (hashes, never raw payloads). Mirrors
-    :attr:`FlowRunResult.guardrail_audit`; populated when the stream completes."""
+    ``FlowRunResult.guardrail_audit``; populated when the stream completes."""
 
     _event_queue: asyncio.Queue[FlowEvent | None] = field(default_factory=asyncio.Queue)
     """Internal — producer pushes events; ``None`` is the end-of-stream sentinel."""
@@ -270,12 +270,12 @@ class FlowRunResultStreaming[StateT]:
     ``stream_events()`` call when ``arun_flow_streamed`` ran outside a loop."""
 
     def push_event(self, event: FlowEvent) -> None:
-        """Enqueue a :class:`FlowEvent` for consumers iterating :meth:`stream_events`.
+        """Enqueue a ``FlowEvent`` for consumers iterating ``stream_events``.
 
-        Public accessor used by :class:`philharmonica.adk.run.runner.Runner` to
+        Public accessor used by ``philharmonica.adk.run.runner.Runner`` to
         forward executor events into the queue without reaching into
         the private ``_event_queue`` attribute. Same encapsulation
-        pattern as :meth:`philharmonica.adk.run.stream.RunResultStreaming.put_event`.
+        pattern as ``philharmonica.adk.run.stream.RunResultStreaming.put_event``.
 
         Args:
             event: The event to enqueue.
@@ -288,7 +288,7 @@ class FlowRunResultStreaming[StateT]:
         Called by the producer task in its ``finally`` block after the
         executor returns, regardless of whether the run succeeded or
         failed. Subsequent calls are idempotent at the queue level — a
-        second sentinel is harmless because :meth:`stream_events` exits
+        second sentinel is harmless because ``stream_events`` exits
         on the first one it sees.
         """
         self._event_queue.put_nowait(None)
@@ -296,10 +296,10 @@ class FlowRunResultStreaming[StateT]:
     def set_producer_task(self, task: asyncio.Task[None]) -> None:
         """Set the background producer task driving the executor.
 
-        Public accessor used by :class:`philharmonica.adk.run.runner.Runner` to
+        Public accessor used by ``philharmonica.adk.run.runner.Runner`` to
         attach the task without reaching into the private
         ``_producer_task`` attribute. Same encapsulation pattern as
-        :meth:`philharmonica.adk.run.stream.RunResultStreaming.set_run_task`.
+        ``philharmonica.adk.run.stream.RunResultStreaming.set_run_task``.
 
         Args:
             task: The producer task scheduled on the event loop.
@@ -309,12 +309,12 @@ class FlowRunResultStreaming[StateT]:
     def set_deferred_run_impl(self, impl: Callable[[], Coroutine[Any, Any, None]]) -> None:
         """Store the producer coroutine factory for lazy scheduling.
 
-        Used by :meth:`philharmonica.adk.run.runner.Runner.arun_flow_streamed`
+        Used by ``philharmonica.adk.run.runner.Runner.arun_flow_streamed``
         when it is called outside a running event loop: no producer task
         can be created yet, so the factory is held here and scheduled on
-        the first :meth:`stream_events` call (which runs inside a loop).
+        the first ``stream_events`` call (which runs inside a loop).
         Same encapsulation pattern as
-        :meth:`philharmonica.adk.run.stream.RunResultStreaming.set_deferred_run_impl`.
+        ``philharmonica.adk.run.stream.RunResultStreaming.set_deferred_run_impl``.
 
         Args:
             impl: A zero-argument callable returning the producer coroutine.
@@ -325,8 +325,8 @@ class FlowRunResultStreaming[StateT]:
     def requires_action(self) -> bool:
         """``True`` when the stream terminated awaiting human approval.
 
-        Mirrors :attr:`FlowRunResult.requires_action` and
-        :attr:`philharmonica.adk.types.run.run_result.RunResult.requires_action`.
+        Mirrors ``FlowRunResult.requires_action`` and
+        ``philharmonica.adk.types.run.run_result.RunResult.requires_action``.
         Equivalent to ``len(deferred_steps) > 0``.
         """
         return len(self.deferred_steps) > 0
@@ -334,13 +334,13 @@ class FlowRunResultStreaming[StateT]:
     async def stream_events(self) -> AsyncIterator[FlowEvent]:
         """Async iterator over the events produced during the Flow run.
 
-        Drains :attr:`_event_queue` until the producer sends the
+        Drains ``_event_queue`` until the producer sends the
         end-of-stream sentinel (``None``). Consumers MAY call
         ``stream_events()`` at most once per result instance — the queue
         is single-consumer.
 
         Yields:
-            :class:`FlowEvent` instances in the order they were produced.
+            ``FlowEvent`` instances in the order they were produced.
         """
         # Lazy producer scheduling for when arun_flow_streamed was called
         # outside a running event loop: no producer task could be created

@@ -3,7 +3,7 @@
 Demonstrates the CrewAI / OpenAI-Agents-SDK supervisor pattern WITHOUT
 the hidden manager-agent that CrewAI creates implicitly when
 ``process=hierarchical``. The supervisor here is just a regular
-:class:`Agent` whose tools are sub-agents exposed via
+``Agent`` whose tools are sub-agents exposed via
 ``Agent.as_tool()`` — no framework code auto-spawns a supervisor.
 
 Pattern shape::

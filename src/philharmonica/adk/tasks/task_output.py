@@ -1,7 +1,7 @@
-"""TaskOutput — typed result of a single :class:`Task` execution.
+"""TaskOutput — typed result of a single ``Task`` execution.
 
 Frozen dataclass surfacing the agent's final output, the
-:class:`RunItem` trail, usage, and an explicit ``skipped`` flag for
+``RunItem`` trail, usage, and an explicit ``skipped`` flag for
 pipeline-conditional execution. Skipped tasks return a
 ``TaskOutput(skipped=True, final_output=None, …)`` so a pipeline's
 positional indexing stays stable — the slot is never silently dropped.
@@ -34,7 +34,7 @@ def _output_preview(output: Any) -> str:
 
 @dataclass(frozen=True, kw_only=True)
 class TaskOutput:
-    """Typed result of a single :class:`Task` execution.
+    """Typed result of a single ``Task`` execution.
 
     Attributes:
         task_id: The task's identity for this run. When ``Task.task_id``
@@ -49,25 +49,25 @@ class TaskOutput:
         final_output: The agent's final output for this task. ``str``
             when no output schema is in effect; otherwise the parsed
             instance of the resolved ``AgentOutputSchemaBase`` type.
-            ``None`` when :attr:`skipped` is ``True`` or
-            :attr:`error` is set.
-        new_items: The Layer 3 :class:`RunItem` trail produced by this
+            ``None`` when ``skipped`` is ``True`` or
+            ``error`` is set.
+        new_items: The Layer 3 ``RunItem`` trail produced by this
             task — messages, tool calls, tool outputs, handoffs.
-            Empty tuple when :attr:`skipped` is ``True``.
-        usage: The :class:`LLMUsage` accumulated **by this task's
+            Empty tuple when ``skipped`` is ``True``.
+        usage: The ``LLMUsage`` accumulated **by this task's
             agent loop**. In a pipeline, summing
             ``output.usage.total_tokens`` over all outputs reproduces
             ``TaskPipelineResult.context.usage.total_tokens`` (the pipeline
             harness sums each completed task's usage into the pipeline
             ``RunContext`` after the task returns).
-        skipped: ``True`` when :attr:`Task.skip_if` returned ``True``
+        skipped: ``True`` when ``Task.skip_if`` returned ``True``
             in a pipeline; the agent was never invoked. ``False`` for
             executed tasks, even on error.
         error: Stringified exception when the task raised. ``None`` on
-            success. Mutually exclusive with :attr:`skipped` —
+            success. Mutually exclusive with ``skipped`` —
             skip-paths never set ``error``.
         streaming_placeholder: ``True`` when this slot was constructed
-            by :meth:`Runner.arun_task_pipeline_streamed` as a
+            by ``Runner.arun_task_pipeline_streamed`` as a
             placeholder for a task whose inner stream may not have
             drained by the time the next task's ``skip_if`` runs. The
             placeholder carries identity + metadata only —
@@ -76,7 +76,7 @@ class TaskOutput:
             outputs must check this flag and either defer or treat the
             slot as unknown. ``False`` for every non-streamed path and
             for fully-resolved streamed slots.
-        metadata: Verbatim copy of :attr:`Task.metadata`. Carried
+        metadata: Verbatim copy of ``Task.metadata``. Carried
             through so downstream consumers (audit, dashboards,
             tracing) can correlate this result with the originating
             request.
@@ -134,22 +134,22 @@ class TaskOutput:
         return f"TaskOutput({', '.join(parts)})"
 
     def to_dict(self) -> dict[str, Any]:
-        """Serialize to a JSON-compatible dict for :class:`TaskPipelineState`.
+        """Serialize to a JSON-compatible dict for ``TaskPipelineState``.
 
         Trades fidelity for portability:
 
-        * :attr:`final_output` is kept as-is when it is genuinely
+        * ``final_output`` is kept as-is when it is genuinely
           JSON-serializable (checked with a real ``json.dumps`` probe, so a
           ``list`` / ``dict`` containing Pydantic or dataclass values does
           NOT slip through), and serialized via ``str(final_output)``
           otherwise. On resume, type recovery is the developer's job — the
           framework does not reverse-engineer Pydantic / dataclass shapes.
-        * :attr:`new_items` is NOT serialized — the audit trail for
+        * ``new_items`` is NOT serialized — the audit trail for
           completed tasks lives on the
-          :class:`~philharmonica.adk.session.session.Session` if attached.
+          ``Session`` if attached.
           Resume rebuilds it from the session when needed; in-memory
           replays start with an empty trail.
-        * :attr:`usage` is serialized to the four scalar token counts
+        * ``usage`` is serialized to the four scalar token counts
           plus ``requests``. Detail breakdowns are dropped — the
           aggregated total is what pipelines care about for budget
           accounting on resume.
@@ -157,7 +157,7 @@ class TaskOutput:
         Returns:
             A JSON-compatible ``dict`` whose values are ``str``,
             ``int``, ``float``, ``bool``, ``None``, ``list``, or
-            ``dict``.  Load via :meth:`from_dict`.
+            ``dict``.  Load via ``from_dict``.
         """
         from philharmonica.adk.types.tokens.llm_usage import LLMUsage
 
@@ -171,7 +171,7 @@ class TaskOutput:
             }
         # A shallow ``isinstance(x, (list, dict))`` check is not enough: a
         # ``list[BaseModel]`` (or a dict holding non-JSON values) passes it yet
-        # crashes the ``json.dumps`` that :class:`TaskPipelineState` runs over
+        # crashes the ``json.dumps`` that ``TaskPipelineState`` runs over
         # this dict. Probe with an actual dump — keep the value only when it is
         # genuinely JSON-serializable, else fall back to ``str()``.
         try:
@@ -192,7 +192,7 @@ class TaskOutput:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> TaskOutput:
-        """Rehydrate a :class:`TaskOutput` from :meth:`to_dict` output.
+        """Rehydrate a ``TaskOutput`` from ``to_dict`` output.
 
         ``new_items`` is always reset to ``()`` (the trail is not
         serialized; replay it from the session if needed). ``usage``
@@ -200,11 +200,11 @@ class TaskOutput:
         Other fields pass through unchanged.
 
         Args:
-            data: A ``dict`` previously produced by :meth:`to_dict`.
+            data: A ``dict`` previously produced by ``to_dict``.
                 Must contain the ``task_id`` and ``task_name`` keys.
 
         Returns:
-            A new :class:`TaskOutput` rehydrated from ``data``.
+            A new ``TaskOutput`` rehydrated from ``data``.
 
         Raises:
             ValueError: When ``task_id`` or ``task_name`` is absent from

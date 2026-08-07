@@ -1,7 +1,7 @@
 """MultiSessions ABC — abstract interface for session managers.
 
 Defines the contract for session management backends.  Concrete
-implementations (e.g. :class:`SQLiteMultiSessions`) provide storage
+implementations (e.g. ``SQLiteMultiSessions``) provide storage
 via specific databases.
 """
 
@@ -20,7 +20,7 @@ class MultiSessions(ABC):
     """Abstract base class for session managers.
 
     A session manager provides CRUD operations on a collection of
-    sessions.  Each returned session implements the :class:`Session`
+    sessions.  Each returned session implements the ``Session``
     ABC and can be passed to the Runner.
 
     Subclasses must implement: ``create``, ``get``, ``get_or_create``,
@@ -44,7 +44,7 @@ class MultiSessions(ABC):
             settings: Per-session settings.
 
         Returns:
-            A :class:`Session` instance bound to the new session.
+            A ``Session`` instance bound to the new session.
 
         Raises:
             ValueError: If a session with this ID already exists.
@@ -63,7 +63,7 @@ class MultiSessions(ABC):
             user_id: User identifier.
 
         Returns:
-            A :class:`Session` instance, or ``None`` if not found.
+            A ``Session`` instance, or ``None`` if not found.
         """
 
     @abstractmethod
@@ -83,7 +83,7 @@ class MultiSessions(ABC):
             settings: Per-session settings for new sessions.
 
         Returns:
-            A :class:`Session` instance.
+            A ``Session`` instance.
         """
 
     @abstractmethod
@@ -97,7 +97,7 @@ class MultiSessions(ABC):
             user_id: If provided, filter by user.  If ``None``, list all.
 
         Returns:
-            List of :class:`~philharmonica.adk.session.sqlite_multi_sessions.SessionInfo` objects.
+            List of ``SessionInfo`` objects.
         """
 
     @abstractmethod

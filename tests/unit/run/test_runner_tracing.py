@@ -1,13 +1,13 @@
-"""End-to-end tracing assertions for :meth:`Runner.arun`.
+"""End-to-end tracing assertions for ``Runner.arun``.
 
 Opts in via ``RunConfig(tracing_enabled=True)`` with an in-memory
 recording tracer, then asserts the emitted span tree shape:
 
-* one outer :class:`AgentSpanData` per run,
-* one :class:`GenerationSpanData` per LLM turn,
-* one :class:`FunctionSpanData` per tool call.
+* one outer ``AgentSpanData`` per run,
+* one ``GenerationSpanData`` per LLM turn,
+* one ``FunctionSpanData`` per tool call.
 
-The loop is driven by a patched :func:`call_llm` that returns a tool
+The loop is driven by a patched ``call_llm`` that returns a tool
 call on turn 1 and a final text message on turn 2 — enough to hit
 both the generation and tool span paths without touching a real LLM.
 """
@@ -47,9 +47,9 @@ from philharmonica.adk.types.tracing import (
 class _RecordingTracer:
     """Minimal in-memory tracer that logs every span created.
 
-    Holds onto the :class:`SpanData` payload for shape assertions and
-    returns real :class:`Span` instances so the
-    :class:`~contextvars.ContextVar` parent chain works end-to-end.
+    Holds onto the ``SpanData`` payload for shape assertions and
+    returns real ``Span`` instances so the
+    ``ContextVar`` parent chain works end-to-end.
     """
 
     def __init__(self) -> None:
@@ -127,7 +127,7 @@ def _final_text_response() -> LLMResponse:
 async def _run_with_tracing(*, tracing_enabled: bool) -> _RecordingTracer:
     """Run ``Runner.arun`` with a mock LLM that returns tool-call then text.
 
-    Returns the installed :class:`_RecordingTracer` so callers can
+    Returns the installed ``_RecordingTracer`` so callers can
     inspect the emitted span list.
     """
     tracer = _RecordingTracer()

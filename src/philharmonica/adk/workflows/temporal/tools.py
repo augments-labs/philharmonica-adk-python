@@ -1,13 +1,13 @@
 """Tool wrappers for durable Temporal execution.
 
-Provides :func:`activity_tool` — a factory that promotes an
-:func:`~temporalio.activity.defn`-decorated async function into a
-:class:`~philharmonica.adk.tools.function_tool.FunctionTool` whose invocation is
-routed through :func:`~temporalio.workflow.execute_activity` when called
+Provides ``activity_tool`` — a factory that promotes an
+``defn``-decorated async function into a
+``FunctionTool`` whose invocation is
+routed through ``execute_activity`` when called
 from inside a Temporal workflow, and called directly otherwise.
 
-Also provides :class:`TemporalToolWrapper` — a lightweight dataclass that
-maps tool names to per-tool :class:`~philharmonica.adk.workflows.engine.ToolActivityConfig`
+Also provides ``TemporalToolWrapper`` — a lightweight dataclass that
+maps tool names to per-tool ``ToolActivityConfig``
 overrides and provides a uniform ``should_wrap`` / ``get_config`` interface
 used by workflow builders when deciding which tools to promote into
 Temporal activities.
@@ -43,21 +43,21 @@ def activity_tool(
     start_to_close_timeout: timedelta = timedelta(seconds=30),
     maximum_attempts: int = 1,
 ) -> FunctionTool:
-    """Promote an activity-decorated async function into a :class:`~philharmonica.adk.tools.function_tool.FunctionTool`.
+    """Promote an activity-decorated async function into a ``FunctionTool``.
 
     The returned tool preserves the original function's signature for JSON
     schema generation.  At invocation time the routing decision is made
     lazily:
 
     - **Inside a Temporal workflow**: the call is dispatched through
-      :func:`~temporalio.workflow.execute_activity` with the supplied
+      ``execute_activity`` with the supplied
       timeout and retry settings, making the tool call durable.
     - **Outside a workflow** (tests, CLI, non-Temporal runners): the
       function is called directly with no overhead.
 
     Args:
         fn: An ``async`` function decorated with
-            :func:`~temporalio.activity.defn`.  The function's name,
+            ``defn``.  The function's name,
             docstring, and parameter annotations are used to build the tool
             schema, so they must be present and accurate.
         start_to_close_timeout: Maximum wall-clock time allowed for a single
@@ -67,7 +67,7 @@ def activity_tool(
             opt into automatic, token-billed re-runs of the activity.
 
     Returns:
-        A :class:`~philharmonica.adk.tools.function_tool.FunctionTool` wrapping
+        A ``FunctionTool`` wrapping
         *fn* with durable routing when inside a Temporal workflow.
 
     References:
@@ -157,16 +157,16 @@ def to_durable_tool(
     start_to_close_timeout: timedelta = timedelta(seconds=30),
     maximum_attempts: int = 1,
 ) -> FunctionTool:
-    """Promote an existing :class:`FunctionTool` to durable Temporal execution.
+    """Promote an existing ``FunctionTool`` to durable Temporal execution.
 
-    Unlike :func:`activity_tool` — which builds a fresh tool from a raw
+    Unlike ``activity_tool`` — which builds a fresh tool from a raw
     activity function — this wraps an *already-constructed* tool, preserving
     its real ``name`` and JSON ``schema``.  Only the invocation is re-routed:
 
     - **Inside a Temporal workflow**: the call is dispatched through
-      :func:`~temporalio.workflow.execute_activity` **by the tool's name**
+      ``execute_activity`` **by the tool's name**
       (the same string-name dispatch used by
-      :class:`~philharmonica.adk.workflows.temporal.mcp.TemporalMCPToolSet`), so
+      ``TemporalMCPToolSet``), so
       the worker must register an activity under ``tool.name``.
     - **Outside a workflow**: the tool's original ``on_invoke`` runs directly.
 
@@ -181,7 +181,7 @@ def to_durable_tool(
     undecorated closure it rejects.
 
     Args:
-        tool: The :class:`FunctionTool` to promote.  Its ``on_invoke`` must
+        tool: The ``FunctionTool`` to promote.  Its ``on_invoke`` must
             be set.
         start_to_close_timeout: Per-attempt wall-clock ceiling.  Defaults to
             30 seconds.
@@ -245,7 +245,7 @@ class TemporalToolWrapper:
     """Per-tool Temporal activity config registry for workflow builders.
 
     Stores a mapping from tool names to either a
-    :class:`~philharmonica.adk.workflows.engine.ToolActivityConfig` (custom config)
+    ``ToolActivityConfig`` (custom config)
     or ``False`` (keep tool in-workflow, no activity wrapping), plus a default
     config applied to all tools not explicitly listed.
 
@@ -267,51 +267,51 @@ class TemporalToolWrapper:
                 agent_tools.append(activity_tool(tool.fn, ...))
 
     Attributes:
-        tool_configs: Per-tool overrides.  A :class:`ToolActivityConfig`
+        tool_configs: Per-tool overrides.  A ``ToolActivityConfig``
             value installs custom timeout / retry settings.  ``False``
             keeps the tool running inside the workflow boundary without
             promotion to a Temporal activity.
         default_config: Config applied to tools whose name is absent from
-            *tool_configs*.  Defaults to :class:`ToolActivityConfig` defaults
+            *tool_configs*.  Defaults to ``ToolActivityConfig`` defaults
             (30 s timeout, 1 total attempt — retries off).
     """
 
     tool_configs: dict[str, ToolActivityConfig | bool] = field(default_factory=dict)
     """Per-tool activity config overrides.
 
-    ``False`` disables wrapping for that tool; any :class:`ToolActivityConfig`
+    ``False`` disables wrapping for that tool; any ``ToolActivityConfig``
     instance enables wrapping with the supplied policy.
     """
 
     default_config: ToolActivityConfig = field(default_factory=ToolActivityConfig)
-    """Default :class:`ToolActivityConfig` applied to tools not listed in
+    """Default ``ToolActivityConfig`` applied to tools not listed in
     *tool_configs*."""
 
     def should_wrap(self, tool_name: str) -> bool:
         """Return ``True`` if *tool_name* should be promoted to a Temporal activity.
 
         Args:
-            tool_name: The :attr:`~philharmonica.adk.tools.function_tool.FunctionTool.name`
+            tool_name: The ``name``
                 of the tool being evaluated.
 
         Returns:
             ``False`` when *tool_name* is explicitly configured to ``False``
-            in :attr:`tool_configs`; ``True`` in all other cases (specific
-            :class:`ToolActivityConfig` or not listed at all).
+            in ``tool_configs``; ``True`` in all other cases (specific
+            ``ToolActivityConfig`` or not listed at all).
         """
         config = self.tool_configs.get(tool_name)
         return config is not False
 
     def get_config(self, tool_name: str) -> ToolActivityConfig:
-        """Return the :class:`ToolActivityConfig` to use for *tool_name*.
+        """Return the ``ToolActivityConfig`` to use for *tool_name*.
 
         Args:
-            tool_name: The :attr:`~philharmonica.adk.tools.function_tool.FunctionTool.name`
+            tool_name: The ``name``
                 of the tool being evaluated.
 
         Returns:
-            The :class:`ToolActivityConfig` stored under *tool_name* in
-            :attr:`tool_configs` when present, otherwise :attr:`default_config`.
+            The ``ToolActivityConfig`` stored under *tool_name* in
+            ``tool_configs`` when present, otherwise ``default_config``.
         """
         config = self.tool_configs.get(tool_name)
         if isinstance(config, ToolActivityConfig):

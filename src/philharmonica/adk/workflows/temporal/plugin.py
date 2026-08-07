@@ -1,6 +1,6 @@
 """Worker wiring plugin for Philharmonica ADK Temporal integration.
 
-:class:`PhilharmonicaTemporalPlugin` implements BOTH of temporalio's plugin
+``PhilharmonicaTemporalPlugin`` implements BOTH of temporalio's plugin
 surfaces — ``temporalio.client.Plugin`` and ``temporalio.worker.Plugin``
 — so one instance wires the Philharmonica data converter into the client and
 the sandboxed workflow runner into every worker created from it, and it
@@ -22,10 +22,10 @@ lists::
     # repeat plugins= on the Worker.
     worker = Worker(client, task_queue="my-queue", workflows=[...], activities=[...])
 
-For manual wiring without the plugin chain, :meth:`build_worker_kwargs`
+For manual wiring without the plugin chain, ``build_worker_kwargs``
 returns the ``workflow_runner`` entry for the ``Worker`` constructor;
 the data converter is a *client* setting — pass
-:func:`~philharmonica.adk.workflows.temporal.serialization.build_philharmonica_data_converter`
+``build_philharmonica_data_converter``
 to ``Client.connect(data_converter=...)``.
 
 References:
@@ -84,18 +84,18 @@ class PhilharmonicaTemporalPlugin(ClientPlugin, WorkerPlugin):
         extra_passthrough_modules: Additional module names to pass through the
             Temporal sandbox beyond the built-in defaults.
         model_registry: Mapping from model name to
-            :class:`~philharmonica.adk.llms.llm.LLM` instance.  Populated via
-            :meth:`register_model`.
+            ``LLM`` instance.  Populated via
+            ``register_model``.
         passthrough_modules: Complete set of sandbox passthrough modules,
-            computed from :data:`~philharmonica.adk.workflows.temporal.determinism.DEFAULT_PASSTHROUGH_MODULES`
-            plus :attr:`extra_passthrough_modules` in ``__post_init__``.
+            computed from ``DEFAULT_PASSTHROUGH_MODULES``
+            plus ``extra_passthrough_modules`` in ``__post_init__``.
     """
 
     extra_passthrough_modules: Sequence[str] = dataclasses.field(default_factory=tuple)
     """Additional sandbox passthrough modules beyond the built-in defaults."""
 
     model_registry: dict[str, LLM] = dataclasses.field(default_factory=dict)
-    """Mapping from model name to :class:`~philharmonica.adk.llms.llm.LLM` instance."""
+    """Mapping from model name to ``LLM`` instance."""
 
     passthrough_modules: tuple[str, ...] = dataclasses.field(init=False)
     """Complete set of sandbox passthrough modules, computed in ``__post_init__``."""
@@ -110,15 +110,15 @@ class PhilharmonicaTemporalPlugin(ClientPlugin, WorkerPlugin):
     def register_model(self, name: str, llm: LLM) -> None:
         """Register an LLM instance by name.
 
-        Adds the instance to :attr:`model_registry` and also registers it
+        Adds the instance to ``model_registry`` and also registers it
         in the module-level activity registry so that
-        :func:`~philharmonica.adk.workflows.temporal.activity.invoke_model_activity`
+        ``invoke_model_activity``
         can resolve it at runtime.
 
         Args:
             name: Registry key — must match the ``model_name`` field used in
                 workflow activity inputs.
-            llm: The :class:`~philharmonica.adk.llms.llm.LLM` instance to register.
+            llm: The ``LLM`` instance to register.
         """
         self.model_registry[name] = llm
         activity_register_model(name, llm)
@@ -199,11 +199,11 @@ class PhilharmonicaTemporalPlugin(ClientPlugin, WorkerPlugin):
     def build_worker_kwargs(self) -> dict[str, Any]:
         """Return kwargs to pass directly to a Temporal ``Worker`` constructor.
 
-        Registers all models from :attr:`model_registry` into the activity
+        Registers all models from ``model_registry`` into the activity
         registry and assembles the ``workflow_runner`` entry. The data
         converter is NOT included — ``Worker`` does not accept one; it is
         a client setting (``Client.connect(data_converter=...)`` or the
-        plugin chain via :meth:`configure_client`).
+        plugin chain via ``configure_client``).
 
         Returns:
             A ``dict`` with the ``"workflow_runner"`` key ready to unpack

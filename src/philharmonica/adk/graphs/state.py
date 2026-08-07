@@ -1,6 +1,6 @@
 """``GraphState`` — per-run mutable state of a graph execution.
 
-Mirrors :class:`~philharmonica.adk.swarms.state.SwarmState` in shape and
+Mirrors ``SwarmState`` in shape and
 serialisation patterns:
 
 - ``to_dict()`` / ``from_dict()`` round-trip the runtime-mutable
@@ -11,10 +11,10 @@ serialisation patterns:
   an older persisted payload either round-trips or fails loudly —
   never a half-populated object.
 
-The :class:`Graph` config is NOT serialised on the state.
+The ``Graph`` config is NOT serialised on the state.
 ``from_json()`` requires the caller to supply the same ``Graph``
 instance (or an equivalent with the same node ids) — the graph
-encapsulates :class:`Executable`\\ s which are code, not data, and
+encapsulates ``Executable``\\ s which are code, not data, and
 will not round-trip through JSON. This matches how ``SwarmState``
 handles its parent ``Swarm``.
 
@@ -84,29 +84,29 @@ TContext = TypeVar("TContext")
 class GraphState[TContext]:
     """Per-run mutable state of a graph execution.
 
-    Held by :func:`~philharmonica.adk.run.graph_loop.run_graph_loop` across
-    supersteps. Passed to :class:`GraphHooks` callbacks,
-    :class:`Checkpointer`\\ s, and edge predicates so they can inspect
+    Held by ``run_graph_loop`` across
+    supersteps. Passed to ``GraphHooks`` callbacks,
+    ``Checkpointer``\\ s, and edge predicates so they can inspect
     progress without touching the driver.
 
     Attributes:
-        graph: The owning :class:`Graph` config. Not serialised.
+        graph: The owning ``Graph`` config. Not serialised.
         thread_id: Caller-supplied identifier for a logical run. When
-            a :class:`Checkpointer` is attached this is the key under
+            a ``Checkpointer`` is attached this is the key under
             which snapshots are stored. ``None`` when no checkpointer
             was configured. Auto-generated via ``uuid.uuid4().hex[:12]``
-            on :meth:`GraphState.new` if the caller does not supply
-            one, mirroring :meth:`Graph.new`'s id behaviour.
+            on ``GraphState.new`` if the caller does not supply
+            one, mirroring ``Graph.new``'s id behaviour.
         superstep: Monotonically-increasing superstep counter
             (1-indexed once the first superstep starts). ``0`` before
             any node has fired.
-        node_results: Latest :class:`NodeResult` per node id. Read by
-            :class:`Merge` strategies (when a node has multiple
+        node_results: Latest ``NodeResult`` per node id. Read by
+            ``Merge`` strategies (when a node has multiple
             incoming edges) and by edge predicates. In cycles, each
             re-firing of a node overwrites its prior entry.
         versions_seen: Per-(node, upstream) map of the last superstep
             at which ``node`` consumed input from ``upstream``. Used
-            by :class:`Checkpointer` restores to decide whether a
+            by ``Checkpointer`` restores to decide whether a
             node should re-fire. See the module docstring.
         produced_at: Per-node superstep at which that node's current
             ``node_results`` entry was produced. Paired with
@@ -114,12 +114,12 @@ class GraphState[TContext]:
         all_items: Append-only Layer 3 audit trail of every item
             produced by every node, in completion order.
         cumulative_usage: Cumulative LLM usage across the whole graph
-            run. Compared against :attr:`GraphConfig.max_total_tokens`.
+            run. Compared against ``GraphConfig.max_total_tokens``.
         per_node_usage: Per-node-id usage attribution. Sum across
-            nodes equals :attr:`cumulative_usage`.
+            nodes equals ``cumulative_usage``.
         terminal_outputs: Outputs of terminal nodes as they fire,
             keyed by terminal node id. When every terminal has fired
-            the loop exits; :attr:`final_output` is computed at that
+            the loop exits; ``final_output`` is computed at that
             point.
         final_output: Aggregate output of the graph run. When there
             is exactly one terminal, this is that terminal's
@@ -132,15 +132,15 @@ class GraphState[TContext]:
             ``Exception`` instance so the state remains JSON-safe.
         pending_interrupts: Interrupts awaiting a human reply, keyed by
             ``node_id``. Populated when a node raises
-            :class:`~philharmonica.adk.graphs.interrupt.InterruptException`;
+            ``InterruptException``;
             cleared by the resume path.
         nested_agent_snapshots: Mid-execution sub-agent state for nodes
-            paused on a :class:`~philharmonica.adk.graphs.interrupt.NestedAgentInterrupt`.
-            Serialised via :meth:`RunState.to_dict`; rehydrated on load.
+            paused on a ``NestedAgentInterrupt``.
+            Serialised via ``RunState.to_dict``; rehydrated on load.
         nested_graph_snapshots: Mid-execution inner-graph state for nodes
-            whose executable is a :class:`~philharmonica.adk.graphs.graph.Graph`
+            whose executable is a ``Graph``
             and whose inner graph suspended. Serialised via
-            :meth:`GraphState.to_dict` recursively; rehydrated on load.
+            ``GraphState.to_dict`` recursively; rehydrated on load.
         resume_counts: How many times each node has been resumed.
             Incremented in the graph loop when a node is dispatched
             with a resume-reply in its input metadata.
@@ -156,7 +156,7 @@ class GraphState[TContext]:
     """1-indexed superstep counter. ``0`` before the first superstep."""
 
     node_results: dict[str, NodeResult] = field(default_factory=dict)
-    """Latest :class:`NodeResult` per node id."""
+    """Latest ``NodeResult`` per node id."""
 
     versions_seen: dict[str, dict[str, int]] = field(default_factory=dict)
     """``node -> {upstream -> last_consumed_superstep}`` — LangGraph-style
@@ -166,7 +166,7 @@ class GraphState[TContext]:
     produced_at: dict[str, int] = field(default_factory=dict)
     """``node_id -> superstep`` at which the current ``node_results``
     entry for that node was produced. Compared against
-    :attr:`versions_seen` on checkpoint restore to decide which nodes
+    ``versions_seen`` on checkpoint restore to decide which nodes
     must re-fire (LangGraph Pregel channel-version comparison)."""
 
     all_items: list[RunItem] = field(default_factory=list)
@@ -200,33 +200,33 @@ class GraphState[TContext]:
     pending_interrupts: dict[str, Interrupt] = field(default_factory=dict)
     """Interrupts awaiting a human reply, keyed by ``node_id``.
 
-    Populated when a node raises :class:`~philharmonica.adk.graphs.interrupt.InterruptException`.
+    Populated when a node raises ``InterruptException``.
     Cleared by the resume path once the caller supplies a
-    :class:`~philharmonica.adk.graphs.interrupt.GraphResume`."""
+    ``GraphResume``."""
 
     nested_agent_snapshots: dict[str, RunState] = field(default_factory=dict)
     """Mid-execution sub-agent state for nodes paused on a
-    :class:`~philharmonica.adk.graphs.interrupt.NestedAgentInterrupt`. Serialized
-    via :meth:`RunState.to_dict`; rehydrated via
-    :meth:`RunState.from_dict` on load."""
+    ``NestedAgentInterrupt``. Serialized
+    via ``RunState.to_dict``; rehydrated via
+    ``RunState.from_dict`` on load."""
 
     nested_graph_snapshots: dict[str, GraphState[Any]] = field(default_factory=dict)
     """Mid-execution inner-graph state for nodes whose executable is a
-    :class:`~philharmonica.adk.graphs.graph.Graph` and whose inner graph
-    suspended. Parallel to :attr:`nested_agent_snapshots` for the
-    graph-backed-node case. Serialized via :meth:`GraphState.to_dict`
-    recursively; rehydrated via :meth:`GraphState.from_dict` on load
+    ``Graph`` and whose inner graph
+    suspended. Parallel to ``nested_agent_snapshots`` for the
+    graph-backed-node case. Serialized via ``GraphState.to_dict``
+    recursively; rehydrated via ``GraphState.from_dict`` on load
     (requires the inner graph to be available in the parent graph's
     node executables). Populated by the BSP loop's
-    :class:`InterruptException` catch when the raised exception
+    ``InterruptException`` catch when the raised exception
     carries a non-``None`` ``_nested_graph_state`` attribute set by
-    :meth:`Graph.invoke`."""
+    ``Graph.invoke``."""
 
     resume_counts: dict[str, int] = field(default_factory=dict)
     """How many times each node has been resumed.
 
     Incremented in the graph loop when a node is dispatched with an
-    :class:`Interrupt` reply (``__resume_reply__``) or a nested-agent
+    ``Interrupt`` reply (``__resume_reply__``) or a nested-agent
     reply (``__nested_agent_reply__``) in its input metadata. The current value (after increment) is stamped onto the
     per-node observability span as
     ``philharmonica.graph.node.resume_attempt``. Original (non-resume) firings
@@ -242,11 +242,11 @@ class GraphState[TContext]:
         Updates ``node_results`` and ``produced_at`` (overwriting any prior entry),
         appends ``result.new_items`` to ``all_items``, and accumulates
         usage both graph-wide and per-node. Called by the graph loop
-        right after :meth:`Executable.invoke` returns.
+        right after ``Executable.invoke`` returns.
 
         Args:
             node_id: Id of the node that fired.
-            result: Its :class:`NodeResult`.
+            result: Its ``NodeResult``.
         """
         self.node_results[node_id] = result
         self.produced_at[node_id] = self.superstep
@@ -264,7 +264,7 @@ class GraphState[TContext]:
         upstream_id: str,
     ) -> None:
         """Record that ``node_id`` consumed input from ``upstream_id``
-        at :attr:`superstep`.
+        at ``superstep``.
 
         Used by the graph loop to populate ``versions_seen``. After a
         checkpoint restore, the loop compares this map against the
@@ -277,7 +277,7 @@ class GraphState[TContext]:
     def to_dict(self) -> dict[str, Any]:
         """Emit the serialisable fields as a plain dict.
 
-        Every value is coerced JSON-safe via :func:`_json_safe` so the
+        Every value is coerced JSON-safe via ``_json_safe`` so the
         payload survives ``json.dumps`` unchanged — a durable checkpointer
         depends on this. Intentionally omits ``graph`` (non-data
         reference). ``node_results`` are serialised as a minimal dict per
@@ -286,7 +286,7 @@ class GraphState[TContext]:
         to Layer 1 params). ``terminal_outputs`` and ``final_output`` are
         likewise made JSON-safe: primitives and nested dict/list structure
         are preserved, and any non-serialisable leaf (e.g. an
-        :class:`LLMUsage` stamped into a nested-graph node's metadata) is
+        ``LLMUsage`` stamped into a nested-graph node's metadata) is
         ``str``-coerced rather than crashing the dump.
         """
         from philharmonica.adk.types.items.items import ItemHelpers
@@ -311,12 +311,12 @@ class GraphState[TContext]:
         }
 
     def _serialise_pending_interrupts(self) -> dict[str, dict[str, Any]]:
-        """Serialise :attr:`pending_interrupts` to plain dicts.
+        """Serialise ``pending_interrupts`` to plain dicts.
 
-        Uses :func:`dataclasses.asdict` so subclass fields (``agent_name``,
-        ``tool_call_ids`` on :class:`NestedAgentInterrupt`) are included
+        Uses ``dataclasses.asdict`` so subclass fields (``agent_name``,
+        ``tool_call_ids`` on ``NestedAgentInterrupt``) are included
         automatically. The discriminator ``kind`` survives the round-trip
-        and drives :meth:`_rehydrate_pending_interrupts` on load.
+        and drives ``_rehydrate_pending_interrupts`` on load.
         """
         return {nid: dataclasses.asdict(interrupt) for nid, interrupt in self.pending_interrupts.items()}
 
@@ -326,27 +326,27 @@ class GraphState[TContext]:
         data: dict[str, Any],
         graph: Graph[TContext],
     ) -> GraphState[TContext]:
-        """Reconstruct a :class:`GraphState` from :meth:`to_dict` output.
+        """Reconstruct a ``GraphState`` from ``to_dict`` output.
 
-        Requires the caller to re-supply the :class:`Graph`. Validates
+        Requires the caller to re-supply the ``Graph``. Validates
         that every ``node_id`` key referenced in the payload is a
         known node in the graph — phantom ids are rejected rather
         than silently imported (mirrors ``SwarmState.from_dict`` for
         consistency with project rules).
 
         Args:
-            data: Payload from :meth:`to_dict`.
-            graph: The parent :class:`Graph`.
+            data: Payload from ``to_dict``.
+            graph: The parent ``Graph``.
 
         Returns:
-            A reconstructed :class:`GraphState`.
+            A reconstructed ``GraphState``.
 
         Raises:
             ValueError: When the payload references node ids not
                 present in ``graph``, when ``status`` carries an
-                unknown value, when a :class:`NestedAgentInterrupt`
+                unknown value, when a ``NestedAgentInterrupt``
                 entry has missing/invalid required fields, or when a
-                :class:`NestedAgentInterrupt` has no matching entry in
+                ``NestedAgentInterrupt`` has no matching entry in
                 ``nested_agent_snapshots``.
         """
         from philharmonica.adk.types.items.items import ItemHelpers
@@ -429,7 +429,7 @@ class GraphState[TContext]:
         """Serialise to a JSON string — ``json.dumps(self.to_dict())``.
 
         Use for on-disk or cross-process persistence. For in-process
-        handoff prefer :meth:`to_dict`.
+        handoff prefer ``to_dict``.
         """
         return json.dumps(self.to_dict())
 
@@ -439,15 +439,15 @@ class GraphState[TContext]:
         raw: str,
         graph: Graph[TContext],
     ) -> GraphState[TContext]:
-        """Deserialise from :meth:`to_json` output — ``from_dict(json.loads(raw))``.
+        """Deserialise from ``to_json`` output — ``from_dict(json.loads(raw))``.
 
         Args:
-            raw: JSON string produced by :meth:`to_json`.
-            graph: The parent :class:`Graph` used to validate node ids
-                (same contract as :meth:`from_dict`).
+            raw: JSON string produced by ``to_json``.
+            graph: The parent ``Graph`` used to validate node ids
+                (same contract as ``from_dict``).
 
         Returns:
-            A reconstructed :class:`GraphState`.
+            A reconstructed ``GraphState``.
 
         Raises:
             ValueError: When an unknown node id appears in the payload
@@ -459,7 +459,7 @@ class GraphState[TContext]:
 
 
 def _serialise_usage(usage: LLMUsage) -> dict[str, int]:
-    """Serialise an :class:`LLMUsage` to its four-counter wire form."""
+    """Serialise an ``LLMUsage`` to its four-counter wire form."""
     return {
         "requests": usage.requests,
         "total_tokens": usage.total_tokens,
@@ -474,14 +474,14 @@ def _json_safe(value: Any) -> Any:
     Primitives (``str`` / ``int`` / ``float`` / ``bool`` / ``None``) pass
     through untouched; ``dict`` and ``list`` / ``tuple`` recurse so a
     non-serialisable leaf is coerced in place; anything else (a dataclass
-    such as :class:`LLMUsage`, a Pydantic model, an arbitrary object) is
+    such as ``LLMUsage``, a Pydantic model, an arbitrary object) is
     ``str``-coerced.
 
     Without this a durable checkpointer's ``json.dumps(state.to_dict())``
     crashes — and fails the whole run — on a value the runtime deposits
-    inside :attr:`NodeResult.metadata` or :attr:`NodeResult.output`. A
+    inside ``NodeResult.metadata`` or ``NodeResult.output``. A
     nested-graph node, for example, stamps ``per_node_usage`` onto its
-    metadata as a ``dict[str, LLMUsage]``, and :class:`LLMUsage` is a
+    metadata as a ``dict[str, LLMUsage]``, and ``LLMUsage`` is a
     dataclass that ``json`` cannot serialise.
 
     Dict keys are ``str``-coerced because JSON object keys are strings.
@@ -496,7 +496,7 @@ def _json_safe(value: Any) -> Any:
 
 
 def _serialise_node_results(node_results: dict[str, NodeResult]) -> dict[str, dict[str, Any]]:
-    """Serialise :attr:`GraphState.node_results` to wire form.
+    """Serialise ``GraphState.node_results`` to wire form.
 
     Each entry's ``output`` is coerced to ``str`` when not a JSON
     primitive; ``new_items`` are converted to Layer 1 params; ``usage``
@@ -517,7 +517,7 @@ def _serialise_node_results(node_results: dict[str, NodeResult]) -> dict[str, di
 
 
 def _rehydrate_usage(data: dict[str, Any]) -> LLMUsage:
-    """Rebuild an :class:`LLMUsage` from its four-counter wire form."""
+    """Rebuild an ``LLMUsage`` from its four-counter wire form."""
     return LLMUsage(
         requests=data.get("requests", 0),
         total_tokens=data.get("total_tokens", 0),
@@ -527,7 +527,7 @@ def _rehydrate_usage(data: dict[str, Any]) -> LLMUsage:
 
 
 def _rehydrate_node_results(data: dict[str, Any]) -> dict[str, NodeResult]:
-    """Rebuild :attr:`GraphState.node_results` from a serialised payload."""
+    """Rebuild ``GraphState.node_results`` from a serialised payload."""
     from philharmonica.adk.orchestration.executable import NodeResult
     from philharmonica.adk.types.items.items import ItemHelpers
 
@@ -544,17 +544,17 @@ def _rehydrate_node_results(data: dict[str, Any]) -> dict[str, NodeResult]:
 
 
 def _rehydrate_pending_interrupts(data: dict[str, Any]) -> dict[str, Interrupt]:
-    """Rebuild :attr:`GraphState.pending_interrupts` from a serialised payload.
+    """Rebuild ``GraphState.pending_interrupts`` from a serialised payload.
 
-    The discriminator ``kind`` selects between :class:`Interrupt` and
-    :class:`NestedAgentInterrupt`. Nested-agent entries validate their
+    The discriminator ``kind`` selects between ``Interrupt`` and
+    ``NestedAgentInterrupt``. Nested-agent entries validate their
     required fields (``agent_name`` non-empty string, ``tool_call_ids``
-    present) and raise :class:`ValueError` on any mismatch — silent
+    present) and raise ``ValueError`` on any mismatch — silent
     fall-through would yield a degraded interrupt that the resume path
     cannot honour.
 
     Args:
-        data: The :meth:`GraphState.to_dict` payload.
+        data: The ``GraphState.to_dict`` payload.
 
     Returns:
         A dict ``node_id -> Interrupt`` (or ``NestedAgentInterrupt``).
@@ -610,10 +610,10 @@ def _rehydrate_nested_graph_snapshots(
     data: dict[str, Any],
     graph: Graph[Any],
 ) -> dict[str, GraphState[Any]]:
-    """Rebuild :attr:`GraphState.nested_graph_snapshots` from a serialised payload.
+    """Rebuild ``GraphState.nested_graph_snapshots`` from a serialised payload.
 
-    Each entry is the inner :class:`GraphState` of a node whose
-    executable is itself a :class:`Graph`. The inner graph instance is
+    Each entry is the inner ``GraphState`` of a node whose
+    executable is itself a ``Graph``. The inner graph instance is
     looked up off the parent ``graph``'s node executables so the
     rehydrate path can recurse into the inner state's own validations.
 
@@ -644,11 +644,11 @@ def _rehydrate_nested_graph_snapshots(
 
 
 def _rehydrate_nested_agent_snapshots(data: dict[str, Any]) -> dict[str, RunState]:
-    """Rebuild :attr:`GraphState.nested_agent_snapshots` from a serialised payload.
+    """Rebuild ``GraphState.nested_agent_snapshots`` from a serialised payload.
 
-    Defers to :meth:`RunState.from_dict` for each entry. A missing
+    Defers to ``RunState.from_dict`` for each entry. A missing
     field yields an empty dict — the cross-reference check in
-    :meth:`GraphState.from_dict` is the authority for refusing a
+    ``GraphState.from_dict`` is the authority for refusing a
     payload that has a nested-interrupt without its snapshot.
     """
     return {nid: RunState.from_dict(payload) for nid, payload in data.get("nested_agent_snapshots", {}).items()}

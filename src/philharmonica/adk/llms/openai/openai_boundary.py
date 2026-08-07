@@ -8,7 +8,7 @@ boundary — one place, two callers.
 
 Defined separately (rather than duplicated per model) so the
 ``Authorization`` / ``x-api-key`` blocklist in
-:func:`headers_as_sdk` is a single load-bearing check instead of
+``headers_as_sdk`` is a single load-bearing check instead of
 two easily-drifting copies.
 
 Every helper returns ``Any`` on purpose: the SDK's typed parameter

@@ -142,7 +142,7 @@ class SwarmTurnInterruptEvent:
     Replaces ``SwarmTurnEndEvent`` for any turn that exits via
     ``InterruptException`` (pure HITL) or ``AgentToolDeferral``
     (nested-agent-defer, lifted to ``NestedAgentInterrupt``). The
-    parked :class:`Interrupt` carries the kind, question, and
+    parked ``Interrupt`` carries the kind, question, and
     metadata the consumer needs to prompt the human; resuming uses
     the same ``SwarmResume`` flow as ``arun_swarm_from_checkpoint``
     via ``arun_swarm_streamed(..., initial_state=..., resume=...)``.
@@ -151,7 +151,7 @@ class SwarmTurnInterruptEvent:
         agent: Name of the suspended member.
         turn: One-indexed turn number (matches ``state.total_turns``).
         interrupt: The parked interrupt (or
-            :class:`~philharmonica.adk.graphs.interrupt.NestedAgentInterrupt`
+            ``NestedAgentInterrupt``
             subtype).
         type: Discriminator constant. Always
             ``"swarm_turn_interrupt"``.
@@ -164,7 +164,7 @@ class SwarmTurnInterruptEvent:
     """One-indexed turn number (matches ``state.total_turns``)."""
 
     interrupt: Interrupt
-    """The parked interrupt (or :class:`NestedAgentInterrupt` subtype)."""
+    """The parked interrupt (or ``NestedAgentInterrupt`` subtype)."""
 
     type: Literal["swarm_turn_interrupt"] = "swarm_turn_interrupt"
     """Discriminator constant."""

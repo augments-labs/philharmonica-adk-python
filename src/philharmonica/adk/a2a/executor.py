@@ -1,21 +1,21 @@
 """``A2AExecutor`` — bridges a2a-sdk's ``AgentExecutor`` ABC to ``Runner.arun``.
 
-The executor is the server-side mirror of :class:`A2AClient`. Where the
+The executor is the server-side mirror of ``A2AClient``. Where the
 client translates outbound framework prompts into A2A wire-format
 requests, the executor translates inbound A2A tasks into local
-:func:`Runner.arun` calls, then projects the resulting
-:class:`RunResult` back into A2A artifacts and status updates.
+``Runner.arun`` calls, then projects the resulting
+``RunResult`` back into A2A artifacts and status updates.
 
 Implements two abstract methods from ``a2a.server.agent_execution.AgentExecutor``:
 
-* :meth:`execute` — run a task to completion. Pulls the prompt from
-  the inbound :class:`Message`, drives :func:`Runner.arun` against the
-  local :class:`Agent`, publishes the result as a single text artifact,
+* ``execute`` — run a task to completion. Pulls the prompt from
+  the inbound ``Message``, drives ``Runner.arun`` against the
+  local ``Agent``, publishes the result as a single text artifact,
   and marks the task ``TASK_STATE_COMPLETED``. Maps every framework
-  exception class to the matching terminal :class:`TaskState`.
-* :meth:`cancel` — cancel a running task by ``task_id``. Routes to the
-  asyncio task tracked in :attr:`_running_tasks` so the inner
-  ``Runner.arun`` coroutine receives a :class:`asyncio.CancelledError``
+  exception class to the matching terminal ``TaskState``.
+* ``cancel`` — cancel a running task by ``task_id``. Routes to the
+  asyncio task tracked in ``_running_tasks`` so the inner
+  ``Runner.arun`` coroutine receives a ``asyncio.CancelledError```
   and unwinds cleanly.
 
 A single ``A2AExecutor`` instance handles many concurrent tasks. Each
@@ -24,14 +24,14 @@ the duration so concurrent ``cancel()`` calls can reach in. The dict
 is small (one entry per in-flight task) and protected by Python's GIL
 on the dict-mutation methods — no extra lock is needed.
 
-Task persistence is optional.  Pass a :class:`~philharmonica.adk.a2a.task_store.TaskStore`
+Task persistence is optional.  Pass a ``TaskStore``
 to ``task_store`` to persist tasks across process restarts.  The default
-(``task_store=None``) uses an :class:`~philharmonica.adk.a2a.task_store.InMemoryTaskStore`
+(``task_store=None``) uses an ``InMemoryTaskStore``
 which replicates the original in-memory behavior with zero new dependencies.
 
-Tracing: every ``execute()`` call opens a :func:`function_span` with
+Tracing: every ``execute()`` call opens a ``function_span`` with
 ``a2a_data={"task_id", "context_id"}`` so the inner ``Runner.arun``
-spans nest as children. Same span pattern :class:`A2AClient` uses on
+spans nest as children. Same span pattern ``A2AClient`` uses on
 the outbound side; both sides share the ``a2a.<task_id>`` naming
 convention.
 """
@@ -93,8 +93,8 @@ def _wrap_text_as_message(text: str) -> Message:
         text: The human-readable reason string to embed in the message.
 
     Returns:
-        A :class:`a2a.types.Message` with ``ROLE_AGENT`` carrying a
-        single text :class:`a2a.types.Part`.
+        A ``a2a.types.Message`` with ``ROLE_AGENT`` carrying a
+        single text ``a2a.types.Part``.
     """
     return Message(role=Role.ROLE_AGENT, parts=[new_text_part(text)])
 
@@ -102,7 +102,7 @@ def _wrap_text_as_message(text: str) -> Message:
 def _exception_to_state(exc: BaseException) -> TaskState:
     """Map a run exception to the appropriate terminal ``TaskState``.
 
-    Mirrors the state-mapping table in :meth:`A2AExecutor._handle_run_exception`
+    Mirrors the state-mapping table in ``A2AExecutor._handle_run_exception``
     so the task-store snapshot records the same verdict that gets published
     to the A2A event queue.
 
@@ -110,7 +110,7 @@ def _exception_to_state(exc: BaseException) -> TaskState:
         exc: The exception that terminated the run.
 
     Returns:
-        A :class:`~a2a.types.TaskState` value (one of COMPLETED / FAILED /
+        A ``TaskState`` value (one of COMPLETED / FAILED /
         CANCELED / REJECTED).
     """
     if isinstance(exc, AgentInputGuardrailTripwireTriggered):
@@ -127,8 +127,8 @@ class A2AExecutor(AgentExecutor):
     server it backs. The instance is stateful only for cancellation
     routing (``_running_tasks: dict[str, asyncio.Task]``); it holds
     no per-task buffer or replay state — those live in the
-    :class:`a2a.server.tasks.TaskStore` configured on the
-    :class:`A2AServer`.
+    ``a2a.server.tasks.TaskStore`` configured on the
+    ``A2AServer``.
     """
 
     def __init__(
@@ -139,20 +139,20 @@ class A2AExecutor(AgentExecutor):
         run_config: RunConfig | None = None,
         task_store: TaskStore | None = None,
     ) -> None:
-        """Construct an :class:`A2AExecutor`.
+        """Construct an ``A2AExecutor``.
 
         Args:
-            agent: The local :class:`Agent` to execute when a task
+            agent: The local ``Agent`` to execute when a task
                 arrives.
             max_turns: Maximum local-agent loop turns per task. Mapped
                 directly to ``Runner.arun(max_turns=...)``.
-            run_config: Optional :class:`RunConfig` override forwarded
+            run_config: Optional ``RunConfig`` override forwarded
                 to ``Runner.arun(run_config=...)``. ``None`` means the
                 framework defaults apply.
-            task_store: Optional :class:`~philharmonica.adk.a2a.task_store.TaskStore`
+            task_store: Optional ``TaskStore``
                 for persisting tasks across process restarts.  ``None``
                 (the default) uses an
-                :class:`~philharmonica.adk.a2a.task_store.InMemoryTaskStore`
+                ``InMemoryTaskStore``
                 with identical behavior to the original dict-based
                 implementation.
         """
@@ -170,14 +170,14 @@ class A2AExecutor(AgentExecutor):
         """Drive a single A2A task to completion.
 
         Method body kept under the 60-line function limit by delegating
-        to :meth:`_resolve_ids`, :meth:`_enqueue_initial_task`,
-        :meth:`_extract_prompt`, :meth:`_run_under_span`, and
-        :meth:`_handle_run_exception`.
+        to ``_resolve_ids``, ``_enqueue_initial_task``,
+        ``_extract_prompt``, ``_run_under_span``, and
+        ``_handle_run_exception``.
 
         Args:
-            context: The a2a-sdk :class:`a2a.server.agent_execution.RequestContext`
+            context: The a2a-sdk ``a2a.server.agent_execution.RequestContext``
                 carrying the inbound task identifiers and message.
-            event_queue: The :class:`a2a.server.events.EventQueue` to
+            event_queue: The ``a2a.server.events.EventQueue`` to
                 publish task status and artifact events onto.
         """
         try:
@@ -229,10 +229,10 @@ class A2AExecutor(AgentExecutor):
         """Run the local agent under a tracing span; publish result + state.
 
         Records the asyncio task for cancellation routing, runs
-        :func:`Runner.arun`, maps the result to A2A artifact +
+        ``Runner.arun``, maps the result to A2A artifact +
         complete, or routes exceptions via
-        :meth:`_handle_run_exception`. Persists the final terminal state
-        to ``_task_store``. Cleans up :attr:`_running_tasks` in
+        ``_handle_run_exception``. Persists the final terminal state
+        to ``_task_store``. Cleans up ``_running_tasks`` in
         ``finally``.
 
         Args:
@@ -242,7 +242,7 @@ class A2AExecutor(AgentExecutor):
                 cancellation tracking.
             context_id: The conversation context identifier for span
                 metadata.
-            updater: The :class:`a2a.server.tasks.TaskUpdater` for
+            updater: The ``a2a.server.tasks.TaskUpdater`` for
                 publishing artifact and terminal status events.
             context: The inbound request context; used when persisting
                 the terminal task snapshot to the store.
@@ -310,7 +310,7 @@ class A2AExecutor(AgentExecutor):
         Args:
             task_id: The A2A task identifier.
             context_id: The conversation context identifier.
-            state: The :class:`~a2a.types.TaskState` to record.
+            state: The ``TaskState`` to record.
             context: The inbound request context; the message history is
                 copied into the stored snapshot.
         """
@@ -337,7 +337,7 @@ class A2AExecutor(AgentExecutor):
         they are populated. An explicit boundary check raises if not.
 
         Args:
-            context: The inbound :class:`a2a.server.agent_execution.RequestContext`.
+            context: The inbound ``a2a.server.agent_execution.RequestContext``.
 
         Returns:
             A ``(task_id, context_id)`` tuple, both non-empty.
@@ -373,15 +373,15 @@ class A2AExecutor(AgentExecutor):
         request depends on.
 
         Args:
-            event_queue: The :class:`a2a.server.events.EventQueue` to
-                push the initial :class:`a2a.types.Task` event onto.
+            event_queue: The ``a2a.server.events.EventQueue`` to
+                push the initial ``a2a.types.Task`` event onto.
             context: The inbound request context, used to copy the
                 message into the task's ``history``.
             task_id: The resolved task identifier.
             context_id: The resolved conversation context identifier.
 
         Returns:
-            The :class:`a2a.types.Task` that was enqueued, for
+            The ``a2a.types.Task`` that was enqueued, for
             persistence to the task store.
         """
         initial_task = Task(
@@ -404,7 +404,7 @@ class A2AExecutor(AgentExecutor):
         single FAILED status with a clear "empty input" reason.
 
         Args:
-            context: The inbound :class:`a2a.server.agent_execution.RequestContext`.
+            context: The inbound ``a2a.server.agent_execution.RequestContext``.
 
         Returns:
             The extracted prompt string, or ``None`` when the message
@@ -425,14 +425,14 @@ class A2AExecutor(AgentExecutor):
     ) -> None:
         """Map a framework exception to the right terminal task state.
 
-        Splits the verdict-publication from :meth:`execute` so the
+        Splits the verdict-publication from ``execute`` so the
         method body stays under the 60-line function limit and the
         state-mapping table is testable in isolation. ``CancelledError``
         is published as CANCELED then re-raised so the asyncio task
         itself unwinds cleanly.
 
         Args:
-            updater: The :class:`a2a.server.tasks.TaskUpdater` for
+            updater: The ``a2a.server.tasks.TaskUpdater`` for
                 publishing the terminal status event.
             task_id: The A2A task identifier, used in log messages.
             exc: The caught exception to map to a terminal state.
@@ -474,9 +474,9 @@ class A2AExecutor(AgentExecutor):
 
         Looks up the asyncio task by ``context.task_id`` and calls
         ``.cancel()`` on it. The inner ``Runner.arun`` coroutine
-        receives a :class:`asyncio.CancelledError` on its next
+        receives a ``asyncio.CancelledError`` on its next
         ``await`` point and unwinds; the ``except CancelledError``
-        branch in :meth:`execute` publishes the terminal CANCELED
+        branch in ``execute`` publishes the terminal CANCELED
         status before re-raising.
 
         Cancelling an unknown ``task_id`` is a no-op — the task may
@@ -484,11 +484,11 @@ class A2AExecutor(AgentExecutor):
         which case the terminal state was already published.
 
         Args:
-            context: The a2a-sdk :class:`a2a.server.agent_execution.RequestContext`
+            context: The a2a-sdk ``a2a.server.agent_execution.RequestContext``
                 carrying the ``task_id`` to cancel.
-            event_queue: Unused — the :meth:`execute` coroutine
+            event_queue: Unused — the ``execute`` coroutine
                 publishes its own terminal status event when it catches
-                the :class:`asyncio.CancelledError`.
+                the ``asyncio.CancelledError``.
         """
         del event_queue  # The execute() task publishes its own status.
         # task_id may be ``None`` on a malformed cancel; treat the

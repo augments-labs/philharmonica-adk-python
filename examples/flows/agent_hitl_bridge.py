@@ -1,21 +1,21 @@
 """Agent-internal HITL bridge example — agent deferral propagates up to Flow.
 
-Demonstrates :func:`arun_flow_agent` carrying an inner agent run's
+Demonstrates ``arun_flow_agent`` carrying an inner agent run's
 ``requires_approval`` tool gate up through the Flow layer:
 
-1. A step body calls :func:`arun_flow_agent` to run an agent.
+1. A step body calls ``arun_flow_agent`` to run an agent.
 2. The agent's deferred-tool short-circuit normally surfaces on
    ``RunResult.requires_action``; here it propagates as
-   :class:`FlowAgentDeferred`, which the executor captures into
-   :attr:`FlowDeferredStep.agent_run_state`.
+   ``FlowAgentDeferred``, which the executor captures into
+   ``FlowDeferredStep.agent_run_state``.
 3. The flow halts with ``status="deferred"`` and a
-   :class:`FlowCheckpoint`.
-4. The developer rehydrates the agent's :class:`RunState`, records
-   decisions via :meth:`RunState.approve` / :meth:`RunState.reject`,
+   ``FlowCheckpoint``.
+4. The developer rehydrates the agent's ``RunState``, records
+   decisions via ``RunState.approve`` / ``RunState.reject``,
    serialises it back, and resumes via
-   :meth:`Runner.arun_flow_from_checkpoint(..., agent_resolutions=...)`.
+   ``Runner.arun_flow_from_checkpoint(..., agent_resolutions=...)``.
 
-The example uses an ``AsyncMock`` over :meth:`Runner.arun` so the
+The example uses an ``AsyncMock`` over ``Runner.arun`` so the
 agent path doesn't need a provider API key. Synthetic-only, no
 ``load_dotenv`` required.
 """

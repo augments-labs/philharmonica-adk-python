@@ -3,7 +3,7 @@
 Uses ``psycopg`` 3 (async) with a connection pool and optimistic locking:
 a ``lock_token`` UUID column acts as a fencing token. On ``save`` the token
 is verified; a stale token (concurrent writer) raises
-:class:`~philharmonica.adk.exceptions.CheckpointConflictError`.
+``CheckpointConflictError``.
 
 One row per ``thread_id`` — the latest checkpoint overwrites the prior
 one (upsert-on-insert, conditional-UPDATE thereafter). Time-travel /
@@ -73,12 +73,12 @@ class PostgresCheckpointer(Checkpointer):
     first write; subsequent saves use a conditional ``UPDATE`` guarded by
     the fencing token cached from the prior ``load`` or ``save``. A
     concurrent writer that rotates the token causes the losing ``save``
-    to raise :class:`~philharmonica.adk.exceptions.CheckpointConflictError`.
+    to raise ``CheckpointConflictError``.
 
-    The caller owns the lifecycle — call :meth:`close` at application
-    shutdown or after a test. :class:`~philharmonica.adk.run.runner.Runner` does
+    The caller owns the lifecycle — call ``close`` at application
+    shutdown or after a test. ``Runner`` does
     not close a caller-supplied checkpointer (same contract as
-    :class:`~philharmonica.adk.graphs.checkpointers.sqlite.SQLiteCheckpointer`).
+    ``SQLiteCheckpointer``).
 
     Requires PostgreSQL 13+ (``gen_random_uuid()`` built-in; no
     extension needed).
@@ -139,13 +139,13 @@ class PostgresCheckpointer(Checkpointer):
         ON CONFLICT DO NOTHING RETURNING lock_token``; subsequent saves
         perform a conditional ``UPDATE … WHERE lock_token = <cached>
         RETURNING lock_token``. If either returns no row — meaning a
-        concurrent writer won the race — :class:`CheckpointConflictError`
+        concurrent writer won the race — ``CheckpointConflictError``
         is raised.
 
         To resume an existing ``thread_id`` on a fresh instance, call
-        :meth:`load` first so the fencing token is cached; otherwise the
+        ``load`` first so the fencing token is cached; otherwise the
         first ``save`` takes the insert path and a pre-existing row raises
-        :class:`CheckpointConflictError`.
+        ``CheckpointConflictError``.
 
         Args:
             checkpoint: The snapshot to persist.
@@ -204,17 +204,17 @@ class PostgresCheckpointer(Checkpointer):
     ) -> GraphState[Any] | None:
         """Rehydrate the checkpoint for ``thread_id`` (``None`` if absent).
 
-        Caches the observed ``lock_token`` so a subsequent :meth:`save`
+        Caches the observed ``lock_token`` so a subsequent ``save``
         can verify it has not been rotated by a concurrent writer.
 
         Args:
             thread_id: The logical run key.
-            graph: The :class:`Graph` the checkpoint belongs to. Mismatch
+            graph: The ``Graph`` the checkpoint belongs to. Mismatch
                 between ``graph.id`` and the stored ``graph_id`` raises
                 ``ValueError``.
 
         Returns:
-            A rehydrated :class:`GraphState`, or ``None`` when no
+            A rehydrated ``GraphState``, or ``None`` when no
             checkpoint exists for ``thread_id``.
 
         Raises:

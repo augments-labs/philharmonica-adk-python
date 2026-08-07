@@ -1,4 +1,4 @@
-"""Tests for the Live streaming surface on :class:`PanelRenderer`.
+"""Tests for the Live streaming surface on ``PanelRenderer``.
 
 Validates ``open_stream_panel`` / ``update_stream_panel`` /
 ``close_stream_panel`` behaviour, the ``_just_streamed_final_answer``

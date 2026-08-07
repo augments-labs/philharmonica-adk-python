@@ -2,14 +2,14 @@
 
 The Strands insight this module adopts: a checkpointer is NOT a
 function the driver calls at fixed boundaries. It is a
-:class:`HookProvider` that subscribes to the graph lifecycle hooks it
+``HookProvider`` that subscribes to the graph lifecycle hooks it
 cares about. The graph loop fires hooks; the checkpointer listens.
 The loop contains ZERO persistence code — swap the checkpointer and
 persistence behaviour changes without touching the driver.
 
 Concurrency contract: network hot-store backends (Postgres, Redis) MUST
 detect concurrent modification of a single ``thread_id`` and raise
-:class:`~philharmonica.adk.exceptions.CheckpointConflictError` on the losing
+``CheckpointConflictError`` on the losing
 writer. Single-process in-memory backends and archival, last-write-wins
 object stores (S3) need not implement this check.
 
@@ -20,20 +20,20 @@ version discriminator.
 
 Concretely:
 
-- :class:`Checkpointer` Protocol extends
-  :class:`~philharmonica.adk.graphs.hooks.HookProvider`. Implementations
-  register themselves on :meth:`GraphHooks.on_node_end` (persist
-  after each node) and :meth:`GraphHooks.on_graph_end` (finalise).
-- :class:`GraphCheckpoint` is the serialisable snapshot. It wraps a
-  :class:`GraphState` plus metadata (thread id, graph id, timestamp,
+- ``Checkpointer`` Protocol extends
+  ``HookProvider``. Implementations
+  register themselves on ``GraphHooks.on_node_end`` (persist
+  after each node) and ``GraphHooks.on_graph_end`` (finalise).
+- ``GraphCheckpoint`` is the serialisable snapshot. It wraps a
+  ``GraphState`` plus metadata (thread id, graph id, timestamp,
   superstep). ``pending_sends`` carries unexecuted fan-out packets;
   ``versions_seen`` lives on the state.
 
 The shipped implementations are
-:class:`~philharmonica.adk.graphs.checkpointers.in_memory.InMemoryCheckpointer`
+``InMemoryCheckpointer``
 — a dict-backed store adequate for tests, notebooks, and single-process
 demos — and
-:class:`~philharmonica.adk.graphs.checkpointers.sqlite.SQLiteCheckpointer`
+``SQLiteCheckpointer``
 — a durable ``aiosqlite``-backed store for multi-process or
 crash-recoverable runs.
 
@@ -76,20 +76,20 @@ logger = logging.getLogger(__name__)
 class GraphCheckpoint:
     """Serialisable snapshot of a graph run at one superstep boundary.
 
-    Produced by :meth:`Checkpointer.save` and consumed by
-    :meth:`Checkpointer.load` to resume an interrupted or crashed
-    run. The payload is the :class:`GraphState` serialised through
-    :meth:`GraphState.to_dict`; the outer envelope carries metadata
+    Produced by ``Checkpointer.save`` and consumed by
+    ``Checkpointer.load`` to resume an interrupted or crashed
+    run. The payload is the ``GraphState`` serialised through
+    ``GraphState.to_dict``; the outer envelope carries metadata
     needed to reconstruct a run independently of the in-memory graph.
 
     Attributes:
         thread_id: Caller-supplied identifier for the logical run.
             The key under which this checkpoint is stored.
-        graph_id: Id of the :class:`Graph` this checkpoint belongs to.
+        graph_id: Id of the ``Graph`` this checkpoint belongs to.
             Mismatch between the stored id and the graph supplied at
-            :meth:`Checkpointer.load` time raises a ``ValueError``.
-        state: Serialised :class:`GraphState.to_dict` payload. Rehydrate
-            via :meth:`GraphState.from_dict`.
+            ``Checkpointer.load`` time raises a ``ValueError``.
+        state: Serialised ``GraphState.to_dict`` payload. Rehydrate
+            via ``GraphState.from_dict``.
         created_at: Unix timestamp (seconds) of when the checkpoint
             was produced. Useful for TTL eviction and debugging.
         superstep: Superstep number at which this checkpoint was
@@ -109,7 +109,7 @@ class GraphCheckpoint:
     """Owning graph id."""
 
     state: dict[str, Any]
-    """Serialised :meth:`GraphState.to_dict` payload."""
+    """Serialised ``GraphState.to_dict`` payload."""
 
     created_at: float = field(default_factory=time.time)
     """Unix timestamp when the checkpoint was produced."""
@@ -125,14 +125,14 @@ class GraphCheckpoint:
 class Checkpointer(Protocol):
     """Protocol for pluggable graph-run persistence.
 
-    Extends :class:`HookProvider` so checkpointers attach themselves
-    to a :class:`HookRegistry` via :meth:`register`. The Protocol
+    Extends ``HookProvider`` so checkpointers attach themselves
+    to a ``HookRegistry`` via ``register``. The Protocol
     contract is:
 
-    1. :meth:`register` attaches the checkpointer's hook callbacks
+    1. ``register`` attaches the checkpointer's hook callbacks
        (typically ``on_node_end`` and ``on_graph_end``).
-    2. :meth:`save` / :meth:`load` / :meth:`list_checkpoints` /
-       :meth:`delete` provide the explicit CRUD surface for callers
+    2. ``save`` / ``load`` / ``list_checkpoints`` /
+       ``delete`` provide the explicit CRUD surface for callers
        that want to inspect or manage checkpoints directly.
 
     The explicit CRUD methods exist alongside the hook-registered
@@ -145,25 +145,25 @@ class Checkpointer(Protocol):
 
     - Persist atomically — a partial write on crash is worse than
       no write.
-    - Accept a missing ``thread_id`` on :meth:`load` and return
+    - Accept a missing ``thread_id`` on ``load`` and return
       ``None`` (first-time run, not an error).
 
     ``@runtime_checkable`` means user code can pass raw objects to
-    :meth:`Runner.arun_graph(..., hooks=[checkpointer])` without
+    ``Runner.arun_graph(..., hooks=[checkpointer])`` without
     inheriting from a concrete base.
     """
 
     def register(self, registry: HookRegistry) -> None:
         """Attach this checkpointer's hook callbacks to ``registry``.
 
-        Called once by :func:`run_graph_loop` when the checkpointer is
+        Called once by ``run_graph_loop`` when the checkpointer is
         passed as a hook provider. Implementations typically construct
         an internal ``GraphHooks`` subclass and call ``registry.add``.
         """
         ...
 
     async def save(self, checkpoint: GraphCheckpoint) -> None:
-        """Persist a :class:`GraphCheckpoint`.
+        """Persist a ``GraphCheckpoint``.
 
         Implementations SHOULD be idempotent on the same
         ``(thread_id, superstep)`` pair. ``thread_id`` is the upsert
@@ -180,13 +180,13 @@ class Checkpointer(Protocol):
 
         Args:
             thread_id: The logical run key.
-            graph: The :class:`Graph` the checkpoint belongs to. Needed
-                to deserialise the :class:`GraphState`; mismatch
+            graph: The ``Graph`` the checkpoint belongs to. Needed
+                to deserialise the ``GraphState``; mismatch
                 between ``graph.id`` and the stored ``graph_id`` MUST
                 raise ``ValueError``.
 
         Returns:
-            A rehydrated :class:`GraphState`, or ``None`` when no
+            A rehydrated ``GraphState``, or ``None`` when no
             checkpoint exists for ``thread_id``.
         """
         ...

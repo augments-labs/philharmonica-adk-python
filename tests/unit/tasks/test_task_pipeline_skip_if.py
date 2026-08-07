@@ -1,7 +1,7 @@
-"""Unit tests for :attr:`Task.skip_if` semantics under
-:meth:`Runner.arun_task_pipeline`.
+"""Unit tests for ``Task.skip_if`` semantics under
+``Runner.arun_task_pipeline``.
 
-Skipped tasks MUST remain in :attr:`TaskPipelineResult.task_outputs`
+Skipped tasks MUST remain in ``TaskPipelineResult.task_outputs``
 with ``skipped=True`` so positional indexing is stable. The
 ``chain_inputs`` formatter receives every prior output, including
 skipped ones.

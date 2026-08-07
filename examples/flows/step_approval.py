@@ -5,7 +5,7 @@ Demonstrates the full HITL round-trip using the typed primitives:
 1. A flow whose ``refund`` step is gated by a callable
    ``requires_approval`` over the cart amount.
 2. A first run with a high-amount cart that defers, captured into a
-   :class:`FlowCheckpoint`.
+   ``FlowCheckpoint``.
 3. Two resume paths: one that approves the refund, one that rejects
    it with a routed message picked up by a
    ``@flow_listen(FLOW_ERROR_TRIGGER)`` handler.
@@ -17,9 +17,9 @@ shape, not to demonstrate a realistic agent workflow.
 Mirrors the tool-HITL contract:
 - decisions baked into the resume payload (the checkpoint), not a
   separate ``approvals=`` kwarg;
-- :meth:`FlowCheckpoint.approve` / :meth:`FlowCheckpoint.reject`
-  share the exact signature of :meth:`RunState.approve` /
-  :meth:`RunState.reject`.
+- ``FlowCheckpoint.approve`` / ``FlowCheckpoint.reject``
+  share the exact signature of ``RunState.approve`` /
+  ``RunState.reject``.
 """
 
 from __future__ import annotations

@@ -8,25 +8,25 @@ Why an ABC and not a duck-typed protocol? Two reasons:
    signature mismatch only shows up at the call site.
 
 2. **Default streaming.** The ABC can ship a non-abstract
-   :meth:`stream_async` whose default implementation calls
-   :meth:`invoke` and yields a single terminal event. Cheap primitives
+   ``stream_async`` whose default implementation calls
+   ``invoke`` and yields a single terminal event. Cheap primitives
    (a callable node) get streaming for free without each adapter
    reimplementing an async iterator. Strands' ``MultiAgentBase`` uses
    the same trick (see ``src/strands/multiagent/base.py``).
 
-The only abstract method is :meth:`invoke`. Subclasses that want
+The only abstract method is ``invoke``. Subclasses that want
 first-class streaming (e.g. an ``AgentExecutable`` that forwards
-per-token events up to a ``Graph``) override :meth:`stream_async`
+per-token events up to a ``Graph``) override ``stream_async``
 as well.
 
-Uniform input type. Each :class:`Executable` receives an
-:class:`ExecutableInput` — a ``list[LLMInputContentItem]`` plus a
+Uniform input type. Each ``Executable`` receives an
+``ExecutableInput`` — a ``list[LLMInputContentItem]`` plus a
 small envelope of routing metadata. Layer 1 for the payload keeps the
 adapters provider-agnostic; the envelope carries graph-level context
 (incoming edge label, upstream node id) that an adapter may or may
 not use.
 
-Uniform output type. :class:`NodeResult` wraps the terminal value,
+Uniform output type. ``NodeResult`` wraps the terminal value,
 the Layer 3 items produced, per-run usage, and a metadata dict. This
 matches Strands' ``NodeResult`` in spirit while staying under
 project rules (``@dataclass`` for framework types; no provider-specific
@@ -62,7 +62,7 @@ TContext = TypeVar("TContext")
 
 @dataclass
 class ExecutableInput:
-    """Uniform input envelope passed to every :meth:`Executable.invoke`.
+    """Uniform input envelope passed to every ``Executable.invoke``.
 
     Keeps the payload as Layer 1 items so adapters stay
     provider-agnostic. The envelope fields carry graph-level routing
@@ -74,7 +74,7 @@ class ExecutableInput:
         content: Layer 1 items the node should consume. Usually the
             merged outputs of upstream nodes; on the entry node it is
             the original user prompt normalized via
-            :meth:`ItemHelpers.input_to_new_input_list`.
+            ``ItemHelpers.input_to_new_input_list``.
         from_node: Id of the upstream node whose output triggered this
             invocation. ``None`` for the entry node or when multiple
             upstream nodes contributed (AND-join fan-in).
@@ -82,12 +82,12 @@ class ExecutableInput:
             invocation (including ``from_node``). Empty tuple on the
             entry node. Populated for AND-join multi-input nodes so
             adapters can do attribution.
-        edge_label: Optional :attr:`GraphEdge.label` of the edge that
+        edge_label: Optional ``GraphEdge.label`` of the edge that
             fired. Useful for "route via intent" patterns where the
             downstream adapter wants to know which branch fired.
         metadata: Free-form dict for adapter-to-adapter signalling.
             Carries the human reply on resume (read via
-            :meth:`resume_reply`); otherwise typically empty.
+            ``resume_reply``); otherwise typically empty.
     """
 
     content: list[LLMInputContentItem]
@@ -100,7 +100,7 @@ class ExecutableInput:
     """All upstream node ids that contributed (empty for entry)."""
 
     edge_label: str | None = None
-    """Label of the triggering :class:`GraphEdge`, if any."""
+    """Label of the triggering ``GraphEdge``, if any."""
 
     metadata: dict[str, Any] = field(default_factory=dict)
     """Adapter-to-adapter side-channel; carries the resume reply (see ``resume_reply()``)."""
@@ -123,40 +123,40 @@ class ExecutableInput:
 
 @dataclass
 class NodeResult[TContext]:
-    """Uniform return envelope every :meth:`Executable.invoke` produces.
+    """Uniform return envelope every ``Executable.invoke`` produces.
 
     ``NodeResult`` is the composition currency. Upstream values are
-    merged into a downstream node's :class:`ExecutableInput` via the
+    merged into a downstream node's ``ExecutableInput`` via the
     receiving node's ``merge_fn`` (see
-    :mod:`philharmonica.adk.graphs.merge`). Conditional edges read the
+    ``philharmonica.adk.graphs.merge``). Conditional edges read the
     ``output`` + ``metadata`` to decide whether to fire.
 
     Attributes:
         output: The terminal value of this node's execution. Shape
             depends on the adapter: ``str`` or the parsed Pydantic
             model for an ``AgentExecutable``;
-            :class:`~philharmonica.adk.swarms.result.SwarmRunResult` for a
+            ``SwarmRunResult`` for a
             ``SwarmExecutable``; arbitrary return value for a
-            ``CallableExecutable``; :class:`GraphRunResult` for a
+            ``CallableExecutable``; ``GraphRunResult`` for a
             nested-graph node. Loops, type guards, and merge
             strategies MUST introspect ``output`` defensively.
         new_items: Layer 3 items produced while the node was running.
             For agent-backed adapters this is the turn's produced
             items; for callables it's either empty or whatever items
             the callable synthesised. The graph loop concatenates these
-            into :attr:`GraphState.all_items` in node-completion order.
-        usage: Cumulative :class:`LLMUsage` for this node's run. Used
-            by :class:`GraphRunResult.per_node_usage` for cost
+            into ``GraphState.all_items`` in node-completion order.
+        usage: Cumulative ``LLMUsage`` for this node's run. Used
+            by ``GraphRunResult.per_node_usage`` for cost
             attribution — the feature that neither LangGraph nor
             Strands exposes ergonomically on a Graph result.
         final_text: Normalized plain-text view of ``output`` when
             ``output`` is a string or carries text. ``None`` otherwise.
             Provided for adapters that want to chain textual context
             without doing their own extraction. The default
-            :mod:`~philharmonica.adk.graphs.merge` strategies read this.
+            ``merge`` strategies read this.
         metadata: Adapter-specific free-form dict for downstream edges
             and merge strategies to read. Keep this dict small — it is
-            emitted on every :class:`GraphStreamEvent`.
+            emitted on every ``GraphStreamEvent``.
     """
 
     output: Any
@@ -178,19 +178,19 @@ class NodeResult[TContext]:
 class Executable[TContext](ABC):
     """Abstract base class every graph-composable primitive implements.
 
-    Three concrete primitives live in the ADK: :class:`Agent`,
-    :class:`Swarm`, :class:`Graph`. None of them inherit from
+    Three concrete primitives live in the ADK: ``Agent``,
+    ``Swarm``, ``Graph``. None of them inherit from
     ``Executable`` directly — those classes stay config-only, never
     gaining execution methods. Instead, thin adapters in
-    :mod:`philharmonica.adk.graphs.adapters` (``AgentExecutable``,
+    ``philharmonica.adk.graphs.adapters`` (``AgentExecutable``,
     ``SwarmExecutable``, ``CallableExecutable``) wrap them. A
-    :class:`~philharmonica.adk.graphs.graph.Graph` itself *does* inherit
+    ``Graph`` itself *does* inherit
     from ``Executable`` directly so graphs nest uniformly (a graph
     node can hold another graph without an intermediate adapter).
 
     Type Parameters:
         TContext: The user-provided context type threaded through
-            :class:`~philharmonica.adk.run.context.RunContext`. Adapters
+            ``RunContext``. Adapters
             propagate this onto the embedded Agent / Swarm / Graph.
     """
 
@@ -212,15 +212,15 @@ class Executable[TContext](ABC):
         Args:
             input: Uniform input envelope — Layer 1 items plus
                 routing metadata.
-            context: Shared :class:`RunContext` — usage accumulator
+            context: Shared ``RunContext`` — usage accumulator
                 and user context. Threaded verbatim so nested
                 executables contribute their usage to the graph total.
-            config: :class:`RunConfig` for the run. Adapters forward
+            config: ``RunConfig`` for the run. Adapters forward
                 this to the underlying primitive
                 (``Runner.arun(..., run_config=config)`` etc.).
 
         Returns:
-            A :class:`NodeResult` wrapping the terminal output,
+            A ``NodeResult`` wrapping the terminal output,
             generated items, usage delta, and metadata.
         """
 
@@ -232,7 +232,7 @@ class Executable[TContext](ABC):
     ) -> AsyncIterator[dict[str, Any]]:
         """Stream execution events, yielding a terminal ``{"result": ...}`` event.
 
-        Default implementation calls :meth:`invoke` and yields a
+        Default implementation calls ``invoke`` and yields a
         single ``{"result": node_result}`` event. Cheap primitives
         (a ``CallableExecutable``) get streaming for free. Adapters
         that want per-token forwarding (``AgentExecutable``) override
@@ -240,7 +240,7 @@ class Executable[TContext](ABC):
         the terminal event last.
 
         Events are plain ``dict`` — the concrete
-        :class:`~philharmonica.adk.graphs.events.GraphStreamEvent` subclasses
+        ``GraphStreamEvent`` subclasses
         also subclass ``dict`` for zero-conversion forwarding. When
         embedded in a ``Graph``, the graph loop rewraps each yielded
         event with a ``graph_path`` tag so nested execution produces
@@ -248,8 +248,8 @@ class Executable[TContext](ABC):
 
         Args:
             input: Uniform input envelope.
-            context: Shared :class:`RunContext`.
-            config: :class:`RunConfig` for the run.
+            context: Shared ``RunContext``.
+            config: ``RunConfig`` for the run.
 
         Yields:
             Dict events. The final event is always

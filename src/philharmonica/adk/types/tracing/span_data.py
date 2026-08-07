@@ -1,7 +1,7 @@
 """Typed span-data dataclasses for framework-level tracing.
 
 Each span kind emitted by the runner has a dedicated
-``@dataclass(frozen=True)`` that extends :class:`SpanData`. The base
+``@dataclass(frozen=True)`` that extends ``SpanData``. The base
 class defines the contract: a ``type`` discriminator and an
 ``export()`` method that returns a JSON-safe ``dict[str, Any]`` for
 downstream exporters.
@@ -38,8 +38,8 @@ if TYPE_CHECKING:
 class SpanData(ABC):
     """Abstract base class for typed span data.
 
-    Subclasses MUST set :attr:`type` to a stable string literal and
-    implement :meth:`export` to produce a JSON-compatible dict.
+    Subclasses MUST set ``type`` to a stable string literal and
+    implement ``export`` to produce a JSON-compatible dict.
     """
 
     type: str
@@ -207,7 +207,7 @@ class GenerationSpanData(SpanData):
 class ResponseSpanData(SpanData):
     """Span data for a completed LLM response as a whole.
 
-    Unlike :class:`GenerationSpanData`, this wraps the single
+    Unlike ``GenerationSpanData``, this wraps the single
     provider-level response identifier so that traces can be correlated
     with downstream provider-side observability.
 
@@ -385,8 +385,8 @@ class GraphSpanData(SpanData):
     """Span data captured for a whole graph run.
 
     The root span of a graph-execution span tree. Children are
-    superstep spans (:class:`GraphSuperstepSpanData`); grandchildren
-    are per-node spans (:class:`GraphNodeSpanData`).
+    superstep spans (``GraphSuperstepSpanData``); grandchildren
+    are per-node spans (``GraphNodeSpanData``).
 
     Attributes:
         graph_id: Stable graph identifier.
@@ -427,8 +427,8 @@ class GraphSpanData(SpanData):
 class GraphSuperstepSpanData(SpanData):
     """Span data captured for one BSP superstep boundary.
 
-    Sits between :class:`GraphSpanData` (parent) and
-    :class:`GraphNodeSpanData` (children). Surfaces the BSP structure
+    Sits between ``GraphSpanData`` (parent) and
+    ``GraphNodeSpanData`` (children). Surfaces the BSP structure
     in traces so operators can see where parallelism happened and
     where the loop blocked.
 
@@ -527,7 +527,7 @@ class SwarmSpanData(SpanData):
     """Span data captured for a whole swarm run.
 
     Root of the swarm-execution span tree. Children are per-iteration
-    spans (:class:`SwarmTurnSpanData`). The ``swarm_id`` is a UUID
+    spans (``SwarmTurnSpanData``). The ``swarm_id`` is a UUID
     generated at runner entry and persisted on the swarm state so a
     resumed run reuses the same id.
 

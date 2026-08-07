@@ -1,4 +1,4 @@
-"""Stream event types for :class:`FlowRunResultStreaming`.
+"""Stream event types for ``FlowRunResultStreaming``.
 
 Flow events are step-granularity, NOT token-granularity. They fire when a
 step starts, when a step ends, when a router resolves to a label, when
@@ -7,7 +7,7 @@ a step body are NOT forwarded through this stream by default — that
 would require the framework to subscribe step bodies to a hidden event
 sink, an implicit subscription outside the developer's declared opt-in.
 Developers wanting token-level streaming inside a step call
-:meth:`Runner.arun_streamed` themselves and consume its events directly.
+``Runner.arun_streamed`` themselves and consume its events directly.
 
 Frozen dataclasses (rather than ``dict`` subclasses) are appropriate
 here because flow events fire at second-scale intervals; the per-event
@@ -36,7 +36,7 @@ class FlowStartEvent:
     """Emitted once at the beginning of a Flow run.
 
     Attributes:
-        flow_id: Stable identifier from the :class:`Flow` instance.
+        flow_id: Stable identifier from the ``Flow`` instance.
         start_steps: Tuple of ``@flow_start`` method names that are about to
             fire in parallel.
         type: Discriminator string; pinned to ``"flow.start"``.
@@ -89,7 +89,7 @@ class FlowStepEndEvent:
             before the step completes.
         usage: LLM usage delta produced by this step's body (zero when
             the step did not call into an LLM). Sum across all steps
-            equals :attr:`FlowRunResult.cumulative_usage`.
+            equals ``FlowRunResult.cumulative_usage``.
         type: Discriminator string; pinned to ``"flow.step_end"``.
     """
 
@@ -177,7 +177,7 @@ class FlowEndEvent:
 
     Attributes:
         flow_id: Stable identifier of the Flow instance.
-        status: Final status — see :data:`FlowRunStatus`.
+        status: Final status — see ``FlowRunStatus``.
         completed_steps: Tuple of every step method name that ran (in
             completion order). Steps that raised but were recovered via
             ``"route_to_error_handler"`` are included.
@@ -213,7 +213,7 @@ class FlowStepSkippedEvent:
         flow_id: Stable identifier of the Flow instance.
         step_name: Method name of the skipped step.
         triggers: Triggers that would have scheduled the step. Same
-            shape as :attr:`FlowStepContext.triggers` — empty for
+            shape as ``FlowStepContext.triggers`` — empty for
             ``@flow_start``, single-element for direct / OR, multi
             for AND.
         type: Discriminator string; pinned to ``"flow.step_skipped"``.
@@ -236,15 +236,15 @@ class FlowStepSkippedEvent:
 class FlowStepDeferredEvent:
     """Emitted when a step's ``requires_approval`` gate fires.
 
-    The step is captured into :attr:`FlowCheckpoint.deferred_steps`
+    The step is captured into ``FlowCheckpoint.deferred_steps``
     and the run halts with ``status="deferred"``. Consumers of the
     streaming API see this event just before the stream ends; there
     is no live-inject channel — decisions are recorded on the
-    returned :class:`FlowCheckpoint` via :meth:`FlowCheckpoint.approve`
-    / :meth:`FlowCheckpoint.reject` and the run resumes through
-    :meth:`Runner.arun_flow_from_checkpoint`. Same contract as the
-    tool layer's :meth:`RunState.approve` / :meth:`RunState.reject`
-    → :meth:`Runner.arun(agent, state)`.
+    returned ``FlowCheckpoint`` via ``FlowCheckpoint.approve``
+    / ``FlowCheckpoint.reject`` and the run resumes through
+    ``Runner.arun_flow_from_checkpoint``. Same contract as the
+    tool layer's ``RunState.approve`` / ``RunState.reject``
+    → ``Runner.arun(agent, state)``.
 
     Attributes:
         flow_id: Stable identifier of the Flow instance.
@@ -275,19 +275,19 @@ class FlowStepDeferredEvent:
 class FlowStepRejectedEvent:
     """Emitted when a step is rejected by an approval decision (``approved=False``).
 
-    The rejection is routed through :attr:`FlowConfig.error_policy` —
+    The rejection is routed through ``FlowConfig.error_policy`` —
     ``@flow_listen("__error__")`` when configured, otherwise the run
     halts with ``status="failed"``. Mirrors the tool-layer surface:
     the model-visible / handler-visible message lives in
-    :attr:`message`; audit metadata (approver_id, audit-reason) lives
-    on :class:`FlowApprovalDecision` and never makes it into this
+    ``message``; audit metadata (approver_id, audit-reason) lives
+    on ``FlowApprovalDecision`` and never makes it into this
     event.
 
     Attributes:
         flow_id: Stable identifier of the Flow instance.
         step_name: Method name of the rejected step.
         message: Routed rejection explanation taken from
-            :attr:`FlowApprovalDecision.message`. ``None`` when no
+            ``FlowApprovalDecision.message``. ``None`` when no
             explanation was supplied.
         type: Discriminator string; pinned to ``"flow.step_rejected"``.
     """
@@ -299,7 +299,7 @@ class FlowStepRejectedEvent:
     """Method name of the rejected step."""
 
     message: str | None
-    """Routed rejection explanation (from :attr:`FlowApprovalDecision.message`)."""
+    """Routed rejection explanation (from ``FlowApprovalDecision.message``)."""
 
     type: Literal["flow.step_rejected"] = "flow.step_rejected"
     """Event discriminator."""

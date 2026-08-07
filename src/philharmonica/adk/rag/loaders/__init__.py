@@ -5,7 +5,7 @@ Loaders are the only format-specific surface in the RAG layer. Stdlib loaders
 loaders need an optional packaging extra (``rag-pdf``, ``rag-docx``,
 ``rag-web``, ``rag-github``, ``rag-youtube``) and verify it at construction.
 
-:func:`resolve_loader` routes a source to a default-constructed loader by URL
+``resolve_loader`` routes a source to a default-constructed loader by URL
 shape or file extension; the ``*SearchTool`` family pins explicit, configured
 loaders instead.
 """

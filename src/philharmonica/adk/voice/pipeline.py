@@ -1,13 +1,13 @@
 """The voice pipeline — wires STT, an agent workflow, and TTS together.
 
-:class:`VoicePipeline` is the single entry point: hand it audio, get back
-a :class:`~philharmonica.adk.voice.result.StreamedAudioResult` to play.
+``VoicePipeline`` is the single entry point: hand it audio, get back
+a ``StreamedAudioResult`` to play.
 
 It supports two input shapes:
 
-- :class:`~philharmonica.adk.voice.audio.AudioInput` — one captured
+- ``AudioInput`` — one captured
   utterance, transcribed once, answered once, spoken once.
-- :class:`~philharmonica.adk.voice.audio.StreamedAudioInput` — a live
+- ``StreamedAudioInput`` — a live
   microphone stream, segmented into turns by a realtime transcription
   session, each turn answered and spoken in sequence.
 
@@ -64,12 +64,12 @@ class VoicePipeline:
         """Start processing audio and return a streamable speech result.
 
         Args:
-            audio_input: A buffered utterance (:class:`AudioInput`) or a
-                live stream (:class:`StreamedAudioInput`).
+            audio_input: A buffered utterance (``AudioInput``) or a
+                live stream (``StreamedAudioInput``).
 
         Returns:
-            A :class:`StreamedAudioResult`; iterate its
-            :meth:`~StreamedAudioResult.stream` to receive speech events.
+            A ``StreamedAudioResult``; iterate its
+            ``stream`` to receive speech events.
         """
         result = StreamedAudioResult(self._tts_model, self._config.tts_settings)
         result.start()

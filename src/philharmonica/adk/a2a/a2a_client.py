@@ -1,24 +1,24 @@
 """Framework-typed client for talking to a remote A2A endpoint.
 
-:class:`A2AClient` is a thin wrapper over the protocol-library
-:class:`Client` abstraction (constructed via
-:func:`a2a.client.create_client`). It does three jobs the bare
+``A2AClient`` is a thin wrapper over the protocol-library
+``Client`` abstraction (constructed via
+``a2a.client.create_client``). It does three jobs the bare
 ``Client`` does not:
 
 1. Translates between framework-typed inputs/outputs (plain ``str``
-   prompts, :class:`A2ARunResult`, :class:`A2AStreamEvent` TypedDicts,
-   :class:`A2AContinuationToken`) and the protobuf wire types — every
-   ``a2a.types`` import stays inside this file or :mod:`converters`.
+   prompts, ``A2ARunResult``, ``A2AStreamEvent`` TypedDicts,
+   ``A2AContinuationToken``) and the protobuf wire types — every
+   ``a2a.types`` import stays inside this file or ``converters``.
 2. Maps protocol-level failures (transport timeouts, malformed
    responses, terminal failure ``TaskState`` values) to the typed
-   :mod:`exceptions` hierarchy so callers can catch by cause rather
+   ``exceptions`` hierarchy so callers can catch by cause rather
    than parse strings.
-3. Owns an internal :class:`httpx.AsyncClient` lifecycle when no client
-   was injected, and emits a :func:`function_span` per public method so
+3. Owns an internal ``httpx.AsyncClient`` lifecycle when no client
+   was injected, and emits a ``function_span`` per public method so
    A2A traffic shows up in OpenTelemetry next to local tool calls.
 
 The class is constructed eagerly with a URL and (optionally) an
-explicit :class:`AgentCard`. The remote card is fetched lazily on first
+explicit ``AgentCard``. The remote card is fetched lazily on first
 use unless one was supplied — this lets construction stay synchronous
 while still benefiting from card-based capability negotiation.
 """
@@ -92,7 +92,7 @@ DEFAULT_POLL_INTERVAL_SECONDS: float = 1.0
 # Per-call streaming hot path is bounded so a runaway remote agent
 # cannot exhaust memory or stall indefinitely. These are framework-
 # side safety bounds — they do NOT belong on
-# :class:`a2a.client.ClientConfig`, which governs protocol-library
+# ``a2a.client.ClientConfig``, which governs protocol-library
 # behaviour rather than ours.
 DEFAULT_MAX_STREAM_CHUNKS: int = 10_000
 DEFAULT_MAX_STREAM_BYTES: int = 8 * 1024 * 1024  # 8 MiB total accumulated text
@@ -115,12 +115,12 @@ class _StreamAccumulator:
     """Typed accumulator for the streaming-Task assembly hot path.
 
     Centralises the contract between
-    :meth:`A2AClient._consume_until_terminal` and
-    :meth:`A2AClient._apply_chunk`. Carries plain locals — a
+    ``A2AClient._consume_until_terminal`` and
+    ``A2AClient._apply_chunk``. Carries plain locals — a
     ``task_id`` / ``context_id`` pair, the latest ``TaskStatus``,
     the running ``artifacts`` list, and the streamed-bytes counter.
 
-    The final :meth:`to_task` constructs a **fresh** :class:`Task`
+    The final ``to_task`` constructs a **fresh** ``Task``
     whose sub-messages protobuf has copied — so the returned Task
     does not alias any object the SDK iterator may still hold a
     reference to.
@@ -128,7 +128,7 @@ class _StreamAccumulator:
     Attributes:
         task_id: Most-recent task identifier seen on the stream.
         context_id: Most-recent context identifier seen on the stream.
-        status: Latest :class:`a2a.types.TaskStatus`; ``None`` until
+        status: Latest ``a2a.types.TaskStatus``; ``None`` until
             the first signal arrives.
         artifacts: Artifacts accumulated across ``artifact_update``
             chunks (or copied from a Task snapshot).
@@ -146,7 +146,7 @@ class _StreamAccumulator:
     """Most-recent context identifier seen on the stream."""
 
     status: TaskStatus | None = None
-    """Latest :class:`a2a.types.TaskStatus`; ``None`` until the first signal arrives."""
+    """Latest ``a2a.types.TaskStatus``; ``None`` until the first signal arrives."""
 
     artifacts: list[Artifact] = dataclasses.field(default_factory=list)
     """Artifacts accumulated across ``artifact_update`` chunks (or copied from a Task snapshot)."""
@@ -161,7 +161,7 @@ class _StreamAccumulator:
     framework-side ``max_stream_bytes`` cap."""
 
     def to_task(self) -> Task:
-        """Construct a fresh :class:`Task` owning its sub-messages.
+        """Construct a fresh ``Task`` owning its sub-messages.
 
         Protobuf-python copies sub-messages and repeated-field
         elements at constructor time, so the returned Task does
@@ -169,10 +169,10 @@ class _StreamAccumulator:
         accumulator captured during streaming.
 
         Returns:
-            A new :class:`a2a.types.Task` built from the accumulated
+            A new ``a2a.types.Task`` built from the accumulated
             ``task_id``, ``context_id``, ``status``, ``artifacts``, and
             free-standing ``messages`` (surfaced as Task ``history`` so
-            :func:`converters.extract_text_from_task` can fall back to a
+            ``converters.extract_text_from_task`` can fall back to a
             message-delivered answer when no artifacts are present).
         """
         return Task(
@@ -184,18 +184,18 @@ class _StreamAccumulator:
         )
 
     def add_artifact(self, artifact: Artifact, *, append: bool) -> None:
-        """Merge a streamed ``artifact_update`` into :attr:`artifacts`.
+        """Merge a streamed ``artifact_update`` into ``artifacts``.
 
         Honors the A2A ``append`` flag exactly as the protocol library's
         server-side artifact assembler does: a chunk with ``append=False``
         replaces the same-id artifact (or is added when the id is unseen);
         ``append=True`` concatenates its parts onto the same-id artifact.
         Without this, every chunk of a multi-chunk artifact would land as a
-        separate list entry and :func:`converters.extract_text_from_task`
+        separate list entry and ``converters.extract_text_from_task``
         — which reads only the last artifact — would return just the final
         chunk, truncating the answer.
 
-        The concat builds a **fresh** :class:`Artifact` (protobuf copies its
+        The concat builds a **fresh** ``Artifact`` (protobuf copies its
         parts at constructor time), so no SDK-vended sub-message is mutated
         in place — preserving the accumulator's freshness contract.
 
@@ -229,7 +229,7 @@ class _StreamAccumulator:
         )
 
     def _artifact_index(self, artifact_id: str) -> int | None:
-        """Return the index of the same-id artifact in :attr:`artifacts`, or ``None``."""
+        """Return the index of the same-id artifact in ``artifacts``, or ``None``."""
         for i, existing in enumerate(self.artifacts):
             if existing.artifact_id == artifact_id:
                 return i
@@ -240,8 +240,8 @@ class A2AClient:
     """Framework-typed client for a single remote A2A endpoint.
 
     All public methods are async. The client manages an internal
-    :class:`httpx.AsyncClient` unless one is injected via the
-    constructor; in either case, calling :meth:`close` (or using the
+    ``httpx.AsyncClient`` unless one is injected via the
+    constructor; in either case, calling ``close`` (or using the
     instance as an async context manager) releases the underlying
     transport.
 
@@ -254,7 +254,7 @@ class A2AClient:
        ``max_stream_chunks * 29s`` (~80 hours at the default cap)
        before the chunk cap fires. Operators concerned with
        adversarial servers MUST wrap streaming calls in
-       :func:`asyncio.wait_for` with an explicit deadline.
+       ``asyncio.wait_for`` with an explicit deadline.
     """
 
     def __init__(
@@ -269,41 +269,41 @@ class A2AClient:
         max_stream_chunks: int = DEFAULT_MAX_STREAM_CHUNKS,
         max_stream_bytes: int = DEFAULT_MAX_STREAM_BYTES,
     ) -> None:
-        """Construct an :class:`A2AClient` for the given endpoint URL.
+        """Construct an ``A2AClient`` for the given endpoint URL.
 
         Args:
             url: Base URL of the remote A2A server (e.g.
                 ``"https://research.example.com"``).
             agent_card: Optional pre-fetched ``AgentCard``. When
                 ``None``, the card is fetched lazily on first call
-                via :class:`A2ACardResolver`.
+                via ``A2ACardResolver``.
             timeout: Per-call HTTP timeout in seconds. Default 30s.
                 Applied via the auto-constructed
-                :class:`httpx.AsyncClient` when ``client_config`` does
+                ``httpx.AsyncClient`` when ``client_config`` does
                 not carry one; otherwise the caller's
                 ``client_config.httpx_client`` governs.
-            interceptors: A list of :class:`ClientCallInterceptor`
-                instances (e.g. :class:`a2a.client.AuthInterceptor`)
+            interceptors: A list of ``ClientCallInterceptor``
+                instances (e.g. ``a2a.client.AuthInterceptor``)
                 inserted into every request. Pure pass-through to the
                 protocol client — no new auth surface in this ADK.
-            client_config: Optional :class:`a2a.client.ClientConfig`
+            client_config: Optional ``a2a.client.ClientConfig``
                 for full pass-through to the underlying protocol
                 library. Use this for wire-transport selection
                 (``supported_protocol_bindings``), connection-pool
                 sharing (``httpx_client``), and every other knob the
                 a2a SDK exposes. ``client_config.httpx_client`` is the
                 **only** way to inject a shared
-                :class:`httpx.AsyncClient` — when present, the
+                ``httpx.AsyncClient`` — when present, the
                 framework does NOT take ownership of it (the caller
                 closes it). When absent, this client auto-constructs
                 an httpx client and owns its lifecycle.
             poll_interval: Seconds between polls when waiting on a
                 background task to reach a terminal state via
-                :meth:`poll_task`. Default 1.0s.
+                ``poll_task``. Default 1.0s.
             max_stream_chunks: Maximum streaming chunks before raising
-                :class:`A2AProtocolError`. Default 10 000.
+                ``A2AProtocolError``. Default 10 000.
             max_stream_bytes: Maximum total accumulated streamed bytes
-                before raising :class:`A2AProtocolError`. Default 8 MiB.
+                before raising ``A2AProtocolError``. Default 8 MiB.
 
         Raises:
             ValueError: If ``url`` is empty.
@@ -316,7 +316,7 @@ class A2AClient:
         self._interceptors = list(interceptors) if interceptors is not None else []
         # Caller-supplied protocol-library config (streaming /
         # polling / grpc / output-modes / etc). ``None`` means
-        # "build a default at first use" — see :meth:`_ensure_client`.
+        # "build a default at first use" — see ``_ensure_client``.
         self._client_config = client_config
         # Framework-side bounds on the streaming hot path; not part
         # of the protocol library's ``ClientConfig``.
@@ -325,7 +325,7 @@ class A2AClient:
         self._max_stream_bytes = max_stream_bytes
         # Single httpx-client surface: caller-supplied via
         # ``client_config.httpx_client`` OR auto-constructed here.
-        # The flag tracks ownership so :meth:`close` only tears down
+        # The flag tracks ownership so ``close`` only tears down
         # what we built.
         injected = client_config.httpx_client if client_config is not None else None
         self._owns_http_client = injected is None
@@ -350,7 +350,7 @@ class A2AClient:
         """Release the underlying transport.
 
         Safe to call multiple times — second and subsequent calls are
-        no-ops. Closes the internal :class:`httpx.AsyncClient` only if
+        no-ops. Closes the internal ``httpx.AsyncClient`` only if
         the client was constructed without an externally-supplied
         instance.
         """
@@ -382,7 +382,7 @@ class A2AClient:
         trip.
 
         Returns:
-            The fetched (or previously cached) :class:`a2a.types.AgentCard`.
+            The fetched (or previously cached) ``a2a.types.AgentCard``.
 
         Raises:
             A2AProtocolError: On any failure to parse or validate the
@@ -403,7 +403,7 @@ class A2AClient:
         return card
 
     async def _ensure_client(self) -> Client:
-        """Lazily construct the underlying protocol :class:`Client`.
+        """Lazily construct the underlying protocol ``Client``.
 
         Double-checked locking: the outer ``self._client is not None``
         avoids the lock on the hot path; the inner re-check inside
@@ -415,10 +415,10 @@ class A2AClient:
         MAY change in that window).
 
         Returns:
-            The lazily-constructed protocol :class:`a2a.client.Client`.
+            The lazily-constructed protocol ``a2a.client.Client``.
 
         Raises:
-            A2AProtocolError: If the :class:`a2a.client.ClientFactory`
+            A2AProtocolError: If the ``a2a.client.ClientFactory``
                 fails to construct the client.
         """
         if self._client is not None:
@@ -462,10 +462,10 @@ class A2AClient:
             return client
 
     def _require_http(self) -> httpx.AsyncClient:
-        """Return the live :class:`httpx.AsyncClient` or raise if closed.
+        """Return the live ``httpx.AsyncClient`` or raise if closed.
 
         Returns:
-            The active :class:`httpx.AsyncClient`.
+            The active ``httpx.AsyncClient``.
 
         Raises:
             RuntimeError: The client has already been closed.
@@ -489,8 +489,8 @@ class A2AClient:
         """Send a prompt and block until the task reaches a terminal state.
 
         Maps non-completed terminal states to typed exceptions:
-        ``failed`` / ``rejected`` -> :class:`A2ATaskError`,
-        ``cancelled`` -> :class:`A2ATaskCancelledError`.
+        ``failed`` / ``rejected`` -> ``A2ATaskError``,
+        ``cancelled`` -> ``A2ATaskCancelledError``.
 
         Args:
             prompt: User-facing prompt text. Multi-modal inputs are
@@ -506,7 +506,7 @@ class A2AClient:
                 (``["text/plain"]``, ``["application/json"]``, ...).
 
         Returns:
-            An :class:`A2ARunResult` carrying the final text, task id,
+            An ``A2ARunResult`` carrying the final text, task id,
             and context id.
 
         Raises:
@@ -562,11 +562,11 @@ class A2AClient:
     ) -> AsyncIterator[A2AStreamEvent]:
         """Stream a prompt response chunk-by-chunk.
 
-        Yields :class:`A2AStreamEvent` TypedDicts terminating in a
+        Yields ``A2AStreamEvent`` TypedDicts terminating in a
         ``"completed"`` or ``"failed"`` event. Bounded by
         ``max_stream_chunks`` / ``max_stream_bytes``; callers
         concerned with slow-drip adversaries should wrap in
-        :func:`asyncio.wait_for` (see class docstring's wall-clock
+        ``asyncio.wait_for`` (see class docstring's wall-clock
         note).
 
         Args:
@@ -576,7 +576,7 @@ class A2AClient:
                 ``None`` and the server creates a fresh context.
 
         Returns:
-            An async iterator of :class:`A2AStreamEvent` TypedDicts,
+            An async iterator of ``A2AStreamEvent`` TypedDicts,
             terminating with a ``"completed"`` or ``"failed"`` event.
 
         Raises:
@@ -687,21 +687,21 @@ class A2AClient:
     ) -> AsyncIterator[A2AStreamEvent]:
         """Generator: walk the SDK stream, enforce bounds, raise interrupts.
 
-        Splits :meth:`stream_message` so the public entry stays
+        Splits ``stream_message`` so the public entry stays
         under the 60-line function limit. ``accumulated`` is mutated
         in place to collect text deltas for the final-event
         fallback in the caller. ``task_id_acc`` is mutated in place
         to capture the first non-empty ``task_id`` seen on the stream
-        so that :class:`A2ATaskInterruptedError` carries the real
+        so that ``A2ATaskInterruptedError`` carries the real
         task identifier rather than an empty string.
 
         Args:
-            stream: The raw :class:`a2a.types.StreamResponse` iterator
+            stream: The raw ``a2a.types.StreamResponse`` iterator
                 from the protocol client.
             accumulated: Mutable list collecting text-delta strings
                 for the final ``"completed"`` event fallback.
             context_id: The conversation context identifier, surfaced
-                on :class:`A2ATaskInterruptedError` when an interrupt
+                on ``A2ATaskInterruptedError`` when an interrupt
                 state is detected.
             task_id_acc: Single-element mutable list; populated with
                 the first non-empty task identifier seen on the stream
@@ -764,7 +764,7 @@ class A2AClient:
 
         The server is asked to return as soon as a ``task_id`` /
         ``context_id`` pair has been issued (typically right after
-        the first ``status_update``). Use :meth:`poll_task` or
+        the first ``status_update``). Use ``poll_task`` or
         ``A2ARunner.arun(agent, prompt, continuation_token=token)``
         to resume.
 
@@ -774,7 +774,7 @@ class A2AClient:
                 continue an existing multi-turn conversation.
 
         Returns:
-            An :class:`A2AContinuationToken` carrying the
+            An ``A2AContinuationToken`` carrying the
             ``task_id``, ``context_id``, and ``remote_url`` needed
             to resume or poll the task from any process.
 
@@ -810,11 +810,11 @@ class A2AClient:
         in a polling loop bounded by your own timeout / retry budget.
 
         Args:
-            token: The :class:`A2AContinuationToken` returned by a
-                prior :meth:`submit_background` call.
+            token: The ``A2AContinuationToken`` returned by a
+                prior ``submit_background`` call.
 
         Returns:
-            An :class:`A2ATaskStatus` snapshot of the task's current
+            An ``A2ATaskStatus`` snapshot of the task's current
             state.
 
         Raises:
@@ -849,12 +849,12 @@ class A2AClient:
 
         Does not block on cancellation completion — the server returns
         a (potentially still ``working``) ``Task`` snapshot which we
-        discard. Caller should :meth:`poll_task` if confirmation
+        discard. Caller should ``poll_task`` if confirmation
         matters.
 
         Args:
-            token: The :class:`A2AContinuationToken` returned by a
-                prior :meth:`submit_background` call.
+            token: The ``A2AContinuationToken`` returned by a
+                prior ``submit_background`` call.
 
         Raises:
             A2AProtocolError: Server-side protocol violation on the
@@ -883,26 +883,26 @@ class A2AClient:
         """Drive a streaming send_message to a terminal/interrupt Task snapshot.
 
         Aggregates incremental Task / status_update / artifact_update
-        events into a :class:`_StreamAccumulator` until a terminal
+        events into a ``_StreamAccumulator`` until a terminal
         OR interrupt state is observed. Returns a **fresh**
-        :class:`Task` constructed from the accumulator — the returned
+        ``Task`` constructed from the accumulator — the returned
         object does NOT alias any SDK-vended sub-message the
         streaming iterator may still reference.
 
-        Per-chunk dispatch lives in :meth:`_apply_chunk`; this
+        Per-chunk dispatch lives in ``_apply_chunk``; this
         method owns only the loop, the bounds, and the wire-error
         mapping.
 
         Bounded by ``self._max_stream_chunks`` and
         ``self._max_stream_bytes`` so a runaway remote cannot grow
-        memory without bound — it raises :class:`A2AProtocolError`.
+        memory without bound — it raises ``A2AProtocolError``.
 
         Args:
-            stream: The raw :class:`a2a.types.StreamResponse` iterator
+            stream: The raw ``a2a.types.StreamResponse`` iterator
                 from the protocol client.
 
         Returns:
-            A fresh :class:`a2a.types.Task` built from the accumulated
+            A fresh ``a2a.types.Task`` built from the accumulated
             stream events.
 
         Raises:
@@ -977,21 +977,21 @@ class A2AClient:
         Task held by the iterator). The accumulator slots
         (``acc.status``, items of ``acc.artifacts``) hold shared
         references to SDK-vended sub-messages until
-        :meth:`_StreamAccumulator.to_task` performs the protobuf
+        ``_StreamAccumulator.to_task`` performs the protobuf
         constructor copy — so the SDK iterator MUST NOT mutate
         sub-messages it has already yielded. The current ``a2a-sdk``
         contract honours this.
 
         Args:
-            chunk: A single :class:`a2a.types.StreamResponse` from
+            chunk: A single ``a2a.types.StreamResponse`` from
                 the protocol client iterator.
-            acc: The mutable :class:`_StreamAccumulator` to update.
+            acc: The mutable ``_StreamAccumulator`` to update.
 
         Returns:
             ``True`` iff this chunk drove the accumulator into a
             terminal or interrupt state — caller's loop stops and
-            constructs the fresh :class:`Task` via
-            :meth:`_StreamAccumulator.to_task`.
+            constructs the fresh ``Task`` via
+            ``_StreamAccumulator.to_task``.
 
         Raises:
             A2AProtocolError: The ``max_stream_bytes`` cap was
@@ -1060,11 +1060,11 @@ class A2AClient:
     async def _read_first_identifiers(self, stream: AsyncIterator[StreamResponse]) -> tuple[str, str]:
         """Pull the first ``task_id`` / ``context_id`` pair off the stream.
 
-        Used by :meth:`submit_background` to surface the identifiers
+        Used by ``submit_background`` to surface the identifiers
         immediately without waiting for terminal state.
 
         Args:
-            stream: The raw :class:`a2a.types.StreamResponse` iterator
+            stream: The raw ``a2a.types.StreamResponse`` iterator
                 from the protocol client.
 
         Returns:
@@ -1094,7 +1094,7 @@ class A2AClient:
 
     @staticmethod
     def _raise_on_interrupt(task: Task) -> None:
-        """Raise :class:`A2ATaskInterruptedError` if the task is paused.
+        """Raise ``A2ATaskInterruptedError`` if the task is paused.
 
         ``input_required`` and ``auth_required`` are non-terminal
         states the server uses to ask the caller for more input or

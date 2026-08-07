@@ -243,7 +243,7 @@ def resolve_swarm_yield_step(
     any sibling tool calls are skipped with the standard
     ``handoff_skipped`` message, and the yield signal is returned.
     The single-agent loop then surfaces the
-    :class:`NextStepSwarmYield` back up to the swarm driver in
+    ``NextStepSwarmYield`` back up to the swarm driver in
     ``run/swarm_loop.py``.
 
     Args:

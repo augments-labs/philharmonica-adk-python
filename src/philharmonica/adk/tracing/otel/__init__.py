@@ -2,9 +2,9 @@
 
 Opt-in integration: install the ``otel`` extra with
 ``pip install 'philharmonica-adk[otel]'``. If the OpenTelemetry packages are
-not importable, constructing :class:`OTelTracer` or calling
-:func:`setup_otel` raises
-:class:`~philharmonica.adk.exceptions.TracingDependencyError` with the install
+not importable, constructing ``OTelTracer`` or calling
+``setup_otel`` raises
+``TracingDependencyError`` with the install
 command.
 
 See ``docs/tracing/otel.md`` for the full walkthrough.

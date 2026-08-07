@@ -1,16 +1,16 @@
-"""Three Tasks running concurrently via :class:`TaskGroup`.
+"""Three Tasks running concurrently via ``TaskGroup``.
 
-Demonstrates the parallel counterpart to :class:`TaskPipeline`. The
+Demonstrates the parallel counterpart to ``TaskPipeline``. The
 three tasks here share an agent but ask about different topics — the
-group fans them out under :func:`asyncio.gather` semantics, then
-returns a :class:`TaskGroupResult` with outputs in input order plus
+group fans them out under ``asyncio.gather`` semantics, then
+returns a ``TaskGroupResult`` with outputs in input order plus
 cumulative LLM usage aggregated across every task.
 
 Key knobs the example exercises:
 
 - ``error_policy="collect_all"`` (the default) — every task runs to
   completion even if a sibling fails. Failures surface as
-  :class:`TaskOutput` slots with ``error`` set.
+  ``TaskOutput`` slots with ``error`` set.
 - ``max_concurrent=2`` — bounds concurrency to two tasks at a time
   even though three are scheduled. Useful against provider rate
   limits.

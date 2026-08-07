@@ -3,9 +3,9 @@
 Compacts older conversation messages into a concise summary produced by
 an LLM call, preserving the most-recent turns verbatim.
 
-The summarization call routes through the framework's :class:`LLM` ABC
+The summarization call routes through the framework's ``LLM`` ABC
 (``llm.acomplete(...)``) so compaction tokens land in
-:attr:`RunContext.usage`, ``Agent.middleware.llms`` sees the call, and
+``RunContext.usage``, ``Agent.middleware.llms`` sees the call, and
 the developer's configured ``LLM`` subclass (Anthropic native, OpenAI
 Responses, etc.) is honoured rather than hardcoding litellm.
 """
@@ -74,16 +74,16 @@ class ContextCompactor:
 
         The ``preserve_recent_items`` most-recent **non-system** messages
         are kept verbatim; everything else is fed to the summarization
-        model via :meth:`LLM.acomplete`.
+        model via ``LLM.acomplete``.
 
         Args:
             messages: Full conversation (including system message).
             llm: The ``LLM`` instance to call for summarization. Use
-                :func:`philharmonica.adk.run.llm_calls.resolve_compaction_llm`
+                ``philharmonica.adk.run.llm_calls.resolve_compaction_llm``
                 to obtain it (honours ``RunConfig.compaction_llm`` then
                 falls back to the agent's primary LLM).
             model_name: Model identifier used for token counting via
-                :class:`TokenCounter`. The token counter uses litellm's
+                ``TokenCounter``. The token counter uses litellm's
                 tokenizer interface which is name-based, so a string is
                 still required even though the LLM call itself is
                 provider-agnostic.
@@ -92,7 +92,7 @@ class ContextCompactor:
                 compactor (currently unused by the compactor itself).
 
         Returns:
-            A :class:`CompactionResult` with the summary and token stats.
+            A ``CompactionResult`` with the summary and token stats.
         """
         instructions = config.instructions or cls.DEFAULT_INSTRUCTIONS
         preserve = config.preserve_recent_items

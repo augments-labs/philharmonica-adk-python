@@ -2,7 +2,7 @@
 
 A guardrail entry is a dotted ``ref`` to a user-defined guardrail object.
 Phase is structural — entries live under the ``input`` or ``output`` list of
-:class:`GuardrailsConfig`, and each ``ref`` is resolved to the guardrail type
+``GuardrailsConfig``, and each ``ref`` is resolved to the guardrail type
 matching the list it appears in.
 """
 

@@ -1,7 +1,7 @@
 """Context directives — LLM-driven context management commands.
 
 Provides directive types that tools can emit to request context mutations.
-The Runner applies these before the next LLM call via :func:`apply_directives`.
+The Runner applies these before the next LLM call via ``apply_directives``.
 
 The LLM strategizes (emits directives), the Runner executes (applies them).
 Directives operate on the *working view* only — the Session (permanent
@@ -9,8 +9,8 @@ record) is never modified.
 
 Directive types:
 
-- :class:`DropDirective` — drop old messages, keeping the N most recent
-- :class:`CompactDirective` — summarize old messages via LLM, keeping
+- ``DropDirective`` — drop old messages, keeping the N most recent
+- ``CompactDirective`` — summarize old messages via LLM, keeping
   the N most recent
 
 See ``docs/tools/jit_context_aware.md`` for usage patterns.
@@ -58,7 +58,7 @@ class DropDirective:
 class CompactDirective:
     """Summarize old messages via LLM, keeping the N most recent.
 
-    Uses :class:`ContextCompactor` to generate a summary of older
+    Uses ``ContextCompactor`` to generate a summary of older
     messages, then rebuilds the message list with
     ``[system, summary, ...preserved]``.
 
@@ -82,8 +82,8 @@ class DirectiveStore:
     """Holds pending directives written by tools, consumed by the Runner.
 
     Thread-safe for single-threaded async (Python event loop).
-    Tools call :meth:`add` during execution; the Runner calls
-    :meth:`consume` before the next LLM call.
+    Tools call ``add`` during execution; the Runner calls
+    ``consume`` before the next LLM call.
     """
 
     def __init__(self) -> None:
@@ -135,9 +135,9 @@ async def apply_directives(
 
     Args:
         messages: Current conversation messages (including system message).
-        store: The :class:`DirectiveStore` to consume directives from.
+        store: The ``DirectiveStore`` to consume directives from.
         llm: The ``LLM`` instance to invoke for ``CompactDirective``
-            (typically resolved via :func:`resolve_compaction_llm`).
+            (typically resolved via ``resolve_compaction_llm``).
         model: Model identifier for token counting (litellm tokenizer
             is name-based).
         run_config: Optional ``RunConfig`` forwarded to the compactor.

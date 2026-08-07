@@ -1,6 +1,6 @@
 """Async SQLite connection via aiosqlite.
 
-:class:`SQLiteDatabaseConnection` manages SQLite connections for both
+``SQLiteDatabaseConnection`` manages SQLite connections for both
 file-based and in-memory databases.  For in-memory databases, it holds
 a persistent connection (since in-memory DBs are destroyed when the
 last connection closes).  For file-based databases, each ``connect()``

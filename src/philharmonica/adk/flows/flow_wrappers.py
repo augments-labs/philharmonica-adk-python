@@ -1,10 +1,10 @@
 """Wrapper class for decorated Flow methods.
 
 When a method is decorated with ``@flow_start`` / ``@flow_listen`` / ``@flow_router``,
-the decorator wraps it in a :class:`FlowStep` instance. The wrapper:
+the decorator wraps it in a ``FlowStep`` instance. The wrapper:
 
 1. Carries decorator markers (``__flow_role__`` and
-   ``__flow_triggers__``) read by :class:`FlowMeta` at class creation.
+   ``__flow_triggers__``) read by ``FlowMeta`` at class creation.
 2. Implements the descriptor protocol (``__get__``) so the wrapped
    method behaves like a regular bound async method when called on an
    instance: ``await flow.step()`` invokes the wrapped function with
@@ -23,7 +23,7 @@ the decorator wraps it in a :class:`FlowStep` instance. The wrapper:
 
 CrewAI uses a similar pattern (one wrapper class per role:
 ``StartMethod`` / ``ListenMethod`` / ``RouterMethod`` all extending
-``FlowMethod[P, R]``). This codebase uses a single :class:`FlowStep`
+``FlowMethod[P, R]``). This codebase uses a single ``FlowStep``
 class with a ``__flow_role__`` data attribute — the role is data, not
 type — to keep the wrapper plumbing small.
 """
@@ -36,12 +36,12 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal, override
 
 FlowRole = Literal["start", "listen", "router"]
-"""Discriminator string identifying the decorator that produced a :class:`FlowStep`.
+"""Discriminator string identifying the decorator that produced a ``FlowStep``.
 
-Stored on every :class:`FlowStep` instance as ``__flow_role__``. The
-:class:`FlowMeta` metaclass reads this to classify each decorated
+Stored on every ``FlowStep`` instance as ``__flow_role__``. The
+``FlowMeta`` metaclass reads this to classify each decorated
 method into the registry's ``starts`` / ``listeners`` / ``routers``
-buckets. The :class:`philharmonica.adk.flows.executor.FlowExecutor` reads it
+buckets. The ``philharmonica.adk.flows.executor.FlowExecutor`` reads it
 to decide whether to capture a router's return value as a route label.
 """
 
@@ -55,10 +55,10 @@ if TYPE_CHECKING:
 
 
 def name_of(obj: Any) -> str:
-    """Extract a step-name string from a :class:`FlowStep`, callable, or string.
+    """Extract a step-name string from a ``FlowStep``, callable, or string.
 
     Args:
-        obj: A :class:`FlowStep` wrapper (the class-body value of a
+        obj: A ``FlowStep`` wrapper (the class-body value of a
             decorated method), a method reference, or a step-name
             string.
 
@@ -91,33 +91,33 @@ def name_of(obj: Any) -> str:
 class FlowStep:
     """Descriptor wrapping a decorated Flow method.
 
-    Built by :func:`philharmonica.adk.flows.decorators.flow_start` /
-    :func:`philharmonica.adk.flows.decorators.flow_listen` /
-    :func:`philharmonica.adk.flows.decorators.flow_router`. The wrapper is:
+    Built by ``philharmonica.adk.flows.decorators.flow_start`` /
+    ``philharmonica.adk.flows.decorators.flow_listen`` /
+    ``philharmonica.adk.flows.decorators.flow_router``. The wrapper is:
 
     - **Callable**: implements ``__call__`` so ``await flow.step()``
       invokes the wrapped async function with the bound instance.
     - **A descriptor**: ``__get__`` returns a new bound
-      :class:`FlowStep` instance when accessed via an instance,
+      ``FlowStep`` instance when accessed via an instance,
       enabling normal Python method-call semantics.
-    - **Composable**: ``__or__`` / ``__and__`` build :class:`Or` /
-      :class:`And` gates from method references in the class body.
+    - **Composable**: ``__or__`` / ``__and__`` build ``Or`` /
+      ``And`` gates from method references in the class body.
 
     Args:
         fn: The async function being wrapped.
         role: Decorator role — one of ``"start"`` / ``"listen"`` /
             ``"router"``.
         triggers: Trigger specs declared by the decorator. Strings,
-            :class:`Or` instances, or :class:`And` instances. ``@flow_start``
+            ``Or`` instances, or ``And`` instances. ``@flow_start``
             has no triggers.
         description: Optional human-readable blurb describing what
-            the step does. Mirrors :attr:`FunctionTool.description`.
+            the step does. Mirrors ``FunctionTool.description``.
             Read by the visualisation emitters to label nodes; falls
             back to the method name when ``None``.
     """
 
     _fn: Callable[..., Any]
-    """The wrapped async function (private; access via :attr:`wrapped_function`)."""
+    """The wrapped async function (private; access via ``wrapped_function``)."""
 
     _instance: Any
     """Bound instance for descriptor-protocol method binding; ``None`` when unbound."""
@@ -126,19 +126,19 @@ class FlowStep:
     """Decorator role identifier — discriminated literal type."""
 
     __flow_triggers__: tuple[Any, ...]
-    """Triggers declared by the decorator; strings, :class:`Or`, or :class:`And` instances."""
+    """Triggers declared by the decorator; strings, ``Or``, or ``And`` instances."""
 
     __flow_description__: str | None
     """Optional human-readable blurb attached by the decorator (``description=`` kwarg)."""
 
     __flow_requires_approval__: FlowStepGate
-    """HITL gate; see :data:`FlowStepGate` for the typed shape."""
+    """HITL gate; see ``FlowStepGate`` for the typed shape."""
 
     __flow_approval_policy__: FlowApprovalPolicy | None
     """Optional declarative approval policy attached to this step's deferral."""
 
     __flow_enabled__: FlowStepGate
-    """Dynamic-skip gate; see :data:`FlowStepGate` for the typed shape."""
+    """Dynamic-skip gate; see ``FlowStepGate`` for the typed shape."""
 
     __flow_max_retries__: int | None
     """Extra retry budget on body exceptions; ``None`` ⇒ no retries."""
@@ -213,9 +213,9 @@ class FlowStep:
         """Descriptor protocol — bind to ``instance`` when accessed via ``flow.step``.
 
         Accessing the step on the class (``MyFlow.step``) returns
-        ``self`` so ``__or__`` / ``__and__`` and :class:`FlowMeta`
+        ``self`` so ``__or__`` / ``__and__`` and ``FlowMeta``
         introspection work directly. Accessing via an instance returns
-        a new bound :class:`FlowStep` whose ``_instance`` is set so
+        a new bound ``FlowStep`` whose ``_instance`` is set so
         ``__call__`` invokes the wrapped function with ``self``
         pre-bound.
 
@@ -224,7 +224,7 @@ class FlowStep:
             owner: The Flow class (unused).
 
         Returns:
-            ``self`` for class access; a bound :class:`FlowStep` for
+            ``self`` for class access; a bound ``FlowStep`` for
             instance access.
         """
         del owner
@@ -274,18 +274,18 @@ class FlowStep:
         return await self._fn(*args, **kwargs)
 
     def __or__(self, other: Any) -> Or:
-        """Build an :class:`Or` gate combining this step with ``other``.
+        """Build an ``Or`` gate combining this step with ``other``.
 
         Args:
-            other: A :class:`FlowStep`, an :class:`Or` (whose triggers
+            other: A ``FlowStep``, an ``Or`` (whose triggers
                 merge), a step-name string, or any callable with
                 ``__name__``.
 
         Returns:
-            An :class:`Or` gate with the union of trigger names.
+            An ``Or`` gate with the union of trigger names.
 
         Raises:
-            TypeError: When ``other`` is an :class:`And` — mixed-type
+            TypeError: When ``other`` is an ``And`` — mixed-type
                 operator chains are rejected.
         """
         from philharmonica.adk.flows.combinators import And, Or
@@ -305,18 +305,18 @@ class FlowStep:
         return Or(triggers=(self.__name__, other_name))
 
     def __and__(self, other: Any) -> And:
-        """Build an :class:`And` gate combining this step with ``other``.
+        """Build an ``And`` gate combining this step with ``other``.
 
         Args:
-            other: A :class:`FlowStep`, an :class:`And` (whose triggers
+            other: A ``FlowStep``, an ``And`` (whose triggers
                 merge), a step-name string, or any callable with
                 ``__name__``.
 
         Returns:
-            An :class:`And` gate with the union of trigger names.
+            An ``And`` gate with the union of trigger names.
 
         Raises:
-            TypeError: When ``other`` is an :class:`Or` — mixed-type
+            TypeError: When ``other`` is an ``Or`` — mixed-type
                 operator chains are rejected.
         """
         from philharmonica.adk.flows.combinators import And, Or
@@ -345,7 +345,7 @@ class FlowStep:
     def wrapped_function(self) -> Callable[..., Any]:
         """Return the underlying wrapped async function.
 
-        Public accessor used by :class:`FlowMeta` to validate the step's
+        Public accessor used by ``FlowMeta`` to validate the step's
         signature without reaching into private state. Equivalent to
         ``self.__wrapped__`` for callers preferring the dunder form.
         """
@@ -366,7 +366,7 @@ class FlowStep:
     def role(self) -> FlowRole:
         """Decorator role — one of ``"start"`` / ``"listen"`` / ``"router"``.
 
-        Public accessor over ``__flow_role__`` (see :data:`FlowRole`)
+        Public accessor over ``__flow_role__`` (see ``FlowRole``)
         for introspection tools that should not touch the dunder.
         """
         return self.__flow_role__
@@ -375,7 +375,7 @@ class FlowStep:
     def triggers(self) -> tuple[Any, ...]:
         """Trigger specs declared by the decorator.
 
-        Tuple of step-name strings, :class:`Or`, or :class:`And`
+        Tuple of step-name strings, ``Or``, or ``And``
         instances; empty for ``@flow_start`` steps. Public accessor
         over ``__flow_triggers__``.
         """
@@ -410,7 +410,7 @@ class FlowStep:
     def approval_policy(self) -> FlowApprovalPolicy | None:
         """Optional declarative approval policy for this step's deferral.
 
-        Attached to the :class:`FlowDeferredStep` the executor captures
+        Attached to the ``FlowDeferredStep`` the executor captures
         when the ``requires_approval`` gate fires, so the out-of-band
         approval driver can enforce quorum / role / deadline semantics.
         ``None`` (default) is the bare single-approver case.
@@ -420,7 +420,7 @@ class FlowStep:
     async def check_enabled(self, ctx: Any) -> bool:
         """Evaluate the ``enabled`` gate against ``ctx``.
 
-        Mirrors :meth:`FunctionTool.check_requires_approval` /
+        Mirrors ``FunctionTool.check_requires_approval`` /
         ``check_enabled`` semantics at the step layer:
 
         - bool literal → returned as-is.
@@ -428,10 +428,10 @@ class FlowStep:
         - async callable → awaited, return coerced to bool.
 
         Args:
-            ctx: The :class:`FlowStepContext` for the step about to
+            ctx: The ``FlowStepContext`` for the step about to
                 fire. Typed as ``Any`` here to avoid a circular import
-                with :mod:`philharmonica.adk.flows.step_context`; callers
-                pass a real :class:`FlowStepContext`.
+                with ``philharmonica.adk.flows.step_context``; callers
+                pass a real ``FlowStepContext``.
 
         Returns:
             ``True`` if the step should run; ``False`` to skip it.
@@ -441,12 +441,12 @@ class FlowStep:
     async def check_requires_approval(self, ctx: Any) -> bool:
         """Evaluate the ``requires_approval`` gate against ``ctx``.
 
-        Same evaluator contract as :meth:`check_enabled` but returns
+        Same evaluator contract as ``check_enabled`` but returns
         ``True`` when the step requires human approval (deferral),
         ``False`` to proceed without approval.
 
         Args:
-            ctx: The :class:`FlowStepContext` for the step about to
+            ctx: The ``FlowStepContext`` for the step about to
                 fire.
 
         Returns:
@@ -457,12 +457,12 @@ class FlowStep:
 
 
 async def _evaluate_gate(gate: Any, ctx: Any, *, default: bool) -> bool:
-    """Resolve a :data:`FlowStepGate` value to a bool.
+    """Resolve a ``FlowStepGate`` value to a bool.
 
     bool → returned; sync callable → invoked then coerced; async
     callable → awaited then coerced.
 
-    Anything else raises :class:`philharmonica.adk.flows.exceptions.FlowDefinitionError`
+    Anything else raises ``philharmonica.adk.flows.exceptions.FlowDefinitionError``
     — silently defaulting on garbage values would fail open on
     safety-critical gates (e.g. a misconfigured
     ``requires_approval`` would silently elevate to "no approval

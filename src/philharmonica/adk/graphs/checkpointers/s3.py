@@ -7,7 +7,7 @@ The intent is durable, long-term storage where a single writer per
 ``thread_id`` is the expected operational pattern.
 
 boto3 is synchronous; every S3 call is wrapped in ``asyncio.to_thread``
-to satisfy the async :class:`~philharmonica.adk.graphs.checkpointer.Checkpointer`
+to satisfy the async ``Checkpointer``
 Protocol without blocking the event loop.
 
 Requires ``boto3>=1.34.0``: ``pip install 'philharmonica-adk[checkpointer-s3]'``.
@@ -62,7 +62,7 @@ class S3Checkpointer(Checkpointer):
 
     Each ``thread_id`` maps to one S3 object at
     ``{prefix}{thread_id}.json``. Writes are unconditional — no fencing
-    tokens and no :class:`~philharmonica.adk.exceptions.CheckpointConflictError`.
+    tokens and no ``CheckpointConflictError``.
     This makes S3 the right choice for archival / audit workloads with a
     single writer per run, not for concurrent multi-writer coordination.
 
@@ -159,12 +159,12 @@ class S3Checkpointer(Checkpointer):
 
         Args:
             thread_id: The logical run key.
-            graph: The :class:`Graph` the checkpoint belongs to. A stored
+            graph: The ``Graph`` the checkpoint belongs to. A stored
                 ``graph_id`` that differs from ``graph.id`` raises
                 ``ValueError``.
 
         Returns:
-            A rehydrated :class:`GraphState`, or ``None`` when no object
+            A rehydrated ``GraphState``, or ``None`` when no object
             exists for ``thread_id``.
 
         Raises:

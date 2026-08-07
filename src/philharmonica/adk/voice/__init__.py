@@ -1,11 +1,11 @@
 """Voice pipeline — speak with an agent over speech-to-text and text-to-speech.
 
-A :class:`VoicePipeline` chains three stages: a :class:`STTModel`
-transcribes audio, a :class:`VoiceWorkflow` (typically
-:class:`SingleAgentVoiceWorkflow` driving one agent) produces the text to
-say, and a :class:`TTSModel` synthesizes speech. The result is a
-:class:`StreamedAudioResult` that yields
-:class:`~philharmonica.adk.voice.events.VoiceStreamEvent` objects — audio
+A ``VoicePipeline`` chains three stages: a ``STTModel``
+transcribes audio, a ``VoiceWorkflow`` (typically
+``SingleAgentVoiceWorkflow`` driving one agent) produces the text to
+say, and a ``TTSModel`` synthesizes speech. The result is a
+``StreamedAudioResult`` that yields
+``VoiceStreamEvent`` objects — audio
 chunks and turn/session lifecycle markers — as they are produced.
 
 Audio is raw PCM ``bytes`` throughout; ``numpy`` is an optional helper

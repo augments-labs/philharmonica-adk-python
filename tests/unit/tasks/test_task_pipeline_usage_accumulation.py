@@ -1,6 +1,6 @@
-"""Unit tests for pipeline-level :class:`LLMUsage` accumulation.
+"""Unit tests for pipeline-level ``LLMUsage`` accumulation.
 
-:meth:`Runner.arun_task_pipeline` MUST sum each non-skipped task's
+``Runner.arun_task_pipeline`` MUST sum each non-skipped task's
 ``TaskOutput.usage`` into the shared
 ``TaskPipelineResult.context.usage``. Skipped tasks contribute zero.
 """

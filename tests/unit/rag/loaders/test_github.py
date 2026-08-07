@@ -1,4 +1,4 @@
-"""Tests for :mod:`philharmonica.adk.rag.loaders.github`.
+"""Tests for ``philharmonica.adk.rag.loaders.github``.
 
 PyGithub is stubbed via ``sys.modules`` so the lazy ``from github import ...``
 inside the worker thread resolves to in-test fakes; no network is touched.

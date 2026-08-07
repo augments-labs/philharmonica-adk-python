@@ -1,8 +1,8 @@
 """SQLite-backed session implementation — single bound session.
 
-``SQLiteSession`` implements the :class:`Session` ABC for one conversation.
+``SQLiteSession`` implements the ``Session`` ABC for one conversation.
 Uses ``aiosqlite`` for truly async database access.  Not constructed
-directly — obtained via :class:`SQLiteMultiSessions`.
+directly — obtained via ``SQLiteMultiSessions``.
 
 Also defines the table schemas and connection helpers shared by both
 ``SQLiteSession`` and ``SQLiteMultiSessions``.
@@ -204,9 +204,9 @@ async def merge_app_state_delta(
 class SQLiteSession(Session):
     """Bound session — implements the ``Session`` ABC.
 
-    Obtained via :meth:`SQLiteMultiSessions.create`,
-    :meth:`SQLiteMultiSessions.get`, or
-    :meth:`SQLiteMultiSessions.get_or_create`.
+    Obtained via ``SQLiteMultiSessions.create``,
+    ``SQLiteMultiSessions.get``, or
+    ``SQLiteMultiSessions.get_or_create``.
 
     Uses ``aiosqlite`` for truly async database access.
     """
@@ -223,22 +223,22 @@ class SQLiteSession(Session):
         strict_concurrency: bool = False,
         updated_at_watermark: str | None = None,
     ) -> None:
-        """Initialise a bound session.  Use :class:`SQLiteMultiSessions` to obtain instances.
+        """Initialise a bound session.  Use ``SQLiteMultiSessions`` to obtain instances.
 
         Args:
             session_id: Unique identifier for this session.
             app_name: Application name for multi-tenant scoping.
             user_id: User identifier for multi-tenant scoping.
             db: Shared database connection managed by the
-                :class:`SQLiteMultiSessions` that created this session.
-            state: Pre-loaded :class:`State` for this session
+                ``SQLiteMultiSessions`` that created this session.
+            state: Pre-loaded ``State`` for this session
                 (session-scoped data merged with app-scoped data).
             settings: Per-session settings, or ``None`` to use defaults.
-            strict_concurrency: When ``True``, :meth:`add` and
-                :meth:`save_state` check the
+            strict_concurrency: When ``True``, ``add`` and
+                ``save_state`` check the
                 session row's ``updated_at`` timestamp before inserting.
                 If another writer has advanced it since this handle last
-                loaded or appended, :exc:`SessionAppendConflictError` is
+                loaded or appended, ``SessionAppendConflictError`` is
                 raised.  Default ``False`` preserves the unconditional
                 append behaviour.  This guard is best-effort, not atomic:
                 the check and insert are separated by asyncio yield points
@@ -292,11 +292,11 @@ class SQLiteSession(Session):
 
         Args:
             limit: Maximum number of events to retrieve.  If ``None``,
-                falls back to the session's :attr:`SessionSettings.limit`,
+                falls back to the session's ``SessionSettings.limit``,
                 then retrieves all events.
 
         Returns:
-            List of :class:`SessionEvent` in chronological order
+            List of ``SessionEvent`` in chronological order
             (oldest first).
         """
         effective_limit = limit
@@ -336,9 +336,9 @@ class SQLiteSession(Session):
         When ``strict_concurrency=True`` (opt-in), the session row's
         ``updated_at`` timestamp is checked before inserting.  If
         another writer has advanced it since this handle last loaded or
-        appended, :exc:`~philharmonica.adk.exceptions.SessionAppendConflictError`
+        appended, ``SessionAppendConflictError``
         is raised.  On success the watermark is refreshed so subsequent
-        :meth:`add` calls on the same handle continue to work.
+        ``add`` calls on the same handle continue to work.
 
         .. note:: **Best-effort, not atomic.**  The timestamp check (SELECT)
             and the row insert (INSERT) are separated by asyncio yield points.
@@ -473,11 +473,11 @@ class SQLiteSession(Session):
     async def _touch_updated_at(self, db: aiosqlite.Connection) -> None:
         """Bump the session row's ``updated_at`` after a destructive change.
 
-        Uses the same sub-second ``strftime`` format as :meth:`add` and
-        :meth:`save_state` so a strict-concurrency handle's watermark stays
+        Uses the same sub-second ``strftime`` format as ``add`` and
+        ``save_state`` so a strict-concurrency handle's watermark stays
         comparable across operation types.  When ``strict_concurrency`` is
         enabled the handle's watermark is refreshed to the value this write
-        produced, so a subsequent :meth:`add` on the same handle does not
+        produced, so a subsequent ``add`` on the same handle does not
         false-positive on the bump it just caused.
 
         Args:
@@ -594,7 +594,7 @@ def _drop_orphaned_tool_result_events(events: list[SessionEvent]) -> list[Sessio
     parallel-call) tool result then has no matching ``function_call`` in the
     returned window, and Anthropic / Gemini reject such orphans with a 400.
 
-    :meth:`ContextEditor.remove_orphaned_tool_results` operates on Layer-1
+    ``ContextEditor.remove_orphaned_tool_results`` operates on Layer-1
     content items and returns the very objects it keeps, so surviving events
     are recovered by content identity.
 
@@ -618,7 +618,7 @@ def _row_to_event(row: aiosqlite.Row) -> SessionEvent:
             ``state_delta``.
 
     Returns:
-        A :class:`SessionEvent` populated from the row's columns.
+        A ``SessionEvent`` populated from the row's columns.
     """
     return SessionEvent(
         id=row["event_id"],

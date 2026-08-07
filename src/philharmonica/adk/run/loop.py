@@ -359,9 +359,9 @@ async def run_agent_block(
     resolution) for a single agent until that agent's contribution
     transitions to one of: final output, handoff to another agent,
     HITL interruption, or swarm yield. Returns an
-    :class:`AgentBlockOutcome` describing the transition.
+    ``AgentBlockOutcome`` describing the transition.
 
-    The outer :func:`run_agent_loop` re-invokes this function (through
+    The outer ``run_agent_loop`` re-invokes this function (through
     the agent-middleware chain) each time a handoff outcome surfaces,
     so per-agent observability via ``Agent.middleware.agents`` re-
     fires on every transition.
@@ -398,13 +398,13 @@ async def run_agent_block(
         starting_total_turns: Cumulative turn counter at block entry.
 
     Returns:
-        :class:`AgentBlockOutcome` describing the transition.
+        ``AgentBlockOutcome`` describing the transition.
 
     Raises:
-        :class:`MaxTurnsExceeded`: If absolute ``max_turns`` is
+        ``MaxTurnsExceeded``: If absolute ``max_turns`` is
             reached and ``RunConfig.on_max_turns`` does not salvage
             a final output.
-        :class:`UsageLimitExceeded`: If ``RunConfig.usage_limits``
+        ``UsageLimitExceeded``: If ``RunConfig.usage_limits``
             is exceeded after an LLM call.
     """
     from philharmonica.adk.run.agent_middleware import AgentBlockOutcome
@@ -859,16 +859,16 @@ async def run_agent_block_streamed(
 ) -> AgentBlockOutcome:
     """Run one agent's tenure within the streaming loop.
 
-    Streaming sibling of :func:`run_agent_block`. Drives the per-turn
+    Streaming sibling of ``run_agent_block``. Drives the per-turn
     cycle (LLM call → tool execution → step resolution) for a single
     agent until that agent's contribution transitions to one of: final
     output, handoff, HITL interruption, swarm yield, or cancellation.
 
-    Unlike :func:`run_agent_block`, the streaming block mutates
+    Unlike ``run_agent_block``, the streaming block mutates
     ``result`` directly (`final_output`, `deferred_requests`, `state`,
     `swarm_yield`, `current_turn`, `current_agent`) rather than
     constructing a ``RunResult``. The returned
-    :class:`AgentBlockOutcome` carries the discriminator the driver
+    ``AgentBlockOutcome`` carries the discriminator the driver
     needs to decide whether to continue (handoff) or stop (final);
     interruption / swarm-yield / cancellation all surface as
     ``kind="final"`` because they all terminate the streaming run.
@@ -1475,9 +1475,9 @@ async def run_agent_loop_streamed(
 ) -> None:
     """Execute the streaming agent loop with per-agent middleware.
 
-    Mirrors the non-streaming :func:`run_agent_loop` driver pattern:
+    Mirrors the non-streaming ``run_agent_loop`` driver pattern:
     each iteration builds the agent-middleware chain around
-    :func:`run_agent_block_streamed` and dispatches on the returned
+    ``run_agent_block_streamed`` and dispatches on the returned
     outcome. Per-agent observability via ``Agent.middleware.agents``
     re-fires on every handoff / swarm transition, just like the
     non-streaming path.

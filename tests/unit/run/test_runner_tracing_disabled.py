@@ -1,12 +1,12 @@
 """Zero-span contract when ``RunConfig.tracing_enabled=False``.
 
 Even if a user has installed a real recording tracer via
-:func:`set_tracer`, a run with ``tracing_enabled=False`` MUST emit
+``set_tracer``, a run with ``tracing_enabled=False`` MUST emit
 exactly zero spans. The per-call-site
 ``disabled=not config.tracing_enabled`` kwarg threaded through every
 instrumentation point is the mechanism.
 
-The assertion matters because the default :class:`RunConfig` ships
+The assertion matters because the default ``RunConfig`` ships
 with ``tracing_enabled=False``: any framework code path that stops
 respecting the flag would silently start paying to build span-data
 payloads on users' hot paths.
@@ -43,7 +43,7 @@ from philharmonica.adk.types.tracing import (
 
 class _RecordingTracer:
     """Counts every factory call; failing this test means a hot path
-    built a :class:`SpanData` and reached the tracer despite the flag."""
+    built a ``SpanData`` and reached the tracer despite the flag."""
 
     def __init__(self) -> None:
         self.spans: list[tuple[str, SpanData]] = []

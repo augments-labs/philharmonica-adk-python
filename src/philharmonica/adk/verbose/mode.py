@@ -1,6 +1,6 @@
 """Verbose-mode resolution.
 
-Resolves a :class:`~philharmonica.adk.verbose.config.VerboseConfig`'s ``mode``
+Resolves a ``VerboseConfig``'s ``mode``
 field to a concrete backend (``line``, ``panel``, or ``off``) based on
 the current environment. A developer can force a specific backend by
 setting ``mode`` explicitly; ``"auto"`` defers to environment detection
@@ -40,10 +40,10 @@ from philharmonica.adk.verbose.config import VerboseConfig
 logger = logging.getLogger(__name__)
 
 VerboseMode = Literal["auto", "line", "panel", "off"]
-"""Developer-facing mode selector on :class:`VerboseConfig`."""
+"""Developer-facing mode selector on ``VerboseConfig``."""
 
 ResolvedMode = Literal["line", "panel", "off"]
-"""Concrete backend returned by :func:`resolve_mode`."""
+"""Concrete backend returned by ``resolve_mode``."""
 
 
 # ---------------------------------------------------------------------------
@@ -139,7 +139,7 @@ def resolve_mode(config: VerboseConfig) -> ResolvedMode:
     are logged at ``DEBUG`` level; the function never raises.
 
     Args:
-        config: The :class:`~philharmonica.adk.verbose.config.VerboseConfig`
+        config: The ``VerboseConfig``
             whose ``mode`` field and ``enabled`` flag are inspected.
 
     Returns:

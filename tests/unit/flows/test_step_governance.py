@@ -261,7 +261,7 @@ class TestStepCacheLRUBehaviour:
     The internal cache structure is intentionally exposed only at the
     framework boundary; these tests construct one directly via the
     public `FlowStepCachePolicy` config and exercise it through a
-    fresh :class:`Flow` instance to avoid touching private members.
+    fresh ``Flow`` instance to avoid touching private members.
     """
 
     async def test_lru_eviction_on_overflow(self) -> None:

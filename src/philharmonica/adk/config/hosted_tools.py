@@ -1,6 +1,6 @@
 """Provider-hosted tool registry and factories for declarative configs.
 
-A hosted-tool factory turns a :class:`HostedToolRef` (``{type, args}``) into
+A hosted-tool factory turns a ``HostedToolRef`` (``{type, args}``) into
 a concrete ``HostedTool`` instance by calling the framework's own dataclass
 constructor with the free-form ``args``. The dataclass is the single source
 of truth — a bad or unknown arg surfaces as a ``ConfigResolutionError`` at
@@ -59,7 +59,7 @@ def register_hosted_tool(name: str, factory: HostedToolFactory) -> None:
 
 
 def build_hosted_tool(ref: HostedToolRef) -> Tool:
-    """Build a provider-hosted tool from a validated :class:`HostedToolRef`.
+    """Build a provider-hosted tool from a validated ``HostedToolRef``.
 
     Args:
         ref: The validated hosted-tool reference.

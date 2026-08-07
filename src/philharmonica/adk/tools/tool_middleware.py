@@ -422,7 +422,7 @@ class ToolMetricsMiddleware:
     specific metrics library.
 
     Attributes:
-        recorder: The metrics sink. See :class:`ToolMetricsRecorder`.
+        recorder: The metrics sink. See ``ToolMetricsRecorder``.
     """
 
     recorder: ToolMetricsRecorder

@@ -1,11 +1,11 @@
 """Block-state tree for the stateful Panel renderer.
 
-The stateless :class:`~philharmonica.adk.verbose.renderer.VerboseRenderer` emits
+The stateless ``VerboseRenderer`` emits
 a line per event and is done. The upcoming Panel backend needs to
 compose panels out of paired ``*_start`` / ``*_end`` events, accumulate
 payload between them, and still close cleanly when an exception
 interrupts a block mid-flight. All of that state lives in a
-:class:`RunTree` owned by the renderer.
+``RunTree`` owned by the renderer.
 
 The tree has **no** behaviour that depends on Rich, the line renderer,
 or any ``VerboseConfig`` field. It is a pure data structure so it is
@@ -31,8 +31,8 @@ The tree uses a stack-of-open-blocks model: every ``open`` pushes and
 every ``close`` removes the matching block from the stack. Mis-ordered
 closes (close A before B when B was opened after A) are tolerated by
 searching the stack and removing *only* the matched block — blocks
-opened after it stay open, stay reachable via :meth:`RunTree.find_open`,
-and are swept by :meth:`RunTree.close_all` if their own close never
+opened after it stay open, stay reachable via ``RunTree.find_open``,
+and are swept by ``RunTree.close_all`` if their own close never
 arrives. This keeps the tree robust against runners that open blocks in
 a parent-child chain but close them in a different order (a runner bug
 we don't want to crash the renderer over) without silently losing the
@@ -89,7 +89,7 @@ class BlockNode:
         """Return ``True`` when the block has not yet been closed.
 
         Returns:
-            ``True`` while :attr:`closed_at` is ``None``; ``False``
+            ``True`` while ``closed_at`` is ``None``; ``False``
             after the block is closed.
         """
         return self.closed_at is None
@@ -112,7 +112,7 @@ class BlockNode:
 
         Args:
             line: A single text line (may contain Rich markup) to
-                accumulate in :attr:`payload`.
+                accumulate in ``payload``.
         """
         self.payload.append(line)
 
@@ -120,7 +120,7 @@ class BlockNode:
 class RunTree:
     """Tree of open and closed blocks for one run.
 
-    One instance per :class:`~philharmonica.adk.verbose.config.VerboseConfig`
+    One instance per ``VerboseConfig``
     (so concurrent runs stay isolated — the Panel renderer owns its
     own tree; nothing is shared at class level). The tree tracks a
     stack of currently-open blocks so nested opens slot under the
@@ -141,19 +141,19 @@ class RunTree:
     ) -> BlockNode:
         """Open a new block as a child of the current top of stack.
 
-        Returns the new :class:`BlockNode` so the caller can append
+        Returns the new ``BlockNode`` so the caller can append
         payload to it without looking it up again.
 
         Args:
             event: Dotted event name of the opening event
                 (e.g. ``"agent.start"``).
             key: Identity tuple that will be used to match this block
-                on a later :meth:`close` call.
+                on a later ``close`` call.
             headline: Short single-line header for the block's panel.
                 Defaults to an empty string.
 
         Returns:
-            The newly-created :class:`BlockNode`, already pushed onto
+            The newly-created ``BlockNode``, already pushed onto
             the stack as a child of the previous top.
         """
         parent = self._stack[-1]
@@ -182,7 +182,7 @@ class RunTree:
         Blocks opened *after* the matched one (an out-of-order close)
         are left untouched: they stay on the stack, stay open, and can
         still be closed by their own close event or swept by
-        :meth:`close_all`. Popping them here would strand them —
+        ``close_all``. Popping them here would strand them —
         removed from the stack yet never marked closed, so no
         follow-up close or cleanup sweep could ever flush their
         panels.
@@ -194,7 +194,7 @@ class RunTree:
                 renderer to choose a panel border colour.
 
         Returns:
-            The closed :class:`BlockNode`, or ``None`` when no open
+            The closed ``BlockNode``, or ``None`` when no open
             block with *key* was found.
         """
         node = self.find_open(key)
@@ -228,7 +228,7 @@ class RunTree:
                 Defaults to ``"interrupted"``.
 
         Returns:
-            List of the :class:`BlockNode` instances that were just
+            List of the ``BlockNode`` instances that were just
             closed, in unwind order (deepest / most-recently-opened
             first). Empty when the stack was already clean.
         """
@@ -249,7 +249,7 @@ class RunTree:
         """Return the innermost currently-open block, or ``None``.
 
         Returns:
-            The :class:`BlockNode` at the top of the stack, or
+            The ``BlockNode`` at the top of the stack, or
             ``None`` when only the sentinel root is present (no blocks
             open).
         """
@@ -269,7 +269,7 @@ class RunTree:
         """Return the sentinel root (for tests + renderer traversal).
 
         Returns:
-            The synthetic ``"__root__"`` :class:`BlockNode` at the
+            The synthetic ``"__root__"`` ``BlockNode`` at the
             bottom of the stack. Never ``None``; never ``is_open()``
             in the ``closed_at`` sense (it is never explicitly closed).
         """
@@ -289,8 +289,8 @@ class RunTree:
             key: Identity tuple to search for.
 
         Returns:
-            The most recently opened :class:`BlockNode` whose
-            :attr:`~BlockNode.key` equals *key* and that is still
+            The most recently opened ``BlockNode`` whose
+            ``key`` equals *key* and that is still
             open, or ``None`` when no match is found.
         """
         for node in reversed(self._stack):

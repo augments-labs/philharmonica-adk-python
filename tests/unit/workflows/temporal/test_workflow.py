@@ -1,4 +1,4 @@
-"""Tests for :mod:`philharmonica.adk.workflows.temporal.workflow`.
+"""Tests for ``philharmonica.adk.workflows.temporal.workflow``.
 
 Covers:
 - ``HumanReply`` frozen dataclass fields and defaults.

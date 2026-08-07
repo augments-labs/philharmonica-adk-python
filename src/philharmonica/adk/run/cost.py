@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 def check_usage_limits(limits: LLMUsageLimits, usage: LLMUsage) -> None:
     """Check if current usage exceeds configured limits.
 
-    Called after each LLM response. Raises :class:`UsageLimitExceeded`
+    Called after each LLM response. Raises ``UsageLimitExceeded``
     on the first limit that is exceeded.
 
     Args:
@@ -76,7 +76,7 @@ def check_tenant_budget(
     consults ``budget.kill_on_exceed`` to decide whether to abort the run or
     log a warning and continue.
 
-    Uses strict ``>`` (matching :func:`check_usage_limits`), so a call whose
+    Uses strict ``>`` (matching ``check_usage_limits``), so a call whose
     projected total exactly meets the cap is allowed. ``estimate is None``
     (provider has no cost table) skips the estimate-based gate — the pre-call
     dollar check is unavailable, so enforcement falls back to post-call
@@ -146,7 +146,7 @@ def apply_result_limits(
 ) -> str:
     """Truncate tool result if it exceeds the tool's token budget.
 
-    Uses :class:`TokenCounter` for accurate estimation, then
+    Uses ``TokenCounter`` for accurate estimation, then
     truncates at an approximate character boundary (avg ~4 chars
     per token for English text).
 

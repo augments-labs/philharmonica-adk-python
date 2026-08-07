@@ -4,15 +4,15 @@ Three production-ready strategies plus an escape hatch, mirroring the
 existing two handoff strategies (code-orchestrated ``HandoffRoute`` vs
 LLM-orchestrated ``Handoff`` list):
 
-- :class:`LLMHandoffPolicy` — AutoGen/Strands parity. The LLM picks the
+- ``LLMHandoffPolicy`` — AutoGen/Strands parity. The LLM picks the
   next agent by calling an injected ``transfer_to_<member>`` tool.
-- :class:`RoundRobinPolicy` — deterministic rotation. Zero LLM routing
+- ``RoundRobinPolicy`` — deterministic rotation. Zero LLM routing
   tokens. Ideal for debates and fixed pipelines.
-- :class:`StructuredRoutingPolicy` — the Philharmonica differentiator. Wraps a
-  :class:`~philharmonica.adk.handoffs.HandoffRoute`; the active agent's
+- ``StructuredRoutingPolicy`` — the Philharmonica differentiator. Wraps a
+  ``HandoffRoute``; the active agent's
   structured ``Intent`` output dispatches via ``.when(X).to(agent)``.
   Zero LLM routing tokens, full type safety.
-- :class:`CustomPolicy` — bring your own ``selector`` callable.
+- ``CustomPolicy`` — bring your own ``selector`` callable.
 
 Tools injected by a policy are merged with ``agent.tools`` at turn
 dispatch time. **Agent config is never mutated.** That is load-bearing:
@@ -21,7 +21,7 @@ because the swarm behaviour lives on the policy, not the agent.
 
 Every policy also injects a ``swarm_done`` tool so any agent can
 terminate the swarm explicitly. Never by absence — absence is not a
-stop signal (see :class:`~philharmonica.adk.swarms.termination.TerminationCondition`).
+stop signal (see ``TerminationCondition``).
 """
 
 from __future__ import annotations
@@ -61,10 +61,10 @@ class _SwarmTransferArgs(BaseModel):
 
     Single ``message`` field carries any explicit instruction the emitting
     agent wants the target to see. Interpreted by
-    :class:`SharedContextStrategy.SCOPED` as the *only* cross-agent
+    ``SharedContextStrategy.SCOPED`` as the *only* cross-agent
     content forwarded — the target does not see the emitter's history by
     default. Developers who want broader context pick a different
-    :class:`~philharmonica.adk.swarms.shared_context_strategy.SharedContextStrategy`.
+    ``SharedContextStrategy``.
     """
 
     message: str = Field(
@@ -81,7 +81,7 @@ class _SwarmDoneArgs(BaseModel):
     """Payload for the ``swarm_done`` termination tool.
 
     The ``reason`` field lands on
-    :class:`~philharmonica.adk.swarms.stop_reason.StopReason.detail` and on the
+    ``detail`` and on the
     ``SwarmDoneEvent`` surfaced to stream consumers. This is the canonical
     way a swarm terminates — the driver does NOT guess termination from
     absence of a transfer.
@@ -107,13 +107,13 @@ def _build_swarm_done_tool() -> FunctionTool:
     Mirrors ``Handoff.to_tool()``: no ``on_invoke`` is set because the
     swarm driver detects the tool by name in the turn-resolution path
     (``turn_resolution.py``) and converts it to a
-    :class:`~philharmonica.adk.swarms.yield_signal.SwarmDone` yield — exactly
+    ``SwarmDone`` yield — exactly
     analogous to how handoff tools short-circuit into a
-    :class:`~philharmonica.adk.run.next_step.NextStepHandoff`.
+    ``NextStepHandoff``.
 
     Returns:
-        A :class:`~philharmonica.adk.tools.function_tool.FunctionTool` named
-        ``swarm_done`` with the :class:`_SwarmDoneArgs` schema.
+        A ``FunctionTool`` named
+        ``swarm_done`` with the ``_SwarmDoneArgs`` schema.
     """
     return FunctionTool(
         name=SWARM_DONE_TOOL_NAME,
@@ -130,7 +130,7 @@ def _build_swarm_done_tool() -> FunctionTool:
 def _build_transfer_tool(target_name: str, description: str | None = None) -> FunctionTool:
     """Construct a ``transfer_to_<target_name>`` tool for LLM-handoff routing.
 
-    Uses the same name prefix as :mod:`philharmonica.adk.handoffs` —
+    Uses the same name prefix as ``philharmonica.adk.handoffs`` —
     ``HANDOFF_TOOL_PREFIX = "transfer_to_"`` — so consumers who already
     pattern-match on the prefix (e.g. verbose rendering, tracing) light
     up automatically without a new branch.
@@ -150,13 +150,13 @@ def _build_transfer_tool(target_name: str, description: str | None = None) -> Fu
         target_name: Name of the target swarm member. MUST be slug-safe
             (``[a-z0-9_]+``).
         description: Optional routing hint from
-            :attr:`Swarm.handoff_descriptions` telling the LLM *when* to
+            ``Swarm.handoff_descriptions`` telling the LLM *when* to
             pick this target. Falls back to a generic description.
 
     Returns:
-        A :class:`~philharmonica.adk.tools.function_tool.FunctionTool` named
+        A ``FunctionTool`` named
         ``transfer_to_<target_name>`` with the
-        :class:`_SwarmTransferArgs` schema.
+        ``_SwarmTransferArgs`` schema.
     """
     if description is None:
         description = (
@@ -187,7 +187,7 @@ class SwarmPolicy[TContext](ABC):
        the extra ``FunctionTool`` instances for this turn. These are
        merged with ``state.current_agent.tools`` at dispatch time.
     2. ``record_yield(state, signal)`` when a turn ends with a
-       :class:`~philharmonica.adk.swarms.yield_signal.SwarmYieldSignal`, so the
+       ``SwarmYieldSignal``, so the
        policy can update its internal routing state if any.
     3. ``select_next(state, context)`` after the yield is recorded and
        any termination check has passed, to pick the agent for the next
@@ -197,10 +197,10 @@ class SwarmPolicy[TContext](ABC):
 
     - Running each turn via the existing runner loop.
     - Converting the injected tool calls into
-      :class:`~philharmonica.adk.swarms.yield_signal.SwarmYieldSignal` values.
+      ``SwarmYieldSignal`` values.
     - Incrementing ``state.handoff_count`` / ``state.total_turns``.
     - Preparing per-turn input via the
-      :class:`~philharmonica.adk.swarms.shared_context_strategy.SharedContextStrategy`.
+      ``SharedContextStrategy``.
 
     Subclasses MUST be importable and constructible without live runner
     state — they are config objects that round-trip through
@@ -228,8 +228,8 @@ class SwarmPolicy[TContext](ABC):
         Deterministic policies (``RoundRobinPolicy``) compute the next
         agent from ``state.total_turns`` and the roster.
 
-        Async so :class:`StructuredRoutingPolicy` can call
-        :meth:`~philharmonica.adk.handoffs.handoff_route.HandoffRoute.resolve`,
+        Async so ``StructuredRoutingPolicy`` can call
+        ``resolve``,
         which is async.
 
         Args:
@@ -258,7 +258,7 @@ class SwarmPolicy[TContext](ABC):
                 agent about to take this turn).
 
         Returns:
-            List of :class:`~philharmonica.adk.tools.function_tool.FunctionTool`
+            List of ``FunctionTool``
             instances to merge into the current agent's tool list for
             this turn only.
         """
@@ -276,7 +276,7 @@ class SwarmPolicy[TContext](ABC):
         Args:
             state: Current swarm state at the moment the yield is
                 recorded.
-            signal: The :class:`~philharmonica.adk.swarms.yield_signal.SwarmYieldSignal`
+            signal: The ``SwarmYieldSignal``
                 emitted by the turn (``SwarmHandoff`` or ``SwarmDone``).
         """
         del state, signal
@@ -298,7 +298,7 @@ class LLMHandoffPolicy(SwarmPolicy[TContext]):
     - The universal ``swarm_done`` tool.
 
     When the LLM calls a transfer tool, the swarm driver emits a
-    :class:`~philharmonica.adk.swarms.yield_signal.SwarmHandoff`, advances
+    ``SwarmHandoff``, advances
     ``state.current_agent`` via ``state.advance_to(target)``, and then
     calls ``record_yield`` (a no-op by default). Because the driver has
     already moved the pointer, ``select_next`` simply returns the current
@@ -313,10 +313,10 @@ class LLMHandoffPolicy(SwarmPolicy[TContext]):
     2. **Explicit done signal.** ``swarm_done`` is the only way the
        swarm terminates via an LLM decision. Absence of a tool call is
        not a stop signal — see
-       :class:`~philharmonica.adk.swarms.termination.ExplicitDoneTermination`.
+       ``ExplicitDoneTermination``.
     3. **No hidden system prompt.** Developers who want the LLM to know
        about transfer semantics opt in via
-       :func:`~philharmonica.adk.swarms.swarm_prompt.prompt_with_swarm_instructions`.
+       ``prompt_with_swarm_instructions``.
     """
 
     @override
@@ -362,8 +362,8 @@ class RoundRobinPolicy(SwarmPolicy[TContext]):
     Consumes zero LLM routing tokens — the next agent is computed from
     ``state.total_turns`` modulo the rotation length. Still injects the
     ``swarm_done`` tool so any agent can terminate explicitly (the only
-    way this policy stops other than via a :class:`TerminationCondition`
-    like :class:`MaxTurnsTermination`).
+    way this policy stops other than via a ``TerminationCondition``
+    like ``MaxTurnsTermination``).
 
     Useful for debates, fixed pipelines, and deterministic test
     fixtures. Often paired with ``MaxTurnsTermination`` to cap the
@@ -461,7 +461,7 @@ class StructuredRoutingPolicy(SwarmPolicy[TContext]):
     """Intent-based routing via the existing ``HandoffRoute`` DSL.
 
     Zero LLM routing tokens. The current agent's structured output must
-    be an :class:`~philharmonica.adk.types.intents.Intent`; the policy reads
+    be an ``Intent``; the policy reads
     the most recent message-output item, resolves the intent against
     the wrapped route, and dispatches to ``.when(IntentType).to(agent)``.
 
@@ -476,10 +476,10 @@ class StructuredRoutingPolicy(SwarmPolicy[TContext]):
     the output schema itself.
 
     Attributes:
-        route: The :class:`HandoffRoute` to consult on each turn. MUST
+        route: The ``HandoffRoute`` to consult on each turn. MUST
             cover (via ``.when`` + ``.otherwise``) every intent the
             active agents can produce, or
-            :class:`~philharmonica.adk.handoffs.handoff_route.UnhandledIntentError`
+            ``UnhandledIntentError``
             will be raised at runtime.
     """
 
@@ -554,7 +554,7 @@ SwarmExtraToolsFn = Callable[["SwarmState[Any]"], list[FunctionTool]]
 """Extra-tools signature: takes the current state, returns tools for this turn.
 
 The returned tools are merged with the universal ``swarm_done`` tool by
-:class:`CustomPolicy`. Developers do not need to include ``swarm_done``
+``CustomPolicy``. Developers do not need to include ``swarm_done``
 themselves.
 """
 

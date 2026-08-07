@@ -34,7 +34,7 @@ from philharmonica.adk.tools.tool_context import ToolContext
 
 
 def _dummy_ctx(tool_name: str, raw_args: str) -> ToolContext[Any]:
-    """Construct a minimal :class:`ToolContext` for discovery-handler tests.
+    """Construct a minimal ``ToolContext`` for discovery-handler tests.
 
     The discovery handlers all ``# noqa: ARG001`` their ``ctx`` parameter,
     so the handler body never dereferences the context. We still pass a

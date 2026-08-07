@@ -1,7 +1,7 @@
-"""Combinators — :class:`Or` / :class:`And` gates built via operator overloads.
+"""Combinators — ``Or`` / ``And`` gates built via operator overloads.
 
 Combinators are constructed by the ``|`` and ``&`` operators on
-:class:`philharmonica.adk.flows.flow_wrappers.FlowStep` instances (the wrapped
+``philharmonica.adk.flows.flow_wrappers.FlowStep`` instances (the wrapped
 form of decorated methods)::
 
     @flow_listen(method_a | method_b)             # Or fires once on first arrival
@@ -17,7 +17,7 @@ AND semantics: the gate fires exactly ONCE per flow run, after the LAST
 required trigger has arrived. Arrivals are tracked by name; the
 listener fires on the arrival that completes the required set.
 
-Mixed-type chains (``Or & x`` or ``And | x``) raise :class:`TypeError`
+Mixed-type chains (``Or & x`` or ``And | x``) raise ``TypeError``
 to keep operator-chain semantics unambiguous. For mixed shapes, build
 the gate directly with the dataclass constructor::
 
@@ -36,15 +36,15 @@ from typing import Any
 
 @dataclass(frozen=True)
 class Or:
-    """OR-gate combinator for :func:`flow_listen`.
+    """OR-gate combinator for ``flow_listen``.
 
     Fires the gated listener ONCE on the first trigger arrival in the
-    flow run. The :class:`philharmonica.adk.flows.executor.FlowExecutor`
+    flow run. The ``philharmonica.adk.flows.executor.FlowExecutor``
     enforces single-fire via its ``consumed_gates`` set (shared by OR
     and AND gates).
 
     Built fluently via ``method_a | method_b`` (operator on
-    :class:`FlowStep`); flattens left-associatively when chained. May
+    ``FlowStep``); flattens left-associatively when chained. May
     also be constructed directly with ``Or(triggers=(...))`` when the
     triggers are pure strings (e.g., route labels).
 
@@ -74,17 +74,17 @@ class Or:
             )
 
     def __or__(self, other: Any) -> Or:
-        """Flatten ``self | other`` into a wider :class:`Or` gate.
+        """Flatten ``self | other`` into a wider ``Or`` gate.
 
         Args:
-            other: Another :class:`Or` (merged), a :class:`FlowStep`, a
+            other: Another ``Or`` (merged), a ``FlowStep``, a
                 step-name string, or any callable with ``__name__``.
 
         Returns:
-            A new :class:`Or` covering the union of triggers.
+            A new ``Or`` covering the union of triggers.
 
         Raises:
-            TypeError: When ``other`` is an :class:`And` — mixing types
+            TypeError: When ``other`` is an ``And`` — mixing types
                 in operator chains is ambiguous.
         """
         if isinstance(other, And):
@@ -117,15 +117,15 @@ class Or:
 
 @dataclass(frozen=True)
 class And:
-    """AND-gate combinator for :func:`flow_listen`.
+    """AND-gate combinator for ``flow_listen``.
 
     Fires the gated listener ONCE after every trigger has arrived in the
-    flow run. The :class:`philharmonica.adk.flows.executor.FlowExecutor` tracks
+    flow run. The ``philharmonica.adk.flows.executor.FlowExecutor`` tracks
     arrivals by name and fires on the arrival that completes the
     required set; the gate is consumed after firing.
 
     Built fluently via ``method_a & method_b`` (operator on
-    :class:`FlowStep`); flattens left-associatively when chained. May
+    ``FlowStep``); flattens left-associatively when chained. May
     also be constructed directly with ``And(triggers=(...))``.
 
     Attributes:
@@ -154,17 +154,17 @@ class And:
             )
 
     def __and__(self, other: Any) -> And:
-        """Flatten ``self & other`` into a wider :class:`And` gate.
+        """Flatten ``self & other`` into a wider ``And`` gate.
 
         Args:
-            other: Another :class:`And` (merged), a :class:`FlowStep`, a
+            other: Another ``And`` (merged), a ``FlowStep``, a
                 step-name string, or any callable with ``__name__``.
 
         Returns:
-            A new :class:`And` covering the union of triggers.
+            A new ``And`` covering the union of triggers.
 
         Raises:
-            TypeError: When ``other`` is an :class:`Or` — mixing types
+            TypeError: When ``other`` is an ``Or`` — mixing types
                 in operator chains is ambiguous.
         """
         if isinstance(other, Or):

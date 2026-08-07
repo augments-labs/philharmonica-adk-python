@@ -185,7 +185,7 @@ def _apply_streamed_redeferral(
 ) -> None:
     """Mark a streamed result interrupted by nested-agent re-deferrals.
 
-    Mirrors :func:`_build_redeferred_run_result` for the streamed path: the
+    Mirrors ``_build_redeferred_run_result`` for the streamed path: the
     remaining decisions were already applied to ``messages`` above, so only the
     still-pending nested approvals surface as new deferred requests.
     """
@@ -227,7 +227,7 @@ async def resume_from_state(
         config: Optional execution configuration.
         context: Optional caller-supplied context value. When provided,
             overrides ``state.context`` in the constructed
-            :class:`RunContext`. This allows the flow agent bridge to
+            ``RunContext``. This allows the flow agent bridge to
             thread the flow's shared ``run_context.context`` through
             resumed inner agent runs so cumulative usage is aggregated
             correctly.

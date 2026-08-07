@@ -577,7 +577,7 @@ def _llm_with_streaming_client(
     The matching ``isinstance(stream_iter, AsyncStream)`` assertion in
     the model code is bypassed by the ``_patch_responses_async_stream``
     fixture — every test using this helper MUST also request that
-    fixture (see :func:`_patch_responses_async_stream` below).
+    fixture (see ``_patch_responses_async_stream`` below).
     """
     llm = OpenAIResponsesLLM(model="gpt-5.1", api_key="test-key")
     client = MagicMock(name="AsyncOpenAI")

@@ -2,9 +2,9 @@
 
 Stores entries in a plain dict.  Search uses keyword overlap scoring
 (case-insensitive word intersection / union).  Thread-safe via
-:class:`threading.Lock`.
+``threading.Lock``.
 
-For production use, prefer :class:`SQLiteMemory` which uses FTS5
+For production use, prefer ``SQLiteMemory`` which uses FTS5
 for proper full-text search.
 """
 
@@ -33,7 +33,7 @@ class TemporaryMemory(Memory):
     matching words between the query and entry content (case-insensitive
     word intersection / union).
 
-    Thread-safe via :class:`threading.Lock`.
+    Thread-safe via ``threading.Lock``.
 
     Two instances with different ``scope`` values store and retrieve
     entries independently even if they share the same underlying dict
@@ -76,9 +76,9 @@ class TemporaryMemory(Memory):
     def _scoped(self, namespace: str) -> str:
         """Return the internal storage key for ``namespace``.
 
-        When :attr:`_scope` is set, the stored key is
+        When ``_scope`` is set, the stored key is
         ``"<scope>/<namespace>"``; otherwise the namespace is used as-is.
-        The stored :attr:`~philharmonica.adk.memory.memory_types.MemoryEntry.namespace`
+        The stored ``namespace``
         field always holds the *original* developer-supplied namespace — the
         scope prefix is purely an internal partitioning mechanism.
         """
@@ -89,8 +89,8 @@ class TemporaryMemory(Memory):
     def _unscoped(self, stored_namespace: str) -> str:
         """Strip the scope prefix from a stored namespace value.
 
-        Reverse of :meth:`_scoped`: strips ``"<scope>/"`` from the
-        front when :attr:`_scope` is set.  Returns ``stored_namespace``
+        Reverse of ``_scoped``: strips ``"<scope>/"`` from the
+        front when ``_scope`` is set.  Returns ``stored_namespace``
         unchanged when there is no scope or the prefix is absent (the
         latter prevents corruption on entries written by a different
         scope or by an unscoped store).
@@ -113,9 +113,9 @@ class TemporaryMemory(Memory):
         """Store a new memory entry in the in-process dict.
 
         The entry is stored under the scoped namespace (see
-        :meth:`_scoped`) so two :class:`TemporaryMemory` instances with
+        ``_scoped``) so two ``TemporaryMemory`` instances with
         different ``scope`` values never see each other's entries.  The
-        returned :class:`MemoryEntry` always carries the
+        returned ``MemoryEntry`` always carries the
         *caller-supplied* (unscoped) namespace.
 
         Args:
@@ -125,7 +125,7 @@ class TemporaryMemory(Memory):
                 metadata with ``MemorySource.MANUAL``.
 
         Returns:
-            The created :class:`MemoryEntry` with the caller-supplied
+            The created ``MemoryEntry`` with the caller-supplied
             namespace.
         """
         meta = metadata or MemoryMetadata(source=MemorySource.MANUAL)
@@ -174,7 +174,7 @@ class TemporaryMemory(Memory):
             filter: Optional filters on metadata fields.
 
         Returns:
-            List of :class:`MemorySearchResult` ordered by descending relevance.
+            List of ``MemorySearchResult`` ordered by descending relevance.
         """
         query_words = set(query.lower().split())
         if len(query_words) == 0:

@@ -1,8 +1,8 @@
-"""Shared hook bridge for :class:`Checkpointer` implementations.
+"""Shared hook bridge for ``Checkpointer`` implementations.
 
 Every checkpointer persists the same way: on ``on_node_end`` and on
-``on_graph_end``, snapshot the current :class:`GraphState` into a
-:class:`GraphCheckpoint` and ``save`` it (skipping when the run did
+``on_graph_end``, snapshot the current ``GraphState`` into a
+``GraphCheckpoint`` and ``save`` it (skipping when the run did
 not opt into checkpointing, i.e. ``state.thread_id is None``). This
 bridge factors that identical logic out so each concrete checkpointer
 only implements storage.
@@ -28,11 +28,11 @@ logger = logging.getLogger(__name__)
 
 class CheckpointerHooks(GraphHooks[Any]):
     """Forwards ``on_node_end`` / ``on_graph_end`` into any
-    :class:`Checkpointer`. Constructed by a checkpointer's
-    :meth:`Checkpointer.register`.
+    ``Checkpointer``. Constructed by a checkpointer's
+    ``Checkpointer.register``.
 
     Setting ``propagate_errors = True`` ensures that a failed
-    :meth:`Checkpointer.save` is not silently swallowed by the hook
+    ``Checkpointer.save`` is not silently swallowed by the hook
     fan-out — the caller receives the error and can decide how to handle it.
     """
 
@@ -49,7 +49,7 @@ class CheckpointerHooks(GraphHooks[Any]):
         node_id: str,
         result: NodeResult,
     ) -> None:
-        """Persist the current :class:`GraphState` after each node fires.
+        """Persist the current ``GraphState`` after each node fires.
 
         Skipped when ``state.thread_id`` is ``None`` — the caller
         didn't opt in to checkpointing on this run even though a

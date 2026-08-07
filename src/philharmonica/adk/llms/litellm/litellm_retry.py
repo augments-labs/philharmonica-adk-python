@@ -1,13 +1,13 @@
 """LiteLLM-specific retry wrapper.
 
-Glue between the framework-level :class:`LLMRetryPolicy` and the
+Glue between the framework-level ``LLMRetryPolicy`` and the
 exceptions raised by the ``litellm`` package. Two public symbols:
 
-- :func:`litellm_exception_to_kind` — classifies a caught exception
-  into a framework-level :data:`LLMRetryErrorKind`, or returns
+- ``litellm_exception_to_kind`` — classifies a caught exception
+  into a framework-level ``LLMRetryErrorKind``, or returns
   ``None`` when the exception is permanent.
-- :func:`call_with_retry` — thin wrapper that delegates to
-  :func:`philharmonica.adk.llms.retry.call_with_retry` with the litellm
+- ``call_with_retry`` — thin wrapper that delegates to
+  ``philharmonica.adk.llms.retry.call_with_retry`` with the litellm
   classifier. Kept as a public re-export so existing call sites
   (``runner.py``, tests) do not have to pass the classifier
   themselves.
@@ -32,7 +32,7 @@ from philharmonica.adk.types.llms import LLMRetryErrorKind, LLMRetryPolicy
 
 
 def litellm_exception_to_kind(exc: BaseException) -> Optional[LLMRetryErrorKind]:
-    """Map a ``litellm`` exception onto an :data:`LLMRetryErrorKind`.
+    """Map a ``litellm`` exception onto an ``LLMRetryErrorKind``.
 
     Returns ``None`` for permanent failures that MUST NOT be retried
     (authentication, bad request, not found, content filter, etc.).
@@ -95,7 +95,7 @@ async def call_with_retry[T](
     """Invoke *coro_fn* with exponential-backoff retries.
 
     Thin delegator that binds the litellm classifier to the generic
-    retry loop in :mod:`philharmonica.adk.llms.retry`. Kept as a public
+    retry loop in ``philharmonica.adk.llms.retry``. Kept as a public
     symbol so existing callers (``runner``, tests) do not have to
     pass the classifier themselves.
 

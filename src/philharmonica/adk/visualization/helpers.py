@@ -1,7 +1,7 @@
 """Internal helpers shared by the Mermaid and DOT emitters.
 
 Module-private utilities: not exported from
-:mod:`philharmonica.adk.visualization` (omitted from ``__init__.py``'s
+``philharmonica.adk.visualization`` (omitted from ``__init__.py``'s
 ``__all__``). Co-locating the shared logic here keeps both emitters
 DRY without underscore-aliased imports.
 """
@@ -17,10 +17,10 @@ if TYPE_CHECKING:
 
 
 def build_step_lookup(flow: Flow) -> dict[str, FlowStep]:
-    """Return a mapping from step name to its :class:`FlowStep` descriptor.
+    """Return a mapping from step name to its ``FlowStep`` descriptor.
 
     Walks ``type(flow).__dict__`` ONLY — matches the contract of
-    :class:`philharmonica.adk.flows.flow.FlowMeta`, which intentionally
+    ``philharmonica.adk.flows.flow.FlowMeta``, which intentionally
     ignores inherited decorated methods. Looking past ``__dict__``
     would silently surface descriptions from parent classes whose
     decorated methods the registry does NOT consider valid steps,
@@ -30,9 +30,9 @@ def build_step_lookup(flow: Flow) -> dict[str, FlowStep]:
         flow: The flow instance whose class is being inspected.
 
     Returns:
-        Mapping from method name to the unbound :class:`FlowStep`.
+        Mapping from method name to the unbound ``FlowStep``.
         Empty when no decorated methods are declared on the class
-        body (the abstract :class:`Flow` base case).
+        body (the abstract ``Flow`` base case).
     """
     lookup: dict[str, FlowStep] = {}
     for attr_name, attr_value in type(flow).__dict__.items():
@@ -149,7 +149,7 @@ def escape_label(label: str) -> str:
 def escape_mermaid_label(label: str) -> str:
     """Escape characters that break a Mermaid quoted label.
 
-    Unlike DOT (see :func:`escape_label`), Mermaid quoted strings do NOT
+    Unlike DOT (see ``escape_label``), Mermaid quoted strings do NOT
     honour backslash escapes — a literal ``\\"`` renders verbatim instead
     of producing a quote and can leave the string unterminated. Mermaid
     instead recognises HTML entity codes written with a leading ``#``
@@ -174,14 +174,14 @@ def node_label_from_desc(name: str, desc_lookup: dict[str, str | None]) -> str:
 
     Uses an explicit ``is not None`` check so an empty-string description
     ``""`` is preserved as the label (matching the semantics of
-    :func:`build_step_lookup`-based helpers that use
+    ``build_step_lookup``-based helpers that use
     ``step.description is not None``). Falls back to ``name`` only when the
     description is ``None``.
 
     Args:
         name: Step method name — used as the fallback label.
         desc_lookup: Mapping from step name to optional description string.
-            Typically built from :class:`~philharmonica.adk.flows.definition.StepInfo`
+            Typically built from ``StepInfo``
             instances.
 
     Returns:
@@ -195,12 +195,12 @@ def node_label_from_desc(name: str, desc_lookup: dict[str, str | None]) -> str:
 def gate_node_id(gate_id: str) -> str:
     """Convert a canonical gate id into an alphanumeric-and-underscore slug.
 
-    :attr:`GateSpec.gate_id` is of the form ``"<listener>:<kind>:<csv>"``.
+    ``GateSpec.gate_id`` is of the form ``"<listener>:<kind>:<csv>"``.
     The slug replaces ``:`` with ``__`` and ``,`` with ``_`` so the
     resulting id is safe as a Mermaid node id and a DOT id.
 
     Args:
-        gate_id: Canonical id from :attr:`GateSpec.gate_id`.
+        gate_id: Canonical id from ``GateSpec.gate_id``.
 
     Returns:
         Mermaid / DOT-safe identifier prefixed with ``gate__``.

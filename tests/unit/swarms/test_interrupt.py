@@ -1,7 +1,7 @@
 """Unit tests for swarms-side HITL primitives.
 
 Covers ``request_human_input_in_swarm`` consume/raise dispatch and
-the :class:`RunContext` swarm-resume-reply slot semantics (key
+the ``RunContext`` swarm-resume-reply slot semantics (key
 presence, ``None`` reply validity, double-consume detection).
 """
 

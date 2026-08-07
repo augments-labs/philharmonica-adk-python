@@ -1,6 +1,6 @@
 """Explicit episodic -> semantic distillation.
 
-Runs a :class:`MemoryExtractor` over raw episodic content and stores the
+Runs a ``MemoryExtractor`` over raw episodic content and stores the
 distilled facts as ``MemoryKind.SEMANTIC`` entries.  Never scheduled by the
 framework — the developer calls it, so the extraction + embedding token cost is
 always chosen explicitly.

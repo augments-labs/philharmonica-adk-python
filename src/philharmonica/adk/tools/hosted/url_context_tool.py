@@ -18,7 +18,7 @@ class URLContextTool(HostedTool):
     Provider matrix:
     - **Gemini**: native via the ``url_context`` tool type. No
       tunable knobs at this time.
-    - All other providers raise :class:`UnsupportedHostedToolError`.
+    - All other providers raise ``UnsupportedHostedToolError``.
 
     Refs:
         - Gemini: https://ai.google.dev/gemini-api/docs/url-context

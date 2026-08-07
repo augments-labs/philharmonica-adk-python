@@ -1,11 +1,11 @@
-"""Tests for :mod:`philharmonica.adk.workflows.engine`.
+"""Tests for ``philharmonica.adk.workflows.engine``.
 
 Covers:
-- Default field values for :class:`ModelActivityConfig`.
-- Custom construction of :class:`ModelActivityConfig`.
-- Default field values for :class:`ToolActivityConfig`.
-- Runtime-checkability of :class:`DurableEngine`.
-- Frozen (immutable) enforcement on :class:`ModelActivityConfig`.
+- Default field values for ``ModelActivityConfig``.
+- Custom construction of ``ModelActivityConfig``.
+- Default field values for ``ToolActivityConfig``.
+- Runtime-checkability of ``DurableEngine``.
+- Frozen (immutable) enforcement on ``ModelActivityConfig``.
 """
 
 from __future__ import annotations

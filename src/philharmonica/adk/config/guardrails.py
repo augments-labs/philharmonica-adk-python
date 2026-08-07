@@ -1,8 +1,8 @@
 """Guardrail assembly for declarative configs.
 
 A guardrail entry is a dotted ``ref`` resolved via the resolver to a runtime
-guardrail object. ``build_guardrails`` turns a :class:`GuardrailsConfig` into
-the runtime :class:`AgentGuardrails`; each ``ref`` is resolved to the
+guardrail object. ``build_guardrails`` turns a ``GuardrailsConfig`` into
+the runtime ``AgentGuardrails``; each ``ref`` is resolved to the
 guardrail type matching the list it appears in (input or output).
 """
 
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 def build_guardrails(config: GuardrailsConfig) -> AgentGuardrails:
-    """Assemble runtime :class:`AgentGuardrails` from a guardrails config.
+    """Assemble runtime ``AgentGuardrails`` from a guardrails config.
 
     Args:
         config: The validated guardrails config (input/output entry lists,

@@ -1,9 +1,9 @@
 """Unit tests for step-level HITL + enabled / max_retries / timeout.
 
 Mirrors the contract of the function-tool HITL surface — decisions
-recorded on :class:`FlowCheckpoint` via
-:meth:`FlowCheckpoint.approve` / :meth:`FlowCheckpoint.reject`, then
-resumed via :meth:`Runner.arun_flow_from_checkpoint(flow, checkpoint)`.
+recorded on ``FlowCheckpoint`` via
+``FlowCheckpoint.approve`` / ``FlowCheckpoint.reject``, then
+resumed via ``Runner.arun_flow_from_checkpoint(flow, checkpoint)``.
 """
 
 from __future__ import annotations

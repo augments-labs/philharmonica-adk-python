@@ -1,13 +1,13 @@
 """OpenTelemetry span adapter.
 
-:class:`OTelSpan` wraps an ``opentelemetry.trace.Span`` inside the
-framework :class:`~philharmonica.adk.tracing.spans.Span` abstraction. It
+``OTelSpan`` wraps an ``opentelemetry.trace.Span`` inside the
+framework ``Span`` abstraction. It
 manages the OTel span lifecycle (start, activate in the OTel context,
 flush attributes on finish, propagate errors) without exposing any OTel
 types on the framework surface.
 
 OTelSpan intentionally does **not** participate in the framework
-:class:`~contextvars.ContextVar` chain — OTel has its own
+``ContextVar`` chain — OTel has its own
 ``opentelemetry.context`` propagation that auto-parents children when
 the span is set as current. Double-tracking would just waste cycles.
 """
@@ -37,10 +37,10 @@ TData = TypeVar("TData", bound=SpanData)
 class OTelSpan[TData: SpanData](Span[TData]):
     """Framework span backed by an ``opentelemetry.trace.Span``.
 
-    The OTel span is started lazily in :meth:`start` so the parent
+    The OTel span is started lazily in ``start`` so the parent
     context is captured at the call site (not at construction time).
     Attributes from ``self.data`` are flushed into the OTel span at
-    :meth:`finish` — this lets the runner mutate ``self.data`` in place
+    ``finish`` — this lets the runner mutate ``self.data`` in place
     during the span body (e.g. updating ``usage`` after the LLM
     response) and have the final state recorded.
     """
@@ -61,7 +61,7 @@ class OTelSpan[TData: SpanData](Span[TData]):
             name: Span name (OTel-conventional, e.g. ``agent.triage``).
             attribute_flattener: Callable that converts ``data.export()``
                 to a flat ``dict[str, str | int | float | bool]`` suitable
-                for :meth:`Span.set_attributes`.
+                for ``Span.set_attributes``.
             span_id: Caller-assigned framework span identifier (does not
                 control the OTel span ID).
         """
@@ -78,7 +78,7 @@ class OTelSpan[TData: SpanData](Span[TData]):
 
         OTel's own context (``opentelemetry.context``) propagates the
         span so child spans started during the body auto-attach as
-        children. No framework :class:`~contextvars.ContextVar`
+        children. No framework ``ContextVar``
         bookkeeping is done here.
         """
         from opentelemetry import context as otel_context, trace as otel_trace

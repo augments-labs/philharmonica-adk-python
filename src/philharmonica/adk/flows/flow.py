@@ -1,24 +1,24 @@
-"""`Flow[StateT]` base class + :class:`FlowMeta` metaclass.
+"""`Flow[StateT]` base class + ``FlowMeta`` metaclass.
 
-A :class:`Flow` is the declarative configuration of a multi-step
+A ``Flow`` is the declarative configuration of a multi-step
 orchestration over a typed state object. Subclasses declare their
 steps via the ``@flow_start`` / ``@flow_listen`` / ``@flow_router`` decorators in
-:mod:`philharmonica.adk.flows.decorators`.
+``philharmonica.adk.flows.decorators``.
 
 A ``Flow`` is configuration; the Runner executes it. So ``Flow``
 carries NO ``run()`` / ``arun()`` method. Execution lives on
-:meth:`philharmonica.adk.run.runner.Runner.arun_flow` /
-:meth:`philharmonica.adk.run.runner.Runner.arun_flow_streamed` /
-:meth:`philharmonica.adk.run.runner.Runner.arun_flow_from_checkpoint`.
+``philharmonica.adk.run.runner.Runner.arun_flow`` /
+``philharmonica.adk.run.runner.Runner.arun_flow_streamed`` /
+``philharmonica.adk.run.runner.Runner.arun_flow_from_checkpoint``.
 
-:class:`FlowMeta` is a minimal metaclass that runs ONCE at class
+``FlowMeta`` is a minimal metaclass that runs ONCE at class
 creation, walks ``cls.__dict__`` (NOT inherited methods — see "Inheritance"
 below), and:
 
 1. Validates each decorated method's signature (must be ``async def``,
    must take only ``self``, must not be a ``classmethod`` / ``staticmethod``).
 2. Collects ``@flow_start`` / ``@flow_listen`` / ``@flow_router`` registrations into a
-   frozen :class:`philharmonica.adk.flows.registry.FlowStepRegistry`.
+   frozen ``philharmonica.adk.flows.registry.FlowStepRegistry``.
 3. Stamps the registry on the class as ``cls.__flow_registry__``.
 
 What the metaclass deliberately does NOT do:
@@ -76,15 +76,15 @@ class FlowMeta(type):
 
     Runs once per class definition, walks ``cls.__dict__`` (NOT inherited
     members), validates signatures, and builds a frozen
-    :class:`FlowStepRegistry` stamped on the class as ``__flow_registry__``.
+    ``FlowStepRegistry`` stamped on the class as ``__flow_registry__``.
 
-    The metaclass distinguishes the abstract :class:`Flow` base from
+    The metaclass distinguishes the abstract ``Flow`` base from
     concrete subclasses by checking whether any base class already
     carries a ``__flow_registry__`` attribute. The abstract base sets
     ``__flow_registry__ = None`` at class-creation time. Concrete
     subclasses (those whose bases include the base ``Flow``) must
     declare at least one ``@flow_start`` — enforced by
-    :class:`FlowStepRegistry.__post_init__`.
+    ``FlowStepRegistry.__post_init__``.
     """
 
     def __init__(
@@ -123,8 +123,8 @@ class FlowMeta(type):
 def _has_flow_ancestor(bases: tuple[type, ...]) -> bool:
     """Return True iff any base class already carries ``__flow_registry__``.
 
-    The abstract :class:`Flow` base sets ``__flow_registry__ = None`` at
-    its own class-creation time. Any class inheriting from :class:`Flow`
+    The abstract ``Flow`` base sets ``__flow_registry__ = None`` at
+    its own class-creation time. Any class inheriting from ``Flow``
     (directly or transitively) will therefore have the attribute via
     inheritance — that is the marker for "concrete subclass."
 
@@ -153,11 +153,11 @@ def _collect_decorations(
     mistake that would produce surprising runtime errors otherwise).
 
     Args:
-        namespace: Class body namespace from :meth:`FlowMeta.__init__`.
+        namespace: Class body namespace from ``FlowMeta.__init__``.
 
     Returns:
         Triple ``(starts, listeners, routers)`` ready to construct a
-        :class:`FlowStepRegistry`.
+        ``FlowStepRegistry``.
 
     Raises:
         FlowDefinitionError: On any signature problem or decorator misuse.
@@ -197,7 +197,7 @@ def _validate_step_signature(step: FlowStep, name: str) -> None:
     error at class-load, not a confusing runtime failure.
 
     Args:
-        step: The :class:`FlowStep` wrapping the decorated method.
+        step: The ``FlowStep`` wrapping the decorated method.
         name: The attribute name (for error messages).
 
     Raises:
@@ -229,14 +229,14 @@ def collect_step_descriptions(namespace: Mapping[str, Any]) -> dict[str, str | N
     """Extract step description strings from a class namespace.
 
     Walks ``namespace`` and reads ``__flow_description__`` from every
-    :class:`FlowStep` found. Used by :meth:`Flow.get_definition` to
+    ``FlowStep`` found. Used by ``Flow.get_definition`` to
     propagate ``description=`` decorator kwarg values into the pure-data
-    :class:`~philharmonica.adk.flows.definition.FlowDefinition` without holding
+    ``FlowDefinition`` without holding
     callable references.
 
     Args:
         namespace: A class body namespace (``cls.__dict__`` or the
-            namespace passed to :meth:`FlowMeta.__init__``).
+            namespace passed to ``FlowMeta.__init__```).
 
     Returns:
         Mapping from step method name to its description string or
@@ -254,22 +254,22 @@ class Flow[StateT](metaclass=FlowMeta):
 
     Subclasses decorate methods with ``@flow_start`` / ``@flow_listen``
     / ``@flow_router`` and access shared state via ``self.state``.
-    The :class:`FlowMeta` metaclass collects the decorations at class
-    creation; the executor runs them at :meth:`Runner.arun_flow` time.
+    The ``FlowMeta`` metaclass collects the decorations at class
+    creation; the executor runs them at ``Runner.arun_flow`` time.
 
     State initialization is mandatory and explicit. Two construction
     paths, both developer-declared: pass ``initial_state=`` (the state
     class, auto-instantiated with zero args, or a pre-built instance),
-    or declare a :attr:`state_factory` class attribute on the subclass.
+    or declare a ``state_factory`` class attribute on the subclass.
     An explicit ``initial_state`` always wins when both are present.
     The framework NEVER auto-instantiates state from the
     ``Flow[StateT]`` generic parameter — that is one of CrewAI's hidden
     behaviors we explicitly forbid.
 
-    Visualisation: :meth:`to_mermaid` / :meth:`to_dot` emit the flow
+    Visualisation: ``to_mermaid`` / ``to_dot`` emit the flow
     topology as a Mermaid or Graphviz DOT string for embedding in
     pull-request descriptions, documentation, or live dashboards.
-    Both methods walk the immutable :class:`FlowStepRegistry`
+    Both methods walk the immutable ``FlowStepRegistry``
     transition table — pure functions of class metadata, no run
     required.
 
@@ -313,19 +313,19 @@ class Flow[StateT](metaclass=FlowMeta):
     Args:
         initial_state: The state class (auto-instantiated with zero
             args) OR a pre-built instance. Mandatory unless the
-            subclass declares :attr:`state_factory`; an explicit value
+            subclass declares ``state_factory``; an explicit value
             always wins over the factory.
 
     Raises:
         FlowDefinitionError: When ``initial_state`` is ``None`` and the
-            subclass declares no usable :attr:`state_factory`.
+            subclass declares no usable ``state_factory``.
     """
 
     __flow_registry__: ClassVar[FlowStepRegistry | None]
-    """Registry stamped by :class:`FlowMeta` at class creation.
+    """Registry stamped by ``FlowMeta`` at class creation.
 
-    ``None`` on the abstract :class:`Flow` base class itself;
-    a frozen :class:`FlowStepRegistry` on every concrete subclass.
+    ``None`` on the abstract ``Flow`` base class itself;
+    a frozen ``FlowStepRegistry`` on every concrete subclass.
     Read by the executor at run time.
     """
 
@@ -353,9 +353,9 @@ class Flow[StateT](metaclass=FlowMeta):
     """Stable identifier for this flow instance (``flow-<8-hex>``)."""
 
     run_context: RunContext[Any] | None = None
-    """Populated by :class:`FlowExecutor` for the duration of a run.
+    """Populated by ``FlowExecutor`` for the duration of a run.
 
-    Step bodies that want their inner :meth:`Runner.arun` calls to share
+    Step bodies that want their inner ``Runner.arun`` calls to share
     a cumulative-usage accumulator pass ``context=self.run_context`` to
     those calls. This is OPT-IN — the framework never auto-injects the
     context into any call. ``None`` outside of a run.
@@ -364,18 +364,18 @@ class Flow[StateT](metaclass=FlowMeta):
     _pending_approvals: dict[str, FlowApprovalDecision]
     """Resume-time approval decisions keyed by deferred step name.
 
-    Populated by :meth:`Runner.arun_flow_from_checkpoint` before the
-    executor starts; read by :class:`FlowExecutor` via
-    :meth:`get_pending_approval`. Empty for cold-start runs.
+    Populated by ``Runner.arun_flow_from_checkpoint`` before the
+    executor starts; read by ``FlowExecutor`` via
+    ``get_pending_approval``. Empty for cold-start runs.
     """
 
     _pending_agent_resolutions: dict[str, str]
     """Resume-time agent-bridge resolutions keyed by ``defer_key``.
 
-    Maps a deferred ``defer_key`` to the serialised :class:`RunState`
+    Maps a deferred ``defer_key`` to the serialised ``RunState``
     JSON the consumer recorded decisions onto (via
-    :meth:`RunState.approve` / :meth:`RunState.reject`). Read by
-    :func:`arun_flow_agent` on resume so the inner agent run picks
+    ``RunState.approve`` / ``RunState.reject``). Read by
+    ``arun_flow_agent`` on resume so the inner agent run picks
     up where it deferred. Empty for cold-start runs.
     """
 
@@ -389,15 +389,15 @@ class Flow[StateT](metaclass=FlowMeta):
                 passed, it is used directly. Mirrors CrewAI's
                 ``Flow.initial_state`` field which accepts the same
                 dual shape. When omitted, the subclass's
-                :attr:`state_factory` class attribute is used instead;
+                ``state_factory`` class attribute is used instead;
                 an explicit ``initial_state`` always wins over the
                 factory. The framework NEVER infers state from the
                 ``Flow[StateT]`` generic parameter.
 
         Raises:
             FlowDefinitionError: When ``initial_state`` is ``None`` and
-                no :attr:`state_factory` is declared, or when
-                :attr:`state_factory` is not callable.
+                no ``state_factory`` is declared, or when
+                ``state_factory`` is not callable.
         """
         if initial_state is None:
             # getattr indirection: pyright method-binds a callable-typed
@@ -452,7 +452,7 @@ class Flow[StateT](metaclass=FlowMeta):
         return f"{type(self).__name__}({', '.join(parts)})"
 
     def set_pending_approvals(self, approvals: dict[str, FlowApprovalDecision]) -> None:
-        """Public setter used by :class:`Runner` on the checkpoint-resume path.
+        """Public setter used by ``Runner`` on the checkpoint-resume path.
 
         Replaces the entire pending-approvals mapping. Called once
         before the executor starts. Routed through this accessor
@@ -461,7 +461,7 @@ class Flow[StateT](metaclass=FlowMeta):
 
         Args:
             approvals: Mapping from deferred step name to the
-                corresponding :class:`FlowApprovalDecision`. Empty
+                corresponding ``FlowApprovalDecision``. Empty
                 mapping clears the table.
         """
         self._pending_approvals = dict(approvals)
@@ -470,24 +470,24 @@ class Flow[StateT](metaclass=FlowMeta):
         """Return the resume-time approval decision for ``step_name``, if any.
 
         Non-consuming read — useful for inspection in hooks / tests.
-        The executor uses :meth:`consume_pending_approval` instead so
+        The executor uses ``consume_pending_approval`` instead so
         a cyclic re-fire of the same step does NOT auto-approve.
 
         Args:
             step_name: Method name of the candidate step.
 
         Returns:
-            The pending :class:`FlowApprovalDecision`, or ``None`` if
+            The pending ``FlowApprovalDecision``, or ``None`` if
             no decision was pre-queued for this step.
         """
         return self._pending_approvals.get(step_name)
 
     def set_pending_agent_resolutions(self, resolutions: dict[str, str]) -> None:
-        """Public setter used by :class:`Runner` on the agent-bridge resume path.
+        """Public setter used by ``Runner`` on the agent-bridge resume path.
 
         Replaces the entire pending-agent-resolutions mapping with a
         copy of ``resolutions`` (``defer_key`` → serialised
-        :class:`RunState` JSON). Called once before the executor
+        ``RunState`` JSON). Called once before the executor
         starts. Routed through this accessor rather than direct
         attribute write so external modules never touch
         ``_pending_agent_resolutions`` directly.
@@ -500,19 +500,19 @@ class Flow[StateT](metaclass=FlowMeta):
         self._pending_agent_resolutions = dict(resolutions)
 
     def consume_pending_agent_resolution(self, defer_key: str) -> str | None:
-        """Pop the resume-time :class:`RunState` JSON for ``defer_key``, if any.
+        """Pop the resume-time ``RunState`` JSON for ``defer_key``, if any.
 
-        Used by :func:`arun_flow_agent` so each pre-queued resolution
+        Used by ``arun_flow_agent`` so each pre-queued resolution
         applies to exactly one inner agent invocation. Mirrors the
-        consume-on-use pattern of :meth:`consume_pending_approval`.
+        consume-on-use pattern of ``consume_pending_approval``.
 
         Args:
             defer_key: The agent-bridge key passed to
-                :func:`arun_flow_agent`.
+                ``arun_flow_agent``.
 
         Returns:
             The popped JSON payload (suitable for
-            :meth:`RunState.from_dict` ``+`` ``json.loads``), or
+            ``RunState.from_dict`` ``+`` ``json.loads``), or
             ``None`` if no resolution was pre-queued.
         """
         return self._pending_agent_resolutions.pop(defer_key, None)
@@ -520,23 +520,23 @@ class Flow[StateT](metaclass=FlowMeta):
     def pending_agent_resolution_keys(self) -> list[str]:
         """Return sorted list of unconsumed agent-resolution ``defer_key`` values.
 
-        Public accessor so :class:`FlowExecutor` can inspect leftover
+        Public accessor so ``FlowExecutor`` can inspect leftover
         resolutions at run completion without reaching into the private
         ``_pending_agent_resolutions`` attribute.
 
         Returns:
             Sorted list of ``defer_key`` strings that were supplied via
-            :meth:`set_pending_agent_resolutions` but never consumed by
-            :func:`arun_flow_agent`.
+            ``set_pending_agent_resolutions`` but never consumed by
+            ``arun_flow_agent``.
         """
         return sorted(self._pending_agent_resolutions.keys())
 
     def consume_pending_approval(self, step_name: str) -> FlowApprovalDecision | None:
         """Pop the resume-time approval decision for ``step_name``, if any.
 
-        Used by :class:`FlowExecutor` so each pre-queued decision
+        Used by ``FlowExecutor`` so each pre-queued decision
         applies to exactly one step invocation. Mirrors the tool-layer
-        contract on :attr:`RunState.approved_tools` / ``rejected_tools``
+        contract on ``RunState.approved_tools`` / ``rejected_tools``
         — they are consumed on use; a one-time approval never
         elevates into a persistent bypass.
 
@@ -544,22 +544,22 @@ class Flow[StateT](metaclass=FlowMeta):
             step_name: Method name of the candidate step.
 
         Returns:
-            The popped :class:`FlowApprovalDecision`, or ``None`` if
+            The popped ``FlowApprovalDecision``, or ``None`` if
             no decision was pre-queued for this step.
         """
         return self._pending_approvals.pop(step_name, None)
 
     def get_registry(self) -> FlowStepRegistry:
-        """Return the frozen :class:`FlowStepRegistry` for this Flow's class.
+        """Return the frozen ``FlowStepRegistry`` for this Flow's class.
 
-        Public accessor for the registry stamped by :class:`FlowMeta`.
+        Public accessor for the registry stamped by ``FlowMeta``.
         Used by the executor at run start to build the transition table.
 
         Returns:
-            The class-level :class:`FlowStepRegistry`.
+            The class-level ``FlowStepRegistry``.
 
         Raises:
-            FlowDefinitionError: When called on the abstract :class:`Flow`
+            FlowDefinitionError: When called on the abstract ``Flow``
                 base class (no registry was built). Concrete subclasses
                 always have a registry stamped by the metaclass.
         """
@@ -572,25 +572,25 @@ class Flow[StateT](metaclass=FlowMeta):
         return registry
 
     def get_definition(self) -> FlowDefinition:
-        """Return a frozen :class:`FlowDefinition` for this Flow's class.
+        """Return a frozen ``FlowDefinition`` for this Flow's class.
 
-        Extracts the step registry stamped by :class:`FlowMeta` and
-        compiles it into a pure-data :class:`FlowDefinition` with no
+        Extracts the step registry stamped by ``FlowMeta`` and
+        compiles it into a pure-data ``FlowDefinition`` with no
         callable references. The definition includes per-step description
         strings sourced from the ``description=`` decorator kwarg on each
-        :class:`FlowStep` in the class body.
+        ``FlowStep`` in the class body.
 
         Calling this method multiple times always returns structurally
         equivalent objects (same field values). The method does NOT cache
         the definition — the cost is one dict walk and is negligible.
 
         Returns:
-            A frozen :class:`FlowDefinition` capturing steps, roles,
+            A frozen ``FlowDefinition`` capturing steps, roles,
             triggers, gate topology, and router trigger mappings.
 
         Raises:
             FlowDefinitionError: When called on the abstract
-                :class:`Flow` base class (no registry was built).
+                ``Flow`` base class (no registry was built).
         """
         from philharmonica.adk.flows.definition import build_flow_definition
 
@@ -602,14 +602,14 @@ class Flow[StateT](metaclass=FlowMeta):
         """Return a Mermaid ``flowchart`` rendering of this Flow's topology.
 
         Thin ergonomic wrapper around
-        :func:`philharmonica.adk.visualization.flow_to_mermaid`. Pure function:
+        ``philharmonica.adk.visualization.flow_to_mermaid``. Pure function:
         no I/O, idempotent. Walks the immutable class registry — no
         run is triggered.
 
         Args:
             direction: Mermaid layout direction. ``"LR"`` (default)
                 reads left-to-right; ``"TD"`` / ``"TB"`` reads top-down.
-                Any value in the :data:`MermaidDirection` Literal is
+                Any value in the ``MermaidDirection`` Literal is
                 valid; invalid values raise ``ValueError`` at runtime.
 
         Returns:
@@ -624,7 +624,7 @@ class Flow[StateT](metaclass=FlowMeta):
         """Return a Graphviz DOT rendering of this Flow's topology.
 
         Thin ergonomic wrapper around
-        :func:`philharmonica.adk.visualization.flow_to_dot`. Pure function:
+        ``philharmonica.adk.visualization.flow_to_dot``. Pure function:
         no I/O. Walks the immutable class registry — no run is
         triggered.
 

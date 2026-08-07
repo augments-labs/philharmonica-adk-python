@@ -107,7 +107,7 @@ class TestResponseToRunItems:
         """The Layer 3 ``ProviderItem.to_param()`` MUST echo the Layer 1 payload.
 
         ``RunItemBase.to_param()`` is typed ``LLMInputContentItem``; the
-        concrete narrowing to :class:`LLMResponseProviderItemParam` happens
+        concrete narrowing to ``LLMResponseProviderItemParam`` happens
         at runtime via the ``type`` discriminator, so we assert it here.
         """
         provider = LLMResponseProviderItem(

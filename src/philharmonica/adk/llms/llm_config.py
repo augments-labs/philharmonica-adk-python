@@ -154,8 +154,8 @@ class LLMConfig:
     (``num_retries``) and gives developers control over total retry
     budget, delay shape, and which error categories are retried.
 
-    Distinct from :attr:`num_retries`: ``num_retries`` is an SDK-level
-    hint forwarded to the provider library; :attr:`retry_policy` runs
+    Distinct from ``num_retries``: ``num_retries`` is an SDK-level
+    hint forwarded to the provider library; ``retry_policy`` runs
     at the framework layer and can express jitter, exponential
     backoff, and category selection.
 

@@ -1,6 +1,6 @@
 """Anthropic Messages API configuration.
 
-Extends the provider-agnostic :class:`LLMConfig` with fields that
+Extends the provider-agnostic ``LLMConfig`` with fields that
 ``anthropic.AsyncAnthropic().messages.create()`` accepts natively. Every
 non-primitive field is typed verbatim against ``anthropic.types.*`` —
 the framework deliberately does NOT define parallel TypedDicts for
@@ -25,10 +25,10 @@ if TYPE_CHECKING:
 
 @dataclass
 class AnthropicConfig(LLMConfig):
-    """Anthropic-Messages-specific config extending :class:`LLMConfig`.
+    """Anthropic-Messages-specific config extending ``LLMConfig``.
 
     Only fields that have no provider-agnostic analogue on the base
-    :class:`LLMConfig` live here. Generic fields (``temperature``,
+    ``LLMConfig`` live here. Generic fields (``temperature``,
     ``max_output_tokens``, ``tool_choice``, ``tool_execution_mode``,
     ``extra_body``, ``extra_args``, ``retry_policy`` …) are inherited
     unchanged. ``max_output_tokens`` maps to Anthropic's required

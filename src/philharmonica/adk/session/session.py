@@ -3,7 +3,7 @@
 A ``Session`` represents one conversation thread.  The Runner calls
 ``get()``, ``add()``, and reads ``settings``/``id``/``state``.
 Concrete implementations are produced by a manager (e.g.
-:class:`SQLiteMultiSessions`).
+``SQLiteMultiSessions``).
 """
 
 from __future__ import annotations
@@ -61,7 +61,7 @@ class Session(ABC):
                 If ``None``, retrieve all.
 
         Returns:
-            List of :class:`SessionEvent` in chronological order
+            List of ``SessionEvent`` in chronological order
             (oldest first).
         """
 

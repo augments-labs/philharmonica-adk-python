@@ -7,7 +7,7 @@ Verifies:
 * Happy path: ``Runner.arun`` runs to completion → status WORKING → add_artifact → complete.
 * Empty input message → ``failed("Empty input")``.
 * Each well-known framework exception type maps to the correct
-  terminal :class:`TaskState`:
+  terminal ``TaskState``:
   - ``AgentInputGuardrailTripwireTriggered`` → REJECTED
   - ``AgentOutputGuardrailTripwireTriggered`` → FAILED
   - ``MaxTurnsExceeded`` / ``UsageLimitExceeded`` → FAILED

@@ -4,7 +4,7 @@ Covers the human-readable ``__repr__`` one-liners on ``Task``,
 ``TaskDependency``, ``TaskPipeline`` / ``TaskPipelineResult``,
 ``TaskGroup`` / ``TaskGroupResult``, ``TaskOutput``, and
 ``TaskPipelineState``, plus the package-level export contract of
-:mod:`philharmonica.adk.tasks`. Reprs are one-liners: full descriptions,
+``philharmonica.adk.tasks``. Reprs are one-liners: full descriptions,
 prompts, and item trails never leak into them; previews are capped at
 60 chars with newlines stripped and a ``…`` ellipsis.
 """

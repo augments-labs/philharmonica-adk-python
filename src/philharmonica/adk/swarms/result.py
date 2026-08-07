@@ -1,16 +1,16 @@
 """Result types for swarm execution.
 
-Mirrors the shape of :class:`~philharmonica.adk.types.run.run_result.RunResult`
+Mirrors the shape of ``RunResult``
 so consumers who already read ``.final_output`` / ``.new_items`` /
 ``.context`` on single-agent runs get the same ergonomics for swarm runs.
 Adds swarm-specific fields that do not make sense on a single-agent
 result:
 
-- ``stop_reason`` — the :class:`~philharmonica.adk.swarms.stop_reason.StopReason`
+- ``stop_reason`` — the ``StopReason``
   that ended the run (never ``None`` on a completed swarm — absence of
   a stop reason is an invalid state because the driver only builds a
   result *because* a termination fired).
-- ``state`` — the final :class:`~philharmonica.adk.swarms.state.SwarmState`,
+- ``state`` — the final ``SwarmState``,
   serializable for inspection / persistence.
 - ``last_agent`` — the agent that emitted the terminal output (the one
   that called ``swarm_done`` or produced the last turn when a
@@ -19,7 +19,7 @@ result:
   cost attribution.
 
 ``SwarmRunResultStreaming`` is the streaming twin returned by
-:meth:`Runner.arun_swarm_streamed`; lives in this file so the public
+``Runner.arun_swarm_streamed``; lives in this file so the public
 API shape is discoverable from one import.
 """
 
@@ -67,9 +67,9 @@ class SwarmRunResult[TContext]:
     """Result of a completed swarm run.
 
     A ``SwarmRunResult`` is only produced when a
-    :class:`~philharmonica.adk.swarms.termination.TerminationCondition` fires
+    ``TerminationCondition`` fires
     or a hard guard trips with a clean
-    :class:`~philharmonica.adk.swarms.stop_reason.StopReason`. Hard-crash exits
+    ``StopReason``. Hard-crash exits
     (e.g. ``MaxTurnsExceeded`` from the underlying runner loop) still
     raise rather than returning a result — same rule as single-agent
     runs.
@@ -86,15 +86,15 @@ class SwarmRunResult[TContext]:
         new_items: Layer 3 RunItems produced across the entire swarm
             run, in order. Equivalent to ``state.shared_history``
             but surfaced at the top level for API parity with
-            :class:`RunResult`.
+            ``RunResult``.
         state: Final swarm state — serializable via ``to_json()`` for
             inspection, post-hoc analysis, or warm-start of a follow-up
             run (useful for HITL pause/resume patterns built on
-            :class:`~philharmonica.adk.swarms.termination.HandoffToTermination`).
+            ``HandoffToTermination``).
         last_agent: The agent that produced the terminal output. When
             stopped via ``swarm_done`` this is the emitter; otherwise
             the agent active on the final turn.
-        context: The :class:`RunContext` shared across the whole run
+        context: The ``RunContext`` shared across the whole run
             (usage tracking, user context).
         per_member_usage: Per-agent token usage breakdown, keyed by
             agent name. Sum across agents equals
@@ -142,14 +142,14 @@ class SwarmRunResult[TContext]:
 
     Empty tuple on a clean run. When the swarm exits with
     ``stop_reason.kind == "interrupted"`` this carries the
-    :class:`Interrupt` objects keyed by member name in
-    :attr:`SwarmState.pending_interrupts`, in lexicographic order.
-    Mirrors :attr:`GraphRunResult.interrupts`."""
+    ``Interrupt`` objects keyed by member name in
+    ``SwarmState.pending_interrupts``, in lexicographic order.
+    Mirrors ``GraphRunResult.interrupts``."""
 
     def release_agents(self) -> None:
         """Drop strong references to agents and item history.
 
-        Parity with :meth:`RunResult.release_agents`. Long-lived caches
+        Parity with ``RunResult.release_agents``. Long-lived caches
         holding many completed ``SwarmRunResult`` instances can pin
         whole agent graphs (system prompts, tool closures, policy
         references) in memory; calling this after you're done with the
@@ -173,7 +173,7 @@ class SwarmRunResult[TContext]:
         ``SwarmState`` — unreadable in a REPL or log line. This shows
         what a human checks first: which swarm, why it stopped, how
         much it cost, and a preview of the output. Tolerates
-        :meth:`release_agents` (``state.swarm`` may be ``None``).
+        ``release_agents`` (``state.swarm`` may be ``None``).
         """
         parts: list[str] = []
         swarm = self.state.swarm if self.state is not None else None
@@ -190,16 +190,16 @@ class SwarmRunResult[TContext]:
 
 @dataclass
 class SwarmRunResultStreaming[TContext]:
-    """Streaming twin of :class:`SwarmRunResult`.
+    """Streaming twin of ``SwarmRunResult``.
 
-    Produced by :meth:`Runner.arun_swarm_streamed`. Iterate events
-    in real time via :meth:`stream_events`, which yields events
+    Produced by ``Runner.arun_swarm_streamed``. Iterate events
+    in real time via ``stream_events``, which yields events
     from the same union as ``Runner.arun_streamed`` plus the
     swarm-scoped variants (``SwarmStartEvent``,
     ``SwarmTurnStartEvent``, ``SwarmHandoffEvent``,
     ``SwarmTurnEndEvent`` / ``SwarmTurnInterruptEvent``,
     ``SwarmDoneEvent``). Cancellation is available via
-    :meth:`cancel`. Terminal fields are populated once the run
+    ``cancel``. Terminal fields are populated once the run
     completes.
 
     Attributes:
@@ -397,9 +397,9 @@ class SwarmRunResultStreaming[TContext]:
     def set_deferred_run_impl(self, impl: Callable[[], Coroutine[Any, Any, None]]) -> None:
         """Store the driver coroutine factory for lazy task creation.
 
-        Called when :meth:`Runner.arun_swarm_streamed` is invoked outside
+        Called when ``Runner.arun_swarm_streamed`` is invoked outside
         an active event loop. The task is created on the first call to
-        :meth:`stream_events`.
+        ``stream_events``.
         """
         self._deferred_run_impl = impl
 

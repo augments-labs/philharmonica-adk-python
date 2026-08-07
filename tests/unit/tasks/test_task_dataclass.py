@@ -1,4 +1,4 @@
-"""Unit tests for the :class:`Task` dataclass.
+"""Unit tests for the ``Task`` dataclass.
 
 Covers frozen invariants, default values, ``__post_init__`` validation,
 and the metadata field.

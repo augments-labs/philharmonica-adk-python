@@ -1,15 +1,15 @@
 """Tests for ``A2ARunner`` — execution entry point for ``A2AAgent``.
 
 Verifies:
-* :meth:`A2ARunner.arun` accepts ONLY ``A2AAgent`` (raises
+* ``A2ARunner.arun`` accepts ONLY ``A2AAgent`` (raises
   ``TypeError`` for ``Agent``, ``Swarm``, plain object, ``None``).
-* Same A2AAgent-only constraint on :meth:`poll_task` and
-  :meth:`cancel_task`.
+* Same A2AAgent-only constraint on ``poll_task`` and
+  ``cancel_task``.
 * The ``stream=True`` × ``background=True`` mutex.
 * The ``continuation_token`` × ``context_id`` mutex.
 * Each flag combination dispatches to the correct underlying
-  :class:`A2AClient` method.
-* ``TypeError`` message names :class:`Runner` so the developer
+  ``A2AClient`` method.
+* ``TypeError`` message names ``Runner`` so the developer
   knows where to go for local agents.
 """
 
@@ -63,7 +63,7 @@ def remote(mock_client: MagicMock) -> A2AAgent:
 
 
 class TestA2AAgentOnlyContract:
-    """``A2ARunner`` accepts only :class:`A2AAgent`; everything else raises."""
+    """``A2ARunner`` accepts only ``A2AAgent``; everything else raises."""
 
     async def test_arun_rejects_local_agent(self) -> None:
         local = Agent(name="local", system_prompt="Be helpful.")

@@ -3,7 +3,7 @@
 This module provides persistent tracking of agent run metrics
 (tokens, requests, errors, duration) and time-windowed quota
 enforcement.  It integrates with the Runner via
-:class:`StatusTrackingHooks` — no Runner changes needed.
+``StatusTrackingHooks`` — no Runner changes needed.
 
 Usage::
 

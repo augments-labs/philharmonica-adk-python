@@ -24,8 +24,8 @@ class Instruments:
 
     Creates all framework histograms and counters against the supplied
     ``Meter`` on construction, then exposes typed ``record_*`` methods
-    that :class:`~philharmonica.adk.tracing.metrics.tracer.MetricsTracer` calls
-    at :meth:`~philharmonica.adk.tracing.spans.Span.finish` time.
+    that ``MetricsTracer`` calls
+    at ``finish`` time.
     """
 
     def __init__(self, meter: Meter) -> None:

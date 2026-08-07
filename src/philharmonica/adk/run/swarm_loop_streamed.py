@@ -636,7 +636,7 @@ async def _stream_member_turn(
     Drains the inner stream's events into ``result``'s queue
     between this turn's ``SwarmTurnStartEvent`` and
     ``SwarmTurnEndEvent`` boundaries, then materialises the
-    terminal :class:`RunResult` from the inner streaming result's
+    terminal ``RunResult`` from the inner streaming result's
     populated fields so the outer loop's post-step-8 block can
     consume it uniformly with a fresh ``run_agent_loop`` call.
 
@@ -732,7 +732,7 @@ def _snapshot_usage(usage: LLMUsage) -> LLMUsage:
 def _usage_delta(before: LLMUsage, after: LLMUsage) -> LLMUsage:
     """Compute a field-wise delta ``after - before``.
 
-    :class:`LLMUsage` defines ``__add__`` but not ``__sub__``; the
+    ``LLMUsage`` defines ``__add__`` but not ``__sub__``; the
     swarm driver needs the delta for per-member attribution. Only the
     four numeric top-level counters are diffed (nested ``*_details``
     are per-request, not meaningfully aggregated across turns), and

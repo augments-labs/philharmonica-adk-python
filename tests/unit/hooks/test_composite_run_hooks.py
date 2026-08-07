@@ -1,10 +1,10 @@
-"""Tests for :class:`CompositeRunHooks` — fan-out composition over multiple hook instances.
+"""Tests for ``CompositeRunHooks`` — fan-out composition over multiple hook instances.
 
 Exercises two invariants:
 
 1. **Every public ``RunHooks`` method has a matching forwarder** on
-   :class:`CompositeRunHooks`. If a new public hook is added to
-   :class:`RunHooks` without a matching override on the composite,
+   ``CompositeRunHooks``. If a new public hook is added to
+   ``RunHooks`` without a matching override on the composite,
    fan-out silently becomes a no-op and verbose/user hooks lose
    visibility. The reflection test below fails in that scenario.
 2. **Exception handling**: a failing member does not prevent the
@@ -48,7 +48,7 @@ class _RaisingHooks(RunHooks):
 
 
 def _public_async_hook_methods() -> list[str]:
-    """Return the names of every public async method on :class:`RunHooks`."""
+    """Return the names of every public async method on ``RunHooks``."""
     names: list[str] = []
     for name, value in inspect.getmembers(RunHooks):
         if name.startswith("_"):

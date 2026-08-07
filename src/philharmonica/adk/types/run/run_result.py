@@ -115,7 +115,7 @@ class RunResult[T]:
     guardrail_results: AgentGuardrailResults = field(default_factory=AgentGuardrailResults)
     """Per-phase agent-level guardrail audit trail for this run.
 
-    A single :class:`~philharmonica.adk.agents.agent_guardrails.AgentGuardrailResults`
+    A single ``AgentGuardrailResults``
     config object holds:
 
     - ``guardrail_results.input``: results from every input guardrail
@@ -184,9 +184,9 @@ class RunResult[T]:
         """The ``response_id`` of the most recent LLM response in this run.
 
         Walks ``new_items`` in reverse and returns the ``id`` of the
-        latest :class:`MessageOutputItem` — the field is populated from
-        :attr:`LLMResponse.response_id` in
-        :meth:`ItemHelpers.response_to_run_items`. Returns ``None`` when
+        latest ``MessageOutputItem`` — the field is populated from
+        ``LLMResponse.response_id`` in
+        ``ItemHelpers.response_to_run_items``. Returns ``None`` when
         no message output item is present (e.g. a purely tool-call turn
         that deferred or was interrupted before any text output landed).
 
@@ -219,7 +219,7 @@ class RunResult[T]:
 
         Note:
             The result is mutated in place. After calling this method,
-            :meth:`to_input_list` and :attr:`last_response_id` will
+            ``to_input_list`` and ``last_response_id`` will
             return empty/None values when ``release_new_items=True``.
         """
         self.last_agent = None

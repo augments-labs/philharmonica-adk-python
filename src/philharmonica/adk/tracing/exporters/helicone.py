@@ -40,7 +40,7 @@ def setup_helicone(*, api_key: str, base_url: str = _DEFAULT_HELICONE_GATEWAY) -
         base_url: Helicone gateway base URL.
 
     Returns:
-        A :class:`HeliconeGatewayConfig` carrying the ``base_url`` and
+        A ``HeliconeGatewayConfig`` carrying the ``base_url`` and
         ``headers`` to wire into your LLM provider config.
 
     Raises:

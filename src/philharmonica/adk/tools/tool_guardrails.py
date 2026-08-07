@@ -197,8 +197,8 @@ class ToolInputGuardrail[TContext_co: Any]:
 
     Attributes:
         guardrail_function: The callable that implements the guardrail
-            logic. Receives a :class:`ToolInputGuardrailData` and
-            returns a :class:`ToolGuardrailFunctionOutput` (sync or
+            logic. Receives a ``ToolInputGuardrailData`` and
+            returns a ``ToolGuardrailFunctionOutput`` (sync or
             async).
         name: Optional name for the guardrail. When ``None``, the
             function's ``__name__`` is used.
@@ -250,8 +250,8 @@ class ToolOutputGuardrail[TContext_co: Any]:
 
     Attributes:
         guardrail_function: The callable that implements the guardrail
-            logic. Receives a :class:`ToolOutputGuardrailData` and
-            returns a :class:`ToolGuardrailFunctionOutput` (sync or
+            logic. Receives a ``ToolOutputGuardrailData`` and
+            returns a ``ToolGuardrailFunctionOutput`` (sync or
             async).
         name: Optional name for the guardrail. When ``None``, the
             function's ``__name__`` is used.
@@ -320,7 +320,7 @@ def tool_input_guardrail(
 def tool_input_guardrail(
     func: _ToolInputFuncSync | _ToolInputFuncAsync | None = None, *, name: str | None = None
 ) -> ToolInputGuardrail[Any] | Callable[[_ToolInputFuncSync | _ToolInputFuncAsync], ToolInputGuardrail[Any]]:
-    """Decorator to create a :class:`ToolInputGuardrail` from a function.
+    """Decorator to create a ``ToolInputGuardrail`` from a function.
 
     Can be used bare (``@tool_input_guardrail``) or with a name keyword
     (``@tool_input_guardrail(name="my_guardrail")``).
@@ -332,7 +332,7 @@ def tool_input_guardrail(
             ``func.__name__`` when ``None``.
 
     Returns:
-        A :class:`ToolInputGuardrail` when used as a bare decorator, or
+        A ``ToolInputGuardrail`` when used as a bare decorator, or
         a decorator callable when called with keyword arguments.
     """
 
@@ -365,7 +365,7 @@ def tool_output_guardrail(
 def tool_output_guardrail(
     func: _ToolOutputFuncSync | _ToolOutputFuncAsync | None = None, *, name: str | None = None
 ) -> ToolOutputGuardrail[Any] | Callable[[_ToolOutputFuncSync | _ToolOutputFuncAsync], ToolOutputGuardrail[Any]]:
-    """Decorator to create a :class:`ToolOutputGuardrail` from a function.
+    """Decorator to create a ``ToolOutputGuardrail`` from a function.
 
     Can be used bare (``@tool_output_guardrail``) or with a name keyword
     (``@tool_output_guardrail(name="my_guardrail")``).
@@ -377,7 +377,7 @@ def tool_output_guardrail(
             ``func.__name__`` when ``None``.
 
     Returns:
-        A :class:`ToolOutputGuardrail` when used as a bare decorator, or
+        A ``ToolOutputGuardrail`` when used as a bare decorator, or
         a decorator callable when called with keyword arguments.
     """
 
@@ -404,7 +404,7 @@ class ToolGuardrails:
         input: Guardrails that run before the tool's ``on_invoke``.
             They validate parsed arguments and can detect PII, jailbreak
             attempts, schema violations, and so on. Each entry returns a
-            :class:`ToolGuardrailFunctionOutput` verdict
+            ``ToolGuardrailFunctionOutput`` verdict
             (``allow`` / ``reject_content`` / ``raise_exception``).
         output: Guardrails that run after the tool's ``on_invoke`` returns.
             They validate the result and can mask PII, enforce output

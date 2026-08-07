@@ -1,4 +1,4 @@
-"""Unit tests for :attr:`Task.depends_on` declarative DAG ordering.
+"""Unit tests for ``Task.depends_on`` declarative DAG ordering.
 
 Covered:
 

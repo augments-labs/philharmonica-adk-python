@@ -1,13 +1,13 @@
 """Merge strategies — how a node folds upstream ``NodeResult`` values
 into the single ``ExecutableInput`` it receives.
 
-A :class:`~philharmonica.adk.graphs.graph.Graph` does not use a global shared
+A ``Graph`` does not use a global shared
 state dict. Instead, each node declares how it wants its inputs
 composed when multiple upstream edges feed it. This keeps the model
 readable (the merge strategy is local to the receiving node) without
 the ``Annotated[list, add_messages]`` magic LangGraph uses.
 
-Five built-in strategies cover the common cases. A :class:`CustomMerge`
+Five built-in strategies cover the common cases. A ``CustomMerge``
 escape hatch lets the developer plug in any pure function.
 
 Example::
@@ -31,10 +31,10 @@ Example::
     )
 
 Design note. Merge functions receive the list of upstream
-:class:`NodeResult` values (already ordered deterministically by the
+``NodeResult`` values (already ordered deterministically by the
 graph loop — see ``graph_loop.py::_ordered_results``) plus the
 original upstream node ids (same order). The function returns the
-payload that becomes :attr:`ExecutableInput.content`. Returning a
+payload that becomes ``ExecutableInput.content``. Returning a
 ``str`` wraps it in a single user message for adapter convenience;
 returning a ``list[LLMInputContentItem]`` is used verbatim.
 """
@@ -60,7 +60,7 @@ MergeFn = Callable[
 
 
 def _extract_text(result: NodeResult) -> str:
-    """Best-effort text view of a :class:`NodeResult`.
+    """Best-effort text view of a ``NodeResult``.
 
     Preference order: ``final_text`` > ``output`` if it is a ``str``
     > ``str(output)`` as a last resort. Returns an empty string when
@@ -86,7 +86,7 @@ class Merge:
 
     The class is never instantiated. ``Merge.custom(fn)`` wraps a
     user-supplied callable with the same signature so custom merges
-    fit the declared :data:`MergeFn` type.
+    fit the declared ``MergeFn`` type.
     """
 
     @staticmethod
@@ -146,13 +146,13 @@ class Merge:
     ) -> str | list[LLMInputContentItem]:
         """Concatenate Layer 1 replay params from every upstream node.
 
-        Each upstream :class:`NodeResult.new_items` is converted via
-        :meth:`ItemHelpers.run_items_to_params` and the resulting
+        Each upstream ``NodeResult.new_items`` is converted via
+        ``ItemHelpers.run_items_to_params`` and the resulting
         Layer 1 items are flattened in source order. Use this when the
         downstream node is an ``AgentExecutable`` that wants to see
         the full turn history of every upstream contributor.
 
-        Heavier on tokens than :meth:`concat_text` but preserves
+        Heavier on tokens than ``concat_text`` but preserves
         turn structure (tool calls, tool results, reasoning).
         """
         from philharmonica.adk.types.items.items import ItemHelpers
@@ -168,7 +168,7 @@ class Merge:
         results: list[NodeResult],
         sources: list[str],
     ) -> str | list[LLMInputContentItem]:
-        """Inverse of :meth:`last_wins` — take the first (source-sorted) result.
+        """Inverse of ``last_wins`` — take the first (source-sorted) result.
 
         Useful for "priority fan-in" where one upstream branch has
         precedence and the others are ignored.

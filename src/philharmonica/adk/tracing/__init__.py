@@ -2,30 +2,30 @@
 
 The tracing layer is opt-in and provider-agnostic:
 
-- :class:`Tracer` — protocol that observability backends implement.
-- :class:`NoOpTracer` — default; records nothing and costs nothing.
-- :func:`get_tracer` / :func:`set_tracer` — install a tracer
+- ``Tracer`` — protocol that observability backends implement.
+- ``NoOpTracer`` — default; records nothing and costs nothing.
+- ``get_tracer`` / ``set_tracer`` — install a tracer
   process-wide.
-- :class:`Span` — generic span wrapper parameterised by a
-  :class:`~philharmonica.adk.types.tracing.span_data.SpanData` payload.
+- ``Span`` — generic span wrapper parameterised by a
+  ``SpanData`` payload.
 - ``*_span()`` factories — one per built-in span kind, plus
-  :func:`custom_span` for developer-authored spans.
-- :class:`MultiTracer` — fan-out composite that forwards every span
+  ``custom_span`` for developer-authored spans.
+- ``MultiTracer`` — fan-out composite that forwards every span
   to an arbitrary number of inner tracers simultaneously. Pair an
-  :class:`OTelTracer` with an in-memory recorder for tests, or fan
+  ``OTelTracer`` with an in-memory recorder for tests, or fan
   out to two observability backends at once.
-- :class:`~philharmonica.adk.types.tracing.convention.TracingConvention` —
+- ``TracingConvention`` —
   span-attribute vocabulary selector (``DEFAULT`` vs ``OPENINFERENCE``).
   Unconditionally available; no optional extra required.
-- :func:`~philharmonica.adk.tracing.logging.log_event` — emit a structured log
+- ``log_event`` — emit a structured log
   record carrying an event name and arbitrary key/value fields.
   Unconditionally available.
 
 OpenTelemetry bridge
 --------------------
 
-:class:`OTelTracer`, :func:`setup_otel`, :class:`MetricsTracer`, and
-:func:`setup_metrics` are re-exported at the package level **only** when
+``OTelTracer``, ``setup_otel``, ``MetricsTracer``, and
+``setup_metrics`` are re-exported at the package level **only** when
 the optional ``opentelemetry`` extras are installed. Install via::
 
     pip install 'philharmonica-adk[otel]'

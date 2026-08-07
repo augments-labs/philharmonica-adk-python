@@ -85,7 +85,7 @@ def load_agent(path: str | Path, *, document: dict[str, Any] | None = None) -> A
             where the file changes between the two reads.
 
     Returns:
-        The constructed :class:`~philharmonica.adk.agents.agent.Agent`.
+        The constructed ``Agent``.
 
     Raises:
         FileNotFoundError: If ``path`` does not exist.

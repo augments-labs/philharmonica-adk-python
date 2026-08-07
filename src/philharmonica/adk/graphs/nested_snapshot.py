@@ -1,11 +1,11 @@
 """Snapshot wrapper for nodes paused on a nested defer.
 
-A graph node whose executable is an :class:`~philharmonica.adk.agents.agent.Agent`
-parks a :class:`~philharmonica.adk.run.state.RunState` when the agent defers a
+A graph node whose executable is an ``Agent``
+parks a ``RunState`` when the agent defers a
 tool call. A graph node whose executable is itself a
-:class:`~philharmonica.adk.graphs.graph.Graph` parks a
-:class:`~philharmonica.adk.graphs.state.GraphState` when the inner graph suspends.
-:class:`NestedSnapshot` unifies these two cases behind a single discriminator
+``Graph`` parks a
+``GraphState`` when the inner graph suspends.
+``NestedSnapshot`` unifies these two cases behind a single discriminator
 so the BSP loop's dispatch site can route by ``snap.kind`` rather than by
 inspecting the executable's type at resume time.
 """
@@ -32,10 +32,10 @@ class NestedSnapshot:
     Attributes:
         kind: Discriminator — ``"agent"`` (agent-paused) or
             ``"graph"`` (inner-graph-paused).
-        run_state: The paused agent's :class:`~philharmonica.adk.run.state.RunState`.
+        run_state: The paused agent's ``RunState``.
             Set iff ``kind == "agent"``.
         graph_state: The paused inner graph's
-            :class:`~philharmonica.adk.graphs.state.GraphState`. Set iff
+            ``GraphState``. Set iff
             ``kind == "graph"``.
     """
 
@@ -43,11 +43,11 @@ class NestedSnapshot:
     """Discriminator: ``"agent"`` (agent-paused) or ``"graph"`` (inner-graph-paused)."""
 
     run_state: RunState | None = None
-    """The paused agent's :class:`~philharmonica.adk.run.state.RunState`. Set iff
+    """The paused agent's ``RunState``. Set iff
     ``kind == "agent"``."""
 
     graph_state: GraphState[Any] | None = None
-    """The paused inner graph's :class:`~philharmonica.adk.graphs.state.GraphState`.
+    """The paused inner graph's ``GraphState``.
     Set iff ``kind == "graph"``."""
 
     def __post_init__(self) -> None:
@@ -67,7 +67,7 @@ class NestedSnapshot:
 
         Both kinds delegate to the wrapped sub-state's own ``to_dict``
         when applicable. The discriminator + payload is reconstructed by
-        :meth:`from_dict` against the parent ``Graph`` for graph-kind
+        ``from_dict`` against the parent ``Graph`` for graph-kind
         entries.
 
         Returns:
@@ -93,10 +93,10 @@ class NestedSnapshot:
         graph: Graph[Any],
         node_id: str | None = None,
     ) -> NestedSnapshot:
-        """Reconstruct a :class:`NestedSnapshot` from :meth:`to_dict` output.
+        """Reconstruct a ``NestedSnapshot`` from ``to_dict`` output.
 
         For a graph-kind snapshot the inner
-        :class:`~philharmonica.adk.graphs.state.GraphState`'s node ids belong to
+        ``GraphState``'s node ids belong to
         the INNER graph — the executable of the parent node — not to the
         parent graph itself. Rehydrating the inner state against the parent
         graph would reject every inner node id as unknown. So ``node_id``
@@ -104,8 +104,8 @@ class NestedSnapshot:
         the inner state is validated against it.
 
         Args:
-            data: Payload produced by :meth:`to_dict`.
-            graph: The parent :class:`~philharmonica.adk.graphs.graph.Graph`. For
+            data: Payload produced by ``to_dict``.
+            graph: The parent ``Graph``. For
                 a graph-kind snapshot the inner graph is resolved off this
                 graph's node ``node_id``.
             node_id: Id of the parent node whose executable is the inner
@@ -113,13 +113,13 @@ class NestedSnapshot:
                 the agent kind.
 
         Returns:
-            A fully rehydrated :class:`NestedSnapshot`.
+            A fully rehydrated ``NestedSnapshot``.
 
         Raises:
             ValueError: When ``data["kind"]`` is neither ``"agent"`` nor
                 ``"graph"``; when a graph-kind snapshot is given no
                 ``node_id``; or when ``node_id`` is unknown or its executable
-                is not a :class:`~philharmonica.adk.graphs.graph.Graph`.
+                is not a ``Graph``.
         """
         from philharmonica.adk.graphs.graph import Graph as GraphCls
         from philharmonica.adk.graphs.state import GraphState

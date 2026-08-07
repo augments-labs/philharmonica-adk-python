@@ -60,7 +60,7 @@ def build_llm(config: AgentConfig) -> tuple[str | LLM | None, LLMConfig | None]:
     which returns a concrete ``LLM`` and its runtime config.
 
     Args:
-        config: A validated :class:`AgentConfig`.
+        config: A validated ``AgentConfig``.
 
     Returns:
         ``(llm, llm_config)`` for ``Agent(llm=…, llm_config=…)``.
@@ -93,12 +93,12 @@ def build_agent(config: AgentConfig) -> Agent:
     """Build an ``Agent`` from a validated configuration model.
 
     Args:
-        config: A validated :class:`AgentConfig`. Inter-agent ``handoffs`` on
-            an :class:`AgentNodeConfig` are NOT wired here — the topology
+        config: A validated ``AgentConfig``. Inter-agent ``handoffs`` on
+            an ``AgentNodeConfig`` are NOT wired here — the topology
             loader assigns them in a second pass.
 
     Returns:
-        The constructed :class:`~philharmonica.adk.agents.agent.Agent`.
+        The constructed ``Agent``.
 
     Raises:
         ConfigResolutionError: If a tool or output-schema reference cannot be

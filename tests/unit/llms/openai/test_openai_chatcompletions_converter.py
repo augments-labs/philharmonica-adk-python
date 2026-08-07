@@ -1,4 +1,4 @@
-"""Tests for :class:`OpenAIChatCompletionsConverter`.
+"""Tests for ``OpenAIChatCompletionsConverter``.
 
 Covers the Layer 1 ↔ ``openai.types.chat.*`` wire-type bridge:
 

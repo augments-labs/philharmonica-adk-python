@@ -1,4 +1,4 @@
-"""Tests for :mod:`philharmonica.adk.workflows.temporal.activity`.
+"""Tests for ``philharmonica.adk.workflows.temporal.activity``.
 
 Covers:
 - ``ModelActivityInput`` serialization and roundtrip via ``dataclasses.asdict``.

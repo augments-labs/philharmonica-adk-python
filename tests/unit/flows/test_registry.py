@@ -1,4 +1,4 @@
-"""Unit tests for :class:`FlowStepRegistry` and :func:`build_transition_table`.
+"""Unit tests for ``FlowStepRegistry`` and ``build_transition_table``.
 
 Covers registry validation (no flow_start, duplicates), the transition-table
 dispatch indexes, and the fan-out cap enforcement.

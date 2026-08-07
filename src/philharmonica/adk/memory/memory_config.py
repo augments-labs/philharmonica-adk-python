@@ -1,6 +1,6 @@
 """Memory configuration for Runner integration.
 
-Defines :class:`MemoryConfig` which controls how memory is injected
+Defines ``MemoryConfig`` which controls how memory is injected
 into and extracted from agent runs.  Everything is opt-in — no hidden
 token costs.
 """

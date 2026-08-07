@@ -1,4 +1,4 @@
-"""Unit tests for :class:`FlowExecutor`.
+"""Unit tests for ``FlowExecutor``.
 
 Covers basic step sequencing, parallel @flow_start fan-out, AND/OR gate
 semantics, max_steps cap, and error policies.

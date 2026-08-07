@@ -3,7 +3,7 @@
 The ``Memory`` class defines the contract for all memory backends.
 Implementations must provide CRUD operations and search.  The
 ``add_from_session`` method provides a default pipeline that
-delegates to a :class:`MemoryExtractor` then calls ``add()``
+delegates to a ``MemoryExtractor`` then calls ``add()``
 for each result.
 """
 
@@ -60,7 +60,7 @@ class Memory(ABC):
                 metadata with ``MemorySource.MANUAL``.
 
         Returns:
-            The created :class:`MemoryEntry`.
+            The created ``MemoryEntry``.
         """
 
     @abstractmethod
@@ -81,7 +81,7 @@ class Memory(ABC):
             filter: Optional filters on metadata fields.
 
         Returns:
-            List of :class:`MemorySearchResult` ordered by relevance.
+            List of ``MemorySearchResult`` ordered by relevance.
         """
 
     @abstractmethod
@@ -139,7 +139,7 @@ class Memory(ABC):
             agent_name: Optional agent name to attach to metadata.
 
         Returns:
-            List of created :class:`MemoryEntry` instances.
+            List of created ``MemoryEntry`` instances.
         """
         logger.info(
             "Memory.add_from_session: extracting from %d messages (namespace=%s)",
@@ -184,7 +184,7 @@ class Memory(ABC):
             agent_name: Optional agent name to attach to metadata.
 
         Returns:
-            List of created :class:`MemoryEntry` instances.
+            List of created ``MemoryEntry`` instances.
         """
         logger.info(
             "Memory.add_session: ingesting session %s (namespace=%s)",
@@ -224,7 +224,7 @@ class Memory(ABC):
             agent_name: Optional agent name to attach to metadata.
 
         Returns:
-            List of created :class:`MemoryEntry` instances.
+            List of created ``MemoryEntry`` instances.
         """
         logger.info(
             "Memory.add_events: processing %d events (namespace=%s)",

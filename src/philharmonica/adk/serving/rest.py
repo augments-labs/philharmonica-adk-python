@@ -1,4 +1,4 @@
-"""Plain-REST surface over the :class:`Runner`.
+"""Plain-REST surface over the ``Runner``.
 
 Two routes let a generic HTTP client (no A2A SDK, no AgentCard) drive a
 served agent:
@@ -21,7 +21,7 @@ Request body (JSON)::
     }
 
 Responses serialize Layer-1 / Layer-3 types only (see
-:mod:`philharmonica.adk.serving.serializers`); the provider wire format
+``philharmonica.adk.serving.serializers``); the provider wire format
 never crosses this boundary.
 """
 
@@ -59,7 +59,7 @@ DEFAULT_MAX_BODY_BYTES = 1024 * 1024
 
 Bounds how many bytes a single ``POST /run`` or ``POST /run_sse`` request
 may stream before the surface returns ``413 Payload Too Large``. Pass
-``max_body_bytes=0`` to :func:`rest_routes` to disable the cap.
+``max_body_bytes=0`` to ``rest_routes`` to disable the cap.
 """
 
 SessionFactory = Callable[[str, str], Awaitable["SessionStore"]]
@@ -201,7 +201,7 @@ async def _open_session(body: dict[str, Any], factory: SessionFactory | None) ->
 
 
 def _json_default(value: Any) -> Any:
-    """Coerce a value :func:`json.dumps` cannot natively encode.
+    """Coerce a value ``json.dumps`` cannot natively encode.
 
     Stream events forward developer-controlled payloads verbatim (e.g. a
     hook lifecycle ``payload`` whose values may be dataclasses or arbitrary
@@ -210,7 +210,7 @@ def _json_default(value: Any) -> Any:
     SSE stream before its terminal ``result`` event.
 
     Args:
-        value: A value :func:`json.dumps` could not serialize natively.
+        value: A value ``json.dumps`` could not serialize natively.
 
     Returns:
         A JSON-serializable stand-in — a dict for dataclasses, else ``str``.
@@ -226,7 +226,7 @@ def _json_default(value: Any) -> Any:
 def _sse_dump(payload: object) -> str:
     """Serialize an SSE payload to JSON without ever raising.
 
-    Uses the coercing :func:`_json_default` so developer-controlled values
+    Uses the coercing ``_json_default`` so developer-controlled values
     degrade gracefully; if serialization still fails (e.g. a circular
     reference), returns a small error object so a single bad event never
     aborts the stream before its terminal ``result`` frame.
@@ -286,7 +286,7 @@ def rest_routes(
         agent: The agent each request runs.
         max_turns: App-level default agent-loop budget; ``None`` defers
             to the framework default. A request body may override it.
-        run_config: Optional :class:`RunConfig` applied to every run.
+        run_config: Optional ``RunConfig`` applied to every run.
         session_factory: Optional ``(user_id, session_id) -> SessionStore``
             used when a request carries a ``session`` block.
         max_body_bytes: Maximum request-body size in bytes; a larger body
@@ -298,7 +298,7 @@ def rest_routes(
             turn budgets.
 
     Returns:
-        The two REST :class:`starlette.routing.Route` objects.
+        The two REST ``starlette.routing.Route`` objects.
     """
 
     async def run_endpoint(request: Request) -> JSONResponse:

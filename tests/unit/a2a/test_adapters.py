@@ -31,7 +31,7 @@ def adapter(remote: A2AAgent) -> A2AExecutableAdapter:
 
 @pytest.fixture
 def mock_client() -> MagicMock:
-    """Build a stub :class:`A2AClient` whose ``send_message`` is mocked.
+    """Build a stub ``A2AClient`` whose ``send_message`` is mocked.
 
     The adapter dispatches via ``A2ARunner.arun`` →
     ``agent.get_client()`` → ``client.send_message``. Mocking at

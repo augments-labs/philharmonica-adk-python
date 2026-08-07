@@ -1,7 +1,7 @@
 """Tests for ``SwarmBuilder`` — the fluent swarm-definition API.
 
 The builder is the readability-first surface (mirrors ``GraphBuilder``);
-every test compiles through to the frozen :class:`Swarm`, which is where
+every test compiles through to the frozen ``Swarm``, which is where
 validation fires (fail at compile time, not at run time).
 """
 

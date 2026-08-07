@@ -6,10 +6,10 @@ Demonstrates a realistic Flow you might deploy in production:
 2. **Classification**: a classifier ``Agent`` produces a route label.
 3. **Routing**: ``@flow_router`` dispatches to one of three specialist branches.
 4. **Specialist branches**: each ``@flow_listen("<label>")`` wraps a
-   specialist agent in a :class:`Task` for declarative budget /
+   specialist agent in a ``Task`` for declarative budget /
    guardrail / metadata control.
 5. **Parallel sub-tasks**: the "research" branch uses a
-   :class:`TaskGroup` to fan-out two background lookups concurrently.
+   ``TaskGroup`` to fan-out two background lookups concurrently.
 6. **Synthesis**: a fan-in via ``@flow_listen(branch_a | branch_b | branch_c)``
    collects whichever branch ran.
 7. **Error routing**: ``error_policy="route_to_error_handler"`` plus
@@ -18,7 +18,7 @@ Demonstrates a realistic Flow you might deploy in production:
    the operator dashboard sees ``flow.step_start`` / ``flow.step_end`` /
    ``flow.route_evaluated`` events live.
 9. **Usage tracking**: step bodies share ``self.run_context`` so
-   :attr:`FlowRunResult.cumulative_usage` reflects the total LLM spend.
+   ``FlowRunResult.cumulative_usage`` reflects the total LLM spend.
 
 Production patterns illustrated:
 
@@ -91,7 +91,7 @@ class TriageState(BaseModel):
     """
 
     question: str = ""
-    """The user's input question. Seeded by :meth:`TriageFlow.receive`."""
+    """The user's input question. Seeded by ``TriageFlow.receive``."""
 
     classification: str = ""
     """Classifier verdict. One of ``'math'`` / ``'coding'`` / ``'research'``."""
@@ -239,7 +239,7 @@ class TriageFlow(Flow[TriageState]):
     async def answer_research(self) -> None:
         """Research branch — parallel TaskGroup + serial synthesis.
 
-        Demonstrates composing :class:`TaskGroup` (parallel) under a
+        Demonstrates composing ``TaskGroup`` (parallel) under a
         Flow step, then doing a follow-up agent run inline.
         """
         group = TaskGroup(

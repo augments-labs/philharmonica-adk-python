@@ -58,8 +58,8 @@ class LLM(ABC):
     exposing a unified interface.  The ``Runner`` interacts with
     agents via this interface, never directly with provider SDKs.
 
-    The two entry points are :meth:`acomplete` (async, primary) and
-    :meth:`complete` (sync convenience wrapper).
+    The two entry points are ``acomplete`` (async, primary) and
+    ``complete`` (sync convenience wrapper).
     """
 
     @overload
@@ -139,13 +139,13 @@ class LLM(ABC):
     ) -> LLMResponse:
         """Call the LLM synchronously.
 
-        Convenience wrapper around :meth:`acomplete` for synchronous code.
+        Convenience wrapper around ``acomplete`` for synchronous code.
         Uses ``asyncio.run()`` internally.
 
         .. warning::
 
             Cannot be called from within a running event loop.
-            Use :meth:`acomplete` in async contexts instead.
+            Use ``acomplete`` in async contexts instead.
 
         Args:
             messages: Conversation input (str or list of items).
@@ -192,12 +192,12 @@ class LLM(ABC):
         *,
         max_output_tokens: int | None = None,
     ) -> CostEstimate:
-        """Best-effort pre-call cost estimate. Symmetric with :meth:`cost`.
+        """Best-effort pre-call cost estimate. Symmetric with ``cost``.
 
-        Input tokens are counted via :class:`TokenCounter`. Output is
+        Input tokens are counted via ``TokenCounter``. Output is
         bounded by ``max_output_tokens`` when provided; absent it the
         estimate is input-only (a documented floor) — no token default is
-        invented. ``estimated_cost_usd`` is ``None`` when :meth:`cost`
+        invented. ``estimated_cost_usd`` is ``None`` when ``cost``
         returns ``None`` (no provider cost table); callers skip dollar
         gating in that case rather than failing the run.
 
@@ -210,7 +210,7 @@ class LLM(ABC):
                 tokens only.
 
         Returns:
-            A :class:`CostEstimate` with token counts and optional USD
+            A ``CostEstimate`` with token counts and optional USD
             estimate.
         """
         from philharmonica.adk.context.token_counter import TokenCounter

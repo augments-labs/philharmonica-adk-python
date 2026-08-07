@@ -1,11 +1,11 @@
 """End-to-end BSP-loop tests for the nested-agent deferral bridge.
 
 The BSP loop seeds ``__nested_agent_snapshots__`` into every prepared
-input via :class:`ExecutableInput.metadata`, and on resume routes a
-node parked on a :class:`NestedAgentInterrupt` to
-:meth:`AgentExecutable.resume_from_snapshot` instead of re-invoking the
-node from scratch. Mocks at the :class:`AgentExecutable` level so the
-tests don't drive a real :meth:`Runner.arun` cycle.
+input via ``ExecutableInput.metadata``, and on resume routes a
+node parked on a ``NestedAgentInterrupt`` to
+``AgentExecutable.resume_from_snapshot`` instead of re-invoking the
+node from scratch. Mocks at the ``AgentExecutable`` level so the
+tests don't drive a real ``Runner.arun`` cycle.
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ from philharmonica.adk.types.tokens.llm_usage import LLMUsage
 
 
 def _deferred_call(call_id: str) -> DeferredToolCall:
-    """Build a placeholder :class:`DeferredToolCall` for snapshot fixtures."""
+    """Build a placeholder ``DeferredToolCall`` for snapshot fixtures."""
     return DeferredToolCall(
         tool_call_id=call_id,
         tool_name="t",
@@ -47,10 +47,10 @@ def _deferred_call(call_id: str) -> DeferredToolCall:
 
 def _trivial_graph() -> Graph[Any]:
     """Build a one-node graph whose node id is ``"n"`` and whose
-    executable is an :class:`AgentExecutable`. The agent's body is
+    executable is an ``AgentExecutable``. The agent's body is
     never reached — every test in this module monkeypatches
-    :meth:`AgentExecutable.invoke` (and sometimes
-    :meth:`AgentExecutable.resume_from_snapshot`) at the class level.
+    ``AgentExecutable.invoke`` (and sometimes
+    ``AgentExecutable.resume_from_snapshot``) at the class level.
     """
     return (
         Graph.new("test-bsp-nested")
@@ -62,7 +62,7 @@ def _trivial_graph() -> Graph[Any]:
 
 
 def _node_result(agent_name: str, output: str) -> NodeResult[Any]:
-    """Build a minimal terminal :class:`NodeResult` for the fake
+    """Build a minimal terminal ``NodeResult`` for the fake
     ``invoke`` / ``resume_from_snapshot`` paths."""
     return NodeResult(
         output=output,
@@ -76,10 +76,10 @@ def _node_result(agent_name: str, output: str) -> NodeResult[Any]:
 async def test_bsp_loop_seeds_nested_agent_snapshots_side_channel(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """The prepared input passed to every :class:`AgentExecutable` node
+    """The prepared input passed to every ``AgentExecutable`` node
     must carry the ``__nested_agent_snapshots__`` side-channel — a
-    reference to the loop's :attr:`GraphState.nested_agent_snapshots`
-    dict. This is the channel :meth:`AgentExecutable.invoke` deposits
+    reference to the loop's ``GraphState.nested_agent_snapshots``
+    dict. This is the channel ``AgentExecutable.invoke`` deposits
     into when the inner agent defers."""
     observed_channels: list[Any] = []
 
@@ -110,10 +110,10 @@ async def test_bsp_loop_seeds_nested_agent_snapshots_side_channel(
 async def test_bsp_loop_routes_resume_to_resume_from_snapshot(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """When a checkpoint has a :class:`NestedAgentInterrupt` on node ``"n"``
-    and ``GraphResume.replies["n"]`` is a :class:`NestedAgentReply`, the
-    loop dispatches :meth:`AgentExecutable.resume_from_snapshot` — NOT
-    :meth:`AgentExecutable.invoke`. The ``nested_agent_snapshots`` kwarg
+    """When a checkpoint has a ``NestedAgentInterrupt`` on node ``"n"``
+    and ``GraphResume.replies["n"]`` is a ``NestedAgentReply``, the
+    loop dispatches ``AgentExecutable.resume_from_snapshot`` — NOT
+    ``AgentExecutable.invoke``. The ``nested_agent_snapshots`` kwarg
     handed to the resumed executable must be a dict (the loop's
     in-memory side-channel) and the entry for ``"n"`` must have been
     popped by the staging helper before dispatch — the snapshot lives
@@ -192,9 +192,9 @@ async def test_bsp_loop_routes_resume_to_resume_from_snapshot(
 
 
 async def test_bsp_loop_rejects_mismatched_reply_type() -> None:
-    """If ``GraphResume.replies["n"]`` is NOT a :class:`NestedAgentReply`
-    but the parked interrupt IS a :class:`NestedAgentInterrupt`, the
-    loop raises :class:`GraphResumeError` BEFORE dispatching the
+    """If ``GraphResume.replies["n"]`` is NOT a ``NestedAgentReply``
+    but the parked interrupt IS a ``NestedAgentInterrupt``, the
+    loop raises ``GraphResumeError`` BEFORE dispatching the
     executable. No monkeypatch needed — the failure path triggers
     before any invoke / resume call."""
     graph = _trivial_graph()
@@ -229,19 +229,19 @@ async def test_bsp_loop_rejects_mismatched_reply_type() -> None:
 
 def _callable_graph() -> Graph[Any]:
     """One-node graph whose executable is a plain callable (not an
-    :class:`AgentExecutable`). The builder auto-wraps it in a
-    :class:`CallableExecutable`. Used to simulate a graph shape that
-    has changed under a parked :class:`NestedAgentInterrupt` — for
+    ``AgentExecutable``). The builder auto-wraps it in a
+    ``CallableExecutable``. Used to simulate a graph shape that
+    has changed under a parked ``NestedAgentInterrupt`` — for
     example, the operator edited the graph between checkpoint and
     resume."""
     return Graph.new("test-bsp-nested-callable").node("n", lambda text: text).entry("n").terminal("n").compile()
 
 
 async def test_bsp_loop_rejects_executable_type_mismatch() -> None:
-    """A :class:`NestedAgentInterrupt` parked on a node whose
-    executable is no longer an :class:`AgentExecutable` (graph shape
+    """A ``NestedAgentInterrupt`` parked on a node whose
+    executable is no longer an ``AgentExecutable`` (graph shape
     drifted between checkpoint and resume) MUST raise
-    :class:`GraphResumeError` synchronously during the seed phase —
+    ``GraphResumeError`` synchronously during the seed phase —
     not be absorbed into a generic FAILED status by the per-task error
     collector."""
     graph = _callable_graph()
@@ -278,7 +278,7 @@ async def test_bsp_loop_rejects_executable_type_mismatch() -> None:
 async def test_bsp_loop_rejects_replies_and_rejected_both_supplied() -> None:
     """``GraphResume.replies[node_id]`` and ``GraphResume.rejected[node_id]``
     are mutually-exclusive intents. Supplying both for the same node
-    MUST raise :class:`GraphResumeError` — silently picking one would
+    MUST raise ``GraphResumeError`` — silently picking one would
     hide the operator's confusion."""
     graph = _trivial_graph()
     checkpointer = InMemoryCheckpointer()
@@ -315,9 +315,9 @@ async def test_bsp_loop_rejects_replies_and_rejected_both_supplied() -> None:
 async def test_bsp_loop_rejects_empty_snapshot_under_rejection() -> None:
     """``GraphResume.rejected[node_id]`` requires the snapshot to carry
     at least one pending approval — otherwise the synthesised
-    :class:`NestedAgentReply` would be empty and the caller likely
+    ``NestedAgentReply`` would be empty and the caller likely
     retried against an already-resolved snapshot. The loop MUST raise
-    :class:`GraphResumeError` rather than silently produce a no-op
+    ``GraphResumeError`` rather than silently produce a no-op
     reply."""
     graph = _trivial_graph()
     checkpointer = InMemoryCheckpointer()

@@ -1,29 +1,29 @@
 """Agent-internal HITL bridge — propagate agent deferrals up to the Flow.
 
 A flow step body that calls
-:func:`arun_flow_agent(flow, agent, input_prompt)` gets a
-:class:`RunResult` like a plain :func:`Runner.arun` call when the
+``arun_flow_agent(flow, agent, input_prompt)`` gets a
+``RunResult`` like a plain ``Runner.arun`` call when the
 agent completes; if the agent's run defers (a tool with
 ``requires_approval=True`` short-circuits the agent loop), the
-bridge raises :class:`FlowAgentDeferred` carrying the agent's
-serialised :class:`RunState`. The executor catches that exception in
-``_process_batch_results``, builds a :class:`FlowDeferredStep` with
+bridge raises ``FlowAgentDeferred`` carrying the agent's
+serialised ``RunState``. The executor catches that exception in
+``_process_batch_results``, builds a ``FlowDeferredStep`` with
 ``agent_run_state`` populated, halts the flow with
-``status="deferred"``, and returns a :class:`FlowCheckpoint` to the
+``status="deferred"``, and returns a ``FlowCheckpoint`` to the
 caller.
 
 The developer records decisions on the deferred agent state via the
-existing tool-layer surface — :meth:`RunState.approve` /
-:meth:`RunState.reject` — then resumes the flow via
-:meth:`Runner.arun_flow_from_checkpoint(flow, checkpoint, agent_resolutions=...)`
+existing tool-layer surface — ``RunState.approve`` /
+``RunState.reject`` — then resumes the flow via
+``Runner.arun_flow_from_checkpoint(flow, checkpoint, agent_resolutions=...)``
 which threads the resolved state back to the inner agent run.
 
-Sits as a free function (not a method on :class:`Flow`) because
-:class:`Flow` is configuration and the Runner is execution — its base
+Sits as a free function (not a method on ``Flow``) because
+``Flow`` is configuration and the Runner is execution — its base
 class never exposes ``run`` / ``arun`` methods. The bridge is a helper
 the developer
 calls from inside a step body, exactly like
-:func:`Runner.arun(...)`.
+``Runner.arun(...)``.
 """
 
 from __future__ import annotations
@@ -53,28 +53,28 @@ async def arun_flow_agent(
     context: RunContext[Any] | None = None,
     run_config: RunConfig | None = None,
 ) -> RunResult[Any]:
-    """Run an :class:`Agent` inside a flow step with HITL propagation.
+    """Run an ``Agent`` inside a flow step with HITL propagation.
 
     Drop-in replacement for ``await Runner.arun(agent, input_prompt)``
     inside a flow step body. The difference: when the agent's run
     returns ``requires_action=True`` (a tool deferred), this helper
-    raises :class:`FlowAgentDeferred` so the
-    :class:`FlowExecutor` halts the flow with a checkpoint instead
-    of returning a half-baked :class:`RunResult` to the step body.
+    raises ``FlowAgentDeferred`` so the
+    ``FlowExecutor`` halts the flow with a checkpoint instead
+    of returning a half-baked ``RunResult`` to the step body.
 
     On resume from a flow checkpoint, the consumer supplies an
     ``agent_resolutions`` mapping (``defer_key → RunState JSON``) to
-    :meth:`Runner.arun_flow_from_checkpoint`. The flow's
+    ``Runner.arun_flow_from_checkpoint``. The flow's
     ``_pending_agent_resolutions`` map carries those into the
     resumed run; this helper pops the matching entry, hands it back
-    to :func:`Runner.arun` to continue the agent loop, and returns
-    the final :class:`RunResult` (or re-raises
-    :class:`FlowAgentDeferred` if the agent defers a second time).
+    to ``Runner.arun`` to continue the agent loop, and returns
+    the final ``RunResult`` (or re-raises
+    ``FlowAgentDeferred`` if the agent defers a second time).
 
     Args:
-        flow: The :class:`Flow` instance the calling step belongs to
+        flow: The ``Flow`` instance the calling step belongs to
             (typically ``self`` from inside a step body).
-        agent: The :class:`Agent` to run.
+        agent: The ``Agent`` to run.
         input_prompt: The user prompt for the agent run.
         defer_key: Optional stable key to identify this particular
             agent invocation when a single step runs multiple
@@ -86,20 +86,20 @@ async def arun_flow_agent(
             ``defer_key`` whenever the call site is more than one
             frame away from the step body (helper methods, nested
             free functions, ``asyncio.gather`` siblings, etc.).
-        context: Optional :class:`RunContext` to attach to the
+        context: Optional ``RunContext`` to attach to the
             agent run. Pass ``flow.run_context`` to share cumulative
             usage with the flow.
         run_config: Optional ``RunConfig`` forwarded to
-            :func:`Runner.arun`.
+            ``Runner.arun``.
 
     Returns:
-        The final :class:`RunResult` when the agent run completes
+        The final ``RunResult`` when the agent run completes
         normally.
 
     Raises:
         FlowAgentDeferred: When the inner agent run defers via a
             tool ``requires_approval`` gate. Caught by the
-            :class:`FlowExecutor` and never seen by step bodies.
+            ``FlowExecutor`` and never seen by step bodies.
     """
     from philharmonica.adk.run.runner import Runner
 
@@ -162,12 +162,12 @@ def _raise_agent_deferral(
     step_name: str,
     defer_key: str,
 ) -> None:
-    """Surface an agent-level deferral as :class:`FlowAgentDeferred`.
+    """Surface an agent-level deferral as ``FlowAgentDeferred``.
 
     Validates the Agent contract (``state is not None`` when
     ``requires_action`` is True) and the serialisability of the
-    captured :class:`RunState`. Both failure modes raise
-    :class:`FlowDefinitionError` so resume never sees an
+    captured ``RunState``. Both failure modes raise
+    ``FlowDefinitionError`` so resume never sees an
     empty-or-invalid state.
     """
     if result.state is None:
@@ -200,15 +200,15 @@ def _decode_pending_run_state(
     step_name: str,
     defer_key: str,
 ) -> RunState:
-    """Rehydrate a :class:`RunState` from the resume-time JSON payload.
+    """Rehydrate a ``RunState`` from the resume-time JSON payload.
 
     Surfaces malformed or tampered payloads as
-    :class:`FlowDefinitionError` rather than silently producing a
+    ``FlowDefinitionError`` rather than silently producing a
     half-populated state.  Validates the load-bearing keys
     (``conversation_history``, ``current_agent_name``) so a stale or
     truncated payload cannot slip past the resume path.
 
-    Imported lazily so the ``Runner`` import in :func:`arun_flow_agent`
+    Imported lazily so the ``Runner`` import in ``arun_flow_agent``
     stays in one place.
     """
     from philharmonica.adk.run.state import RunState
@@ -239,15 +239,15 @@ def _infer_calling_step_name(flow: Flow[Any]) -> str | None:
     """Look up the enclosing flow step's method name, validated against the registry.
 
     Walks the call stack one frame at a time looking for the first
-    frame whose ``self`` is the supplied :class:`Flow` instance AND
+    frame whose ``self`` is the supplied ``Flow`` instance AND
     whose function name matches a registered step. Returns ``None``
-    when no match is found — caller raises :class:`FlowDefinitionError`
+    when no match is found — caller raises ``FlowDefinitionError``
     rather than guessing, so an un-resumable deferred step is never
     silently produced.
 
     Cross-checking against the registry prevents helper methods on
     the Flow subclass from being mistaken for the step (a Flow with
-    `async def _call_agent(self)` calling :func:`arun_flow_agent`
+    `async def _call_agent(self)` calling ``arun_flow_agent``
     would otherwise capture ``_call_agent`` rather than the actual
     step name).
     """

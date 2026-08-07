@@ -1,7 +1,7 @@
 """Public immutable snapshot of a Flow's wiring topology.
 
-:class:`FlowDefinition` captures the complete structural declaration of a
-:class:`~philharmonica.adk.flows.flow.Flow` subclass in pure-data form: step names,
+``FlowDefinition`` captures the complete structural declaration of a
+``Flow`` subclass in pure-data form: step names,
 roles, trigger specs, gate specs, and router targets — with no callable
 references and no back-reference to the originating ``Flow`` class or
 instance. As a result it is:
@@ -14,9 +14,9 @@ instance. As a result it is:
 - **Portable** — can be serialised, sent over a queue, or stored without
   importing any Flow-specific callable.
 
-:func:`build_flow_definition` is a pure function: same
-:class:`~philharmonica.adk.flows.registry.FlowStepRegistry` always produces the
-same :class:`FlowDefinition`. :meth:`Flow.get_definition` is the ergonomic
+``build_flow_definition`` is a pure function: same
+``FlowStepRegistry`` always produces the
+same ``FlowDefinition``. ``Flow.get_definition`` is the ergonomic
 entry point; the underlying function is public so tooling can call it
 directly with a registry it already holds.
 """
@@ -40,8 +40,8 @@ class StepInfo:
     Carries the name, role discriminator, and raw trigger specs
     originally declared on the step. No callable reference; all
     trigger specs have already been normalised to name-strings,
-    :class:`~philharmonica.adk.flows.combinators.Or`, or
-    :class:`~philharmonica.adk.flows.combinators.And` by the time they reach
+    ``Or``, or
+    ``And`` by the time they reach
     the registry.
 
     Attributes:
@@ -74,7 +74,7 @@ class StepInfo:
 class GateInfo:
     """Pure-data snapshot of an AND or OR gate.
 
-    Mirrors :class:`~philharmonica.adk.flows.registry.GateSpec` but lives in the
+    Mirrors ``GateSpec`` but lives in the
     definition layer rather than the transition-table layer. The gate kind
     is encoded as a ``"and"`` / ``"or"`` string rather than a separate
     class so the type remains a plain frozen dataclass with no variant
@@ -106,16 +106,16 @@ class GateInfo:
 class FlowDefinition:
     """Immutable pure-data snapshot of a Flow's wiring topology.
 
-    Produced once per Flow class by :func:`build_flow_definition` /
-    :meth:`~philharmonica.adk.flows.flow.Flow.get_definition`. Captures every
+    Produced once per Flow class by ``build_flow_definition`` /
+    ``get_definition``. Captures every
     structural decision made by the decorators — which steps exist,
     their roles, their triggers, the gate topology — with no callable
     references and no reference to the originating Flow class.
 
     Every field is either a primitive, a tuple, a frozenset, a
-    :class:`~types.MappingProxyType` read-only view, or a frozen
-    dataclass composed of those. A :class:`FlowDefinition` is picklable
-    because :meth:`__reduce__` serialises the mapping fields as plain
+    ``MappingProxyType`` read-only view, or a frozen
+    dataclass composed of those. A ``FlowDefinition`` is picklable
+    because ``__reduce__`` serialises the mapping fields as plain
     ``dict`` objects, which are re-wrapped into ``MappingProxyType`` on
     reconstruction. It can be used for:
 
@@ -124,7 +124,7 @@ class FlowDefinition:
     - Offline tooling, serialisation, and schema generation.
 
     Attributes:
-        steps: Tuple of :class:`StepInfo` objects, one per decorated
+        steps: Tuple of ``StepInfo`` objects, one per decorated
             step, sorted by name for deterministic ordering.
         starts: Frozen set of step names decorated with ``@flow_start``.
         roles: Read-only mapping from step name to its role string
@@ -132,7 +132,7 @@ class FlowDefinition:
         direct_triggers: Read-only mapping from listener/router name to
             the tuple of plain string trigger names declared on it.
             Does not include gate triggers.
-        gates: Tuple of :class:`GateInfo` objects covering both AND
+        gates: Tuple of ``GateInfo`` objects covering both AND
             and OR gates, sorted by ``gate_id`` for determinism.
         router_triggers: Read-only mapping from router name to the
             tuple of plain string trigger names that activate it.
@@ -157,10 +157,10 @@ class FlowDefinition:
     """router name → plain-string trigger names that activate it (read-only)."""
 
     def __post_init__(self) -> None:
-        """Wrap any plain dict fields in :class:`MappingProxyType` for mutation resistance.
+        """Wrap any plain dict fields in ``MappingProxyType`` for mutation resistance.
 
         The dataclass constructor accepts both plain ``dict`` and
-        ``MappingProxyType`` values (so :func:`build_flow_definition` can
+        ``MappingProxyType`` values (so ``build_flow_definition`` can
         pass dicts and ``__reduce__`` can reconstruct via the same path).
         This hook ensures the fields are always ``MappingProxyType`` on
         the live object, regardless of how the instance was constructed.
@@ -178,9 +178,9 @@ class FlowDefinition:
     def __reduce__(self) -> tuple[type, tuple[object, ...]]:
         """Return a picklable reconstruction tuple.
 
-        :class:`~types.MappingProxyType` is not picklable directly.
+        ``MappingProxyType`` is not picklable directly.
         This method serialises the mapping fields as plain ``dict``
-        objects; the constructor calls :meth:`__post_init__` which
+        objects; the constructor calls ``__post_init__`` which
         re-wraps them on reconstruction.
 
         Returns:
@@ -214,8 +214,8 @@ class FlowDefinition:
             role: One of ``"start"``, ``"listen"``, ``"router"``.
 
         Returns:
-            Tuple of :class:`StepInfo` objects whose ``role`` matches,
-            in the same sorted order as :attr:`steps`.
+            Tuple of ``StepInfo`` objects whose ``role`` matches,
+            in the same sorted order as ``steps``.
         """
         return tuple(s for s in self.steps if s.role == role)
 
@@ -225,29 +225,29 @@ def build_flow_definition(
     *,
     descriptions: dict[str, str | None] | None = None,
 ) -> FlowDefinition:
-    """Compile a :class:`FlowStepRegistry` into a :class:`FlowDefinition`.
+    """Compile a ``FlowStepRegistry`` into a ``FlowDefinition``.
 
     Pure function: same ``registry`` and ``descriptions`` always produce
     the same output. No side effects, no globals.
 
     Args:
         registry: The frozen step registry produced by
-            :class:`~philharmonica.adk.flows.flow.FlowMeta` at class creation.
+            ``FlowMeta`` at class creation.
         descriptions: Optional mapping from step name to its
             ``description=`` kwarg value. When ``None``, all step
             descriptions are recorded as ``None``. Pass the result of
-            :func:`~philharmonica.adk.flows.flow.collect_step_descriptions`
-            (used by :meth:`~philharmonica.adk.flows.flow.Flow.get_definition`)
+            ``collect_step_descriptions``
+            (used by ``get_definition``)
             to propagate decorator-level descriptions.
 
     Returns:
-        A frozen :class:`FlowDefinition` reflecting the full wiring
+        A frozen ``FlowDefinition`` reflecting the full wiring
         topology encoded in ``registry``.
 
     Raises:
         FlowDefinitionError: When a ``@flow_router`` step declares a
             combinator gate trigger — the same rejection
-            :func:`~philharmonica.adk.flows.registry.build_transition_table`
+            ``build_transition_table``
             applies, so a definition never describes an unrunnable flow.
     """
     descs: dict[str, str | None] = descriptions if descriptions is not None else {}
@@ -288,14 +288,14 @@ def build_flow_definition(
 
 
 def _build_start_step(name: str, descs: dict[str, str | None]) -> StepInfo:
-    """Build a :class:`StepInfo` for a ``@flow_start`` step.
+    """Build a ``StepInfo`` for a ``@flow_start`` step.
 
     Args:
         name: The step method name.
         descs: Description lookup from the class namespace.
 
     Returns:
-        A :class:`StepInfo` with role ``"start"`` and empty triggers.
+        A ``StepInfo`` with role ``"start"`` and empty triggers.
     """
     return StepInfo(name=name, role="start", triggers=(), description=descs.get(name))
 
@@ -305,7 +305,7 @@ def _build_listener_step(
     trigger_specs: tuple[TriggerSpec, ...],
     descs: dict[str, str | None],
 ) -> tuple[StepInfo, list[str], list[GateInfo]]:
-    """Build a :class:`StepInfo` and extracted gate info for a ``@flow_listen`` step.
+    """Build a ``StepInfo`` and extracted gate info for a ``@flow_listen`` step.
 
     Args:
         name: The step method name.
@@ -313,8 +313,8 @@ def _build_listener_step(
         descs: Description lookup from the class namespace.
 
     Returns:
-        Triple of the :class:`StepInfo`, a list of plain-string trigger
-        names (no gate triggers), and a list of :class:`GateInfo` entries
+        Triple of the ``StepInfo``, a list of plain-string trigger
+        names (no gate triggers), and a list of ``GateInfo`` entries
         for any AND/OR triggers in the spec.
     """
     plain: list[str] = []
@@ -341,7 +341,7 @@ def _build_router_step(
     trigger_specs: tuple[TriggerSpec, ...],
     descs: dict[str, str | None],
 ) -> tuple[StepInfo, list[str]]:
-    """Build a :class:`StepInfo` and plain trigger names for a ``@flow_router`` step.
+    """Build a ``StepInfo`` and plain trigger names for a ``@flow_router`` step.
 
     Args:
         name: The step method name.
@@ -349,12 +349,12 @@ def _build_router_step(
         descs: Description lookup from the class namespace.
 
     Returns:
-        Pair of the :class:`StepInfo` and a list of plain-string trigger
+        Pair of the ``StepInfo`` and a list of plain-string trigger
         names activating this router.
 
     Raises:
         FlowDefinitionError: When any trigger spec is a combinator gate —
-            same rejection as :func:`build_transition_table`, because a
+            same rejection as ``build_transition_table``, because a
             gate-gated router could never execute and a silently-built
             definition would describe an unrunnable flow.
     """

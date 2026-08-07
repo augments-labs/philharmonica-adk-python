@@ -181,7 +181,7 @@ class PineconeVectorStore:
             filter: Optional metadata filters.
 
         Returns:
-            List of :class:`VectorQueryResult` ordered by descending score.
+            List of ``VectorQueryResult`` ordered by descending score.
 
         Raises:
             RuntimeError: If a match is returned without vector values.
@@ -213,7 +213,7 @@ class PineconeVectorStore:
             record_id: The unique record identifier (namespace-free).
 
         Returns:
-            The matching :class:`VectorRecord`, or ``None`` if not found.
+            The matching ``VectorRecord``, or ``None`` if not found.
         """
         vectors = await asyncio.to_thread(_sync_fetch, self._index, [record_id])
         if record_id not in vectors:

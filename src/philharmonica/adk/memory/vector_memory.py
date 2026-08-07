@@ -1,7 +1,7 @@
 """VectorMemory — an embedding-backed Memory.
 
-Composes an :class:`Embedder` and a :class:`VectorStore` to satisfy the
-existing :class:`Memory` ABC.  ``add`` embeds content as a document and upserts;
+Composes an ``Embedder`` and a ``VectorStore`` to satisfy the
+existing ``Memory`` ABC.  ``add`` embeds content as a document and upserts;
 ``search`` embeds the query and queries the store.  Because it is a ``Memory``,
 the Runner, ``MemoryConfig``, and the existing ``RecallMemoryTool`` use it
 unchanged.
@@ -39,7 +39,7 @@ def _record_to_entry(record: VectorRecord) -> MemoryEntry:
 
 
 class VectorMemory(Memory):
-    """Embedding-backed memory that composes an :class:`Embedder` and a :class:`VectorStore`.
+    """Embedding-backed memory that composes an ``Embedder`` and a ``VectorStore``.
 
     ``add`` embeds content as a document and upserts the record.
     ``search`` embeds the query and issues a nearest-neighbour query.
@@ -70,7 +70,7 @@ class VectorMemory(Memory):
                 metadata with ``MemorySource.MANUAL``.
 
         Returns:
-            The created :class:`MemoryEntry`.
+            The created ``MemoryEntry``.
 
         Raises:
             RuntimeError: If the embedder returns no embedding for the content.
@@ -119,7 +119,7 @@ class VectorMemory(Memory):
             filter: Optional filters on metadata fields.
 
         Returns:
-            List of :class:`MemorySearchResult` ordered by descending relevance.
+            List of ``MemorySearchResult`` ordered by descending relevance.
         """
         if len(query.strip()) == 0:
             return []

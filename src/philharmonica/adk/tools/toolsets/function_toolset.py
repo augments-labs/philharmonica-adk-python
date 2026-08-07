@@ -61,7 +61,7 @@ class FunctionToolset(Toolset):
         Args:
             ctx: Run context for the current turn. Not used by this
                 implementation but accepted to satisfy the
-                :class:`Toolset` interface.
+                ``Toolset`` interface.
 
         Returns:
             A mapping of ``tool_name -> FunctionTool`` for all tools in

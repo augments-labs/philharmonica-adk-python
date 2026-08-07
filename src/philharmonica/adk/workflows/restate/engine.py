@@ -1,7 +1,7 @@
 """RestateDurableEngine — concrete DurableEngine implementation for Restate.
 
-Provides the :class:`RestateDurableEngine` facade that satisfies the
-:class:`~philharmonica.adk.workflows.engine.DurableEngine` Protocol.
+Provides the ``RestateDurableEngine`` facade that satisfies the
+``DurableEngine`` Protocol.
 
 References:
     Restate Python SDK durable execution:
@@ -25,15 +25,15 @@ logger = logging.getLogger(__name__)
 
 
 class RestateDurableEngine:
-    """Concrete :class:`~philharmonica.adk.workflows.engine.DurableEngine` for Restate.
+    """Concrete ``DurableEngine`` for Restate.
 
-    Wraps LLMs via :class:`~philharmonica.adk.workflows.restate.llm.RestateLLM`.
+    Wraps LLMs via ``RestateLLM``.
     Tool wrapping re-uses the existing Restate tool helpers
-    (:mod:`philharmonica.adk.workflows.restate.tools`) when available; callers may
+    (``philharmonica.adk.workflows.restate.tools``) when available; callers may
     also wrap tools manually using ``ctx.run`` for full journaling semantics.
 
     Reports whether the current call stack is inside a Restate handler via
-    :func:`~philharmonica.adk.workflows.restate.llm.get_restate_context`.
+    ``get_restate_context``.
 
     References:
         Restate Python SDK:
@@ -48,14 +48,14 @@ class RestateDurableEngine:
         *,
         config: ModelActivityConfig,
     ) -> LLM:
-        """Wrap *llm* in a :class:`~philharmonica.adk.workflows.restate.llm.RestateLLM`.
+        """Wrap *llm* in a ``RestateLLM``.
 
         Args:
-            llm: The :class:`~philharmonica.adk.llms.llm.LLM` instance to wrap.
+            llm: The ``LLM`` instance to wrap.
             config: Timeout and retry policy carried for Protocol compatibility.
 
         Returns:
-            A :class:`~philharmonica.adk.workflows.restate.llm.RestateLLM` that
+            A ``RestateLLM`` that
             routes calls through ``ctx.run()`` when inside a Restate handler.
 
         References:
@@ -81,7 +81,7 @@ class RestateDurableEngine:
         compose their own wrapping strategy.
 
         Args:
-            tool: The :class:`~philharmonica.adk.tools.function_tool.FunctionTool`
+            tool: The ``FunctionTool``
                 to evaluate.
             config: Retained for Protocol compatibility; ignored.
 

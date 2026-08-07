@@ -3,7 +3,7 @@
 The Rich ``Live`` widget that drives the CrewAI-style streaming panel
 needs the current run's ``RunHooks`` and ``Agent`` instances on every
 LLM stream chunk, but the streaming hot path
-(:func:`philharmonica.adk.run.llm_calls.call_llm_streamed`) intentionally
+(``philharmonica.adk.run.llm_calls.call_llm_streamed``) intentionally
 does not take a verbose-specific argument — adding one would ripple
 into every middleware and break the API. This module supplies two
 ``ContextVar`` slots the runner sets at the top of its
@@ -13,7 +13,7 @@ without explicit plumbing.
 The same task that calls ``call_llm_streamed`` also runs the loop's
 ``finally`` clause, so the ContextVar is automatically inherited
 across yields. Mirrors the MCP run-hooks bridge at
-:mod:`philharmonica.adk.mcp.run_hooks_bridge`.
+``philharmonica.adk.mcp.run_hooks_bridge``.
 """
 
 from __future__ import annotations
@@ -40,12 +40,12 @@ active_verbose_agent: ContextVar[Agent | None] = ContextVar(
     "philharmonica_verbose_active_agent",
     default=None,
 )
-"""Active :class:`Agent` for the calling task. ``None`` outside a
+"""Active ``Agent`` for the calling task. ``None`` outside a
 verbose-enabled streaming bracket."""
 
 
 def fire_stream_chunk(accumulated_text: str, call_type: str) -> None:
-    """Forward an accumulated streaming chunk to :func:`emit_stream_chunk`.
+    """Forward an accumulated streaming chunk to ``emit_stream_chunk``.
 
     Safe to call from inside the streaming loop without checking
     whether verbose is active — a no-op when either ContextVar is

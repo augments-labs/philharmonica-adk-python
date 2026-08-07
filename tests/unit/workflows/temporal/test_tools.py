@@ -1,4 +1,4 @@
-"""Tests for :mod:`philharmonica.adk.workflows.temporal.tools`.
+"""Tests for ``philharmonica.adk.workflows.temporal.tools``.
 
 Covers:
 - ``activity_tool`` preserves the wrapped function's name as the tool name.

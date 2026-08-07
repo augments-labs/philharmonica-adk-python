@@ -1,10 +1,10 @@
 """Flow-specific exception types.
 
-All inherit from :class:`philharmonica.adk.exceptions.PhilharmonicaError` so the
+All inherit from ``philharmonica.adk.exceptions.PhilharmonicaError`` so the
 framework-wide exception hierarchy is preserved. Module-scoped rather than
-in the central :mod:`philharmonica.adk.exceptions` file because they are tightly
+in the central ``philharmonica.adk.exceptions`` file because they are tightly
 coupled to Flow internals — same precedent as
-:class:`philharmonica.adk.graphs.interrupt.InterruptException`.
+``philharmonica.adk.graphs.interrupt.InterruptException``.
 """
 
 from __future__ import annotations
@@ -15,14 +15,14 @@ from philharmonica.adk.exceptions.exceptions import PhilharmonicaError, UserErro
 class FlowDefinitionError(UserError):
     """Raised at Flow class-definition time when the decorator wiring is invalid.
 
-    Subclass of :class:`UserError` because the cause is always a
+    Subclass of ``UserError`` because the cause is always a
     misconfiguration by the developer authoring the Flow class — never a
     framework internal failure. Typical triggers:
 
     - No ``@flow_start`` method declared on the class.
     - A method decorated with both ``@flow_listen`` and ``@flow_router`` (rejected
       by the decorator itself, but defense-in-depth checked in
-      :class:`FlowMeta`).
+      ``FlowMeta``).
     - A step method that is not ``async def`` or takes parameters
       besides ``self``.
     - A ``@flow_listen(trigger=...)`` referencing an unknown form.
@@ -35,9 +35,9 @@ class FlowDefinitionError(UserError):
 
 
 class FlowMaxStepsExceeded(PhilharmonicaError):
-    """Raised by :class:`FlowExecutor` when the configured ``max_steps`` cap is hit.
+    """Raised by ``FlowExecutor`` when the configured ``max_steps`` cap is hit.
 
-    Distinct from :class:`philharmonica.adk.exceptions.MaxTurnsExceeded` (which
+    Distinct from ``philharmonica.adk.exceptions.MaxTurnsExceeded`` (which
     counts LLM turns inside a single agent loop). ``max_steps`` counts
     the number of Flow step invocations across the entire run; the cap
     exists to prevent unbounded fan-out in mis-wired flows.
@@ -50,9 +50,9 @@ class FlowMaxStepsExceeded(PhilharmonicaError):
 
 
 class FlowStepError(PhilharmonicaError):
-    """Raised by :class:`FlowExecutor` when a step raises and ``error_policy = "halt"``.
+    """Raised by ``FlowExecutor`` when a step raises and ``error_policy = "halt"``.
 
-    Wraps the underlying exception so the caller of :meth:`Runner.arun_flow`
+    Wraps the underlying exception so the caller of ``Runner.arun_flow``
     sees a structured error rather than the raw step exception. The
     underlying exception is available via the standard ``__cause__``
     attribute (set by ``raise ... from`` inside the executor).
@@ -76,10 +76,10 @@ class FlowStepDeferred(PhilharmonicaError):
     """Internal signal raised by the executor when a ``requires_approval`` gate trips.
 
     NOT part of the public error surface — caught inside
-    :meth:`FlowExecutor.run` to capture the step into the
-    :class:`FlowCheckpoint` and halt the run with
+    ``FlowExecutor.run`` to capture the step into the
+    ``FlowCheckpoint`` and halt the run with
     ``status="deferred"``. Developers never see this exception; they
-    see a :class:`FlowRunResult` with ``deferred_steps`` populated.
+    see a ``FlowRunResult`` with ``deferred_steps`` populated.
 
     Args:
         step_name: Method name of the deferred step.
@@ -94,12 +94,12 @@ class FlowStepDeferred(PhilharmonicaError):
 
 
 class FlowStepRateLimitExceeded(PhilharmonicaError):
-    """Raised when a step's :class:`FlowStepRateLimit` window is saturated.
+    """Raised when a step's ``FlowStepRateLimit`` window is saturated.
 
     Surfaces when ``FlowStepRateLimit.behavior == "error"`` or when
     a ``"wait"`` configuration would exceed
-    :attr:`FlowStepRateLimit.max_wait_seconds`. Routes through
-    :attr:`FlowConfig.error_policy` exactly like any other step
+    ``FlowStepRateLimit.max_wait_seconds``. Routes through
+    ``FlowConfig.error_policy`` exactly like any other step
     exception.
 
     Args:
@@ -125,12 +125,12 @@ class FlowStepGovernanceError(PhilharmonicaError):
     """Wraps an exception raised by a step's governance hook.
 
     Surfaces when a developer-supplied callable inside a step's
-    :class:`FlowStepGuardrails` / :class:`FlowStepCachePolicy` /
-    :class:`FlowStepRateLimit` machinery raises an exception that is
+    ``FlowStepGuardrails`` / ``FlowStepCachePolicy`` /
+    ``FlowStepRateLimit`` machinery raises an exception that is
     NOT a typed verdict / rate-limit signal. Carries breadcrumb
     metadata (``hook``, ``phase``) so operators can tell the source
     of the failure apart from a step-body raise — the
-    :class:`FlowStepErrorEvent` then reports
+    ``FlowStepErrorEvent`` then reports
     ``FlowStepGovernanceError`` rather than the underlying
     exception's bare type.
 
@@ -166,11 +166,11 @@ class FlowStepGovernanceError(PhilharmonicaError):
 
 
 class FlowStepGuardrailTripped(PhilharmonicaError):
-    """Raised when a :class:`FlowStepGuardrails` member returns a non-allow verdict.
+    """Raised when a ``FlowStepGuardrails`` member returns a non-allow verdict.
 
     Wraps the routed rejection ``message`` so the verdict's
     explanation surfaces through error handlers. Routes through
-    :attr:`FlowConfig.error_policy`.
+    ``FlowConfig.error_policy``.
 
     Args:
         step_name: Method name of the step whose guardrail tripped.
@@ -185,7 +185,7 @@ class FlowStepGuardrailTripped(PhilharmonicaError):
     """``"pre"`` or ``"post"``."""
 
     verdict_message: str | None
-    """Routed verdict message (renamed to avoid LSP clash with :attr:`PhilharmonicaError.message`)."""
+    """Routed verdict message (renamed to avoid LSP clash with ``PhilharmonicaError.message``)."""
 
     def __init__(self, step_name: str, phase: str, message: str | None) -> None:
         self.step_name = step_name
@@ -198,19 +198,19 @@ class FlowStepGuardrailTripped(PhilharmonicaError):
 
 
 class FlowAgentDeferred(PhilharmonicaError):
-    """Internal signal raised by :func:`arun_flow_agent` when an inner agent run defers.
+    """Internal signal raised by ``arun_flow_agent`` when an inner agent run defers.
 
-    A step body that calls :func:`arun_flow_agent` may surface an
+    A step body that calls ``arun_flow_agent`` may surface an
     agent-level HITL deferral (a tool with ``requires_approval=True``
     inside the agent run). This exception carries the agent's
-    serialised :class:`RunState` JSON so the executor can stash it
-    into :attr:`FlowDeferredStep.agent_run_state`, halt the flow, and
+    serialised ``RunState`` JSON so the executor can stash it
+    into ``FlowDeferredStep.agent_run_state``, halt the flow, and
     resume the agent through the same checkpoint round-trip used for
     step-level approvals.
 
     NOT part of the public error surface — caught inside
-    :meth:`FlowExecutor._process_batch_results`. Developers never see
-    this exception; they see a :class:`FlowRunResult` with
+    ``FlowExecutor._process_batch_results``. Developers never see
+    this exception; they see a ``FlowRunResult`` with
     ``deferred_steps`` populated.
 
     Args:
@@ -220,9 +220,9 @@ class FlowAgentDeferred(PhilharmonicaError):
             step that runs multiple agents can target each
             independently. Defaults to ``step_name`` when the
             developer doesn't override.
-        run_state_data: JSON-encoded :class:`RunState` snapshot
-            produced by :meth:`RunState.to_dict` ``+`` ``json.dumps``.
-            Stored on :attr:`FlowDeferredStep.agent_run_state`.
+        run_state_data: JSON-encoded ``RunState`` snapshot
+            produced by ``RunState.to_dict`` ``+`` ``json.dumps``.
+            Stored on ``FlowDeferredStep.agent_run_state``.
     """
 
     step_name: str
@@ -232,7 +232,7 @@ class FlowAgentDeferred(PhilharmonicaError):
     """Stable key identifying the inner agent invocation."""
 
     run_state_data: str
-    """Serialised :class:`RunState` payload."""
+    """Serialised ``RunState`` payload."""
 
     def __init__(self, step_name: str, defer_key: str, run_state_data: str) -> None:
         self.step_name = step_name
@@ -248,9 +248,9 @@ class FlowStepSkipped(PhilharmonicaError):
 
     NOT part of the public error surface — caught inside the executor
     to suppress successor dispatch for the step. Developers never see
-    this exception; they see a :class:`FlowStepSkippedEvent` on the
+    this exception; they see a ``FlowStepSkippedEvent`` on the
     streaming path and the absence of the step from
-    :attr:`FlowRunResult.completed_steps`.
+    ``FlowRunResult.completed_steps``.
 
     Args:
         step_name: Method name of the skipped step.
@@ -265,9 +265,9 @@ class FlowStepSkipped(PhilharmonicaError):
 
 
 class FlowCheckpointNotFoundError(UserError):
-    """Raised by :meth:`Runner.arun_flow_from_id` when no checkpoint exists for the given id.
+    """Raised by ``Runner.arun_flow_from_id`` when no checkpoint exists for the given id.
 
-    Subclass of :class:`UserError` because the cause is a developer
+    Subclass of ``UserError`` because the cause is a developer
     mistake — supplying an id that was never persisted, or targeting the
     wrong backend — not a framework internal failure.
 
@@ -291,25 +291,25 @@ class FlowStepRejected(PhilharmonicaError):
 
     NOT part of the public error surface — caught inside the executor
     to route the rejection through ``FlowConfig.error_policy``. Carries
-    the routed rejection :attr:`decision_message` (from
-    :attr:`FlowApprovalDecision.message`) so the error handler / final
+    the routed rejection ``decision_message`` (from
+    ``FlowApprovalDecision.message``) so the error handler / final
     result can surface it. Audit metadata stays on the originating
-    :class:`FlowApprovalDecision` and never travels via this exception.
+    ``FlowApprovalDecision`` and never travels via this exception.
 
     Args:
         step_name: Method name of the rejected step.
         message: Routed rejection explanation from
-            :attr:`FlowApprovalDecision.message`.
+            ``FlowApprovalDecision.message``.
     """
 
     step_name: str
     """The step method whose approval decision was ``False``."""
 
     decision_message: str | None
-    """Routed rejection explanation (from :attr:`FlowApprovalDecision.message`).
+    """Routed rejection explanation (from ``FlowApprovalDecision.message``).
 
     Renamed from ``message`` to avoid the LSP clash with the
-    :attr:`PhilharmonicaError.message` attribute (which is typed
+    ``PhilharmonicaError.message`` attribute (which is typed
     ``str``, never ``None``).
     """
 

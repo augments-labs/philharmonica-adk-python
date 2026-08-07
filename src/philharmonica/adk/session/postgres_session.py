@@ -1,9 +1,9 @@
 """PostgreSQL-backed session implementation — single bound session.
 
-``PostgresSession`` implements the :class:`Session` ABC for one
-conversation, backed by an :class:`AsyncConnectionPool` owned by
-:class:`~philharmonica.adk.session.postgres_multi_sessions.PostgresMultiSessions`.
-It mirrors :class:`~philharmonica.adk.session.sqlite_session.SQLiteSession`
+``PostgresSession`` implements the ``Session`` ABC for one
+conversation, backed by an ``AsyncConnectionPool`` owned by
+``PostgresMultiSessions``.
+It mirrors ``SQLiteSession``
 so the same agent code runs against a shared Postgres backend for
 multi-replica deployments.
 
@@ -150,13 +150,13 @@ async def merge_app_state_delta(conn: AsyncConnection, app_name: str, delta: dic
 
 
 def _row_to_event(row: tuple[Any, ...]) -> SessionEvent:
-    """Convert an ``agent_messages`` row tuple to a :class:`SessionEvent`.
+    """Convert an ``agent_messages`` row tuple to a ``SessionEvent``.
 
     Args:
         row: ``(event_id, author, timestamp, data, state_delta)``.
 
     Returns:
-        The reconstructed :class:`SessionEvent`.
+        The reconstructed ``SessionEvent``.
     """
     event_id, author, timestamp, data, state_delta = row
     return SessionEvent(
@@ -176,7 +176,7 @@ def _drop_orphaned_tool_result_events(events: list[SessionEvent]) -> list[Sessio
     parallel-call) tool result then has no matching ``function_call`` in the
     returned window, and Anthropic / Gemini reject such orphans with a 400.
 
-    :meth:`ContextEditor.remove_orphaned_tool_results` operates on Layer-1
+    ``ContextEditor.remove_orphaned_tool_results`` operates on Layer-1
     content items and returns the very objects it keeps, so surviving events
     are recovered by content identity.
 
@@ -192,11 +192,11 @@ def _drop_orphaned_tool_result_events(events: list[SessionEvent]) -> list[Sessio
 
 
 class PostgresSession(Session):
-    """Bound Postgres session — implements the :class:`Session` ABC.
+    """Bound Postgres session — implements the ``Session`` ABC.
 
-    Obtained via :class:`PostgresMultiSessions`; shares the manager's
+    Obtained via ``PostgresMultiSessions``; shares the manager's
     connection pool. Methods open a short-lived pooled connection (which
-    commits on clean exit), mirroring :class:`SQLiteSession`.
+    commits on clean exit), mirroring ``SQLiteSession``.
     """
 
     def __init__(
@@ -211,18 +211,18 @@ class PostgresSession(Session):
         strict_concurrency: bool = False,
         updated_at_watermark: str | None = None,
     ) -> None:
-        """Initialise a bound session. Use :class:`PostgresMultiSessions` to obtain instances.
+        """Initialise a bound session. Use ``PostgresMultiSessions`` to obtain instances.
 
         Args:
             session_id: Unique identifier for this session.
             app_name: Application name for multi-tenant scoping.
             user_id: User identifier for multi-tenant scoping.
             pool: Shared connection pool owned by the manager.
-            state: Pre-loaded :class:`State` (session data merged with app data).
+            state: Pre-loaded ``State`` (session data merged with app data).
             settings: Per-session settings, or ``None`` to use defaults.
             strict_concurrency: When ``True``, ``add`` / ``save_state``
                 check the row's ``updated_at`` against a watermark and
-                raise :exc:`SessionAppendConflictError` on a concurrent
+                raise ``SessionAppendConflictError`` on a concurrent
                 advance. Best-effort, not atomic. Default ``False``.
             updated_at_watermark: The ``updated_at`` recorded when this
                 handle loaded; only consulted when ``strict_concurrency``.
@@ -267,10 +267,10 @@ class PostgresSession(Session):
 
         Args:
             limit: Maximum number of events; falls back to the session's
-                :attr:`SessionSettings.limit`, then to all events.
+                ``SessionSettings.limit``, then to all events.
 
         Returns:
-            List of :class:`SessionEvent` oldest-first.
+            List of ``SessionEvent`` oldest-first.
         """
         effective_limit = limit
         if effective_limit is None and self._settings is not None:

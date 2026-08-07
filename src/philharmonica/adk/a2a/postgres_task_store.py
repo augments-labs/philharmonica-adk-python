@@ -1,13 +1,13 @@
 """``PostgresTaskStore`` — durable, shared A2A task store on PostgreSQL.
 
 The Postgres counterpart of
-:class:`~philharmonica.adk.a2a.task_store.SQLiteTaskStore`: a single
+``SQLiteTaskStore``: a single
 ``a2a_tasks`` table reached through a ``psycopg`` async connection pool.
 Because every replica talks to the same database, A2A background tasks and
 ``A2AContinuationToken`` resumption survive across a horizontally-scaled
 deployment — which a per-pod SQLite file cannot.
 
-Satisfies the :class:`~philharmonica.adk.a2a.task_store.TaskStore` protocol
+Satisfies the ``TaskStore`` protocol
 structurally. Wire types (``a2a.types.Task``) are confined to this module
 and serialized as JSON, exactly as the SQLite store does.
 
@@ -77,8 +77,8 @@ _DEFAULT_MAX_TERMINAL_ROWS = 1_000
 class PostgresTaskStore:
     """Durable A2A ``TaskStore`` backed by PostgreSQL via psycopg.
 
-    The caller owns the lifecycle — call :meth:`close` at shutdown. Before
-    accepting requests, call :meth:`recover_on_startup` once to mark tasks
+    The caller owns the lifecycle — call ``close`` at shutdown. Before
+    accepting requests, call ``recover_on_startup`` once to mark tasks
     a prior process left non-terminal as FAILED.
 
     Attributes:
@@ -151,7 +151,7 @@ class PostgresTaskStore:
             task_id: The A2A task identifier.
 
         Returns:
-            The deserialized :class:`~a2a.types.Task`, or ``None``.
+            The deserialized ``Task``, or ``None``.
         """
         pool = await self._get_pool()
         async with pool.connection() as conn:

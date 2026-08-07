@@ -1,17 +1,17 @@
-"""FlowExecutable — wraps a :class:`Flow` as an :class:`Executable` for Graph nesting.
+"""FlowExecutable — wraps a ``Flow`` as an ``Executable`` for Graph nesting.
 
-Lets a :class:`Flow` sit inside a :class:`Graph` node uniformly with
-:class:`Agent` / :class:`Swarm` / callables. Mirrors the
-:class:`AgentExecutable` / :class:`SwarmExecutable` precedent in
+Lets a ``Flow`` sit inside a ``Graph`` node uniformly with
+``Agent`` / ``Swarm`` / callables. Mirrors the
+``AgentExecutable`` / ``SwarmExecutable`` precedent in
 ``graphs/adapters.py`` — single-class adapter forwarding to
-:meth:`Runner.arun_flow` and flattening the :class:`FlowRunResult`
-into a :class:`NodeResult` the graph loop can route.
+``Runner.arun_flow`` and flattening the ``FlowRunResult``
+into a ``NodeResult`` the graph loop can route.
 
 The adapter does NOT mutate the Flow. The Flow's typed state is
-preserved on :attr:`NodeResult.output` so downstream edge predicates
+preserved on ``NodeResult.output`` so downstream edge predicates
 can inspect fields when routing — same composition pattern as
-:class:`SwarmExecutable` preserving the full
-:class:`SwarmRunResult` for `stop_reason`-based routing.
+``SwarmExecutable`` preserving the full
+``SwarmRunResult`` for `stop_reason`-based routing.
 """
 
 from __future__ import annotations
@@ -35,27 +35,27 @@ if TYPE_CHECKING:
 
 @dataclass
 class FlowExecutable[TContext](Executable[TContext]):
-    """Wrap a :class:`Flow` so it can sit inside a graph node.
+    """Wrap a ``Flow`` so it can sit inside a graph node.
 
-    Calling :meth:`invoke` delegates to
-    :meth:`philharmonica.adk.run.runner.Runner.arun_flow` and converts the
-    resulting :class:`FlowRunResult` into a :class:`NodeResult`. The
-    Flow's typed state surfaces on :attr:`NodeResult.output` so
+    Calling ``invoke`` delegates to
+    ``philharmonica.adk.run.runner.Runner.arun_flow`` and converts the
+    resulting ``FlowRunResult`` into a ``NodeResult``. The
+    Flow's typed state surfaces on ``NodeResult.output`` so
     downstream edges can route on it.
 
     Attributes:
-        flow: The :class:`Flow` to run. Treated as configuration — NOT
-            mutated by :meth:`invoke`.
-        config: Optional :class:`FlowConfig` carrying ``max_steps``,
+        flow: The ``Flow`` to run. Treated as configuration — NOT
+            mutated by ``invoke``.
+        config: Optional ``FlowConfig`` carrying ``max_steps``,
             error policy, etc. ``None`` uses the
-            :class:`FlowConfig` defaults.
+            ``FlowConfig`` defaults.
     """
 
     flow: Flow[Any]
     """The wrapped Flow. Kept as-is — no runtime mutation."""
 
     config: FlowConfig | None = None
-    """Optional :class:`FlowConfig`. ``None`` uses defaults."""
+    """Optional ``FlowConfig``. ``None`` uses defaults."""
 
     @override
     async def invoke(
@@ -64,32 +64,32 @@ class FlowExecutable[TContext](Executable[TContext]):
         context: RunContext[TContext],
         config: RunConfig,
     ) -> NodeResult[TContext]:
-        """Run the wrapped Flow once and package its :class:`FlowRunResult`.
+        """Run the wrapped Flow once and package its ``FlowRunResult``.
 
         Threads ``context.context`` (the user's ``TContext``) into the
-        inner :meth:`Runner.arun_flow` call. The inner Flow's
-        :attr:`run_context` is independent of ``context`` (the executor
+        inner ``Runner.arun_flow`` call. The inner Flow's
+        ``run_context`` is independent of ``context`` (the executor
         creates its own); usage / new_items are forwarded onto the
-        :class:`NodeResult` for the graph loop to aggregate.
+        ``NodeResult`` for the graph loop to aggregate.
 
         Args:
-            input: Upstream :class:`ExecutableInput`. The Flow itself
+            input: Upstream ``ExecutableInput``. The Flow itself
                 does NOT consume the input messages — Flow step bodies
                 build their own prompts from ``self.state``. Accepted
                 for forward compatibility but currently not consumed
                 by the Flow.
-            context: Outer graph's :class:`RunContext`. ``context.context``
+            context: Outer graph's ``RunContext``. ``context.context``
                 threads through to the Flow's inner runs; ``context.usage``
                 accumulates the Flow's cumulative usage delta.
-            config: Outer :class:`RunConfig`. Accepted for
-                :class:`~philharmonica.adk.orchestration.executable.Executable`
+            config: Outer ``RunConfig``. Accepted for
+                ``Executable``
                 interface conformance and deliberately unused — the
-                wrapped Flow's own :class:`FlowConfig` governs the run,
+                wrapped Flow's own ``FlowConfig`` governs the run,
                 so inner agent runs inside step bodies do NOT inherit
                 the outer graph's guardrails / hooks / model overrides.
 
         Returns:
-            A :class:`NodeResult` whose ``output`` is the Flow's final
+            A ``NodeResult`` whose ``output`` is the Flow's final
             typed state, ``new_items`` is empty (Flows produce items
             on inner agent runs that already record into the run
             context), ``usage`` is the cumulative LLM usage delta

@@ -1,7 +1,7 @@
 """Memory extraction from conversation history.
 
-Defines the :class:`MemoryExtractor` protocol and a default
-:class:`LLMExtractor` that uses an LLM to identify knowledge
+Defines the ``MemoryExtractor`` protocol and a default
+``LLMExtractor`` that uses an LLM to identify knowledge
 worth persisting.
 """
 

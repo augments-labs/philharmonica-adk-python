@@ -1,13 +1,13 @@
 """Base workflow class and HITL payload types for Philharmonica Temporal workflows.
 
-Provides :class:`PhilharmonicaWorkflow` — a :func:`~temporalio.workflow.defn`-decorated
+Provides ``PhilharmonicaWorkflow`` — a ``defn``-decorated
 base class that wires up the Human-In-The-Loop (HITL) protocol.  Concrete
-workflow implementations subclass it and override :meth:`~PhilharmonicaWorkflow.run`.
+workflow implementations subclass it and override ``run``.
 
 Also exposes two frozen dataclasses used as HITL signal/update payloads:
 
-- :class:`HumanReply` — carries a human's response to an interrupted agent node.
-- :class:`ToolApprovalDecision` — carries an approval or rejection for a deferred
+- ``HumanReply`` — carries a human's response to an interrupted agent node.
+- ``ToolApprovalDecision`` — carries an approval or rejection for a deferred
   tool call.
 
 References:
@@ -88,10 +88,10 @@ try:
     class PhilharmonicaWorkflow:
         """Base Temporal workflow that implements the HITL protocol.
 
-        Subclasses override :meth:`run` and call the helper methods below to
+        Subclasses override ``run`` and call the helper methods below to
         exchange HITL messages with external actors.
 
-        The class attribute :attr:`__philharmonica_agents__` is a sequence of agent
+        The class attribute ``__philharmonica_agents__`` is a sequence of agent
         instances that the workflow orchestrates.  Subclasses populate it at
         class definition time.
 
@@ -116,7 +116,7 @@ try:
             """Signal: receive a human reply for an interrupted node.
 
             Appends *reply* to the internal queue.  Callers drain the queue via
-            :meth:`consume_replies`.
+            ``consume_replies``.
 
             Args:
                 reply: The human response to enqueue.
@@ -133,7 +133,7 @@ try:
             """Query: return the current workflow state snapshot.
 
             The returned dict includes all key-value pairs set via
-            :meth:`update_state` plus a ``"cancellation_reason"`` key whose
+            ``update_state`` plus a ``"cancellation_reason"`` key whose
             value is the reason string supplied with the most recent external
             cancellation request, or ``None`` when the workflow has not been
             cancelled.
@@ -168,8 +168,8 @@ try:
         def approve_tool_call(self, decision: ToolApprovalDecision) -> None:
             """Update: record an approval or rejection for a deferred tool call.
 
-            Stores *decision* keyed by :attr:`~ToolApprovalDecision.call_id`.
-            Callers retrieve the decision via :meth:`consume_approval`.
+            Stores *decision* keyed by ``call_id``.
+            Callers retrieve the decision via ``consume_approval``.
 
             Args:
                 decision: The approval or rejection decision to store.
@@ -203,7 +203,7 @@ try:
                 call_id: The tool call identifier to look up.
 
             Returns:
-                The stored :class:`ToolApprovalDecision`, or ``None`` if no
+                The stored ``ToolApprovalDecision``, or ``None`` if no
                 decision has been recorded for *call_id*.
             """
             return self._approval_decisions.pop(call_id, None)
@@ -212,7 +212,7 @@ try:
             """Merge *state* into the current workflow state snapshot.
 
             Args:
-                state: Key-value pairs to merge into :attr:`_current_state`.
+                state: Key-value pairs to merge into ``_current_state``.
             """
             self._current_state.update(state)
 

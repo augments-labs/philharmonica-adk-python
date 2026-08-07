@@ -18,7 +18,7 @@ _MISSING: Final[object] = object()
 
 Distinguishes "no reply seeded" (the default) from an explicit ``None``
 reply value (a valid abstain answer). Identity comparison only — never
-exported; consumers use the accessor methods on :class:`RunContext`.
+exported; consumers use the accessor methods on ``RunContext``.
 """
 
 
@@ -71,7 +71,7 @@ class RunContext(Generic[TContext]):
 
     The swarm driver seeds this with the caller-supplied reply before
     re-firing a member parked on a pure-HITL interrupt;
-    :func:`philharmonica.adk.swarms.interrupt.request_human_input_in_swarm`
+    ``philharmonica.adk.swarms.interrupt.request_human_input_in_swarm``
     consumes it and clears the slot. Default is the ``_MISSING``
     sentinel so an explicit ``None`` reply (abstain) is distinguishable
     from "no reply seeded". External code should NOT read or write this
@@ -98,7 +98,7 @@ class RunContext(Generic[TContext]):
 
         Raises:
             LookupError: When no reply has been seeded. Callers must
-                check :meth:`has_swarm_resume_reply` first.
+                check ``has_swarm_resume_reply`` first.
         """
         if self._swarm_resume_reply is _MISSING:
             raise LookupError(
@@ -113,9 +113,9 @@ class RunContext(Generic[TContext]):
 
         Idempotent overwrite; the swarm driver calls this once per
         resumed turn. Callers should consume the seeded reply by
-        invoking :meth:`consume_swarm_resume_reply` from inside the
+        invoking ``consume_swarm_resume_reply`` from inside the
         member's tool body (typically via
-        :func:`philharmonica.adk.swarms.interrupt.request_human_input_in_swarm`).
+        ``philharmonica.adk.swarms.interrupt.request_human_input_in_swarm``).
         """
         self._swarm_resume_reply = reply
 

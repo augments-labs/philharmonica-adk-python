@@ -1,13 +1,13 @@
 """``SQLiteCheckpointer`` — durable, single-file graph-run persistence.
 
-Mirrors :class:`~philharmonica.adk.session.sqlite_session.SQLiteSession` in
+Mirrors ``SQLiteSession`` in
 structure (``aiosqlite``, lazy-open connection, JSON columns). One row
 per ``thread_id`` — the latest checkpoint overwrites the previous
 (``save`` is an upsert). Time-travel / replay-from-any-superstep is out
 of scope; that would require a row-per-superstep shape.
 
 The checkpointer subscribes to ``on_node_end`` and ``on_graph_end``
-via :class:`~philharmonica.adk.graphs.checkpointers.hooks.CheckpointerHooks`,
+via ``CheckpointerHooks``,
 so the graph loop contains zero persistence code.
 """
 
@@ -43,11 +43,11 @@ CREATE TABLE IF NOT EXISTS graph_checkpoints (
 
 
 class SQLiteCheckpointer(Checkpointer):
-    """Durable :class:`Checkpointer` backed by a single SQLite file.
+    """Durable ``Checkpointer`` backed by a single SQLite file.
 
     Uses ``aiosqlite`` for truly async database access. The connection
     is opened lazily on first use and held for the lifetime of the
-    instance. Call :meth:`close` when done (e.g. after a test or at
+    instance. Call ``close`` when done (e.g. after a test or at
     application shutdown).
 
     **Connection lifecycle and ownership.** The caller owns the
@@ -55,10 +55,10 @@ class SQLiteCheckpointer(Checkpointer):
     instance for the initial run and any later resume so both share
     the same process-lifetime store.  The connection opens lazily on
     first use and is reused for the instance's lifetime.
-    :class:`~philharmonica.adk.run.runner.Runner` does not close a
+    ``Runner`` does not close a
     caller-supplied checkpointer — the runner does not own it, the same
-    as :class:`~philharmonica.adk.graphs.checkpointers.in_memory.InMemoryCheckpointer`.
-    Call :meth:`close` at application shutdown, or per-instance if you
+    as ``InMemoryCheckpointer``.
+    Call ``close`` at application shutdown, or per-instance if you
     construct one per request.
 
     Attributes:
@@ -124,12 +124,12 @@ class SQLiteCheckpointer(Checkpointer):
 
         Args:
             thread_id: The logical run key.
-            graph: The :class:`Graph` the checkpoint belongs to. Mismatch
+            graph: The ``Graph`` the checkpoint belongs to. Mismatch
                 between ``graph.id`` and the stored ``graph_id`` raises
                 ``ValueError``.
 
         Returns:
-            A rehydrated :class:`GraphState`, or ``None`` when no checkpoint
+            A rehydrated ``GraphState``, or ``None`` when no checkpoint
             exists for ``thread_id``.
 
         Raises:

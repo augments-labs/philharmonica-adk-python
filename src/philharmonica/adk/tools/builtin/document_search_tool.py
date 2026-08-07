@@ -2,22 +2,22 @@
 
 A built-in tool that gives an agent a ``search(query)`` capability over a
 developer-curated set of documents (files, directories, or URLs). It composes
-the RAG primitives — format loaders, the :class:`TextChunker`, and a
-:class:`DocumentIndex` over any :class:`VectorStore` — behind the
-:class:`ExecutableBuiltinTool` contract, so it sits in ``Agent.tools`` and is
+the RAG primitives — format loaders, the ``TextChunker``, and a
+``DocumentIndex`` over any ``VectorStore`` — behind the
+``ExecutableBuiltinTool`` contract, so it sits in ``Agent.tools`` and is
 dispatched like any other tool.
 
 Design choices that follow the framework's cost and safety posture:
 
 - **Explicit embedder, no default.** Embedding spends tokens, so the developer
-  must supply an :class:`Embedder`; the framework never picks one implicitly.
+  must supply an ``Embedder``; the framework never picks one implicitly.
 - **Ephemeral store by default.** Absent an explicit ``vector_store``, an
   in-memory store is used — nothing is written to disk without opt-in.
 - **Sources are bound at construction.** The corpus is the developer's, fixed
   when the tool is built; the LLM supplies only the *query*, never a new path
   or URL. This keeps the tool off the attacker-controlled file/SSRF surface.
 - **Lazy, idempotent indexing.** Loading + chunking + embedding runs on the
-  first search (or an explicit :meth:`DocumentSearchTool.index` call) and once
+  first search (or an explicit ``DocumentSearchTool.index`` call) and once
   only — the embedding cost is paid when the corpus is first queried.
 
 The thin ``*SearchTool`` subclasses (``PDFSearchTool``, ``WebsiteSearchTool``,
@@ -83,14 +83,14 @@ class DocumentSearchTool(ExecutableBuiltinTool):
     Attributes:
         name: Tool name shown to the LLM (``"document_search"``).
         description: Tool description shown to the LLM.
-        schema: Input schema (:class:`DocumentSearchInput`).
+        schema: Input schema (``DocumentSearchInput``).
         embedder: Embedder used for chunks and queries (required).
         sources: Paths / directories / URLs to index. Routed by extension or
             URL shape when ``loader`` is ``None``.
         vector_store: Backend for chunk vectors. Defaults to an ephemeral
             in-memory store.
         chunker: Splitter applied before embedding. Defaults to a standard
-            :class:`TextChunker`.
+            ``TextChunker``.
         loader: Pins a single loader for every source (set by the typed
             subclasses). ``None`` means dispatch per source by type.
         namespace: Scoping key for this corpus's chunks.

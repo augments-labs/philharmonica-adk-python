@@ -1,7 +1,7 @@
 """TaskPipelineState — serializable resume state for TaskPipeline runs.
 
-A :class:`TaskPipelineState` records the completed slots and the next
-task index for a partially-executed :class:`TaskPipeline`. Persisting
+A ``TaskPipelineState`` records the completed slots and the next
+task index for a partially-executed ``TaskPipeline``. Persisting
 the state between processes lets a long pipeline survive a crash or
 a deliberate pause/resume across sessions.
 
@@ -9,18 +9,18 @@ Scope:
 
 - The state captures **between-task boundaries only**. Mid-turn HITL
   resume — pausing inside an agent loop and resuming from a captured
-  :class:`~philharmonica.adk.run.state.RunState` — is intentionally NOT
+  ``RunState`` — is intentionally NOT
   supported. The resume entry point starts the next-indexed task
   from scratch.
-- :attr:`TaskOutput.new_items` is not serialized. The audit trail
+- ``TaskOutput.new_items`` is not serialized. The audit trail
   for completed tasks lives on the
-  :class:`~philharmonica.adk.session.session.Session` if one is attached;
+  ``Session`` if one is attached;
   resume rebuilds it from there.
-- :attr:`Task.skip_if` / :attr:`Task.metadata` / :attr:`Task.agent`
+- ``Task.skip_if`` / ``Task.metadata`` / ``Task.agent``
   are NOT serialized. Resume requires the developer to reconstruct
-  the same :class:`TaskPipeline` definition on the resuming side
+  the same ``TaskPipeline`` definition on the resuming side
   (same Agent identities, same Task definitions) — analogous to
-  :class:`~philharmonica.adk.run.state.RunState`'s "same Agent definition
+  ``RunState``'s "same Agent definition
   on both sides" contract.
 """
 
@@ -44,16 +44,16 @@ class TaskPipelineState:
             correlation id); the framework does not generate one.
             Carried through round-trips so the resuming side can
             correlate the resume with the originating run.
-        slots: Per-task :class:`TaskOutput` slots in input order. Each
+        slots: Per-task ``TaskOutput`` slots in input order. Each
             slot covers a task that finished (either ran or skipped)
             BEFORE the checkpoint. Same indexing as
-            :attr:`TaskPipeline.tasks`.
+            ``TaskPipeline.tasks``.
         resume_index: Index of the next task to execute on resume.
             ``len(slots) == resume_index`` is the invariant after a
             clean checkpoint at a task boundary. Resume from index 0
             re-runs the entire pipeline. For DAG-shaped pipelines
-            (any task declaring :attr:`Task.depends_on`) the
-            :attr:`completed_task_ids` set is authoritative on what
+            (any task declaring ``Task.depends_on``) the
+            ``completed_task_ids`` set is authoritative on what
             to skip; ``resume_index`` is then advisory only.
         completed_task_ids: Stable IDs of every task that finished
             before the checkpoint (whether ran or skipped). Used by
@@ -61,7 +61,7 @@ class TaskPipelineState:
             (those whose ID is NOT in this set). Empty tuple ⇒
             positional-index semantics apply.
         metadata: Open-ended developer tag dict. Surfaced verbatim on
-            the resumed :class:`TaskPipelineResult`. Useful for
+            the resumed ``TaskPipelineResult``. Useful for
             tenant ids, request-correlation tags, etc.
     """
 
@@ -84,7 +84,7 @@ class TaskPipelineState:
     def __repr__(self) -> str:
         """One-line checkpoint summary: id, slots, resume point.
 
-        ``completed`` counts :attr:`completed_task_ids` — the
+        ``completed`` counts ``completed_task_ids`` — the
         authoritative skip-set on DAG resume.
         """
         parts: list[str] = [
@@ -96,11 +96,11 @@ class TaskPipelineState:
         return f"TaskPipelineState({', '.join(parts)})"
 
     def __post_init__(self) -> None:
-        """Validate :class:`TaskPipelineState` construction.
+        """Validate ``TaskPipelineState`` construction.
 
         Raises:
-            ValueError: When :attr:`resume_index` is negative or
-                inconsistent with :attr:`slots` length.
+            ValueError: When ``resume_index`` is negative or
+                inconsistent with ``slots`` length.
         """
         if self.resume_index < 0:
             raise ValueError(
@@ -116,7 +116,7 @@ class TaskPipelineState:
         """Serialize to a JSON string.
 
         The output is portable across processes. Load via
-        :meth:`from_json`.
+        ``from_json``.
 
         Returns:
             A compact JSON string representing this checkpoint. All
@@ -133,20 +133,20 @@ class TaskPipelineState:
 
     @classmethod
     def from_json(cls, payload: str) -> TaskPipelineState:
-        """Rehydrate from a :meth:`to_json` output.
+        """Rehydrate from a ``to_json`` output.
 
         Required fields (``pipeline_id``, ``slots``, ``resume_index``)
         MUST be present in the payload; their absence raises
-        :class:`ValueError` so a truncated or corrupted state cannot
+        ``ValueError`` so a truncated or corrupted state cannot
         silently load as a partial / empty pipeline. ``metadata`` and
         ``completed_task_ids`` are optional with empty defaults.
 
         Args:
             payload: A JSON string previously produced by
-                :meth:`to_json`.
+                ``to_json``.
 
         Returns:
-            A :class:`TaskPipelineState` rehydrated from ``payload``.
+            A ``TaskPipelineState`` rehydrated from ``payload``.
 
         Raises:
             ValueError: When ``payload`` is not valid JSON or when any

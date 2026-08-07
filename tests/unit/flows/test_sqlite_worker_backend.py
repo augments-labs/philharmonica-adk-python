@@ -1,4 +1,4 @@
-"""Regression tests for :class:`SqliteFlowWorkerBackend` defect fixes.
+"""Regression tests for ``SqliteFlowWorkerBackend`` defect fixes.
 
 Covers three confirmed defects:
 

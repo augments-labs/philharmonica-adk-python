@@ -1,6 +1,6 @@
 """Graph topology diagram for an Agent-based review pipeline.
 
-Builds a Graph whose nodes wrap Agents (via :class:`AgentExecutable`),
+Builds a Graph whose nodes wrap Agents (via ``AgentExecutable``),
 emits Mermaid + DOT before running, and renders to disk via the
 optional ``viz`` / ``mermaid`` extras.
 

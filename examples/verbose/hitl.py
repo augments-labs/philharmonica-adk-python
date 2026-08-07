@@ -1,9 +1,9 @@
 """Verbose output — HITL (Human-in-the-Loop) visualization.
 
 Demonstrates the ADK-first-class event vocabulary CrewAI lacks:
-:const:`~philharmonica.adk.verbose.EVENT_HITL_APPROVAL_REQUESTED`,
-:const:`~philharmonica.adk.verbose.EVENT_HITL_APPROVAL_GRANTED`,
-:const:`~philharmonica.adk.verbose.EVENT_HITL_APPROVAL_REJECTED`.
+``EVENT_HITL_APPROVAL_REQUESTED``,
+``EVENT_HITL_APPROVAL_GRANTED``,
+``EVENT_HITL_APPROVAL_REJECTED``.
 
 When a tool with ``requires_approval=True`` is invoked, the runner
 pauses before execution and emits a yellow HITL panel tagged

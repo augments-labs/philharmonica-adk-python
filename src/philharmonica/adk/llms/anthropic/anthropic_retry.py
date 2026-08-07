@@ -1,9 +1,9 @@
 """Anthropic-specific exception classification + retry wrapper.
 
-Thin layer over :func:`philharmonica.adk.llms.retry.call_with_retry` that
+Thin layer over ``philharmonica.adk.llms.retry.call_with_retry`` that
 supplies the Anthropic SDK's exception classifier. The generic loop
 (backoff, jitter, budget accounting) lives in
-:mod:`philharmonica.adk.llms.retry` — this module only translates the
+``philharmonica.adk.llms.retry`` — this module only translates the
 ``anthropic`` SDK's exception hierarchy onto the framework's three
 retryable categories (``"rate_limit"`` / ``"timeout"`` /
 ``"server_error"``).
@@ -11,11 +11,11 @@ retryable categories (``"rate_limit"`` / ``"timeout"`` /
 Classification rules (match the Anthropic SDK's public exception types —
 https://github.com/anthropics/anthropic-sdk-python#error-handling):
 
-- :class:`anthropic.RateLimitError` (HTTP 429) → ``"rate_limit"``
-- :class:`anthropic.APITimeoutError` → ``"timeout"``
-- :class:`anthropic.APIConnectionError` → ``"server_error"``
+- ``anthropic.RateLimitError`` (HTTP 429) → ``"rate_limit"``
+- ``anthropic.APITimeoutError`` → ``"timeout"``
+- ``anthropic.APIConnectionError`` → ``"server_error"``
   (network-level — TCP reset, TLS handshake failure, etc.)
-- :class:`anthropic.APIStatusError` — classified by HTTP status:
+- ``anthropic.APIStatusError`` — classified by HTTP status:
 
   =====================  =====================
   Status code            Kind
@@ -27,8 +27,8 @@ https://github.com/anthropics/anthropic-sdk-python#error-handling):
   other ``4xx``          ``None`` (permanent)
   =====================  =====================
 
-Anthropic's :class:`OverloadedError` (HTTP 529) is a subclass of
-:class:`APIStatusError`, so the status-code branch handles it without
+Anthropic's ``OverloadedError`` (HTTP 529) is a subclass of
+``APIStatusError``, so the status-code branch handles it without
 a dedicated import — the ``OverloadedError`` symbol is not re-exported
 at the ``anthropic`` package root and would force an
 ``anthropic._exceptions`` private import to reach it.
@@ -91,9 +91,9 @@ async def call_with_retry[T](
 ) -> T:
     """Thin Anthropic-specific shim over the generic retry loop.
 
-    See :func:`philharmonica.adk.llms.retry.call_with_retry` for the loop
+    See ``philharmonica.adk.llms.retry.call_with_retry`` for the loop
     contract; this wrapper only injects
-    :func:`anthropic_exception_to_kind` as the classifier so provider
+    ``anthropic_exception_to_kind`` as the classifier so provider
     code can stay classifier-agnostic.
     """
     return await _generic_call_with_retry(

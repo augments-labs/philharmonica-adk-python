@@ -1,16 +1,16 @@
 """Provider-agnostic retry loop for LLM calls.
 
-Shared between :mod:`philharmonica.adk.llms.litellm.litellm_retry` and
-:mod:`philharmonica.adk.llms.openai.openai_retry` (and any future provider
+Shared between ``philharmonica.adk.llms.litellm.litellm_retry`` and
+``philharmonica.adk.llms.openai.openai_retry`` (and any future provider
 module). The loop logic — backoff, jitter, budget accounting, logging —
 is identical across providers; only the classifier differs, because
 each SDK raises a distinct exception hierarchy.
 
 This module exposes a single function:
 
-- :func:`call_with_retry` — wraps an async callable in an
+- ``call_with_retry`` — wraps an async callable in an
   exponential-backoff retry loop governed by an
-  :class:`LLMRetryPolicy` and a caller-supplied classifier.
+  ``LLMRetryPolicy`` and a caller-supplied classifier.
 
 Streaming calls are **not** retried by this helper. Reconnecting
 mid-stream would silently lose tokens or double-emit events, so
@@ -51,7 +51,7 @@ async def call_with_retry[T](
         policy: Retry policy controlling backoff, jitter, and the
             set of error kinds that are retried.
         classifier: Maps a caught exception onto a framework-level
-            :data:`LLMRetryErrorKind`, or ``None`` when the exception
+            ``LLMRetryErrorKind``, or ``None`` when the exception
             is permanent (authentication, bad request, content filter,
             etc.). Each provider module supplies its own.
         model: Optional model identifier for log messages.

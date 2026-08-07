@@ -1,4 +1,4 @@
-"""Mermaid ``flowchart`` emitters for :class:`Flow` and :class:`Graph`.
+"""Mermaid ``flowchart`` emitters for ``Flow`` and ``Graph``.
 
 Pure functions translating immutable topology data into Mermaid
 diagram strings. The output is a complete ``flowchart`` block ready
@@ -50,18 +50,18 @@ common choices; ``RL`` and ``BT`` are accepted for completeness.
 """
 
 _VALID_DIRECTIONS: frozenset[str] = frozenset({"LR", "TD", "TB", "RL", "BT"})
-"""Runtime-validated direction values matching :data:`MermaidDirection`."""
+"""Runtime-validated direction values matching ``MermaidDirection``."""
 
 
 def flow_to_mermaid(flow: Flow, *, direction: MermaidDirection = "LR") -> str:
     """Emit a Mermaid ``flowchart`` describing the Flow's topology.
 
-    Walks the immutable :class:`FlowStepRegistry` of the flow's class and
-    its derived :class:`FlowTransitionTable` to produce a complete
+    Walks the immutable ``FlowStepRegistry`` of the flow's class and
+    its derived ``FlowTransitionTable`` to produce a complete
     Mermaid block. Pure function: no I/O, no side effects, idempotent.
 
     Args:
-        flow: A constructed :class:`Flow` instance. The instance is
+        flow: A constructed ``Flow`` instance. The instance is
             only used to access the class-level registry — no run is
             triggered.
         direction: Mermaid layout direction. ``"LR"`` (default) reads
@@ -110,21 +110,21 @@ def flow_to_mermaid(flow: Flow, *, direction: MermaidDirection = "LR") -> str:
 
 
 def definition_to_mermaid(defn: FlowDefinition, *, direction: MermaidDirection = "LR") -> str:
-    """Emit a Mermaid ``flowchart`` from a :class:`FlowDefinition`.
+    """Emit a Mermaid ``flowchart`` from a ``FlowDefinition``.
 
-    Produces the same diagram as :func:`flow_to_mermaid` but accepts a
-    :class:`~philharmonica.adk.flows.definition.FlowDefinition` directly, so
+    Produces the same diagram as ``flow_to_mermaid`` but accepts a
+    ``FlowDefinition`` directly, so
     visualisation is possible without constructing or running a
-    :class:`~philharmonica.adk.flows.flow.Flow` instance.
+    ``Flow`` instance.
 
     Pure function: no I/O, no side effects. Descriptions are read from
-    :attr:`~philharmonica.adk.flows.definition.StepInfo.description` on each
+    ``description`` on each
     step.
 
     Args:
-        defn: A frozen :class:`FlowDefinition` produced by
-            :meth:`~philharmonica.adk.flows.flow.Flow.get_definition` or
-            :func:`~philharmonica.adk.flows.definition.build_flow_definition`.
+        defn: A frozen ``FlowDefinition`` produced by
+            ``get_definition`` or
+            ``build_flow_definition``.
         direction: Mermaid layout direction. ``"LR"`` (default).
 
     Returns:
@@ -164,7 +164,7 @@ def _mermaid_node_decl(name: str, role: str, desc_lookup: dict[str, str | None])
         name: Step method name (node id).
         role: ``"start"`` / ``"listen"`` / ``"router"``.
         desc_lookup: Mapping from step name to optional description string.
-            Passed to :func:`~philharmonica.adk.visualization.helpers.node_label_from_desc`
+            Passed to ``node_label_from_desc``
             for explicit ``is not None`` label resolution.
 
     Returns:
@@ -183,10 +183,10 @@ def _defn_direct_edges_mermaid(
     sanitised: dict[str, str],
     inverse: dict[str, str],
 ) -> list[str]:
-    """Emit Mermaid direct-trigger edges from a :class:`FlowDefinition`.
+    """Emit Mermaid direct-trigger edges from a ``FlowDefinition``.
 
     Reverses the ``listener → triggers`` mapping stored in
-    :attr:`FlowDefinition.direct_triggers` to produce one edge per
+    ``FlowDefinition.direct_triggers`` to produce one edge per
     ``trigger → listener`` pair.
 
     Args:
@@ -215,7 +215,7 @@ def _defn_router_edges_mermaid(
     sanitised: dict[str, str],
     inverse: dict[str, str],
 ) -> list[str]:
-    """Emit Mermaid router-trigger edges from a :class:`FlowDefinition`.
+    """Emit Mermaid router-trigger edges from a ``FlowDefinition``.
 
     Args:
         defn: The compiled flow definition.
@@ -244,7 +244,7 @@ def _defn_gate_edges_mermaid(
     sanitised: dict[str, str],
     inverse: dict[str, str],
 ) -> list[str]:
-    """Emit Mermaid gate nodes and their edges from a :class:`FlowDefinition`.
+    """Emit Mermaid gate nodes and their edges from a ``FlowDefinition``.
 
     Args:
         defn: The compiled flow definition.
@@ -272,7 +272,7 @@ def _defn_gate_edges_mermaid(
 def _flow_direct_edges(table: FlowTransitionTable, sanitised: dict[str, str], inverse: dict[str, str]) -> list[str]:
     """Emit Mermaid edges for direct (non-gated, non-routed) triggers.
 
-    Each trigger and listener is run through :func:`assert_no_collision`
+    Each trigger and listener is run through ``assert_no_collision``
     so a route label that would collide with an existing step name
     (or vice versa) raises ``ValueError`` instead of silently
     retargeting an edge.
@@ -325,8 +325,8 @@ def _flow_gate_edges(
 ) -> list[str]:
     """Emit Mermaid synthesised gate nodes and their incoming / outgoing edges.
 
-    Gate node ids are derived from :attr:`GateSpec.gate_id` via
-    :func:`gate_node_id`. The id is also registered in ``sanitised``
+    Gate node ids are derived from ``GateSpec.gate_id`` via
+    ``gate_node_id``. The id is also registered in ``sanitised``
     so a step name that happens to slug to the same string raises a
     typed collision error instead of overlapping diagram nodes.
 
@@ -372,7 +372,7 @@ def graph_to_mermaid(graph: Graph, *, direction: MermaidDirection = "LR") -> str
     Mermaid block. Pure function: no I/O.
 
     Args:
-        graph: A compiled :class:`Graph` instance.
+        graph: A compiled ``Graph`` instance.
         direction: Mermaid layout direction.
 
     Returns:
@@ -402,10 +402,10 @@ def graph_to_mermaid(graph: Graph, *, direction: MermaidDirection = "LR") -> str
 
 
 def _render_graph_edge(edge: GraphEdge) -> str:
-    """Format a single :class:`GraphEdge` as a Mermaid edge.
+    """Format a single ``GraphEdge`` as a Mermaid edge.
 
     Args:
-        edge: A :class:`GraphEdge`.
+        edge: A ``GraphEdge``.
 
     Returns:
         A Mermaid edge declaration string.
@@ -446,7 +446,7 @@ def _node_decl(name: str, role: str, lookup: dict[str, FlowStep]) -> str:
     Args:
         name: The step's method name (also the node id).
         role: One of ``"start"`` / ``"listen"`` / ``"router"``.
-        lookup: Mapping from name to bound :class:`FlowStep` for
+        lookup: Mapping from name to bound ``FlowStep`` for
             description lookup.
 
     Returns:

@@ -1,7 +1,7 @@
 """``philharmonica serve`` — expose a local Agent over HTTP.
 
 Serves a single Agent through the framework's serving layer
-(:func:`philharmonica.adk.serving.build_app`) under uvicorn. By default it
+(``philharmonica.adk.serving.build_app``) under uvicorn. By default it
 exposes the plain-REST surface (``POST /run``, ``POST /run_sse``) and the
 health routes (``GET /healthz``, ``GET /readyz``); passing ``--card``
 additionally publishes the A2A JSON-RPC + discovery surface.
@@ -195,7 +195,7 @@ def _build_a2a_server(
     max_turns: int | None,
     executor_store: _DurableTaskStore | None,
 ) -> A2AServer:
-    """Build the :class:`A2AServer` config around an opened task store.
+    """Build the ``A2AServer`` config around an opened task store.
 
     Args:
         agent: The local agent to expose.
@@ -205,7 +205,7 @@ def _build_a2a_server(
             or ``None`` for the in-memory default.
 
     Returns:
-        A frozen :class:`A2AServer` config the serving app mounts.
+        A frozen ``A2AServer`` config the serving app mounts.
 
     Raises:
         click.UsageError: If the ``a2a`` extra is not installed.
@@ -260,7 +260,7 @@ def _open_task_store(task_db: Path | None, task_dsn: str | None) -> _DurableTask
     """Construct a durable A2A task store, or ``None`` for in-memory.
 
     The store's restart recovery is deferred to the serving lifespan
-    (:func:`_install_lifespan`), so any connection pool it opens is bound
+    (``_install_lifespan``), so any connection pool it opens is bound
     to the loop that serves requests rather than a bootstrap loop that is
     closed before the first request.
 
@@ -373,7 +373,7 @@ def _load_card(card_path: Path) -> AgentCard:
         card_path: Path to the AgentCard JSON file.
 
     Returns:
-        The parsed :class:`a2a.types.AgentCard`.
+        The parsed ``a2a.types.AgentCard``.
 
     Raises:
         click.UsageError: If the file is not valid AgentCard JSON.

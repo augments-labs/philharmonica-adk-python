@@ -1,6 +1,6 @@
 """Philharmonica Workflows — durable execution engine abstraction.
 
-Provides the :class:`DurableEngine` Protocol and configuration dataclasses
+Provides the ``DurableEngine`` Protocol and configuration dataclasses
 shared by all durable execution backends.  Concrete backends live in
 sub-packages:
 

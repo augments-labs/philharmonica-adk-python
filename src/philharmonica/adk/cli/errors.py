@@ -28,7 +28,7 @@ def framework_errors[**P, R](f: Callable[P, R]) -> Callable[P, R]:
 
     Returns:
         The wrapped callback; config parse/resolution errors re-raise as
-        :class:`click.UsageError` with the original guiding message.
+        ``click.UsageError`` with the original guiding message.
     """
 
     @functools.wraps(f)

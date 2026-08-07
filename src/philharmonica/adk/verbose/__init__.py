@@ -1,6 +1,6 @@
 """Configurable colourful verbose-output for agent runs.
 
-See :mod:`philharmonica.adk.verbose.config` for the public API. Wire via
+See ``philharmonica.adk.verbose.config`` for the public API. Wire via
 ``RunConfig(verbose=VerboseConfig(...))`` or per-agent via
 ``Agent(verbose=VerboseConfig(...))``.
 """

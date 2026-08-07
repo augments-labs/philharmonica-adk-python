@@ -1,4 +1,4 @@
-"""Unit tests for :func:`graph_to_dot` and :meth:`Graph.to_dot`."""
+"""Unit tests for ``graph_to_dot`` and ``Graph.to_dot``."""
 
 from __future__ import annotations
 

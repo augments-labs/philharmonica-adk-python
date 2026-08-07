@@ -1,33 +1,33 @@
 """``Graph`` — the compiled, immutable, composable orchestration primitive.
 
-A :class:`Graph` is the frozen artifact produced by
-:meth:`GraphBuilder.compile`. It carries the full definition of a
+A ``Graph`` is the frozen artifact produced by
+``GraphBuilder.compile``. It carries the full definition of a
 multi-node run:
 
-- :attr:`nodes` — the node roster (a tuple of :class:`GraphNode`\\ s).
-- :attr:`edges` — the directed-edge set (a tuple of :class:`GraphEdge`\\ s).
-- :attr:`entry` — the single entry-node id.
-- :attr:`terminals` — one or more terminal-node ids.
-- :attr:`config` — the graph-wide :class:`GraphConfig`.
-- :attr:`hooks` — attached :class:`GraphHooks` observers.
-- :attr:`id` / :attr:`description` / :attr:`metadata` — identity and
+- ``nodes`` — the node roster (a tuple of ``GraphNode``\\ s).
+- ``edges`` — the directed-edge set (a tuple of ``GraphEdge``\\ s).
+- ``entry`` — the single entry-node id.
+- ``terminals`` — one or more terminal-node ids.
+- ``config`` — the graph-wide ``GraphConfig``.
+- ``hooks`` — attached ``GraphHooks`` observers.
+- ``id`` / ``description`` / ``metadata`` — identity and
   free-form tags for tracing and logging.
 
-A ``Graph`` implements :class:`Executable` directly. The graph loop
+A ``Graph`` implements ``Executable`` directly. The graph loop
 treats a nested ``Graph`` exactly like any other node — calling
-:meth:`invoke` runs the inner loop and returns the resulting
-:class:`NodeResult`. This is what lets a ``Graph`` live inside
+``invoke`` runs the inner loop and returns the resulting
+``NodeResult``. This is what lets a ``Graph`` live inside
 another ``Graph`` without an intermediate adapter. The "Graph of
 Graphs" composition pattern.
 
-Construction. Callers MUST go through :meth:`Graph.new` →
-:class:`GraphBuilder` → :meth:`GraphBuilder.compile`. The direct
+Construction. Callers MUST go through ``Graph.new`` →
+``GraphBuilder`` → ``GraphBuilder.compile``. The direct
 constructor is not part of the public API — it exists so the builder
 can instantiate a frozen ``Graph`` at compile time. Building a
 ``Graph`` by hand is possible but bypasses the builder's validation
 and should be reserved for tests.
 
-Identity. :meth:`Graph.new(id=None)` auto-generates a ``graph-XXXX``
+Identity. ``Graph.new(id=None)`` auto-generates a ``graph-XXXX``
 id when none is supplied, mirroring CrewAI and OpenAI's Agents
 Python SDK. Supply an explicit id when you want deterministic trace
 span names, or when you expect to persist and later restore a
@@ -68,7 +68,7 @@ TContext = TypeVar("TContext")
 def _generate_graph_id() -> str:
     """Return a slug-safe auto-generated graph id.
 
-    Format: ``graph-<12 hex chars>``. Uses :func:`uuid.uuid4` for
+    Format: ``graph-<12 hex chars>``. Uses ``uuid.uuid4`` for
     collision safety and trims to 12 hex characters for readability
     in logs and OTel spans — consistent with CrewAI's ``crewai-...``
     auto-ids and OpenAI Agents SDK's run ids. 12 hex chars give ~48
@@ -81,38 +81,38 @@ def _generate_graph_id() -> str:
 class Graph[TContext](Executable[TContext]):
     """Frozen, compiled graph ready for execution.
 
-    ``Graph`` inherits from :class:`Executable` so nested graphs
-    compose without adapters — a :class:`GraphNode` can hold a
+    ``Graph`` inherits from ``Executable`` so nested graphs
+    compose without adapters — a ``GraphNode`` can hold a
     ``Graph`` directly and the outer loop will call
-    :meth:`Graph.invoke` on it the same way it calls
-    :meth:`AgentExecutable.invoke`.
+    ``Graph.invoke`` on it the same way it calls
+    ``AgentExecutable.invoke``.
 
     All fields are frozen. Mutation is impossible after
-    :meth:`GraphBuilder.compile` returns, which keeps the graph safely
+    ``GraphBuilder.compile`` returns, which keeps the graph safely
     shareable across concurrent runs and serialisation-friendly.
 
     Attributes:
         id: Unique graph identifier. Used as the OTel span name
             ``graph:<id>`` and as an element of the ``graph_path``
-            propagated on every :class:`GraphStreamEvent`.
-            Auto-generated ``graph-XXXX`` when :meth:`Graph.new` is
+            propagated on every ``GraphStreamEvent``.
+            Auto-generated ``graph-XXXX`` when ``Graph.new`` is
             called without an explicit id.
         description: Optional human-readable blurb. Emitted on
-            :class:`GraphStartEvent` and on OTel span attributes.
+            ``GraphStartEvent`` and on OTel span attributes.
         metadata: Free-form user tag dict. Escape hatch for attaching
             cost-center, team owner, or SLO tier to a graph.
-        nodes: Tuple of :class:`GraphNode`\\ s — the node roster.
-            Immutable; use :meth:`get_node` for id-based lookup.
-        edges: Tuple of :class:`GraphEdge`\\ s. Ordering is
+        nodes: Tuple of ``GraphNode``\\ s — the node roster.
+            Immutable; use ``get_node`` for id-based lookup.
+        edges: Tuple of ``GraphEdge``\\ s. Ordering is
             construction order; the graph loop sorts on read when
             determinism matters.
         entry: Id of the single entry node. Guaranteed to name a node
-            in :attr:`nodes` (validated at compile time).
+            in ``nodes`` (validated at compile time).
         terminals: Tuple of terminal node ids (at least one).
-        config: The graph-wide :class:`GraphConfig`.
-        hooks: Tuple of :class:`GraphHooks` observers attached to the
+        config: The graph-wide ``GraphConfig``.
+        hooks: Tuple of ``GraphHooks`` observers attached to the
             graph. Merged with any run-level hooks passed to
-            :meth:`Runner.arun_graph`.
+            ``Runner.arun_graph``.
     """
 
     id: str
@@ -140,7 +140,7 @@ class Graph[TContext](Executable[TContext]):
     """Graph-wide config (budgets, defaults, behaviour knobs)."""
 
     hooks: tuple[GraphHooks[Any], ...] = field(default_factory=tuple)
-    """Attached :class:`GraphHooks` observers."""
+    """Attached ``GraphHooks`` observers."""
 
     # -- Construction -----------------------------------------------
 
@@ -151,12 +151,12 @@ class Graph[TContext](Executable[TContext]):
         description: str | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> GraphBuilder[Any]:
-        """Open a :class:`GraphBuilder` with fresh identity.
+        """Open a ``GraphBuilder`` with fresh identity.
 
         This is the primary entry point to building a graph. The
         returned builder accumulates nodes and edges via method
-        chaining; :meth:`GraphBuilder.compile` produces the frozen
-        :class:`Graph` artifact.
+        chaining; ``GraphBuilder.compile`` produces the frozen
+        ``Graph`` artifact.
 
         Args:
             id: Optional explicit graph id. When ``None``, an id of
@@ -166,13 +166,13 @@ class Graph[TContext](Executable[TContext]):
                 or when you plan to persist checkpoints across
                 process restarts.
             description: Optional human-readable description emitted
-                on :class:`GraphStartEvent` and OTel spans.
+                on ``GraphStartEvent`` and OTel spans.
             metadata: Optional free-form tag dict. Not validated;
                 surfaced verbatim on events and spans.
 
         Returns:
-            A :class:`GraphBuilder` ready to receive
-            :meth:`node`/:meth:`edge`/:meth:`pipe` calls.
+            A ``GraphBuilder`` ready to receive
+            ``node``/``edge``/``pipe`` calls.
 
         Example::
 
@@ -202,7 +202,7 @@ class Graph[TContext](Executable[TContext]):
     # -- Lookup -----------------------------------------------------
 
     def get_node(self, node_id: str) -> GraphNode:
-        """Return the :class:`GraphNode` with id ``node_id``.
+        """Return the ``GraphNode`` with id ``node_id``.
 
         Raises ``KeyError`` when no node with that id exists.
         """
@@ -227,9 +227,9 @@ class Graph[TContext](Executable[TContext]):
         """Return a Mermaid ``flowchart`` rendering of this Graph's topology.
 
         Thin ergonomic wrapper around
-        :func:`philharmonica.adk.visualization.graph_to_mermaid`. Pure
+        ``philharmonica.adk.visualization.graph_to_mermaid``. Pure
         function: no I/O. Walks ``self.nodes`` and ``self.edges`` —
-        the immutable frozen artifact built by :meth:`GraphBuilder.compile`.
+        the immutable frozen artifact built by ``GraphBuilder.compile``.
 
         Args:
             direction: Mermaid layout direction. ``"LR"`` (default)
@@ -248,7 +248,7 @@ class Graph[TContext](Executable[TContext]):
         """Return a Graphviz DOT rendering of this Graph's topology.
 
         Thin ergonomic wrapper around
-        :func:`philharmonica.adk.visualization.graph_to_dot`. Pure function:
+        ``philharmonica.adk.visualization.graph_to_dot``. Pure function:
         no I/O. Walks ``self.nodes`` and ``self.edges``.
 
         Args:
@@ -274,28 +274,28 @@ class Graph[TContext](Executable[TContext]):
     ) -> NodeResult[TContext]:
         """Run the graph end-to-end when embedded as a node in another graph.
 
-        Delegates to :func:`run_graph_loop` (the same driver
-        :meth:`Runner.arun_graph` uses) and converts the resulting
-        :class:`GraphRunResult` into a :class:`NodeResult` so the outer
+        Delegates to ``run_graph_loop`` (the same driver
+        ``Runner.arun_graph`` uses) and converts the resulting
+        ``GraphRunResult`` into a ``NodeResult`` so the outer
         graph treats the inner graph indistinguishably from any other
         node.
 
         The ``input.content`` becomes the inner graph's initial prompt.
         If the inner graph has multiple terminals, the aggregate dict
-        is placed on :attr:`NodeResult.output`; ``final_text`` is set
+        is placed on ``NodeResult.output``; ``final_text`` is set
         when the terminal output is a single string.
 
         Args:
             input: Uniform input envelope from the outer graph.
-            context: Shared :class:`RunContext`. Usage from the inner
+            context: Shared ``RunContext``. Usage from the inner
                 run does NOT auto-propagate; the outer graph loop's
-                :meth:`GraphState.record` aggregates via
-                :attr:`NodeResult.usage`.
-            config: :class:`RunConfig` threaded from the outer run.
+                ``GraphState.record`` aggregates via
+                ``NodeResult.usage``.
+            config: ``RunConfig`` threaded from the outer run.
 
         Returns:
-            A :class:`NodeResult` wrapping the inner
-            :class:`GraphRunResult`.
+            A ``NodeResult`` wrapping the inner
+            ``GraphRunResult``.
         """
         # Local import — run/graph_loop.py imports types from graphs/;
         # importing it at module top would create a circular dependency

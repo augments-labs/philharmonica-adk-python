@@ -24,7 +24,7 @@ class SessionEvent:
     """A single conversation event in a session.
 
     Events are append-only and immutable once stored.  Each event wraps
-    a single :data:`LLMInputContentItem` with metadata.
+    a single ``LLMInputContentItem`` with metadata.
 
     Attributes:
         id: Unique event identifier (UUID).
@@ -46,7 +46,7 @@ class SessionEvent:
         """Extract the content item for LLM input construction.
 
         Returns:
-            The :data:`LLMInputContentItem` carried by this event.
+            The ``LLMInputContentItem`` carried by this event.
         """
         return self.content
 
@@ -64,7 +64,7 @@ def create_session_event(
         state_delta: Optional state changes from this event.
 
     Returns:
-        A new :class:`SessionEvent` instance.
+        A new ``SessionEvent`` instance.
     """
     return SessionEvent(
         id=str(uuid.uuid4()),

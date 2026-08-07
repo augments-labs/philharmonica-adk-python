@@ -171,7 +171,7 @@ class FunctionTool:
 
     ``None`` (default) means no guardrails configured — the executor
     skips both phases entirely on the fast path. When set, the
-    :class:`~philharmonica.adk.tools.tool_guardrails.ToolGuardrails` config
+    ``ToolGuardrails`` config
     holds two phase-typed lists:
 
     - ``guardrails.input``: validates parsed arguments before
@@ -223,7 +223,7 @@ class FunctionTool:
     variable-size results (RAG, web search, file readers) SHOULD set
     a bound** — unbounded results are re-sent every turn until the
     context editor clears them, and that editor is itself opt-in (see
-    :attr:`ContextEditingConfig.clear_tool_results`).
+    ``ContextEditingConfig.clear_tool_results``).
     """
 
     max_retries: int | None = None
@@ -268,12 +268,12 @@ class FunctionTool:
     """
 
     execution_aware: bool = False
-    """Whether this tool expects :class:`ExecutionAwareToolContext`.
+    """Whether this tool expects ``ExecutionAwareToolContext``.
 
     When ``True``, the Runner constructs an
-    :class:`ExecutionAwareToolContext` with read-only execution state
+    ``ExecutionAwareToolContext`` with read-only execution state
     snapshots (usage, turn count, message count, token estimate)
-    instead of a plain :class:`ToolContext`.
+    instead of a plain ``ToolContext``.
 
     Set automatically by ``@function_tool`` when the function's first
     parameter is annotated as ``ExecutionAwareToolContext``, or manually
@@ -281,12 +281,12 @@ class FunctionTool:
     """
 
     history_aware: bool = False
-    """Whether this tool expects :class:`HistoryAwareToolContext`.
+    """Whether this tool expects ``HistoryAwareToolContext``.
 
     When ``True``, the Runner constructs a
-    :class:`HistoryAwareToolContext` with a read-only snapshot of the
+    ``HistoryAwareToolContext`` with a read-only snapshot of the
     conversation history as Layer 3 RunItems, in addition to all
-    execution state from :class:`ExecutionAwareToolContext`.
+    execution state from ``ExecutionAwareToolContext``.
 
     Implies ``execution_aware=True`` (enforced in ``__post_init__``).
 
@@ -299,7 +299,7 @@ class FunctionTool:
     """Whether to cache tool results by input arguments.
 
     ``False`` disables caching. ``True`` enables the safe default
-    :class:`ToolCachePolicy` (run-scoped, bounded LRU). Pass an explicit
+    ``ToolCachePolicy`` (run-scoped, bounded LRU). Pass an explicit
     policy with ``scope="process"`` for cache reuse across runs. Cache
     keys are canonical JSON strings unless a policy supplies
     ``key_builder``. Output guardrails and post-processing still apply to
@@ -378,7 +378,7 @@ class FunctionTool:
     tool to function.
 
     Validated by ``Agent.__post_init__`` — any missing variable raises
-    :class:`philharmonica.adk.exceptions.ToolDependencyError` listing every
+    ``philharmonica.adk.exceptions.ToolDependencyError`` listing every
     unsatisfied requirement across every tool. Failing fast at agent
     construction surfaces misconfiguration before the first LLM call,
     rather than as a cryptic error mid-turn.
@@ -441,7 +441,7 @@ class FunctionTool:
     - ``behavior="error"``: the executor returns a rate-limit error
       result the LLM can react to in its next turn.
 
-    State is stored on the tool instance via :meth:`acquire_rate_slot`
+    State is stored on the tool instance via ``acquire_rate_slot``
     and persists across invocations within the same process. Use one
     ``FunctionTool`` instance per limited backend so the window is
     enforced consistently.
@@ -1254,7 +1254,7 @@ def function_tool(
         prepare: Dynamic tool definition modifier per LLM step.
         requires_env: Environment variables required for this tool to function.
             Validated at agent construction; missing vars raise
-            :class:`philharmonica.adk.exceptions.ToolDependencyError`.
+            ``philharmonica.adk.exceptions.ToolDependencyError``.
         requires_packages: PEP 508 package requirements (e.g.
             ``("slack-sdk>=3.0",)``) required for this tool to function.
             Validated at agent construction.

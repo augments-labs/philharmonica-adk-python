@@ -193,7 +193,7 @@ class SQLiteMemory(Memory):
     def _scoped(self, namespace: str) -> str:
         """Return the internal storage key for ``namespace``.
 
-        When :attr:`_scope` is set, the stored key is
+        When ``_scope`` is set, the stored key is
         ``"<scope>/<namespace>"``; otherwise the namespace is used as-is.
         The value written to the ``namespace`` column in SQLite always
         uses this key, and queries always pass this key as the bind
@@ -206,8 +206,8 @@ class SQLiteMemory(Memory):
     def _unscoped(self, stored_namespace: str) -> str:
         """Strip the scope prefix from a stored namespace column value.
 
-        Reverse of :meth:`_scoped`: strips ``"<scope>/"`` from the
-        front when :attr:`_scope` is set.  Returns ``stored_namespace``
+        Reverse of ``_scoped``: strips ``"<scope>/"`` from the
+        front when ``_scope`` is set.  Returns ``stored_namespace``
         unchanged when there is no scope or the prefix is absent (the
         latter prevents corruption on rows written by a different scope
         or by an unscoped store sharing the same file).
@@ -239,10 +239,10 @@ class SQLiteMemory(Memory):
     ) -> MemoryEntry:
         """Store a new memory entry and index it for full-text search.
 
-        The row is stored with the scoped namespace (see :meth:`_scoped`)
-        so two :class:`SQLiteMemory` instances with different ``scope``
+        The row is stored with the scoped namespace (see ``_scoped``)
+        so two ``SQLiteMemory`` instances with different ``scope``
         values sharing the same file never see each other's entries.  The
-        returned :class:`MemoryEntry` carries the caller-supplied
+        returned ``MemoryEntry`` carries the caller-supplied
         (unscoped) namespace.
 
         Args:
@@ -252,7 +252,7 @@ class SQLiteMemory(Memory):
                 metadata with ``MemorySource.MANUAL``.
 
         Returns:
-            The created :class:`MemoryEntry` with the caller-supplied
+            The created ``MemoryEntry`` with the caller-supplied
             namespace.
         """
         await self._ensure_ready()
@@ -320,7 +320,7 @@ class SQLiteMemory(Memory):
             filter: Optional filters on metadata fields.
 
         Returns:
-            List of :class:`MemorySearchResult` ordered by descending relevance.
+            List of ``MemorySearchResult`` ordered by descending relevance.
         """
         await self._ensure_ready()
         if len(query.strip()) == 0:

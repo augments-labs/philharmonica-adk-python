@@ -46,7 +46,7 @@ if TYPE_CHECKING:
 
 
 class _CumulativeUsageDict(TypedDict):
-    """Serialized shape of :class:`LLMUsage` inside :class:`SwarmStateDict`.
+    """Serialized shape of ``LLMUsage`` inside ``SwarmStateDict``.
 
     Kept TypedDict rather than re-deriving from ``LLMUsage`` so the
     swarm-state schema is self-contained — bumping the usage dataclass
@@ -66,7 +66,7 @@ class _CumulativeUsageDict(TypedDict):
 
 
 class _HandoffYieldDict(TypedDict):
-    """Serialized shape of a :class:`SwarmHandoff` yield.
+    """Serialized shape of a ``SwarmHandoff`` yield.
 
     Attributes:
         kind: Discriminator constant — always ``"handoff"``.
@@ -80,7 +80,7 @@ class _HandoffYieldDict(TypedDict):
 
 
 class _DoneYieldDict(TypedDict):
-    """Serialized shape of a :class:`SwarmDone` yield.
+    """Serialized shape of a ``SwarmDone`` yield.
 
     ``final_output`` is intentionally ``Any | None`` — the structured
     output is whatever the member agent returned (Pydantic model,
@@ -104,10 +104,10 @@ _LastYieldDict = _HandoffYieldDict | _DoneYieldDict
 
 
 class SwarmStateDict(TypedDict):
-    """Serialized shape of :class:`SwarmState`.
+    """Serialized shape of ``SwarmState``.
 
-    Produced by :meth:`SwarmState.to_dict` and consumed by
-    :meth:`SwarmState.from_dict`. The bare serialized dict — no
+    Produced by ``SwarmState.to_dict`` and consumed by
+    ``SwarmState.from_dict``. The bare serialized dict — no
     version key, no envelope.
 
     ``last_yield`` may be ``None`` before the first turn has yielded.
@@ -125,7 +125,7 @@ class SwarmStateDict(TypedDict):
         total_turns: 1-indexed count of member turns completed or in
             progress.
         cumulative_usage: Aggregate LLM token usage across all member
-            turns, serialized as a :class:`_CumulativeUsageDict`.
+            turns, serialized as a ``_CumulativeUsageDict``.
         last_yield: The most recent explicit yield signal (handoff or
             done), or ``None`` before the first yield.
         pending_interrupts: Serialized interrupt payloads awaiting a
@@ -185,7 +185,7 @@ class SwarmState[TContext]:
     config and will resolve ``current_agent`` by name.
 
     Attributes:
-        swarm: The :class:`~philharmonica.adk.swarms.swarm.Swarm` config this
+        swarm: The ``Swarm`` config this
             state belongs to. Not serialized.
         current_agent: The agent whose turn is next (or in progress).
             Not serialized directly — resolved from
@@ -207,7 +207,7 @@ class SwarmState[TContext]:
         pending_interrupts: Interrupts awaiting a human reply, keyed by
             swarm member name.
         nested_agent_snapshots: Mid-execution sub-agent state for
-            members paused on a :class:`NestedAgentInterrupt`, keyed
+            members paused on a ``NestedAgentInterrupt``, keyed
             by member name.
         status: Lifecycle tag: ``"running"`` / ``"completed"`` /
             ``"failed"`` / ``"interrupted"``.
@@ -276,18 +276,18 @@ class SwarmState[TContext]:
     """Interrupts awaiting a human reply, keyed by swarm member name.
 
     Populated by the swarm loop when a member's turn raises
-    :class:`~philharmonica.adk.graphs.interrupt.InterruptException` (HITL via
+    ``InterruptException`` (HITL via
     ``request_human_input``) or when a member's tool defers
-    (:class:`AgentToolDeferral` lifted to
-    :class:`NestedAgentInterrupt`). Cleared by the resume path once
-    the caller supplies a :class:`SwarmResume`."""
+    (``AgentToolDeferral`` lifted to
+    ``NestedAgentInterrupt``). Cleared by the resume path once
+    the caller supplies a ``SwarmResume``."""
 
     nested_agent_snapshots: dict[str, RunState] = field(default_factory=dict)
     """Mid-execution sub-agent state for members paused on a
-    :class:`NestedAgentInterrupt`. Serialised via :meth:`RunState.to_dict`;
-    rehydrated via :meth:`RunState.from_dict` on load. The cross-reference
-    invariant in :meth:`from_dict` requires every NestedAgentInterrupt
-    entry in :attr:`pending_interrupts` to have a matching snapshot here."""
+    ``NestedAgentInterrupt``. Serialised via ``RunState.to_dict``;
+    rehydrated via ``RunState.from_dict`` on load. The cross-reference
+    invariant in ``from_dict`` requires every NestedAgentInterrupt
+    entry in ``pending_interrupts`` to have a matching snapshot here."""
 
     status: str = "running"
     """Lifecycle tag: ``"running"`` / ``"completed"`` / ``"failed"`` /
@@ -332,9 +332,9 @@ class SwarmState[TContext]:
 
     Populated by the swarm driver after each turn when the active agent
     has an ``output_schema`` — the value is the parsed Pydantic model
-    (commonly an :class:`~philharmonica.adk.types.intents.Intent` subclass).
+    (commonly an ``Intent`` subclass).
     Read by
-    :class:`~philharmonica.adk.swarms.policy.StructuredRoutingPolicy` to
+    ``StructuredRoutingPolicy`` to
     dispatch via the wrapped ``HandoffRoute``. ``None`` when the
     active agent does not have a structured-output schema or when the
     last turn produced free-form text.
@@ -363,7 +363,7 @@ class SwarmState[TContext]:
             self.per_agent_scratch[agent.name] = []
 
     def to_dict(self) -> SwarmStateDict:
-        """Emit the serializable fields as a :class:`SwarmStateDict`.
+        """Emit the serializable fields as a ``SwarmStateDict``.
 
         Intentionally omits ``swarm`` and ``current_agent`` (non-data
         references). ``last_yield`` is emitted as a tagged dict so
@@ -374,11 +374,11 @@ class SwarmState[TContext]:
         should use ``to_json()``.
 
         Returns:
-            A :class:`SwarmStateDict` containing all serializable
+            A ``SwarmStateDict`` containing all serializable
             fields of this state.
 
         Raises:
-            TypeError: If ``last_yield`` is a :class:`SwarmYieldSignal`
+            TypeError: If ``last_yield`` is a ``SwarmYieldSignal``
                 subtype not handled by this method.
         """
         from philharmonica.adk.types.items.items import ItemHelpers  # local to avoid cycle
@@ -441,13 +441,13 @@ class SwarmState[TContext]:
 
         Args:
             data: The serialized state dict produced by
-                :meth:`to_dict`.
-            swarm: The :class:`~philharmonica.adk.swarms.swarm.Swarm` config
+                ``to_dict``.
+            swarm: The ``Swarm`` config
                 this state belongs to. Provides the ``Agent`` instances
                 needed to resolve ``current_agent_name``.
 
         Returns:
-            A fully rehydrated :class:`SwarmState` ready for the
+            A fully rehydrated ``SwarmState`` ready for the
             driver to resume from.
 
         Raises:
@@ -573,13 +573,13 @@ class SwarmState[TContext]:
         """Deserialize from ``to_json()`` output — ``from_dict(json.loads(raw))``.
 
         Args:
-            raw: A JSON string produced by :meth:`to_json`.
-            swarm: The :class:`~philharmonica.adk.swarms.swarm.Swarm` config
-                this state belongs to. Forwarded to :meth:`from_dict`
+            raw: A JSON string produced by ``to_json``.
+            swarm: The ``Swarm`` config
+                this state belongs to. Forwarded to ``from_dict``
                 for member-name resolution.
 
         Returns:
-            A fully rehydrated :class:`SwarmState`.
+            A fully rehydrated ``SwarmState``.
 
         Raises:
             ValueError: If ``current_agent_name`` or any
@@ -594,7 +594,7 @@ class SwarmState[TContext]:
 _VALID_SWARM_STATUS_VALUES: frozenset[str] = frozenset({"running", "completed", "failed", "interrupted"})
 """Allowlist of ``SwarmState.status`` values accepted on deserialisation.
 
-Mirrors :data:`philharmonica.adk.graphs.state._VALID_STATUS_VALUES`. Prevents
+Mirrors ``philharmonica.adk.graphs.state._VALID_STATUS_VALUES``. Prevents
 arbitrary strings in a persisted payload from propagating into
 ``SwarmRunResult.status`` where consumer logic branches on it."""
 
@@ -634,18 +634,18 @@ def _rehydrate_swarm_pending_interrupts(
     """Rebuild SwarmState.pending_interrupts from serialised dicts.
 
     Reads the ``kind`` discriminator to select the concrete
-    :class:`Interrupt` subclass — ``NestedAgentInterrupt`` for nested-
-    agent deferrals, the base :class:`Interrupt` for plain HITL.
+    ``Interrupt`` subclass — ``NestedAgentInterrupt`` for nested-
+    agent deferrals, the base ``Interrupt`` for plain HITL.
     Validates required NestedAgentInterrupt fields rather than
     surfacing opaque KeyErrors on partial payloads.
 
     Args:
-        data: The raw :class:`SwarmStateDict` produced by
-            :meth:`SwarmState.to_dict`.
+        data: The raw ``SwarmStateDict`` produced by
+            ``SwarmState.to_dict``.
 
     Returns:
-        Mapping from member name to the rehydrated :class:`Interrupt`
-        (or :class:`NestedAgentInterrupt` subtype).
+        Mapping from member name to the rehydrated ``Interrupt``
+        (or ``NestedAgentInterrupt`` subtype).
 
     Raises:
         ValueError: When a ``NestedAgentInterrupt`` payload is missing
@@ -694,10 +694,10 @@ def _rehydrate_swarm_nested_agent_snapshots(
     """Rebuild SwarmState.nested_agent_snapshots from serialised dicts.
 
     Args:
-        data: The raw :class:`SwarmStateDict` produced by
-            :meth:`SwarmState.to_dict`.
+        data: The raw ``SwarmStateDict`` produced by
+            ``SwarmState.to_dict``.
 
     Returns:
-        Mapping from member name to the rehydrated :class:`RunState`.
+        Mapping from member name to the rehydrated ``RunState``.
     """
     return {name: RunState.from_dict(payload) for name, payload in data.get("nested_agent_snapshots", {}).items()}

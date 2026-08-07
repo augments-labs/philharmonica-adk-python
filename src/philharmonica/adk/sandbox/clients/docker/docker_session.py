@@ -86,7 +86,7 @@ class DockerSandboxSession(BaseSandboxSession):
     async def _timeout_bin_available(self) -> bool:
         """Probe (once) whether the container image ships a 'timeout' binary.
 
-        Used by :meth:`run` to enforce deadlines in-container. A probe
+        Used by ``run`` to enforce deadlines in-container. A probe
         failure (no shell, exec error) records the binary as unavailable
         so timed runs fall back to host-side enforcement.
         """

@@ -105,12 +105,12 @@ class MCPToolset(Toolset):
     framework's HITL evaluation path."""
 
     _connected: bool = field(default=False, init=False, repr=False)
-    """Backing field for :attr:`is_connected` — read-only lifecycle
+    """Backing field for ``is_connected`` — read-only lifecycle
     predicate surfaced via the public property below. Callers read
     ``toolset.is_connected``, never ``toolset._connected``."""
 
     _disposed: bool = field(default=False, init=False, repr=False)
-    """Backing field for :attr:`is_disposed`. See ``_connected``."""
+    """Backing field for ``is_disposed``. See ``_connected``."""
 
     _connect_lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False, repr=False)
     """Synchronisation primitive — never observable; no public

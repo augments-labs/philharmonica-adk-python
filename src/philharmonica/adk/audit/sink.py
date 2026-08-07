@@ -43,7 +43,7 @@ class InMemoryAuditSink:
         self.events: list[AuditEvent] = []
 
     async def record(self, event: AuditEvent) -> None:
-        """Append ``event`` to :attr:`events`.
+        """Append ``event`` to ``events``.
 
         Args:
             event: The audit event to store.
@@ -77,7 +77,7 @@ class JsonlFileAuditSink:
         self.path = Path(path)
 
     async def record(self, event: AuditEvent) -> None:
-        """Serialise ``event`` as JSON and append it to :attr:`path`.
+        """Serialise ``event`` as JSON and append it to ``path``.
 
         Args:
             event: The audit event to write.

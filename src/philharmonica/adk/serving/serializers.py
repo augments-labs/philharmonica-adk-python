@@ -1,9 +1,9 @@
 """JSON serialization of Runner outputs for the HTTP serving surfaces.
 
-Turns the framework's Layer-3 results (:class:`RunResult`,
-:class:`RunResultStreaming`) and streaming events into JSON-able dicts.
+Turns the framework's Layer-3 results (``RunResult``,
+``RunResultStreaming``) and streaming events into JSON-able dicts.
 Conversation items are converted through the framework's existing
-Layer-3 → Layer-1 path (:meth:`ItemHelpers.run_items_to_params`); the
+Layer-3 → Layer-1 path (``ItemHelpers.run_items_to_params``); the
 Layer-2 provider wire types never appear here, so the REST surface
 speaks only the provider-agnostic layers.
 """
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 def usage_to_dict(usage: LLMUsage) -> dict[str, int]:
-    """Project an :class:`LLMUsage` accumulator to its scalar JSON shape.
+    """Project an ``LLMUsage`` accumulator to its scalar JSON shape.
 
     Args:
         usage: The cumulative usage tracked on the run context.
@@ -77,7 +77,7 @@ def _output_to_jsonable(value: Any) -> Any:
 
 
 def run_result_to_dict(result: RunResult[Any]) -> dict[str, Any]:
-    """Serialize a completed (or interrupted) :class:`RunResult` to JSON.
+    """Serialize a completed (or interrupted) ``RunResult`` to JSON.
 
     Args:
         result: The result returned by a non-streaming ``Runner.arun``.
@@ -148,7 +148,7 @@ def _raw_text_delta(data: Any) -> str | None:
     """Pull the incremental text fragment from a raw stream chunk.
 
     Args:
-        data: The opaque payload on a :class:`RawResponseStreamEvent`.
+        data: The opaque payload on a ``RawResponseStreamEvent``.
 
     Returns:
         The text delta when the chunk is a ``part_delta`` carrying one,
@@ -163,8 +163,8 @@ def _item_to_param(item: Any) -> Any:
     """Convert a streamed run item to its Layer-1 param form.
 
     Args:
-        item: The ``item`` payload on a :class:`RunItemStreamEvent`
-            (a Layer-3 :class:`RunItemBase` in practice).
+        item: The ``item`` payload on a ``RunItemStreamEvent``
+            (a Layer-3 ``RunItemBase`` in practice).
 
     Returns:
         The Layer-1 param dict, or ``item`` unchanged when it is not a

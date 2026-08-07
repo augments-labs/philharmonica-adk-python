@@ -13,12 +13,12 @@ The model has two levels (per-agent overrides per-run):
 Design notes
 ------------
 
-The style table (:attr:`VerboseConfig.styles`) is a plain ``dict`` keyed
+The style table (``VerboseConfig.styles``) is a plain ``dict`` keyed
 by string event names rather than a closed ``Enum``. This is on
 purpose: future ``Agent`` attributes that want visibility (e.g. a
 hypothetical ``memory_access``, ``reasoning.step``, ``plan.revised``)
 can publish their own default styles and register them on an existing
-``VerboseConfig`` via :meth:`register_event`, without modifying the
+``VerboseConfig`` via ``register_event``, without modifying the
 renderer.
 
 Colour / icon choices are inspired by CrewAI's ``ConsoleFormatter`` but
@@ -36,9 +36,9 @@ from dataclasses import dataclass, field
 from typing import Literal, TextIO
 
 VerboseMode = Literal["auto", "line", "panel", "off"]
-"""Developer-facing backend selector for :class:`VerboseConfig`.
+"""Developer-facing backend selector for ``VerboseConfig``.
 
-``"auto"`` defers to :func:`philharmonica.adk.verbose.mode.resolve_mode`
+``"auto"`` defers to ``philharmonica.adk.verbose.mode.resolve_mode``
 which inspects the environment (TTY, ``NO_COLOR``, ``FORCE_COLOR``,
 ``CI``, rich availability) and picks the right backend.
 ``"line"`` forces the stateless line renderer (CI / non-TTY / piped output).
@@ -395,7 +395,7 @@ class VerboseConfig:
 
     ``eq=False`` keeps identity-based ``__hash__`` so instances are
     usable as ``WeakKeyDictionary`` keys (the renderer cache on
-    :class:`~philharmonica.adk.verbose.hooks.VerboseHooks` relies on this).
+    ``VerboseHooks`` relies on this).
 
     Plug into a run via::
 
@@ -433,10 +433,10 @@ class VerboseConfig:
         output: Destination stream. ``None`` resolves to ``sys.stderr``
             at render time so that verbose output does not pollute
             stdout pipelines.
-        styles: Map from event name to :class:`EventStyle`. Modify or
+        styles: Map from event name to ``EventStyle``. Modify or
             replace individual entries to recolour / rename / mute
             specific events. New event types (from future Agent
-            attributes) can be added via :meth:`register_event`.
+            attributes) can be added via ``register_event``.
 
     Example — recolour tools and silence LLM events::
 
@@ -473,7 +473,7 @@ class VerboseConfig:
     environment (TTY, ``NO_COLOR``, ``FORCE_COLOR``, ``CI``, rich
     availability); ``"line"`` forces the stateless line renderer;
     ``"panel"`` forces the Rich-backed panel renderer; ``"off"``
-    emits nothing. See :func:`philharmonica.adk.verbose.mode.resolve_mode`
+    emits nothing. See ``philharmonica.adk.verbose.mode.resolve_mode``
     for the full precedence ladder."""
 
     use_color: bool = True
@@ -503,7 +503,7 @@ class VerboseConfig:
             event: Dotted event name (e.g. ``"tool.start"``).
 
         Returns:
-            The registered :class:`EventStyle`, or a default-constructed
+            The registered ``EventStyle``, or a default-constructed
             (all-empty) ``EventStyle`` when *event* is not in the table.
         """
         return self.styles.get(event, EventStyle())
@@ -520,7 +520,7 @@ class VerboseConfig:
         Args:
             event: Dotted event name to register
                 (e.g. ``"memory.read"``).
-            style: The :class:`EventStyle` to associate with *event*.
+            style: The ``EventStyle`` to associate with *event*.
                 Overwrites any previously-registered style silently.
         """
         self.styles[event] = style
@@ -529,8 +529,8 @@ class VerboseConfig:
         """Return the effective output stream (defaults to stderr).
 
         Returns:
-            The explicitly-configured :attr:`output` stream, or
-            ``sys.stderr`` when :attr:`output` is ``None``.
+            The explicitly-configured ``output`` stream, or
+            ``sys.stderr`` when ``output`` is ``None``.
         """
         if self.output is not None:
             return self.output

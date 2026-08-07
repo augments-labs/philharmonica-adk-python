@@ -1,6 +1,6 @@
 """Decorators — ``@flow_start``, ``@flow_listen``, ``@flow_router``.
 
-Each decorator wraps the decorated method in a :class:`FlowStep`
+Each decorator wraps the decorated method in a ``FlowStep``
 instance. The wrapper carries the decorator role and trigger spec as
 data, exposes ``__or__`` / ``__and__`` for fluent combinator
 construction, and forwards calls via the descriptor protocol so
@@ -9,11 +9,11 @@ construction, and forwards calls via the descriptor protocol so
 What this module deliberately does NOT do:
 
 - NEVER injects step-method arguments — step methods take ONLY ``self``.
-  CrewAI's :func:`_execute_single_listener` inspects parameter counts
+  CrewAI's ``_execute_single_listener`` inspects parameter counts
   and injects the previous step's return value when present
   (``lib/crewai/src/crewai/flow/flow.py:3117-3139``). We reject this.
 - NEVER auto-persists state — the developer drives
-  :class:`FlowCheckpoint` explicitly.
+  ``FlowCheckpoint`` explicitly.
 - NEVER treats a bare ``str`` return from a non-router as a route name —
   only ``@flow_router`` returns drive dispatch; other returns are ignored.
 - NEVER generates code at runtime — wrappers are constructed via the
@@ -21,7 +21,7 @@ What this module deliberately does NOT do:
 
 Combinator construction is operator-only — there are NO ``or_()`` /
 ``and_()`` helper functions. Use the ``|`` and ``&`` operators on
-:class:`FlowStep` instances::
+``FlowStep`` instances::
 
     @flow_listen(method_a | method_b)             # Or gate
     @flow_listen(method_a & method_b & method_c)  # And gate (flattens left-assoc)
@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 
 
 class _GateKwargs(TypedDict):
-    """Shared decorator kwargs forwarded to :class:`FlowStep`.
+    """Shared decorator kwargs forwarded to ``FlowStep``.
 
     Keeps the three decorator entry points (``flow_start`` /
     ``flow_listen`` / ``flow_router``) under the function-length cap
@@ -57,12 +57,12 @@ class _GateKwargs(TypedDict):
             Read by the visualisation emitters to label diagram nodes.
         requires_approval: HITL gate — ``False`` to proceed; ``True`` to
             always defer; or a callable receiving a
-            :class:`FlowStepContext` and returning a bool.
+            ``FlowStepContext`` and returning a bool.
         approval_policy: Optional declarative approval policy attached
             to the deferral when the gate fires. ``None`` ⇒ bare
             single-approver deferral.
         enabled: Dynamic-skip gate — ``True`` to run; ``False`` to skip;
-            or a callable receiving a :class:`FlowStepContext`.
+            or a callable receiving a ``FlowStepContext``.
         max_retries: Optional count of extra retry attempts on body
             exception. ``None`` ⇒ no retries.
         timeout: Optional ``asyncio.wait_for`` ceiling in seconds.
@@ -101,7 +101,7 @@ def _build_step(
     guardrails: FlowStepGuardrails | None,
     cache: FlowStepCachePolicy | None,
 ) -> FlowStep:
-    """Construct a :class:`FlowStep` from the decorator-supplied kwargs.
+    """Construct a ``FlowStep`` from the decorator-supplied kwargs.
 
     Single construction site for every decorator branch keeps each
     decorator under the function-length cap and centralises the gate
@@ -129,16 +129,16 @@ FlowTriggerSpec = str | Callable[..., Any] | Or | And
 - ``str`` — a step name or route label.
 - ``Callable`` — a method reference (typically an unbound method on the
   flow class); the wrapper normalizes it to ``__name__``.
-- :class:`Or` / :class:`And` — combinator gate produced by the ``|`` /
-  ``&`` operators on :class:`FlowStep` instances.
+- ``Or`` / ``And`` — combinator gate produced by the ``|`` /
+  ``&`` operators on ``FlowStep`` instances.
 """
 
 
 def _normalize_trigger(trigger: FlowTriggerSpec) -> str | Or | And:
     """Normalize a trigger spec to its stable internal form.
 
-    Strings and callables / :class:`FlowStep` instances flatten to the
-    step name string. :class:`Or` / :class:`And` instances pass through
+    Strings and callables / ``FlowStep`` instances flatten to the
+    step name string. ``Or`` / ``And`` instances pass through
     so the executor can interpret the gate semantics.
 
     Args:
@@ -148,7 +148,7 @@ def _normalize_trigger(trigger: FlowTriggerSpec) -> str | Or | And:
         Either a step-name ``str`` or a gate dataclass.
 
     Raises:
-        ValueError / TypeError: See :func:`philharmonica.adk.flows.flow_wrappers.name_of`.
+        ValueError / TypeError: See ``philharmonica.adk.flows.flow_wrappers.name_of``.
     """
     if isinstance(trigger, (Or, And)):
         return trigger
@@ -194,7 +194,7 @@ def flow_start(
 
     Multiple ``@flow_start`` methods are allowed on one Flow class; all of
     them fire in parallel when the flow begins execution. Each method
-    MUST be ``async def`` taking only ``self`` — :class:`FlowMeta`
+    MUST be ``async def`` taking only ``self`` — ``FlowMeta``
     enforces this at class-definition time.
 
     Supports both call forms::
@@ -215,32 +215,32 @@ def flow_start(
             label diagram nodes.
         requires_approval: HITL gate. ``False`` (default) ⇒ no gate;
             ``True`` ⇒ always defer the step; a callable receives a
-            :class:`FlowStepContext` and returns a bool (sync or
+            ``FlowStepContext`` and returns a bool (sync or
             async). When the gate fires, the executor captures the
-            step into the :class:`FlowCheckpoint` and halts.
-        approval_policy: Optional :class:`FlowApprovalPolicy` attached
-            to the captured :class:`FlowDeferredStep` when
+            step into the ``FlowCheckpoint`` and halts.
+        approval_policy: Optional ``FlowApprovalPolicy`` attached
+            to the captured ``FlowDeferredStep`` when
             ``requires_approval`` fires. The executor does NOT evaluate
             quorum / roles / deadline — the out-of-band approval driver
-            does (see the :class:`FlowApprovalPolicy` module docstring).
+            does (see the ``FlowApprovalPolicy`` module docstring).
             ``None`` (default) ⇒ bare single-approver deferral.
         enabled: Dynamic step skip. ``True`` (default) ⇒ always run;
             ``False`` ⇒ never run (silently skipped); a callable
-            receives a :class:`FlowStepContext` and returns a bool.
+            receives a ``FlowStepContext`` and returns a bool.
         max_retries: Optional retry-on-exception count for the step
             body. ``None`` (default) ⇒ no retries.
         timeout: Optional ``asyncio.wait_for`` ceiling (seconds) on
             the step body. ``None`` (default) ⇒ no timeout.
-        rate_limit: Optional :class:`FlowStepRateLimit` sliding-window
+        rate_limit: Optional ``FlowStepRateLimit`` sliding-window
             cap for the step body. ``None`` (default) ⇒ no rate limit.
-        guardrails: Optional :class:`FlowStepGuardrails` pre/post
+        guardrails: Optional ``FlowStepGuardrails`` pre/post
             verdict chain around the step body. ``None`` (default) ⇒
             no guardrails.
-        cache: Optional :class:`FlowStepCachePolicy` result cache for
+        cache: Optional ``FlowStepCachePolicy`` result cache for
             the step. ``None`` (default) ⇒ no caching.
 
     Returns:
-        Bare form: a :class:`FlowStep` wrapping ``fn`` with
+        Bare form: a ``FlowStep`` wrapping ``fn`` with
         ``__flow_role__ = "start"``. Parenthesised form: a decorator
         producing the same wrapper. The wrapper supports ``|`` and
         ``&`` operators for building gates that reference this step.
@@ -295,11 +295,11 @@ def flow_listen(
       completes OR when a router returns the string as its label.
     - A method reference (``MyFlow.research``) — resolved to the
       method's ``__name__``.
-    - A :class:`FlowStep` (the wrapped method on the class body) —
+    - A ``FlowStep`` (the wrapped method on the class body) —
       same as the method reference form.
-    - An :class:`Or` gate built via ``method_a | method_b`` — fires
+    - An ``Or`` gate built via ``method_a | method_b`` — fires
       ONCE on first arrival in the run.
-    - An :class:`And` gate built via ``method_a & method_b`` — fires
+    - An ``And`` gate built via ``method_a & method_b`` — fires
       ONCE after every required trigger has arrived.
 
     Step methods receive only ``self``; return values are IGNORED.
@@ -309,24 +309,24 @@ def flow_listen(
         trigger: One trigger spec — see above.
         description: Optional human-readable blurb describing what the
             step does. Read by the visualisation emitters.
-        requires_approval: HITL gate (see :func:`flow_start`).
-        approval_policy: Optional :class:`FlowApprovalPolicy` for the
-            captured deferral (see :func:`flow_start`). The executor
+        requires_approval: HITL gate (see ``flow_start``).
+        approval_policy: Optional ``FlowApprovalPolicy`` for the
+            captured deferral (see ``flow_start``). The executor
             does NOT evaluate quorum / roles / deadline — the approval
             driver does.
-        enabled: Dynamic skip gate (see :func:`flow_start`).
+        enabled: Dynamic skip gate (see ``flow_start``).
         max_retries: Step-body retry-on-exception count.
         timeout: ``asyncio.wait_for`` ceiling in seconds for the step body.
         rate_limit: Optional per-step sliding-window rate limit (see
-            :func:`flow_start`).
+            ``flow_start``).
         guardrails: Optional pre/post guardrail bundle (see
-            :func:`flow_start`).
+            ``flow_start``).
         cache: Optional per-step result-cache policy (see
-            :func:`flow_start`).
+            ``flow_start``).
 
     Returns:
         A decorator that wraps the target function as a
-        :class:`FlowStep` with ``__flow_role__ = "listen"`` and the
+        ``FlowStep`` with ``__flow_role__ = "listen"`` and the
         trigger stored on ``__flow_triggers__``.
 
     Raises:
@@ -377,26 +377,26 @@ def flow_router(
     next step's name" behavior. If you need routing, write a ``@flow_router``.
 
     Args:
-        trigger: One trigger spec — see :func:`flow_listen` for valid forms.
-        description: Optional human-readable blurb (see :func:`flow_start`).
-        requires_approval: HITL gate (see :func:`flow_start`).
-        approval_policy: Optional :class:`FlowApprovalPolicy` for the
-            captured deferral (see :func:`flow_start`). The executor
+        trigger: One trigger spec — see ``flow_listen`` for valid forms.
+        description: Optional human-readable blurb (see ``flow_start``).
+        requires_approval: HITL gate (see ``flow_start``).
+        approval_policy: Optional ``FlowApprovalPolicy`` for the
+            captured deferral (see ``flow_start``). The executor
             does NOT evaluate quorum / roles / deadline — the approval
             driver does.
-        enabled: Dynamic skip gate (see :func:`flow_start`).
+        enabled: Dynamic skip gate (see ``flow_start``).
         max_retries: Step-body retry-on-exception count.
         timeout: ``asyncio.wait_for`` ceiling in seconds for the step body.
         rate_limit: Optional per-step sliding-window rate limit (see
-            :func:`flow_start`).
+            ``flow_start``).
         guardrails: Optional pre/post guardrail bundle (see
-            :func:`flow_start`).
+            ``flow_start``).
         cache: Optional per-step result-cache policy (see
-            :func:`flow_start`).
+            ``flow_start``).
 
     Returns:
         A decorator that wraps the target function as a
-        :class:`FlowStep` with ``__flow_role__ = "router"`` and the
+        ``FlowStep`` with ``__flow_role__ = "router"`` and the
         trigger stored on ``__flow_triggers__``.
 
     Raises:

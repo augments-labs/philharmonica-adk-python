@@ -1,7 +1,7 @@
 """Exception hierarchy for the A2A (Agent-to-Agent) protocol layer.
 
-All A2A errors derive from :class:`A2AError`, which itself derives from
-:class:`philharmonica.adk.exceptions.PhilharmonicaError`. Callers can catch any
+All A2A errors derive from ``A2AError``, which itself derives from
+``philharmonica.adk.exceptions.PhilharmonicaError``. Callers can catch any
 framework error including A2A failures with a single ``except PhilharmonicaError``.
 
 Mirrors the convention established by ``llms/litellm/exceptions.py`` —
@@ -112,13 +112,13 @@ class A2ATaskInterruptedError(A2AError):
       message in the same ``context_id`` to provide it.
     * ``auth_required`` — the agent is asking the caller to supply
       authentication; the caller should configure an
-      :class:`a2a.client.AuthInterceptor` or otherwise satisfy the
+      ``a2a.client.AuthInterceptor`` or otherwise satisfy the
       auth scheme advertised in the AgentCard, then resume.
 
-    Distinct from :class:`A2ATaskError`: interruption is not a
+    Distinct from ``A2ATaskError``: interruption is not a
     failure — the task can still complete once the input is supplied.
     Callers that don't care about the distinction may catch
-    :class:`A2AError` for both cases.
+    ``A2AError`` for both cases.
 
     Attributes:
         task_id: The remote task identifier (use to resume).
@@ -137,7 +137,7 @@ class A2ATaskInterruptedError(A2AError):
        Applications surfacing this field to end-users (in
        error pages, chat UIs, follow-up LLM prompts) MUST escape /
        sanitise it appropriately. Same caution as
-       :class:`A2ATaskError.remote_message`.
+       ``A2ATaskError.remote_message``.
     """
 
     task_id: str

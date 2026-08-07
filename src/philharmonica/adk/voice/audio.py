@@ -2,18 +2,18 @@
 
 Audio is represented as raw little-endian PCM ``bytes`` throughout the
 public surface — no third-party array library is required to *use* the
-voice pipeline. ``numpy`` is an optional convenience: :func:`pcm16_from_float32`
-and :func:`pcm16_from_int16` convert sample arrays captured from a
+voice pipeline. ``numpy`` is an optional convenience: ``pcm16_from_float32``
+and ``pcm16_from_int16`` convert sample arrays captured from a
 microphone library into the PCM bytes the models consume, and raise a
-guiding :class:`ImportError` when ``numpy`` is absent.
+guiding ``ImportError`` when ``numpy`` is absent.
 
 Two shapes exist:
 
-- :class:`AudioInput` — a complete, already-captured utterance. Fed to
-  :meth:`~philharmonica.adk.voice.stt.STTModel.transcribe` for a single
+- ``AudioInput`` — a complete, already-captured utterance. Fed to
+  ``transcribe`` for a single
   buffered turn.
-- :class:`StreamedAudioInput` — an append-as-you-go microphone stream.
-  Fed to :meth:`~philharmonica.adk.voice.stt.STTModel.create_session` for
+- ``StreamedAudioInput`` — an append-as-you-go microphone stream.
+  Fed to ``create_session`` for
   continuous, multi-turn transcription. ``add_audio(None)`` signals the
   end of the stream.
 """
@@ -67,7 +67,7 @@ class AudioInput:
 
         Transcription HTTP endpoints expect a self-describing audio
         file rather than headerless PCM. This wraps the buffer in a
-        minimal WAV container using the stdlib :mod:`wave` module — no
+        minimal WAV container using the stdlib ``wave`` module — no
         third-party dependency.
 
         Returns:
@@ -99,10 +99,10 @@ class AudioInput:
 class StreamedAudioInput:
     """An append-as-you-go microphone stream backed by an async queue.
 
-    Producers call :meth:`add_audio` with PCM byte chunks as they are
-    captured, then :meth:`add_audio` with ``None`` to close the stream.
+    Producers call ``add_audio`` with PCM byte chunks as they are
+    captured, then ``add_audio`` with ``None`` to close the stream.
     A realtime transcription session consumes the chunks via
-    :meth:`iter_chunks`.
+    ``iter_chunks``.
     """
 
     def __init__(self) -> None:

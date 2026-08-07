@@ -1,6 +1,6 @@
 """Google Gemini configuration.
 
-Extends the provider-agnostic :class:`LLMConfig` with fields that
+Extends the provider-agnostic ``LLMConfig`` with fields that
 ``client.aio.models.generate_content`` accepts natively. Every
 non-primitive field is typed verbatim against ``google.genai.types``
 — the framework deliberately does NOT define parallel TypedDicts for
@@ -27,10 +27,10 @@ if TYPE_CHECKING:
 
 @dataclass
 class GeminiConfig(LLMConfig):
-    """Gemini-specific config extending :class:`LLMConfig`.
+    """Gemini-specific config extending ``LLMConfig``.
 
     Only fields that have no provider-agnostic analogue on the base
-    :class:`LLMConfig` live here. Generic fields (``temperature``,
+    ``LLMConfig`` live here. Generic fields (``temperature``,
     ``max_output_tokens``, ``tool_choice``, ``tool_execution_mode``,
     ``extra_body``, ``extra_args``, ``retry_policy`` …) are inherited
     unchanged. ``max_output_tokens`` maps to Gemini's
@@ -95,7 +95,7 @@ class GeminiConfig(LLMConfig):
     safety_settings: list[SafetySetting] | None = None
     """Per-category harm thresholds.
 
-    Each :class:`google.genai.types.SafetySetting` pairs a
+    Each ``google.genai.types.SafetySetting`` pairs a
     ``HarmCategory`` (e.g. ``HARM_CATEGORY_HATE_SPEECH``) with a
     ``HarmBlockThreshold`` (e.g. ``BLOCK_MEDIUM_AND_ABOVE``). When
     blocked, the response carries ``finish_reason="SAFETY"`` rather

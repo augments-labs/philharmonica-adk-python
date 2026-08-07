@@ -69,7 +69,7 @@ class MCPServerSse(MCPServerWithClientSession):
     """MCP server over the SSE transport (MCP-spec-deprecated).
 
     .. deprecated::
-        Prefer :class:`MCPServerStreamableHttp`. The MCP project
+        Prefer ``MCPServerStreamableHttp``. The MCP project
         marks SSE deprecated; this class supports servers that have
         not migrated to streamable HTTP.
     """

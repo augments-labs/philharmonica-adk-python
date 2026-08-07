@@ -1,4 +1,4 @@
-"""Tests for :mod:`philharmonica.adk.workflows.temporal.tracing`.
+"""Tests for ``philharmonica.adk.workflows.temporal.tracing``.
 
 Covers:
 - ``should_emit_span`` suppresses emission during Temporal workflow replay.
@@ -141,7 +141,7 @@ class TestDeterministicUuid:
         assert len(result) > 0
 
     def test_deterministic_uuid_uses_system_uuid_outside_workflow(self) -> None:
-        """Uses :func:`uuid.uuid4` when outside a Temporal workflow."""
+        """Uses ``uuid.uuid4`` when outside a Temporal workflow."""
         mock_wf = _mock_workflow(in_workflow=False)
 
         with (

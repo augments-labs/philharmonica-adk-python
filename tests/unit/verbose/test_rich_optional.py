@@ -1,6 +1,6 @@
 """Enforce the soft-import contract for ``rich``.
 
-The :mod:`philharmonica.adk.verbose` module declares ``rich`` as **optional**
+The ``philharmonica.adk.verbose`` module declares ``rich`` as **optional**
 (installed via ``pip install 'philharmonica-adk[verbose]'``). If any future
 change accidentally promotes ``rich`` to a hard dependency — by adding
 a top-level ``from rich import ...`` anywhere on the import path of
@@ -40,7 +40,7 @@ def block_rich(monkeypatch: pytest.MonkeyPatch) -> None:
     """Prevent ``rich`` from being imported for the duration of the test.
 
     Also purges any already-cached ``rich`` / ``philharmonica.adk.verbose.*``
-    modules from :data:`sys.modules` so the next import executes module
+    modules from ``sys.modules`` so the next import executes module
     top-level against the blocked finder.
     """
     # Evict any cached verbose + rich modules — guarantees re-execution.
@@ -56,7 +56,7 @@ def block_rich(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def _shim_find_spec(real_find_spec: Any) -> Any:
-    """Wrap :func:`importlib.util.find_spec` so the blocker is honored.
+    """Wrap ``importlib.util.find_spec`` so the blocker is honored.
 
     ``is_rich_available`` calls ``importlib.util.find_spec("rich")`` —
     that bypasses the ``sys.meta_path`` blocker (it goes through the

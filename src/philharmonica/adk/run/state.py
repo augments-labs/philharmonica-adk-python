@@ -116,7 +116,7 @@ class RunState:
         approval_metadata: Audit metadata for each approval decision,
             keyed by ``tool_call_id``. Populated only when
             ``approver_id`` or ``reason`` are supplied to
-            :meth:`approve` / :meth:`reject`.
+            ``approve`` / ``reject``.
         original_user_prompt: The original input that started this
             run.
         current_agent_name: Name of the agent currently executing.

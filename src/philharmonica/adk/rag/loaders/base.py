@@ -1,16 +1,16 @@
-"""The :class:`DocumentLoader` abstract base.
+"""The ``DocumentLoader`` abstract base.
 
 A loader turns one *source* (a file path or URL) into a list of
-:class:`LoadedDocument` spans. Loaders are the only format-specific surface in
+``LoadedDocument`` spans. Loaders are the only format-specific surface in
 the RAG layer — everything downstream (chunking, embedding, vector search) is
 format-agnostic. A loader for a remote or heavyweight format declares the
 third-party packages it needs in ``requires_packages`` and verifies them at
-construction (see :meth:`ensure_dependencies`), so a missing optional
+construction (see ``ensure_dependencies``), so a missing optional
 dependency surfaces as a clear, actionable error before any work begins rather
 than deep inside an agent run.
 
 Blocking I/O (file reads, network calls, third-party parsers) MUST be wrapped
-in :func:`asyncio.to_thread` inside :meth:`load` so loaders never stall the
+in ``asyncio.to_thread`` inside ``load`` so loaders never stall the
 event loop.
 """
 
@@ -29,13 +29,13 @@ logger = logging.getLogger(__name__)
 class DocumentLoader(ABC):
     """Turns a single source (path or URL) into loaded document spans.
 
-    Subclasses set :attr:`requires_packages` (import names of the
-    third-party libraries they need) and implement :meth:`load`. Pure-stdlib
+    Subclasses set ``requires_packages`` (import names of the
+    third-party libraries they need) and implement ``load``. Pure-stdlib
     loaders leave ``requires_packages`` empty.
 
     Attributes:
         requires_packages: Import names whose absence makes this loader
-            unusable. Verified by :meth:`ensure_dependencies`, which
+            unusable. Verified by ``ensure_dependencies``, which
             subclasses call from ``__init__`` so the failure is raised at
             tool-construction time.
         install_extra: The packaging extra that provides
@@ -47,7 +47,7 @@ class DocumentLoader(ABC):
     """Import names whose absence makes this loader unusable."""
 
     install_extra: ClassVar[str] = ""
-    """The packaging extra that provides :attr:`requires_packages`."""
+    """The packaging extra that provides ``requires_packages``."""
 
     @abstractmethod
     async def load(self, source: str) -> list[LoadedDocument]:
@@ -65,7 +65,7 @@ class DocumentLoader(ABC):
         """
 
     def ensure_dependencies(self) -> None:
-        """Verify every entry in :attr:`requires_packages` is importable.
+        """Verify every entry in ``requires_packages`` is importable.
 
         Subclasses call this from ``__init__`` so a missing optional
         dependency fails fast at construction, with guidance toward the

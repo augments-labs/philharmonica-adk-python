@@ -1,6 +1,6 @@
 """Deploy artifact templates and their render functions.
 
-Templates are plain strings rendered with :class:`string.Template` —
+Templates are plain strings rendered with ``string.Template`` —
 audit-transparent, no template-engine dependency, no package data to
 ship. Placeholders are lowercase (``$port``, ``$agent_ref``); uppercase
 shell variables (``$PORT``, ``$AGENT_REF``) and Go-template braces pass

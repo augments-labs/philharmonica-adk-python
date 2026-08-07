@@ -1,8 +1,8 @@
 """Run the external deploy CLIs (docker/gcloud/kubectl/aws/helm).
 
 ``CommandRunner`` is the seam between deploy logic and the host's
-binaries. :class:`SubprocessRunner` shells out to the operator's
-installed CLIs; tests inject :class:`RecordingRunner` to assert the exact
+binaries. ``SubprocessRunner`` shells out to the operator's
+installed CLIs; tests inject ``RecordingRunner`` to assert the exact
 argv without touching a cloud. The framework imports no cloud SDK — the
 deploy path drives the same commands an operator would run by hand, so
 there are no extra runtime dependencies.
@@ -80,7 +80,7 @@ class SubprocessRunner:
             input_text: Optional text fed to the process stdin.
 
         Returns:
-            The captured :class:`CommandResult`.
+            The captured ``CommandResult``.
 
         Raises:
             ValueError: If *args* is empty.
@@ -97,9 +97,9 @@ class RecordingRunner:
     """Test ``CommandRunner`` that records calls instead of executing.
 
     Attributes:
-        calls: The argv lists passed to :meth:`run`, in order.
+        calls: The argv lists passed to ``run``, in order.
         inputs: The ``input_text`` passed to each call, aligned with ``calls``.
-        available: Tools :meth:`which` reports present; all present when
+        available: Tools ``which`` reports present; all present when
             empty.
         results: Per-call canned results, indexed by call order; calls
             past the end return success.
@@ -117,7 +117,7 @@ class RecordingRunner:
     def run(self, args: Sequence[str], *, cwd: Path | None = None, input_text: str | None = None) -> CommandResult:  # noqa: ARG002
         """Record *args* / ``input_text`` and return the canned (or success) result.
 
-        ``cwd`` is part of the :class:`CommandRunner` contract; the
+        ``cwd`` is part of the ``CommandRunner`` contract; the
         recorder ignores it.
         """
         self.calls.append(list(args))
@@ -147,7 +147,7 @@ class DeployCommandFailed(RuntimeError):
 
 
 def require_tool(runner: CommandRunner, tool: str) -> None:
-    """Raise :class:`DeployToolMissing` if *tool* is unavailable to *runner*.
+    """Raise ``DeployToolMissing`` if *tool* is unavailable to *runner*.
 
     Args:
         runner: The command runner to query.
@@ -172,7 +172,7 @@ def run_checked(
         input_text: Optional text fed to the process stdin.
 
     Returns:
-        The successful :class:`CommandResult`.
+        The successful ``CommandResult``.
 
     Raises:
         DeployCommandFailed: If the command exits non-zero.

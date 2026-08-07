@@ -2,7 +2,7 @@
 
 Reads from two sources, in priority order:
 
-1. :attr:`AnthropicConfig.thinking` — typed
+1. ``AnthropicConfig.thinking`` — typed
    ``anthropic.types.ThinkingConfigParam``. Highest priority.
 2. ``LLMConfig.extra_args["thinking"]`` — passthrough escape hatch
    for callers using a plain ``LLMConfig`` instance.
@@ -15,14 +15,14 @@ emits a warning when the requested budget is below the floor —
 Anthropic rejects the request server-side, but a clear local log
 helps developers diagnose without a roundtrip.
 
-When :attr:`AnthropicConfig.thinking_display` is set and the resolved
+When ``AnthropicConfig.thinking_display`` is set and the resolved
 thinking config has type ``enabled`` or ``adaptive``, the ``display`` field is
 merged into the returned dict.  This maps to the ``display`` key of
 ``anthropic.types.ThinkingConfigEnabledParam`` (``"omitted"`` or
 ``"summarized"``).  Callers supplying a pre-built dict via
 ``extra_args["thinking"]`` must include ``display`` themselves — the
 resolver does not patch dicts that did not originate from a typed
-:class:`~philharmonica.adk.llms.anthropic.anthropic_config.AnthropicConfig`.
+``AnthropicConfig``.
 
 Anthropic extended thinking docs:
 https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking
@@ -50,13 +50,13 @@ def resolve_thinking(config: LLMConfig) -> ThinkingConfigParam | None:
     """Resolve a thinking config dict from the LLMConfig.
 
     Args:
-        config: The LLM configuration. Either an :class:`AnthropicConfig`
-            with a typed ``thinking`` field, or a plain :class:`LLMConfig`
+        config: The LLM configuration. Either an ``AnthropicConfig``
+            with a typed ``thinking`` field, or a plain ``LLMConfig``
             carrying the dict under ``extra_args["thinking"]``.
 
     Returns:
         Anthropic ``ThinkingConfigParam`` dict, or ``None`` when not
-        configured.  When :attr:`AnthropicConfig.thinking_display` is set
+        configured.  When ``AnthropicConfig.thinking_display`` is set
         and the resolved config type is ``enabled`` or ``adaptive``, the returned
         dict is a shallow copy with the ``display`` field merged in — the
         original config dict is never mutated.

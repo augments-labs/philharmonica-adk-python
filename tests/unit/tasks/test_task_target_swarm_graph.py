@@ -1,19 +1,19 @@
-"""Unit tests for :class:`Task` with non-Agent targets.
+"""Unit tests for ``Task`` with non-Agent targets.
 
-The :attr:`Task.agent` field accepts an :class:`Agent`, a
-:class:`Swarm`, or a :class:`Graph`. :meth:`Runner.arun_task`
-dispatches via :func:`isinstance` and projects the inner result type
+The ``Task.agent`` field accepts an ``Agent``, a
+``Swarm``, or a ``Graph``. ``Runner.arun_task``
+dispatches via ``isinstance`` and projects the inner result type
 (``RunResult`` / ``SwarmRunResult`` / ``GraphRunResult``) into a
-:class:`TaskOutput`.
+``TaskOutput``.
 
 Covered:
 
 - ``output_schema`` is rejected at Task construction when the target
   is not an Agent.
-- Task with :class:`Swarm` target: dispatch hits ``arun_swarm``,
+- Task with ``Swarm`` target: dispatch hits ``arun_swarm``,
   output projection carries ``final_output`` + ``new_items`` +
   ``usage`` from the swarm's run context.
-- Task with :class:`Graph` target: dispatch hits ``arun_graph``,
+- Task with ``Graph`` target: dispatch hits ``arun_graph``,
   output projection carries ``final_output`` + ``new_items`` +
   ``cumulative_usage``. Hooks supplied at the ``arun_task`` level
   are NOT propagated into the graph (documented limitation).

@@ -9,7 +9,7 @@ from dataclasses import dataclass
 class CostEstimate:
     """A pre-call estimate of an LLM request's cost.
 
-    The pre-flight twin of :meth:`LLM.cost`. Input tokens are counted
+    The pre-flight twin of ``LLM.cost``. Input tokens are counted
     precisely; output is bounded by the resolved ``max_output_tokens``
     when the developer set one, otherwise excluded (``output_bounded`` is
     ``False`` and the estimate is an input-only floor).

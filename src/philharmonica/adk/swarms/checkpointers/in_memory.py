@@ -1,13 +1,13 @@
-"""In-memory :class:`SwarmCheckpointer` — reference implementation.
+"""In-memory ``SwarmCheckpointer`` — reference implementation.
 
 Suitable for single-process workflows + tests. Cross-process resume
 requires a durable backend.
 
-Auto-save: on registration via :meth:`InMemorySwarmCheckpointer.register`,
-attaches a :class:`~philharmonica.adk.swarms.checkpointers.hooks.SwarmCheckpointerHooks`
+Auto-save: on registration via ``InMemorySwarmCheckpointer.register``,
+attaches a ``SwarmCheckpointerHooks``
 instance to the supplied registry. The hooks override both
 ``on_swarm_turn_end`` and ``on_swarm_turn_interrupt`` to call
-:meth:`save` with the current :class:`SwarmState.to_dict()` snapshot.
+``save`` with the current ``SwarmState.to_dict()`` snapshot.
 The interrupt override makes parked HITL state durable: the swarm loop
 returns before ``on_swarm_turn_end`` fires when a turn suspends, so
 without the interrupt hook the parked ``pending_interrupts`` and
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 class InMemorySwarmCheckpointer:
-    """Stores :class:`SwarmCheckpoint` instances in a process-local dict.
+    """Stores ``SwarmCheckpoint`` instances in a process-local dict.
 
     Keyed by ``thread_id``. Each save overwrites any prior checkpoint
     for the same thread; load returns the latest.
@@ -39,7 +39,7 @@ class InMemorySwarmCheckpointer:
         """Initialise the in-memory store.
 
         Args:
-            thread_id: Identifier used by :meth:`register`'s auto-save
+            thread_id: Identifier used by ``register``'s auto-save
                 hook. Defaults to ``"default"`` when the caller does not
                 supply an explicit id.
         """
@@ -63,9 +63,9 @@ class InMemorySwarmCheckpointer:
         """Return the latest checkpoint for ``thread_id`` or ``None``.
 
         ``swarm`` is accepted for protocol parity with the graphs
-        :class:`Checkpointer.load` shape. Cross-validation of the
+        ``Checkpointer.load`` shape. Cross-validation of the
         persisted state against the live ``swarm`` is intentionally
-        deferred — member-name resolution in :meth:`SwarmState.from_dict`
+        deferred — member-name resolution in ``SwarmState.from_dict``
         provides the de-facto integrity check at rehydration time.
         """
         del swarm
@@ -84,7 +84,7 @@ class InMemorySwarmCheckpointer:
             logger.debug("InMemorySwarmCheckpointer: delete no-op, unknown thread_id=%s", thread_id)
 
     def register(self, registry: SwarmHookRegistry) -> None:
-        """Subscribe a :class:`SwarmCheckpointerHooks` to ``registry``."""
+        """Subscribe a ``SwarmCheckpointerHooks`` to ``registry``."""
         from philharmonica.adk.swarms.checkpointers.hooks import SwarmCheckpointerHooks
 
         registry.add(SwarmCheckpointerHooks(self, self._thread_id))

@@ -1,4 +1,4 @@
-"""Unit tests for :mod:`philharmonica.adk.visualization.helpers`.
+"""Unit tests for ``philharmonica.adk.visualization.helpers``.
 
 Covers the collision detector, the empty-input edges of ``safe``, and
 the escape function — the regression hooks the review-gate asked for.

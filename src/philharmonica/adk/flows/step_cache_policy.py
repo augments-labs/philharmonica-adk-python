@@ -8,7 +8,7 @@ run. A miss runs the body normally and writes its post-body state
 snapshot back to the cache under the computed key.
 
 The cache scope is **per-executor** (one cache per
-:meth:`Runner.arun_flow` call). Sharing a cache across runs would
+``Runner.arun_flow`` call). Sharing a cache across runs would
 require a backend store and is out of scope for this primitive —
 the developer can compose checkpointing + an external KV cache on
 top.
@@ -16,9 +16,9 @@ top.
 Snapshot semantics:
 
 - Pydantic ``BaseModel`` states snapshot via
-  :meth:`BaseModel.model_copy(deep=True)`.
-- ``@dataclass`` states snapshot via :func:`copy.deepcopy`.
-- Anything else raises :class:`FlowDefinitionError` at cache-write
+  ``BaseModel.model_copy(deep=True)``.
+- ``@dataclass`` states snapshot via ``copy.deepcopy``.
+- Anything else raises ``FlowDefinitionError`` at cache-write
   time so the developer sees the unsupported shape loudly rather
   than caching a shallow alias.
 
@@ -41,12 +41,12 @@ FlowCacheKeyFn = Callable[
     ["FlowStepContext[Any]"],
     "str | Awaitable[str]",
 ]
-"""Callable that maps a :class:`FlowStepContext` to a cache key string.
+"""Callable that maps a ``FlowStepContext`` to a cache key string.
 
 Sync or async; the executor awaits the result if it is awaitable.
 The returned string is used verbatim as the cache key — developers
 typically derive it from
-:attr:`FlowStepContext.flow_state` fields they consider load-bearing
+``FlowStepContext.flow_state`` fields they consider load-bearing
 for the step's output, deliberately excluding fields that should
 NOT participate in the hit/miss decision (timestamps, request ids,
 ...).
@@ -57,8 +57,8 @@ NOT participate in the hit/miss decision (timestamps, request ids,
 class FlowStepCachePolicy:
     """Per-step result-cache configuration.
 
-    Attached to a :class:`FlowStep` via the decorator's ``cache=``
-    keyword. Independent of :class:`FlowConfig` because the cache
+    Attached to a ``FlowStep`` via the decorator's ``cache=``
+    keyword. Independent of ``FlowConfig`` because the cache
     is a step-local concern; the same flow class can have caching
     on some steps and not others.
 
@@ -71,7 +71,7 @@ class FlowStepCachePolicy:
             set, entries older than ``ttl_seconds`` (measured by
             ``time.monotonic()``) are evicted on lookup. ``None``
             (default) means entries never expire — bounded only by
-            :attr:`max_entries`.
+            ``max_entries``.
         max_entries: Maximum cache entries retained per step.
             LRU-evicted when exceeded. Cost-conservative default
             ``128`` — large enough for typical fan-out, small
@@ -89,7 +89,7 @@ class FlowStepCachePolicy:
     """LRU cap on entries retained per step."""
 
     def __post_init__(self) -> None:
-        """Validate :class:`FlowStepCachePolicy` field values.
+        """Validate ``FlowStepCachePolicy`` field values.
 
         Raises:
             ValueError: When ``cache_key_fn`` is not callable, when

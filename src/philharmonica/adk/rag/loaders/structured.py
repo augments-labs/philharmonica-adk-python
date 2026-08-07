@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 def _read_raw(source: str) -> str:
-    """Read a UTF-8 file, raising :class:`DocumentLoadError` on failure."""
+    """Read a UTF-8 file, raising ``DocumentLoadError`` on failure."""
     try:
         return Path(source).read_text(encoding="utf-8")
     except FileNotFoundError as exc:

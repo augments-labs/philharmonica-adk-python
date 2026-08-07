@@ -1,8 +1,8 @@
 """Provider + capability lookups for a litellm model string.
 
 Thin wrappers around litellm's local tables to identify the backing provider
-(:func:`litellm.get_llm_provider`) and read model capabilities
-(:func:`litellm.get_model_info`) for a model string.  Used by the Runner and
+(``litellm.get_llm_provider``) and read model capabilities
+(``litellm.get_model_info``) for a model string.  Used by the Runner and
 ContextManager to enable provider-specific optimisations (prompt caching,
 server-side compaction, etc.), and to size request budgets to the model.
 """

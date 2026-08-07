@@ -1,6 +1,6 @@
 """SQLite-backed persistence for agent run records and quota enforcement.
 
-:class:`AgentStatusStore` manages a standalone SQLite database for
+``AgentStatusStore`` manages a standalone SQLite database for
 recording per-run metadata and querying cumulative statistics.
 Independent of the Session module — uses its own database file.
 """
@@ -214,7 +214,7 @@ class AgentStatusStore:
                 to this tenant.
 
         Returns:
-            Aggregated :class:`AgentStatus` with cumulative stats.
+            Aggregated ``AgentStatus`` with cumulative stats.
         """
         await self._ensure_ready()
         async with self._db.connect() as conn:
@@ -293,7 +293,7 @@ class AgentStatusStore:
                 to this tenant.
 
         Returns:
-            List of :class:`AgentRunRecord` ordered by most recent first.
+            List of ``AgentRunRecord`` ordered by most recent first.
         """
         await self._ensure_ready()
         query = _SELECT_RECORDS

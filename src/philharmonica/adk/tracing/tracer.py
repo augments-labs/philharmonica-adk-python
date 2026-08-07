@@ -1,8 +1,8 @@
 """Tracer protocol and registry.
 
-Defines the :class:`Tracer` protocol that observability backends
-implement and a module-level registry with :func:`get_tracer` and
-:func:`set_tracer`. The default tracer is :class:`NoOpTracer` — it
+Defines the ``Tracer`` protocol that observability backends
+implement and a module-level registry with ``get_tracer`` and
+``set_tracer``. The default tracer is ``NoOpTracer`` — it
 does nothing, costs nothing, and is active until an application
 explicitly opts in.
 
@@ -13,9 +13,9 @@ Opt-in pattern::
     set_tracer(MyBackendTracer())
 
 Framework code (runner, LLM layer, tool executor) fetches the current
-tracer with :func:`get_tracer` at call time and calls its ``span_*``
+tracer with ``get_tracer`` at call time and calls its ``span_*``
 factory methods to create spans. When the tracer is a
-:class:`NoOpTracer`, every factory returns a :class:`NoOpSpan`, so the
+``NoOpTracer``, every factory returns a ``NoOpSpan``, so the
 hot path is cost-free.
 """
 
@@ -45,7 +45,7 @@ class Flushable(Protocol):
 
     Implementing this protocol is optional.  Tracers that buffer spans
     (e.g. those backed by an OTel ``BatchSpanProcessor``) should implement
-    :meth:`flush` to guarantee that all spans started before the call are
+    ``flush`` to guarantee that all spans started before the call are
     delivered to the exporter before the method returns.
     """
 
@@ -58,11 +58,11 @@ class Flushable(Protocol):
 class Tracer(Protocol):
     """Protocol for framework-level tracers.
 
-    A tracer is a factory of :class:`Span` objects, one method per
+    A tracer is a factory of ``Span`` objects, one method per
     span kind. Implementations may record to any backend (OpenTelemetry,
     stdout, in-memory for tests, etc.).
 
-    Every method returns a :class:`Span` that the caller uses as a
+    Every method returns a ``Span`` that the caller uses as a
     context manager. The span's lifecycle is ``start → body → finish``,
     and its associated data dataclass is updated in-place during the
     body.
@@ -101,8 +101,8 @@ class NoOpTracer:
     """Tracer that records nothing.
 
     The default tracer, active until an application opts in by calling
-    :func:`set_tracer`. Every factory method returns a
-    :class:`NoOpSpan`, so tracing adds zero overhead to the hot path.
+    ``set_tracer``. Every factory method returns a
+    ``NoOpSpan``, so tracing adds zero overhead to the hot path.
     """
 
     def agent_span(self, data: AgentSpanData) -> Span[AgentSpanData]:
@@ -148,8 +148,8 @@ def get_tracer() -> Tracer:
     """Return the current process-wide tracer.
 
     Returns:
-        The tracer installed via :func:`set_tracer`, or a
-        :class:`NoOpTracer` when tracing has not been opted into.
+        The tracer installed via ``set_tracer``, or a
+        ``NoOpTracer`` when tracing has not been opted into.
     """
     return _current_tracer
 
@@ -159,7 +159,7 @@ def set_tracer(tracer: Tracer | None) -> None:
 
     Args:
         tracer: The tracer implementation to install, or ``None`` to
-            restore the default :class:`NoOpTracer`.
+            restore the default ``NoOpTracer``.
     """
     global _current_tracer
     if tracer is None:
@@ -180,7 +180,7 @@ def flush_traces() -> None:
     the exporter.
 
     The call is a no-op when the installed tracer does not implement the
-    :class:`Flushable` protocol (e.g. :class:`NoOpTracer`). When the
+    ``Flushable`` protocol (e.g. ``NoOpTracer``). When the
     installed tracer is a ``MultiTracer``, failures on individual child
     tracers are logged and skipped — the call does not raise even if some
     backends fail to flush.

@@ -119,7 +119,7 @@ class Toolset(ABC):
                 name. Defaults to ``"_"``.
 
         Returns:
-            A :class:`PrefixedToolset` wrapping ``self``.
+            A ``PrefixedToolset`` wrapping ``self``.
         """
         from philharmonica.adk.tools.toolsets.prefixed import PrefixedToolset
 
@@ -136,7 +136,7 @@ class Toolset(ABC):
             name_map: Mapping of original tool name to new tool name.
 
         Returns:
-            A :class:`RenamedToolset` wrapping ``self``.
+            A ``RenamedToolset`` wrapping ``self``.
         """
         from philharmonica.adk.tools.toolsets.renamed import RenamedToolset
 
@@ -155,7 +155,7 @@ class Toolset(ABC):
                 async). Returns ``True`` to include the tool this turn.
 
         Returns:
-            A :class:`FilteredToolset` wrapping ``self``.
+            A ``FilteredToolset`` wrapping ``self``.
         """
         from philharmonica.adk.tools.toolsets.filtered import FilteredToolset
 
@@ -172,7 +172,7 @@ class Toolset(ABC):
             other: The second toolset to compose.
 
         Returns:
-            A :class:`CombinedToolset` containing ``[self, other]``.
+            A ``CombinedToolset`` containing ``[self, other]``.
         """
         from philharmonica.adk.tools.toolsets.combined import CombinedToolset
 

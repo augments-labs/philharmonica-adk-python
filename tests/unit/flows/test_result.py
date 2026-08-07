@@ -1,7 +1,7 @@
-"""Tests for :mod:`philharmonica.adk.flows.result`.
+"""Tests for ``philharmonica.adk.flows.result``.
 
 Locks in the lazy-producer scheduling contract on
-:class:`FlowRunResultStreaming`: when the streamed result is constructed
+``FlowRunResultStreaming``: when the streamed result is constructed
 outside a running event loop (so no producer task can be created yet) the
 producer factory is stored and scheduled on the first ``stream_events()``
 call. Without lazy scheduling the consumer's first ``await queue.get()``

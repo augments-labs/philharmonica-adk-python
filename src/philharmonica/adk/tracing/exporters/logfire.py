@@ -17,7 +17,7 @@ def logfire_headers(*, token: str) -> dict[str, str]:
 
     Returns:
         Header dict suitable for the ``headers`` argument of
-        :func:`~philharmonica.adk.tracing.otel.setup.setup_otel`.
+        ``setup_otel``.
 
     Raises:
         ValueError: When ``token`` is empty.
@@ -31,7 +31,7 @@ def logfire_headers(*, token: str) -> dict[str, str]:
 
 
 def setup_logfire(*, token: str, endpoint: str | None = None, service_name: str = "philharmonica-adk") -> OTelTracer:
-    """Return an :class:`OTelTracer` exporting spans to Logfire's OTLP endpoint.
+    """Return an ``OTelTracer`` exporting spans to Logfire's OTLP endpoint.
 
     Args:
         token: Logfire write token (non-empty). Load from the environment.
@@ -40,7 +40,7 @@ def setup_logfire(*, token: str, endpoint: str | None = None, service_name: str 
         service_name: Value for the ``service.name`` resource attribute.
 
     Returns:
-        A configured :class:`OTelTracer` pointing at Logfire.
+        A configured ``OTelTracer`` pointing at Logfire.
 
     Raises:
         TracingDependencyError: When the ``opentelemetry`` packages are

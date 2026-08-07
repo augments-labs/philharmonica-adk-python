@@ -2,7 +2,7 @@
 
 Typed span-data dataclasses used by the framework-level tracer. Each
 span kind has a dedicated ``@dataclass(frozen=True)`` that derives from
-:class:`SpanData` and implements ``export()`` — producing a JSON-safe
+``SpanData`` and implements ``export()`` — producing a JSON-safe
 ``dict[str, Any]`` snapshot for observability backends.
 
 Span data objects are provider-agnostic. The ``Tracer`` protocol in

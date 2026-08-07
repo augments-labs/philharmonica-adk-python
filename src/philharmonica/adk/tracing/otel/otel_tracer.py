@@ -1,8 +1,8 @@
-"""OpenTelemetry-backed :class:`Tracer` implementation.
+"""OpenTelemetry-backed ``Tracer`` implementation.
 
 Wraps an ``opentelemetry.trace.TracerProvider`` and exposes the seven
 typed ``*_span`` factories the runner calls. Each factory constructs an
-:class:`~philharmonica.adk.tracing.otel.otel_span.OTelSpan` with an OTel span
+``OTelSpan`` with an OTel span
 name following the conventions documented in ``docs/tracing/otel.md``:
 
 ================= ===================================
@@ -22,8 +22,8 @@ Attribute keys follow GenAI semantic conventions where applicable
 ``gen_ai.usage.output_tokens``). Framework-specific fields live under
 the ``philharmonica.*`` prefix.
 
-Construction imports :mod:`opentelemetry` at call time; missing packages
-surface as :class:`~philharmonica.adk.exceptions.TracingDependencyError`.
+Construction imports ``opentelemetry`` at call time; missing packages
+surface as ``TracingDependencyError``.
 """
 
 from __future__ import annotations
@@ -297,7 +297,7 @@ def _custom_attrs(data: CustomSpanData) -> dict[str, Any]:
 def _graph_attrs(data: CustomSpanData) -> dict[str, Any]:
     """Graph-execution root-span attribute mapping.
 
-    Reads the exported :class:`GraphSpanData` payload from
+    Reads the exported ``GraphSpanData`` payload from
     ``data.data`` and surfaces graph identity + terminal state under
     the ``philharmonica.graph.*`` namespace. ``None``-valued fields are
     omitted (OTel rejects ``None`` attribute values).
@@ -378,7 +378,7 @@ def _graph_node_attrs(data: CustomSpanData) -> dict[str, Any]:
 def _swarm_attrs(data: CustomSpanData) -> dict[str, Any]:
     """Swarm-execution root-span attribute mapping.
 
-    Reads the exported :class:`SwarmSpanData` payload from
+    Reads the exported ``SwarmSpanData`` payload from
     ``data.data`` and surfaces swarm identity + terminal state under
     the ``philharmonica.swarm.*`` namespace. ``None``-valued fields are
     omitted (OTel rejects ``None`` attribute values).
@@ -436,12 +436,12 @@ def _filter_to_fields(exported: dict[str, Any], cls: type) -> dict[str, Any]:
 
     Used when reconstructing a frozen SpanData dataclass from an
     ``export()`` snapshot: any key that is not a declared field of *cls*
-    would raise :class:`TypeError` on ``cls(**...)`` construction, and
+    would raise ``TypeError`` on ``cls(**...)`` construction, and
     future additions to the exported dict should not silently break the
     OTel bridge.  The ``"type"`` discriminator key is always excluded.
 
     Args:
-        exported: Raw dict produced by :meth:`~SpanData.export`.
+        exported: Raw dict produced by ``export``.
         cls: The target dataclass type.
 
     Returns:
@@ -480,7 +480,7 @@ class OTelTracer:
             provider: An existing ``TracerProvider``. When omitted, falls
                 back to the global provider via
                 ``opentelemetry.trace.get_tracer_provider()`` (which is the
-                no-op provider unless :func:`setup_otel` or user code
+                no-op provider unless ``setup_otel`` or user code
                 installed one).
             service_name: Instrumentation scope name, used as the
                 ``instrumentation-scope`` label on every emitted span.
@@ -677,11 +677,11 @@ class OTelTracer:
         """Synchronously drain all pending spans to the configured exporter(s).
 
         When an explicit ``TracerProvider`` was supplied at construction time
-        its :meth:`~opentelemetry.sdk.trace.TracerProvider.force_flush` method
+        its ``force_flush`` method
         is called directly.  Otherwise the global provider (installed by
-        :func:`~philharmonica.adk.tracing.otel.setup_otel` via
+        ``setup_otel`` via
         ``opentelemetry.trace.set_tracer_provider``) is flushed instead — it
-        may be the OTel SDK no-op provider if :func:`setup_otel` was not
+        may be the OTel SDK no-op provider if ``setup_otel`` was not
         called, in which case ``force_flush`` is a no-op.
         """
         try:

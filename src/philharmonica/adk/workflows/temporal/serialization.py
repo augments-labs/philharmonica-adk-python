@@ -32,15 +32,15 @@ _HTTPX_TIMEOUT_KEY = "__httpx_timeout__"
 
 
 def build_philharmonica_data_converter() -> DataConverter:
-    """Return a Temporal :class:`~temporalio.converter.DataConverter` for Philharmonica workflows.
+    """Return a Temporal ``DataConverter`` for Philharmonica workflows.
 
     Tries to import the Pydantic-aware converter supplied by
     ``temporalio.contrib.pydantic``.  If that module is unavailable a
-    shallow copy of :attr:`DataConverter.default <temporalio.converter.DataConverter.default>`
+    shallow copy of ``DataConverter.default``
     is returned instead so callers always get a fully-configured converter.
 
     Returns:
-        A :class:`~temporalio.converter.DataConverter` instance ready to
+        A ``DataConverter`` instance ready to
         pass to a Temporal ``Worker`` or ``Client``.
     """
     try:
@@ -56,7 +56,7 @@ def build_philharmonica_data_converter() -> DataConverter:
 
 
 def config_to_json_dict(config: LLMConfig) -> dict[str, Any]:
-    """Serialize an :class:`LLMConfig` to a JSON-safe dict for activity transport.
+    """Serialize an ``LLMConfig`` to a JSON-safe dict for activity transport.
 
     Most fields are JSON-native, but two are not and would make
     ``json.dumps`` raise (crashing the durable run at its first LLM turn):
@@ -67,7 +67,7 @@ def config_to_json_dict(config: LLMConfig) -> dict[str, Any]:
     - ``timeout`` may be an ``httpx.Timeout`` — flattened to its four
       components under a sentinel key. A plain float timeout passes through.
 
-    :func:`config_from_json_dict` is the inverse for every non-``None`` field
+    ``config_from_json_dict`` is the inverse for every non-``None`` field
     (``to_json_dict`` drops ``None`` fields, which all default back to ``None``).
     """
     out = config.to_json_dict()
@@ -91,7 +91,7 @@ def config_to_json_dict(config: LLMConfig) -> dict[str, Any]:
 
 
 def config_from_json_dict(data: dict[str, Any]) -> LLMConfig:
-    """Reconstruct an :class:`LLMConfig` from :func:`config_to_json_dict` output.
+    """Reconstruct an ``LLMConfig`` from ``config_to_json_dict`` output.
 
     Rebuilds the ``retry_policy`` dataclass (``retry_on`` back to a frozenset)
     and the ``httpx.Timeout`` from its components, so the durable activity
@@ -177,7 +177,7 @@ def tool_to_json_dict(tool: Tool) -> dict[str, Any] | None:
 
 
 def tool_from_json_dict(data: dict[str, Any]) -> FunctionTool:
-    """Reconstruct a definition-only :class:`FunctionTool` from :func:`tool_to_json_dict`.
+    """Reconstruct a definition-only ``FunctionTool`` from ``tool_to_json_dict``.
 
     The result carries no ``on_invoke`` — it exists solely so the LLM call in
     the activity emits the correct tool definitions. Both ``FunctionTool`` and
@@ -185,7 +185,7 @@ def tool_from_json_dict(data: dict[str, Any]) -> FunctionTool:
     which is exactly what the model sees for either.
 
     Args:
-        data: One entry produced by :func:`tool_to_json_dict`.
+        data: One entry produced by ``tool_to_json_dict``.
 
     Returns:
         A ``FunctionTool`` with name, description, parameter schema, and
@@ -265,7 +265,7 @@ def output_schema_to_json_dict(output_schema: AgentOutputSchemaBase) -> dict[str
 
 
 def output_schema_from_json_dict(data: dict[str, Any]) -> AgentOutputSchemaBase:
-    """Reconstruct a :class:`ForwardedOutputSchema` from :func:`output_schema_to_json_dict`."""
+    """Reconstruct a ``ForwardedOutputSchema`` from ``output_schema_to_json_dict``."""
     return ForwardedOutputSchema(
         schema_dict=data["json_schema"],
         strict=data.get("is_strict", False),

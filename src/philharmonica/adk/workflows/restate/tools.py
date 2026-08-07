@@ -1,6 +1,6 @@
 """Tool wrapper for durable Restate execution.
 
-Provides :func:`restate_tool` — a decorator/factory that routes tool
+Provides ``restate_tool`` — a decorator/factory that routes tool
 function calls through ``ctx.run()`` when inside a Restate handler, and
 calls the function directly otherwise.
 

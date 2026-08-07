@@ -595,7 +595,7 @@ class GeminiConverter:
 
     @classmethod
     def _convert_response_part(cls, part: Part) -> LLMResponsePart | None:
-        """Convert a single response :class:`Part` to a framework part."""
+        """Convert a single response ``Part`` to a framework part."""
         # Thought first: Gemini sets thought=True on a Part whose text
         # is the reasoning summary; thought_signature carries the opaque
         # bytes for replay. Base64-encode them (lossless for arbitrary

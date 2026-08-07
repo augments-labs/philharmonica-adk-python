@@ -44,7 +44,7 @@ def _checkpoint(
     thread_id: str,
     superstep: int = 0,
 ) -> GraphCheckpoint:
-    """Build a minimal :class:`GraphCheckpoint` for ``graph`` and ``thread_id``."""
+    """Build a minimal ``GraphCheckpoint`` for ``graph`` and ``thread_id``."""
     state = GraphState(graph=graph, thread_id=thread_id)
     state.superstep = superstep
     return GraphCheckpoint(

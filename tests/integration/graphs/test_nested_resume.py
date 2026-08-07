@@ -1,11 +1,11 @@
 """End-to-end integration of the nested-agent deferral bridge.
 
-Each test drives a real graph through :meth:`Runner.arun_graph` and
-:meth:`Runner.arun_graph_from_checkpoint`, exercising every layer of the
-bridge — :meth:`AgentExecutable.invoke` -> ``AgentToolDeferral`` lift ->
-BSP loop checkpoint -> resume staging -> :meth:`AgentExecutable.resume_from_snapshot`
+Each test drives a real graph through ``Runner.arun_graph`` and
+``Runner.arun_graph_from_checkpoint``, exercising every layer of the
+bridge — ``AgentExecutable.invoke`` -> ``AgentToolDeferral`` lift ->
+BSP loop checkpoint -> resume staging -> ``AgentExecutable.resume_from_snapshot``
 -> completion (or re-deferral) — except the inner LLM step, which is
-mocked at :meth:`Runner.arun` for honesty: simulating a real provider
+mocked at ``Runner.arun`` for honesty: simulating a real provider
 inside a unit-style test would defeat the test's purpose.
 
 Three shapes covered:
@@ -46,7 +46,7 @@ from philharmonica.adk.types.tokens.llm_usage import LLMUsage
 
 
 def _deferred_call(call_id: str, tool_name: str = "approve_me") -> DeferredToolCall:
-    """Build a placeholder :class:`DeferredToolCall` used in fake deferrals."""
+    """Build a placeholder ``DeferredToolCall`` used in fake deferrals."""
     return DeferredToolCall(
         tool_call_id=call_id,
         tool_name=tool_name,
@@ -59,7 +59,7 @@ class _FakeAgentRef:
     """Minimal stand-in for the ``Agent`` instance referenced by ``RunResult.last_agent``.
 
     The bridge reads ``result.last_agent.name`` to populate
-    :attr:`NodeResult.metadata['last_agent_name']`. A real :class:`Agent`
+    ``NodeResult.metadata['last_agent_name']``. A real ``Agent``
     works too but pulls more wiring into the fake than needed.
     """
 
@@ -75,10 +75,10 @@ class _FakeRunContextRef:
 
 
 class _CompletedRunResult:
-    """Stand-in for a normal :class:`RunResult` returned by :meth:`Runner.arun`.
+    """Stand-in for a normal ``RunResult`` returned by ``Runner.arun``.
 
-    Mirrors the shape :meth:`AgentExecutable.invoke` /
-    :meth:`AgentExecutable.resume_from_snapshot` read after a non-deferred
+    Mirrors the shape ``AgentExecutable.invoke`` /
+    ``AgentExecutable.resume_from_snapshot`` read after a non-deferred
     inner run: ``final_output``, ``new_items``, ``context.usage``,
     ``last_agent.name``, ``requires_action=False``, no
     ``deferred_requests``/``state``.
@@ -95,11 +95,11 @@ class _CompletedRunResult:
 
 
 class _ReDeferringRunResult:
-    """Stand-in for a :class:`RunResult` whose resumed run deferred AGAIN.
+    """Stand-in for a ``RunResult`` whose resumed run deferred AGAIN.
 
-    The bridge's :meth:`AgentExecutable._handle_re_deferral` reads
+    The bridge's ``AgentExecutable._handle_re_deferral`` reads
     ``requires_action=True`` + ``deferred_requests`` + ``state`` to lift a
-    fresh :class:`NestedAgentInterrupt`.
+    fresh ``NestedAgentInterrupt``.
     """
 
     def __init__(self, new_state: RunState, agent_name: str = "planner") -> None:
@@ -113,10 +113,10 @@ class _ReDeferringRunResult:
 
 
 def _single_node_graph(node_id: str = "n", agent_name: str = "planner") -> Graph[Any]:
-    """Build a one-node graph wrapping an :class:`Agent` node.
+    """Build a one-node graph wrapping an ``Agent`` node.
 
     The agent body is never reached — the test monkeypatches
-    :meth:`Runner.arun` at the class level so the inner LLM step never
+    ``Runner.arun`` at the class level so the inner LLM step never
     fires. The node id matches the bridge's reserved metadata channel.
     """
     return (
@@ -153,17 +153,17 @@ def _install_scripted_arun(
     monkeypatch: pytest.MonkeyPatch,
     script: list[Any],
 ) -> dict[str, list[Any]]:
-    """Install a :meth:`Runner.arun` class-level mock driven by ``script``.
+    """Install a ``Runner.arun`` class-level mock driven by ``script``.
 
-    Each invocation pops the next entry: if an :class:`Exception` instance,
-    the call raises it (this is how :class:`AgentToolDeferral` is delivered
-    to :meth:`AgentExecutable.invoke`); otherwise the call returns the
-    entry as the :class:`RunResult` stand-in.
+    Each invocation pops the next entry: if an ``Exception`` instance,
+    the call raises it (this is how ``AgentToolDeferral`` is delivered
+    to ``AgentExecutable.invoke``); otherwise the call returns the
+    entry as the ``RunResult`` stand-in.
 
     Records every ``(agent_name, user_prompt_or_state)`` pair so a test can
     assert which leg of the bridge the call landed on (initial invoke
     receives a ``str``/``list``; resume_from_snapshot receives a
-    :class:`RunState`).
+    ``RunState``).
 
     Returns the recording dict so the test body can inspect call shapes.
     """
@@ -196,9 +196,9 @@ async def test_single_level_defer_then_resume_completes(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """One agent node defers; the loop suspends with a single
-    :class:`NestedAgentInterrupt` carrying the deferred tool-call id and
+    ``NestedAgentInterrupt`` carrying the deferred tool-call id and
     a snapshot in ``state.nested_agent_snapshots``. Resuming with a
-    matching :class:`NestedAgentApproval` lands the decision on the
+    matching ``NestedAgentApproval`` lands the decision on the
     snapshot via ``state.approve`` and completes the graph with the
     resumed run's ``final_output``.
     """
@@ -400,7 +400,7 @@ async def test_re_deferral_after_resume_re_checkpoints(
     """The first deferral surfaces; the user approves; the resumed agent
     defers AGAIN with a NEW pending tool-call id; the second resume
     completes the graph. Exercises
-    :meth:`AgentExecutable._handle_re_deferral`'s integration with the
+    ``AgentExecutable._handle_re_deferral``'s integration with the
     BSP loop's checkpoint-on-suspend and side-channel deposit.
     """
     first_defer_state = RunState(

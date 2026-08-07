@@ -1,19 +1,19 @@
 """Retrieval-augmented generation (RAG) primitives.
 
 A small, reusable layer for turning documents into a semantically searchable
-index, built on the framework's existing :class:`Embedder` and
-:class:`VectorStore` abstractions:
+index, built on the framework's existing ``Embedder`` and
+``VectorStore`` abstractions:
 
-- :mod:`~philharmonica.adk.rag.loaders` — format loaders (PDF, DOCX, CSV, JSON, text,
+- ``loaders`` — format loaders (PDF, DOCX, CSV, JSON, text,
   Markdown, directory, website, GitHub, YouTube) behind a common
-  :class:`DocumentLoader` ABC, plus :func:`resolve_loader` dispatch.
-- :class:`TextChunker` — recursive, bounded text splitting.
-- :class:`DocumentIndex` — chunk → embed → store → search over any
+  ``DocumentLoader`` ABC, plus ``resolve_loader`` dispatch.
+- ``TextChunker`` — recursive, bounded text splitting.
+- ``DocumentIndex`` — chunk → embed → store → search over any
   ``VectorStore`` backend.
 
 The agent-facing ``DocumentSearchTool`` (and its ``PDFSearchTool`` /
 ``WebsiteSearchTool`` / … wrappers) live in
-:mod:`philharmonica.adk.tools.builtin.document_search_tool` and compose these
+``philharmonica.adk.tools.builtin.document_search_tool`` and compose these
 primitives. See ``docs/rag/`` and ``examples/rag/``.
 """
 

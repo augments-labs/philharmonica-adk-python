@@ -3,7 +3,7 @@
 ``deploy init`` writes a Dockerfile, ``.dockerignore``, and a starter
 ``requirements.txt`` (plus per-target manifests as targets are added).
 ``deploy build`` builds the image by driving the operator's installed
-``docker`` CLI through the :class:`CommandRunner` seam. The framework
+``docker`` CLI through the ``CommandRunner`` seam. The framework
 imports no cloud SDK — deployment is index/operator-owned.
 """
 
@@ -52,7 +52,7 @@ def _ship(action: Callable[[], None]) -> None:
 
 
 def context_options[F: Callable[..., object]](f: F) -> F:
-    """Attach the flags that build a :class:`DeployContext`."""
+    """Attach the flags that build a ``DeployContext``."""
     f = click.option("--agent", "agent_ref", required=True, help="Agent reference 'module:var' the container serves.")(
         f
     )
@@ -83,7 +83,7 @@ def _context(
     extras: str,
     env_keys: tuple[str, ...],
 ) -> DeployContext:
-    """Build a validated :class:`DeployContext`, mapping bad input to UsageError.
+    """Build a validated ``DeployContext``, mapping bad input to UsageError.
 
     Args:
         agent_ref: The ``module:var`` reference the container serves.

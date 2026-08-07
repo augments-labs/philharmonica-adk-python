@@ -63,7 +63,7 @@ class TestGraphTaskPanelLifecycle:
 
     async def test_task_failed_fires_when_graph_status_failed(self) -> None:
         """Graphs do NOT propagate node-level exceptions — they record
-        the failure on :attr:`GraphRunResult.status`. The Task panel
+        the failure on ``GraphRunResult.status``. The Task panel
         close must honour that and emit ``❌ Task Failed`` rather than
         the success variant, so developers see the same failure
         signal they see in ``arun`` / ``arun_swarm``.

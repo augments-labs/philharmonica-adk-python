@@ -1,4 +1,4 @@
-"""Unit tests for :func:`graph_to_mermaid` and :meth:`Graph.to_mermaid`."""
+"""Unit tests for ``graph_to_mermaid`` and ``Graph.to_mermaid``."""
 
 from __future__ import annotations
 

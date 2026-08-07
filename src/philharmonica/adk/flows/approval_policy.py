@@ -1,7 +1,7 @@
 """FlowApprovalPolicy — declarative approval rules for HITL steps.
 
 Supplements the simple ``bool | Callable[[ctx], bool]`` form of
-:attr:`FlowStep.__flow_requires_approval__` with a typed primitive
+``FlowStep.__flow_requires_approval__`` with a typed primitive
 that expresses common policy shapes without bespoke callable code:
 
 - Quorum-of-N approvers.
@@ -9,8 +9,8 @@ that expresses common policy shapes without bespoke callable code:
 - SLA deadlines with auto-reject on expiry.
 
 Mirrors the typed-primitive philosophy already established by
-:class:`FlowTriggerEvent`, :class:`FlowApprovalDecision`,
-:class:`HandoffInputFilter`: prefer dataclasses over weak primitive
+``FlowTriggerEvent``, ``FlowApprovalDecision``,
+``HandoffInputFilter``: prefer dataclasses over weak primitive
 types, so callers can attach attributes (audit, telemetry, retry
 budgets) to the policy itself rather than to ad-hoc context dicts.
 
@@ -31,8 +31,8 @@ from typing import Any
 class FlowApprovalPolicy:
     """Declarative policy attached to a deferred step's approval requirement.
 
-    Attached to :attr:`FlowDeferredStep.policy` when the executor
-    defers a step; surfaced through :class:`FlowCheckpoint` so the
+    Attached to ``FlowDeferredStep.policy`` when the executor
+    defers a step; surfaced through ``FlowCheckpoint`` so the
     out-of-band approval driver (UI, Slack bot, approval service) can
     enforce quorum / role / deadline semantics before recording a
     decision.
@@ -42,23 +42,23 @@ class FlowApprovalPolicy:
             the step may proceed. ``1`` (default) is the standard
             single-approver case. Higher values declare quorum
             requirements that the approval driver MUST honour when
-            constructing the resume :class:`FlowApprovalDecision`
+            constructing the resume ``FlowApprovalDecision``
             sequence. Cost-conservative default (no quorum overhead).
         allowed_roles: Tuple of role / group identifiers permitted to
             decide. Empty tuple (default) means *anyone* may decide —
             no role restriction. Non-empty values name the
-            :attr:`FlowApprovalDecision.approver_role` strings that
+            ``FlowApprovalDecision.approver_role`` strings that
             count as valid; decisions from outside the pool MUST be
             rejected by the driver.
         deadline_seconds: Optional SLA ceiling, in seconds, measured
-            from :attr:`FlowDeferredStep.request_time`. ``None``
+            from ``FlowDeferredStep.request_time``. ``None``
             (default) means no deadline. When set, the driver SHOULD
             auto-reject the step once
             ``now - request_time > deadline_seconds`` (assuming
-            :attr:`auto_reject_on_expiry`).
+            ``auto_reject_on_expiry``).
         auto_reject_on_expiry: When ``deadline_seconds`` is set and
             elapses, controls whether the driver auto-issues a
-            :class:`FlowApprovalDecision` with ``approved=False`` and
+            ``FlowApprovalDecision`` with ``approved=False`` and
             ``message="deadline_expired"``. ``True`` (default) is the
             safe choice — failing closed on expired SLAs prevents a
             quiescent flow from hanging indefinitely. ``False`` keeps
@@ -81,7 +81,7 @@ class FlowApprovalPolicy:
     """When deadline elapses: ``True`` auto-rejects; ``False`` keeps pending."""
 
     metadata: dict[str, Any] = field(default_factory=dict)
-    """Open-ended audit / telemetry payload — parity with :attr:`FlowDeferredStep.metadata`."""
+    """Open-ended audit / telemetry payload — parity with ``FlowDeferredStep.metadata``."""
 
     def __post_init__(self) -> None:
         """Validate field invariants at construction time.

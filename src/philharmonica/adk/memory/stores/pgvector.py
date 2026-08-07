@@ -246,7 +246,7 @@ class PgVectorStore:
             filter: Optional metadata filters applied as SQL WHERE clauses.
 
         Returns:
-            List of :class:`VectorQueryResult` ordered by descending score.
+            List of ``VectorQueryResult`` ordered by descending score.
 
         Raises:
             ValueError: If the query vector dimension differs from the
@@ -278,7 +278,7 @@ class PgVectorStore:
             record_id: The unique record identifier (namespace-free).
 
         Returns:
-            The matching :class:`VectorRecord`, or ``None`` if not found.
+            The matching ``VectorRecord``, or ``None`` if not found.
         """
         pool = await self._ensure_ready()
         async with pool.connection() as conn:

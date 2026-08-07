@@ -4,7 +4,7 @@ Temporal replays workflow history deterministically when recovering from
 failures.  During replay, side effects such as emitting OpenTelemetry spans
 must be suppressed to avoid duplicate traces.  Timestamps and UUIDs must be
 sourced from Temporal's deterministic clock and PRNG rather than the system
-clock and :mod:`uuid`.
+clock and ``uuid``.
 
 Each function in this module checks whether it is being called inside a
 Temporal workflow and, if so, whether the workflow is currently replaying.
@@ -61,9 +61,9 @@ def should_emit_span() -> bool:
 def deterministic_timestamp() -> float:
     """Return a deterministic timestamp safe for use inside Temporal workflows.
 
-    Inside a workflow the Temporal clock (:func:`temporalio.workflow.now`) is
+    Inside a workflow the Temporal clock (``temporalio.workflow.now``) is
     used so that replay produces the same value.  Outside a workflow or when
-    ``temporalio`` is not installed, :func:`time.time` is used.
+    ``temporalio`` is not installed, ``time.time`` is used.
 
     Returns:
         A Unix timestamp as a float.
@@ -87,9 +87,9 @@ def deterministic_timestamp() -> float:
 def deterministic_uuid() -> str:
     """Return a deterministic UUID string safe for use inside Temporal workflows.
 
-    Inside a workflow :func:`temporalio.workflow.uuid4` is used so that replay
+    Inside a workflow ``temporalio.workflow.uuid4`` is used so that replay
     produces the same identifier.  Outside a workflow or when ``temporalio`` is
-    not installed, :func:`uuid.uuid4` is used.
+    not installed, ``uuid.uuid4`` is used.
 
     Returns:
         A UUID as a hyphenated lowercase string.

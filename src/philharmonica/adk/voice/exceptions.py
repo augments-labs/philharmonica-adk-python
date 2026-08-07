@@ -1,7 +1,7 @@
 """Exception hierarchy for the voice subsystem.
 
-Every voice error derives from :class:`VoiceError`, which in turn
-derives from the framework-wide :class:`~philharmonica.adk.exceptions.PhilharmonicaError`.
+Every voice error derives from ``VoiceError``, which in turn
+derives from the framework-wide ``PhilharmonicaError``.
 Catching ``PhilharmonicaError`` therefore catches voice failures too, while
 ``VoiceError`` narrows to the speech pipeline.
 """

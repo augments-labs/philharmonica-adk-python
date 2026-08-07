@@ -1,16 +1,16 @@
 """HTTP serving layer for the Philharmonica ADK.
 
-This package turns a local :class:`~philharmonica.adk.agents.agent.Agent`
+This package turns a local ``Agent``
 into an ASGI app the developer's own runtime serves. It is the single
-place that maps a :class:`~philharmonica.adk.run.runner.Runner` call onto
-HTTP, exposing three **opt-in** surfaces composed by :func:`build_app`:
+place that maps a ``Runner`` call onto
+HTTP, exposing three **opt-in** surfaces composed by ``build_app``:
 
 * a plain-REST surface — ``POST /run`` (collect → JSON) and
   ``POST /run_sse`` (Server-Sent Events) for generic HTTP clients;
 * health routes — ``GET /healthz`` (liveness) and ``GET /readyz``
   (readiness) for container probes and load-balancer checks;
 * the A2A JSON-RPC + discovery routes (when an ``A2AServer`` is passed),
-  delegated to :mod:`philharmonica.adk.a2a`.
+  delegated to ``philharmonica.adk.a2a``.
 
 Responses serialize the framework's provider-agnostic layers only
 (Layer 1 / Layer 3); the provider wire format never crosses the HTTP
@@ -22,7 +22,7 @@ The Starlette + sse-starlette stack is an optional extra. Install with::
 
 When the extra is missing, every public name in this module is ``None``;
 downstream code can branch on ``build_app is None`` to skip serving
-wiring gracefully. The mechanism mirrors :mod:`philharmonica.adk.a2a`.
+wiring gracefully. The mechanism mirrors ``philharmonica.adk.a2a``.
 """
 
 from typing import TYPE_CHECKING

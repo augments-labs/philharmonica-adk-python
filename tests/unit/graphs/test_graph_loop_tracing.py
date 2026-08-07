@@ -1,11 +1,11 @@
 """BSP loop opens graph + node spans around the run.
 
 When a tracer is installed, executing a graph via ``Runner.arun_graph``
-records one :class:`GraphSpanData` for the whole run plus one
-:class:`GraphNodeSpanData` per node — with the node span CLOSED at
+records one ``GraphSpanData`` for the whole run plus one
+``GraphNodeSpanData`` per node — with the node span CLOSED at
 the matching ``on_node_*`` hook site (success, error, or interrupt).
 
-The tests use the same custom-span-routing :class:`CustomSpanData`
+The tests use the same custom-span-routing ``CustomSpanData``
 shape as the factories (see ``tests/unit/tracing/test_graph_spans.py``)
 so the recording tracer sees the discriminator + payload without
 needing a graph-aware Tracer protocol.

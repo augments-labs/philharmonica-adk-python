@@ -1,6 +1,6 @@
 """Distributed-flow example — two workers share a SQLite-backed flow run.
 
-Demonstrates :class:`SqliteFlowWorkerBackend` coordinating two
+Demonstrates ``SqliteFlowWorkerBackend`` coordinating two
 flow workers running in the same process. The first worker
 claims the cold-start batch, runs it, persists a checkpoint, and
 releases. The second worker then claims the next batch from the
@@ -10,7 +10,7 @@ This example uses a single-process simulation (two ``await``
 calls in sequence with distinct ``worker_id`` values) so the
 example runs without subprocess fixtures. The real distributed
 case spawns multiple processes that each call
-:meth:`Runner.arun_flow_distributed` against the same SQLite
+``Runner.arun_flow_distributed`` against the same SQLite
 file; the contention semantics are identical (``BEGIN IMMEDIATE``
 serialises claim attempts at the SQLite layer).
 

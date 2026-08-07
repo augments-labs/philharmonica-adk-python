@@ -2,7 +2,7 @@
 
 ``SQLiteMultiSessions`` is the manager/store.  It opens a database and
 provides methods to create, retrieve, list, and delete sessions.  Each
-returned session is a :class:`SQLiteSession` that the Runner can use.
+returned session is a ``SQLiteSession`` that the Runner can use.
 
 Uses ``aiosqlite`` for truly async database access.
 """
@@ -46,7 +46,7 @@ logger = logging.getLogger(__name__)
 class SessionInfo:
     """Metadata for a session in the database.
 
-    Returned by :meth:`SQLiteMultiSessions.list`.
+    Returned by ``SQLiteMultiSessions.list``.
 
     Attributes:
         session_id: The unique session identifier.
@@ -198,7 +198,7 @@ class SQLiteMultiSessions(MultiSessions):
     """Manager for SQLite-backed sessions.
 
     Opens a database and provides methods to create, retrieve, list,
-    and delete sessions.  Each session is a :class:`Session` instance
+    and delete sessions.  Each session is a ``Session`` instance
     that the Runner can use directly.
 
     Uses ``aiosqlite`` for truly async database access — no locks,
@@ -208,7 +208,7 @@ class SQLiteMultiSessions(MultiSessions):
         path: Path to the SQLite database file, or ``":memory:"`` for
             in-memory storage.
         app_name: Application name for multi-tenant scoping.
-        settings: Default :class:`SessionSettings` applied when
+        settings: Default ``SessionSettings`` applied when
             ``create()`` or ``get_or_create()`` are called without
             explicit settings.
 
@@ -289,7 +289,7 @@ class SQLiteMultiSessions(MultiSessions):
                 default settings if ``None``.
 
         Returns:
-            A :class:`Session` instance bound to the new session.
+            A ``Session`` instance bound to the new session.
 
         Raises:
             ValueError: If a session with this ID already exists
@@ -350,7 +350,7 @@ class SQLiteMultiSessions(MultiSessions):
             user_id: User identifier.
 
         Returns:
-            A :class:`Session` instance, or ``None`` if the session
+            A ``Session`` instance, or ``None`` if the session
             does not exist.
         """
         await self._ensure_ready()
@@ -392,7 +392,7 @@ class SQLiteMultiSessions(MultiSessions):
             settings: Per-session settings for new sessions.
 
         Returns:
-            A :class:`Session` instance.
+            A ``Session`` instance.
         """
         await self._ensure_ready()
         initial_state = state or {}
@@ -445,7 +445,7 @@ class SQLiteMultiSessions(MultiSessions):
                 all sessions for this app.
 
         Returns:
-            List of :class:`SessionInfo` ordered by creation time
+            List of ``SessionInfo`` ordered by creation time
             (oldest first).
         """
         await self._ensure_ready()
@@ -554,7 +554,7 @@ class SQLiteMultiSessions(MultiSessions):
         yet.
 
         This is a read-only helper — it does not load session history or
-        construct a :class:`Session` object.
+        construct a ``Session`` object.
 
         Returns:
             Mapping of app-scoped keys to their current values.
@@ -582,7 +582,7 @@ class SQLiteMultiSessions(MultiSessions):
                 the sessions table.
 
         Returns:
-            A :class:`State` with app-scoped data as the base and
+            A ``State`` with app-scoped data as the base and
             session-scoped data applied on top.
         """
         async with self._db.connect() as db:

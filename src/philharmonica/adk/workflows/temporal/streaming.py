@@ -1,10 +1,10 @@
 """TemporalStreamingLLM — streaming LLM bridge for Temporal workflows.
 
-Extends :class:`~philharmonica.adk.workflows.temporal.llm.TemporalLLM` with a
+Extends ``TemporalLLM`` with a
 dedicated streaming method.  Outside a Temporal workflow the call is
 forwarded directly to the wrapped LLM with ``stream=True``.  Inside a
 workflow, the activity executes non-streaming and the complete
-response is surfaced as a single ``"done"`` :class:`LLMStreamEvent`;
+response is surfaced as a single ``"done"`` ``LLMStreamEvent``;
 native token-level streaming applies only outside a workflow.
 
 Usage::
@@ -83,8 +83,8 @@ class StreamTokenEvent:
 class TemporalStreamingLLM(TemporalLLM):
     """LLM bridge with streaming support for Temporal workflows.
 
-    Extends :class:`~philharmonica.adk.workflows.temporal.llm.TemporalLLM` with
-    :meth:`acomplete_streamed`, which delegates to the wrapped LLM's native
+    Extends ``TemporalLLM`` with
+    ``acomplete_streamed``, which delegates to the wrapped LLM's native
     streaming path when called outside a workflow and falls back to a
     single-event non-streaming activity call inside a workflow.
 
@@ -93,7 +93,7 @@ class TemporalStreamingLLM(TemporalLLM):
     non-streaming activity fallback.
 
     Attributes:
-        wrapped: The underlying :class:`~philharmonica.adk.llms.llm.LLM` that
+        wrapped: The underlying ``LLM`` that
             handles provider communication.
         activity_config: Timeout and retry policy for each Temporal
             activity execution.
@@ -129,7 +129,7 @@ class TemporalStreamingLLM(TemporalLLM):
         Outside a Temporal workflow the call is forwarded directly to the
         wrapped LLM with ``stream=True``.  Inside a workflow the activity
         executes non-streaming and yields a single ``"done"``
-        :class:`~philharmonica.adk.types.responses.llm_response.LLMStreamEvent`
+        ``LLMStreamEvent``
         wrapping the complete response.
 
         This method is an async generator — callers iterate it directly::
@@ -145,7 +145,7 @@ class TemporalStreamingLLM(TemporalLLM):
             output_schema: Optional structured output schema.
 
         Yields:
-            :class:`~philharmonica.adk.types.responses.llm_response.LLMStreamEvent`
+            ``LLMStreamEvent``
             objects.
 
         References:

@@ -39,7 +39,7 @@ class RedisCostLedger:
 
     Supply either a configured ``client`` or a ``url``. When ``url`` is
     supplied this instance creates and owns the underlying client; call
-    :meth:`close` to release it. A caller-supplied ``client`` is left open
+    ``close`` to release it. A caller-supplied ``client`` is left open
     — the caller owns its lifecycle.
     """
 

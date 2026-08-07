@@ -2,7 +2,7 @@
 
 Demonstrates non-blocking flow execution from inside an ``async def``
 context. Use this mode from web handlers, async tasks, or
-pytest-asyncio tests. Returns a :class:`FlowRunResult` once the flow
+pytest-asyncio tests. Returns a ``FlowRunResult`` once the flow
 completes.
 
 For the blocking wrapper, see ``examples/flows/sync_flow.py``.

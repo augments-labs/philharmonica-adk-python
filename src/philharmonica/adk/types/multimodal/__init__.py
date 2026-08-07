@@ -28,7 +28,7 @@ framework constructs the ``Image`` instance from that string before
 
 For binary payloads the developer constructs at runtime — e.g.
 returning an ``Image`` from a sibling tool that produced a PNG —
-:meth:`File.as_data_url` builds an inline ``data:<mime>;base64,…``
+``File.as_data_url`` builds an inline ``data:<mime>;base64,…``
 URL that downstream serializers can carry through provider message
 boundaries.
 """

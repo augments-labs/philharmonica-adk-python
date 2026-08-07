@@ -1,6 +1,6 @@
-"""Tests for :mod:`philharmonica.adk.verbose.state`.
+"""Tests for ``philharmonica.adk.verbose.state``.
 
-Covers the :class:`BlockNode` container and :class:`RunTree` stack-based
+Covers the ``BlockNode`` container and ``RunTree`` stack-based
 block tracker used by the Panel renderer. The tree has no Rich / render
 dependencies, so these tests are pure data-structure assertions —
 open / close / cleanup / stale-close tolerance.

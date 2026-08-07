@@ -92,7 +92,7 @@ class NextStepInterruption:
     Attributes:
         deferred: The deferred tool requests awaiting approval or
             external execution.
-        state: Serializable :class:`~philharmonica.adk.run.state.RunState`
+        state: Serializable ``RunState``
             for resumption.
         completed_tool_results: Tool results that completed before the
             interruption (same batch as the deferred calls).
@@ -113,8 +113,8 @@ class NextStepSwarmYield:
     """Agent called a swarm-injected tool — yield control to the swarm driver.
 
     Emitted by ``turn_resolution`` when the active agent's turn produced
-    a ``transfer_to_<member>`` call (a :class:`SwarmHandoff` signal) or
-    a ``swarm_done`` call (a :class:`SwarmDone` signal) from the tool
+    a ``transfer_to_<member>`` call (a ``SwarmHandoff`` signal) or
+    a ``swarm_done`` call (a ``SwarmDone`` signal) from the tool
     list the swarm policy injected for this turn.
 
     The single-agent runner loop surfaces this variant up to the swarm
@@ -123,7 +123,7 @@ class NextStepSwarmYield:
     running termination checks, preparing the next turn's input, and
     invoking the runner for the next member.
 
-    Distinct from :class:`NextStepHandoff`: ``NextStepHandoff`` applies
+    Distinct from ``NextStepHandoff``: ``NextStepHandoff`` applies
     to the single-agent ``Handoff`` / ``HandoffRoute`` mechanism where
     the target is known to the runner. ``NextStepSwarmYield`` delegates
     target resolution and member-graph traversal to the swarm driver.
@@ -134,7 +134,7 @@ class NextStepSwarmYield:
         context_end: New context boundary after this turn's output was
             appended. Used by the swarm driver to slice shared history
             for the next turn's input preparation — mirrors
-            :attr:`NextStepHandoff.context_end`.
+            ``NextStepHandoff.context_end``.
     """
 
     signal: SwarmYieldSignal
@@ -144,7 +144,7 @@ class NextStepSwarmYield:
     context_end: int
     """New context boundary after this turn's output was appended.
     Used by the swarm driver to slice shared history for the next
-    turn's input preparation — mirrors :attr:`NextStepHandoff.context_end`."""
+    turn's input preparation — mirrors ``NextStepHandoff.context_end``."""
 
 
 NextStep = Union[

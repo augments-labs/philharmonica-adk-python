@@ -16,7 +16,7 @@ Individual tools:
 - ``SearchHistoryTool``: Search conversation history by keyword
 - ``ContextStatsTool``: Check token usage and context budget
 
-Each is an :class:`ExecutableBuiltinTool` with its own schema and callback.
+Each is an ``ExecutableBuiltinTool`` with its own schema and callback.
 
 Example::
 
@@ -82,7 +82,7 @@ class NoteEntry:
 class NoteStore(Protocol):
     """Protocol for note storage backends.
 
-    Default implementation: :class:`InMemoryNoteStore`.
+    Default implementation: ``InMemoryNoteStore``.
     """
 
     def save(self, key: str, content: str, importance: int, turn: int) -> NoteEntry:
@@ -139,7 +139,7 @@ class InMemoryNoteStore:
             turn: Agent loop turn number at save time.
 
         Returns:
-            The newly created :class:`NoteEntry`.
+            The newly created ``NoteEntry``.
         """
         entry = NoteEntry(
             key=key,
@@ -326,7 +326,7 @@ def _make_manage_context_invoke(tool: ManageContextAwareTool):
     Uses lazy ``tool.directives`` access so shared directives work.
 
     Args:
-        tool: The :class:`ManageContextAwareTool` instance whose
+        tool: The ``ManageContextAwareTool`` instance whose
             ``directives`` store receives the compact/drop directive.
 
     Returns:
@@ -371,7 +371,7 @@ def _make_search_history_invoke():
 
     Returns:
         An async callable matching the ``ToolInvokeFunction`` signature.
-        The callable expects a :class:`HistoryAwareToolContext` so it
+        The callable expects a ``HistoryAwareToolContext`` so it
         can access ``ctx.history``.
     """
 
@@ -427,12 +427,12 @@ def _make_context_stats_invoke(store: NoteStore):
     """Create the on_invoke callable for ContextStatsContextAwareTool.
 
     Args:
-        store: The note store whose :meth:`count` is included in the
+        store: The note store whose ``count`` is included in the
             stats report.
 
     Returns:
         An async callable matching the ``ToolInvokeFunction`` signature.
-        The callable expects an :class:`ExecutionAwareToolContext` so it
+        The callable expects an ``ExecutionAwareToolContext`` so it
         can read ``ctx.tokens``, ``ctx.turns``, ``ctx.messages``, and
         ``ctx.usage``.
     """
@@ -482,7 +482,7 @@ class JITContextAwareTool(ExecutableBuiltinTool):
         capacity: Maximum number of notes the store can hold.
         importance: Default importance level for ``save_note`` (1-5).
         store: Pluggable storage backend. Defaults to
-            :class:`InMemoryNoteStore`.
+            ``InMemoryNoteStore``.
         execution_aware: Whether this tool needs execution state
             (usage, turns, messages, tokens).
         history_aware: Whether this tool needs conversation history
@@ -530,7 +530,7 @@ class SaveNoteContextAwareTool(JITContextAwareTool):
     Attributes:
         name: Tool name shown to the LLM (``"save_note"``).
         description: Tool description shown to the LLM.
-        schema: Input schema (:class:`SaveNoteInput`).
+        schema: Input schema (``SaveNoteInput``).
         capacity: Maximum number of notes the store can hold (inherited).
         importance: Default importance level for saved notes (inherited).
         store: Pluggable storage backend (inherited).
@@ -564,7 +564,7 @@ class RecallNotesContextAwareTool(JITContextAwareTool):
     Attributes:
         name: Tool name shown to the LLM (``"recall_notes"``).
         description: Tool description shown to the LLM.
-        schema: Input schema (:class:`RecallNotesInput`).
+        schema: Input schema (``RecallNotesInput``).
         capacity: Maximum number of notes the store can hold (inherited).
         importance: Default importance level for saved notes (inherited).
         store: Pluggable storage backend (inherited).
@@ -596,7 +596,7 @@ class ManageContextAwareTool(JITContextAwareTool):
     Attributes:
         name: Tool name shown to the LLM (``"manage_context"``).
         description: Tool description shown to the LLM.
-        schema: Input schema (:class:`ManageContextInput`).
+        schema: Input schema (``ManageContextInput``).
         execution_aware: Always ``True`` — this tool reads ``ctx.messages``
             to bound the ``preserve`` parameter.
         capacity: Maximum number of notes the store can hold (inherited).
@@ -629,7 +629,7 @@ class SearchHistoryContextAwareTool(JITContextAwareTool):
     Attributes:
         name: Tool name shown to the LLM (``"search_history"``).
         description: Tool description shown to the LLM.
-        schema: Input schema (:class:`SearchHistoryInput`).
+        schema: Input schema (``SearchHistoryInput``).
         history_aware: Always ``True`` — this tool reads ``ctx.history``
             to search the conversation.
         capacity: Maximum number of notes the store can hold (inherited).
@@ -661,7 +661,7 @@ class ContextStatsContextAwareTool(JITContextAwareTool):
     Attributes:
         name: Tool name shown to the LLM (``"context_stats"``).
         description: Tool description shown to the LLM.
-        schema: Input schema (:class:`ContextStatsInput`).
+        schema: Input schema (``ContextStatsInput``).
         execution_aware: Always ``True`` — this tool reads token, turn,
             and message counts from ``ctx``.
         capacity: Maximum number of notes the store can hold (inherited).

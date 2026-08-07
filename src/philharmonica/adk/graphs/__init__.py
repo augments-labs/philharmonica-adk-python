@@ -1,19 +1,19 @@
 """Philharmonica Graph — composable multi-agent orchestration primitive.
 
-A :class:`Graph` is a directed graph of :class:`GraphNode`\\ s executed
+A ``Graph`` is a directed graph of ``GraphNode``\\ s executed
 under BSP (Bulk Synchronous Parallel) supersteps. Nodes may host an
-:class:`~philharmonica.adk.agents.agent.Agent`, a
-:class:`~philharmonica.adk.swarms.swarm.Swarm`, another :class:`Graph`, or a
+``Agent``, a
+``Swarm``, another ``Graph``, or a
 plain Python ``Callable`` — all uniformly, via the
-:class:`~philharmonica.adk.orchestration.executable.Executable` seam and the
-thin adapters in :mod:`philharmonica.adk.graphs.adapters`.
+``Executable`` seam and the
+thin adapters in ``philharmonica.adk.graphs.adapters``.
 
 The public surface is intentionally flat so end-users write
 ``from philharmonica.adk.graphs import Graph, Merge, GraphConfig`` without
 knowing the internal file layout.
 
-See :doc:`docs/graphs/graphs.md` for the end-to-end tutorial and
-:mod:`examples.graphs` for runnable demos.
+See ``docs/graphs/graphs.md`` for the end-to-end tutorial and
+``examples.graphs`` for runnable demos.
 """
 
 from __future__ import annotations

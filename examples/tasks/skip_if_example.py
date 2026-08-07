@@ -2,11 +2,11 @@
 
 Demonstrates:
 
-- A three-step :class:`TaskPipeline` where the middle step is skipped
+- A three-step ``TaskPipeline`` where the middle step is skipped
   conditionally based on the first step's classification output.
-- Skipped tasks remain in :attr:`TaskPipelineResult.task_outputs` with
+- Skipped tasks remain in ``TaskPipelineResult.task_outputs`` with
   ``skipped=True`` — positional indexing stays stable.
-- ``skip_if`` predicate inspecting prior :class:`TaskOutput` content.
+- ``skip_if`` predicate inspecting prior ``TaskOutput`` content.
 
 Each task's ``description`` is fed verbatim as the user prompt; the
 framework does not rewrite prompts at runtime. The classifier sees a
@@ -72,7 +72,7 @@ reviewer = Agent(
 def skip_translation_if_already_english(prior: Sequence[TaskOutput]) -> bool:
     """Skip translation when the classifier said 'english'.
 
-    ``prior`` is the immutable tuple of every prior :class:`TaskOutput`
+    ``prior`` is the immutable tuple of every prior ``TaskOutput``
     in pipeline order. Pure function of inputs — no side effects.
     """
     last_output = prior[-1].final_output

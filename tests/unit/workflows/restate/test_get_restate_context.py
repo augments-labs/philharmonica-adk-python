@@ -1,4 +1,4 @@
-"""Tests for :func:`~philharmonica.adk.workflows.restate.llm.get_restate_context`.
+"""Tests for ``get_restate_context``.
 
 The accessor reads ``restate.extensions.current_context()``, which raises
 ``LookupError`` when its ``ContextVar`` is unset (called outside a

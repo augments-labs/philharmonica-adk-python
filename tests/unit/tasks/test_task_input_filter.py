@@ -1,4 +1,4 @@
-"""Unit tests for :attr:`Task.input_filter` upstream-output forwarding.
+"""Unit tests for ``Task.input_filter`` upstream-output forwarding.
 
 Covered:
 
@@ -7,7 +7,7 @@ Covered:
   final output into the downstream prompt.
 - A custom filter has access to upstream ``output`` and ``items`` and
   can shape ``forwarded`` arbitrarily via ``TaskInputData.clone``.
-- ``depends_on`` accepts both :class:`Task` instances and ``task_id``
+- ``depends_on`` accepts both ``Task`` instances and ``task_id``
   strings, mixed freely.
 - ``TaskInputData.clone`` only accepts ``forwarded`` as a named param
   (no **kwargs; audit fields task_id/output/items are read-only).

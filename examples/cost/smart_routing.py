@@ -7,13 +7,13 @@ the run completes normally. One real API call is made — only to haiku.
 
 Key concepts:
 
-- :class:`~philharmonica.adk.llms.routing.LLMRouter` defines an ordered candidate list.
+- ``LLMRouter`` defines an ordered candidate list.
 - The agent loop escalates to the next candidate on any non-framework error
   (provider timeout, bad model name, etc.).
-- :class:`~philharmonica.adk.llms.routing.CheapestFirstRouter` orders candidates by
+- ``CheapestFirstRouter`` orders candidates by
   estimated USD ascending; this example uses a custom fixed-order subclass
   so the broken candidate is always tried first, making the fallback explicit.
-- Pass the router via :attr:`~philharmonica.adk.run.config.RunConfig.router`.
+- Pass the router via ``router``.
 
 Usage::
 

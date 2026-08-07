@@ -1,10 +1,10 @@
 """Trim a FunctionTool's output to a character or token budget.
 
-This module provides :func:`trim_tool_output`, a lightweight wrapper that
-returns a new :class:`FunctionTool` whose ``on_invoke`` stringifies and
+This module provides ``trim_tool_output``, a lightweight wrapper that
+returns a new ``FunctionTool`` whose ``on_invoke`` stringifies and
 trims the original tool's output before handing it back to the runner.
 
-Unlike :attr:`FunctionTool.max_result_tokens` (which operates inside the
+Unlike ``FunctionTool.max_result_tokens`` (which operates inside the
 runner on the *post-execution* result), this helper composes on the tool
 itself — handy when wiring third-party tools whose raw output is too
 chatty for the model, without subclassing or re-decorating.
@@ -41,22 +41,22 @@ def trim_tool_output(
     ``response_format="content_and_artifact"``) and then truncated to
     fit ``max_chars`` and/or ``max_tokens``. The original tool is left
     untouched — a shallow clone is returned via
-    :func:`dataclasses.replace`.
+    ``dataclasses.replace``.
 
     Args:
-        tool: The source :class:`FunctionTool`. Must have a non-``None``
+        tool: The source ``FunctionTool``. Must have a non-``None``
             ``on_invoke`` callback.
         max_chars: Hard character cap. When the trimmed text exceeds
             this, it is cut to ``max_chars - len(marker)`` and the
             marker is appended. ``None`` disables the char cap.
         max_tokens: Hard token cap. Requires ``model`` to be set.
-            Uses :meth:`TokenCounter.count_text` and, on overflow,
+            Uses ``TokenCounter.count_text`` and, on overflow,
             progressively shrinks via a proportional cut + rechecks
             until the budget is satisfied.
         model: litellm model identifier (e.g. ``"gpt-4o"``) used for
             token counting. Required when ``max_tokens`` is set.
         marker: Suffix appended when truncation occurs. Defaults to
-            :data:`DEFAULT_TRUNCATION_MARKER`.
+            ``DEFAULT_TRUNCATION_MARKER``.
 
     Returns:
         A new ``FunctionTool`` — same ``name``, ``description``,

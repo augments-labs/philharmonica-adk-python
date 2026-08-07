@@ -103,7 +103,7 @@ class VectorStore(Protocol):
             filter: Optional metadata filters (kind, importance, agent, time range).
 
         Returns:
-            List of :class:`VectorQueryResult` ordered by descending similarity score.
+            List of ``VectorQueryResult`` ordered by descending similarity score.
         """
         ...
 
@@ -114,7 +114,7 @@ class VectorStore(Protocol):
             record_id: The unique record identifier (namespace-free).
 
         Returns:
-            The matching :class:`VectorRecord`, or ``None`` if not found.
+            The matching ``VectorRecord``, or ``None`` if not found.
         """
         ...
 

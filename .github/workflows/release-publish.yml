@@ -71,6 +71,12 @@ jobs:
           gh release download "$TAG" --repo "${{ github.repository }}" \
             --dir dist --pattern '*.whl' --pattern '*.tar.gz'
 
+      # This job never checks out, so it has no toolchain of its own; the
+      # verification below needs one to run twine.
+      - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          python-version: "3.12"
+
       # Guard both paths: publishing an empty or partial dist would create a
       # release on PyPI that can never be corrected, since a version number is
       # consumed permanently on first upload.

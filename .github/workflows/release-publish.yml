@@ -1,0 +1,85 @@
+name: Release — publish to PyPI
+
+# Step 3 of the release flow (see RELEASING.md). Uploads the wheel + sdist
+# that release-tag.yml already built and verified to PyPI via OIDC trusted
+# publishing. Never rebuilds: it publishes the exact artifacts that passed
+# twine check and the clean-venv import + CLI smoke test.
+#
+# Why this is a separate workflow rather than a job in release-tag.yml:
+# a deployment branch policy is matched against github.ref. release-tag.yml
+# runs on `pull_request`, where that ref is `refs/pull/N/merge` — a ref no
+# branch-name pattern can match, so the `pypi` environment could never admit
+# a job running there. `workflow_run` runs against the default branch, so the
+# policy has a real ref to match and the environment can restrict publishing
+# without asking a human to approve every release.
+
+on:
+  # Normal path: chained off a successful tag + GitHub Release.
+  workflow_run:
+    workflows: ["Release — tag & GitHub Release"]
+    types: [completed]
+  # Recovery path: re-publish an already-tagged release whose upload failed
+  # (PyPI outage, expired artifact, a misconfigured environment). Takes the
+  # artifacts from the GitHub Release, which are the same verified files.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to publish (e.g. v0.1.1)
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  publish-pypi:
+    name: Publish to PyPI (OIDC)
+    # For the chained path, only a SUCCESSFUL tag run may publish; a failed or
+    # cancelled one must not. workflow_dispatch carries no such conclusion and
+    # is gated by who can dispatch plus the environment.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    # Trusted publishing: the short-lived OIDC token is minted only inside the
+    # `pypi` environment, whose deployment branch policy admits only the
+    # default branch — which is the ref both triggers above run on.
+    environment: pypi
+    permissions:
+      id-token: write # OIDC token for trusted publishing
+      contents: read # read release assets on the dispatch path
+      actions: read # read the triggering run's artifact
+    steps:
+      # Chained path: the artifact belongs to the run that triggered this one,
+      # so it needs an explicit run-id — the default would look in this run.
+      - name: Download artifacts from the tag run
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download artifacts from the GitHub Release
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          gh release download "$TAG" --dir dist --pattern '*.whl' --pattern '*.tar.gz'
+
+      # Guard both paths: publishing an empty or partial dist would create a
+      # release on PyPI that can never be corrected, since a version number is
+      # consumed permanently on first upload.
+      - name: Verify the artifacts to be published
+        run: |
+          ls -l dist/
+          wheels=$(find dist -maxdepth 1 -name '*.whl' | wc -l)
+          sdists=$(find dist -maxdepth 1 -name '*.tar.gz' | wc -l)
+          if [ "$wheels" -ne 1 ] || [ "$sdists" -ne 1 ]; then
+            echo "::error::expected exactly 1 wheel and 1 sdist, found ${wheels} and ${sdists}"
+            exit 1
+          fi
+          uvx twine check dist/*
+
+      - uses: pypa/gh-action-pypi-publish@release/v1

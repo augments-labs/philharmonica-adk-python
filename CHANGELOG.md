@@ -9,6 +9,38 @@ and the project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/v
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-08-08
+
+### Fixed
+
+- `examples/skills/skills_agent_with_skills.py`: the tool input guardrail read
+  `data.agent_output`, which `ToolInputGuardrailData` does not define, so the
+  example raised `AttributeError` on its first tool call. It now reads
+  `data.context.tool_arguments`.
+- `examples/tools/deferred_tools_hitl.py`: the conditional-approval callback
+  dereferenced `ctx.context` in a scenario that runs without one, raising
+  `AttributeError` on `None`. It now falls back to the non-production branch.
+- `examples/config/run_config_agent.py` and
+  `examples/tools/tool_advanced_features.py`: reading `.name` off a tool
+  collection that can also hold hosted tools and toolsets, neither of which
+  defines it.
+- `examples/skills/skills_customer_support.py`: the demo account store was
+  typed loosely enough that arithmetic on a balance was unsound.
+- Assorted typing repairs across the examples suite (`run_examples.py`,
+  `toolsets_basic.py`, `llm_orchestrated.py`, `human_in_the_loop.py`,
+  `middleware_basic.py`, `agent_guardrails.py`, `message_filters.py`,
+  `run_topology.py`).
+
+### Added
+
+- The examples suite is type-checked on every pull request. It was previously
+  excluded from the type checker, so a broken attribute access in a shipped
+  example could not fail any gate.
+
+### Changed
+
+- The README header logo renders at 256px wide.
+
 ## [0.1.0] - 2026-08-07
 
 ### Added

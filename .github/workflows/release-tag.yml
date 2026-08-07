@@ -4,8 +4,9 @@ name: Release — tag & publish artifacts
 # merges into main: verify the version, tag it, build the wheel + sdist, and
 # create the GitHub Release with those assets attached. The publish-pypi job
 # then uploads the SAME artifacts to PyPI via OIDC trusted publishing (no
-# long-lived token), gated by the `pypi` GitHub Environment's required
-# reviewer approval — that approval is the point of no return.
+# long-lived token). The `pypi` GitHub Environment restricts deployment to
+# release/v* branches and requests no approval, so merging the release PR is
+# itself the point of no return.
 
 on:
   pull_request:
@@ -125,8 +126,10 @@ jobs:
       startsWith(github.event.pull_request.head.ref, 'release/v')
     runs-on: ubuntu-latest
     # Trusted publishing: the short-lived OIDC token is minted only inside
-    # the `pypi` environment, whose required-reviewer approval is the human
-    # point of no return (see RELEASING.md).
+    # the `pypi` environment, whose deployment branch policy admits only
+    # release/v* refs. The `if:` above is the same restriction expressed in
+    # workflow terms; the environment policy is what enforces it against a
+    # workflow edit (see RELEASING.md).
     environment: pypi
     permissions:
       id-token: write

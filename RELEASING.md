@@ -152,7 +152,7 @@ Contributors *do* add `CHANGELOG.md` entries under `[Unreleased]`.
 
 The flow is workflow-driven. [Commitizen](https://commitizen-tools.github.io/commitizen/)
 performs the atomic version bump, keeping `pyproject.toml:version` and
-`src/philharmonica/adk/__init__.py:__version__` in lockstep, and two GitHub
+`src/philharmonica/adk/__init__.py:__version__` in lockstep, and three GitHub
 Actions workflows orchestrate the rest.
 
 `update_changelog_on_bump` is off, because the CHANGELOG is hand-maintained in
@@ -168,14 +168,33 @@ Keep a Changelog form. Commitizen therefore does **not** touch `CHANGELOG.md`
    `cz bump --files-only --increment <tier>`, pushes a `release/vX.Y.Z`
    branch, and opens a PR against `main`.
 4. Review the PR: confirm the version and that CI is green.
-5. Merging it as a normal merge commit fires the **"Release — tag & publish
-   artifacts"** workflow, which verifies the merged `pyproject.toml` version
+5. Merging it as a normal merge commit fires the **"Release — tag & GitHub
+   Release"** workflow, which verifies the merged `pyproject.toml` version
    matches the branch suffix, tags `vX.Y.Z` on `main`, builds the wheel +
    sdist, and creates the GitHub Release with those assets attached.
+6. Its success chains into **"Release — publish to PyPI"**, which uploads those
+   exact artifacts — never a rebuild — via OIDC trusted publishing.
 
-That same merge publishes the wheel and sdist to PyPI via OIDC trusted
-publishing — no approval is requested and the upload cannot be undone. Treat
+No approval is requested at any point, and the upload cannot be undone. Treat
 merging the release PR, not any later step, as the irreversible act.
+
+### Why publishing is a separate workflow
+
+The `pypi` GitHub Environment restricts deployments by *ref*, and it matches
+against `github.ref`. Step 5 runs on `pull_request`, where that ref is
+`refs/pull/N/merge` — a ref no branch-name pattern can ever match, so an
+environment protecting a job there can only reject it. Step 6 runs on
+`workflow_run`, whose ref is the default branch, which the policy can match.
+That is what lets publishing be both automatic and ref-restricted without a
+long-lived credential.
+
+### If a publish fails after the tag exists
+
+The tag and GitHub Release are already correct; only the upload is missing.
+Re-run **"Release — publish to PyPI"** via *Run workflow* and give it the tag
+(e.g. `v0.1.1`). It takes the wheel and sdist from that GitHub Release — the
+same files step 5 verified — so recovery never rebuilds or re-tags. Do not cut
+a new version number to work around a failed upload.
 
 ## Local dry run
 
@@ -196,5 +215,5 @@ python -m twine check dist/*
 
 Follow this file exactly. If the tier is genuinely ambiguous, ask the
 maintainer rather than inventing a number. Never push a tag by hand — the tag
-is created by the "Release — tag & publish artifacts" workflow after the
+is created by the "Release — tag & GitHub Release" workflow after the
 release PR merges.

@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/augments-labs/philharmonica-adk-python/main/docs/images/logo.png"
+       alt="Philharmonica" width="132" height="132">
+</p>
+
 # Philharmonica Agent Development Kit (ADK)
 
 A provider-agnostic Python framework to orchestrate complex

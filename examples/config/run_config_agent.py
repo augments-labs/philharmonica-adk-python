@@ -50,7 +50,9 @@ async def main() -> None:
     agent = load_agent(CONFIG_PATH)
     logger.info("Loaded agent %r from %s", agent.name, CONFIG_PATH.name)
     logger.info("  model: %s", agent.llm)
-    logger.info("  tools: %s", [tool.name for tool in agent.tools])
+    # Hosted tools and toolsets carry no ``name``, so read it defensively —
+    # the config could declare either.
+    logger.info("  tools: %s", [getattr(tool, "name", str(tool)) for tool in agent.tools])
     logger.info("  output_schema: %s", type(agent.output_schema).__name__)
 
     # Live turn — requires an LLM API key.

@@ -32,9 +32,8 @@ Six pure-function emitters re-exported from `__init__.py`:
 
 The `Flow` / `Graph` classes also expose ergonomic instance methods
 (`to_mermaid` / `to_dot`) that delegate here. `definition_to_mermaid` /
-`definition_to_dot` accept a
-:class:`~philharmonica.adk.flows.definition.FlowDefinition` directly and render
-the same topology without requiring a `Flow` instance or any run.
+`definition_to_dot` accept a `FlowDefinition` directly and render the same
+topology without requiring a `Flow` instance or any run.
 
 `helpers.py` is module-private (omitted from `__all__`).
 

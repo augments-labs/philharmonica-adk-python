@@ -1,5 +1,3 @@
-(tasks/index)=
-
 # Tasks
 
 Declarative units of work executed by `Runner.arun_task` and

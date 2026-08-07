@@ -1,5 +1,3 @@
-(guides/mcp)=
-
 # 🔌 MCP (Model Context Protocol)
 
 **Model Context Protocol (MCP)** is an open standard that lets an
@@ -14,15 +12,15 @@ transport plugs into an agent's `tools` list without changes to the
 agent itself. The ADK can also expose its own tools *as* an MCP server
 so other hosts can consume them.
 
-```{admonition} Prerequisite
-:class: note
-MCP support is an optional extra.
-
-    pip install 'philharmonica-adk[mcp]'
-
-Without the extra, every `philharmonica.adk.mcp.*` name is bound to `None`;
-compare against `None` to detect availability at runtime.
-```
+> [!NOTE]
+> **Prerequisite**
+>
+> MCP support is an optional extra.
+>
+>     pip install 'philharmonica-adk[mcp]'
+>
+> Without the extra, every `philharmonica.adk.mcp.*` name is bound to `None`;
+> compare against `None` to detect availability at runtime.
 
 ---
 
@@ -40,7 +38,7 @@ code. They are not interchangeable:
 **Rule:** function tools are the default unit of behaviour. MCP extends
 the *tool surface* from external servers. A2A delegates to *other
 agents* that happen to run as HTTP services. See
-{doc}`../concepts/index` for the side-by-side comparison table.
+[Concepts](../concepts/index.md) for the side-by-side comparison table.
 
 ---
 
@@ -261,13 +259,13 @@ For per-tool granularity, write a `tool_filter` that wraps selected
 `FunctionTool` instances with `requires_approval=True` after
 conversion.
 
-```{admonition} Layer 3 items
-:class: note
-`MCPApprovalRequestItem` and `MCPApprovalResponseItem` are Layer 3
-`RunItem` types — they appear in `RunResult.new_items` and in the run's
-conversation history. See {doc}`../architecture/type-layers`
-for the full layer contract.
-```
+> [!NOTE]
+> **Layer 3 items**
+>
+> `MCPApprovalRequestItem` and `MCPApprovalResponseItem` are Layer 3
+> `RunItem` types — they appear in `RunResult.new_items` and in the run's
+> conversation history. See [🧩 The Three Type Layers](../architecture/type-layers.md)
+> for the full layer contract.
 
 ---
 
@@ -475,8 +473,8 @@ because they do not ship hosted MCP server-side.
 
 ## See also
 
-- {doc}`../concepts/index` — MCP vs A2A vs function tools side-by-side.
-- {doc}`../architecture/type-layers` — the three-layer type architecture,
+- [Concepts](../concepts/index.md) — MCP vs A2A vs function tools side-by-side.
+- [🧩 The Three Type Layers](../architecture/type-layers.md) — the three-layer type architecture,
   including how `MCPListToolsItem`, `MCPApprovalRequestItem`, and
   `MCPApprovalResponseItem` fit into the Layer 3 `RunItem` contract.
 - `examples/mcp/` — runnable examples (stdio, streamable HTTP,

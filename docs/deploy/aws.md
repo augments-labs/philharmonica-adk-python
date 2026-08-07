@@ -1,5 +1,3 @@
-(deploy/aws)=
-
 # AWS
 
 Three AWS targets are available, each suited to a different traffic pattern:
@@ -236,11 +234,10 @@ Packages the agent as a Lambda function image using the
 [Lambda Web Adapter](https://github.com/awslabs/aws-lambda-web-adapter) and
 updates an existing function's image URI.
 
-:::{note}
-Lambda is best suited to spiky or intermittent traffic. Sustained multi-turn
-agent conversations benefit from ECS or App Runner, which keep the process
-running between requests.
-:::
+> [!NOTE]
+> Lambda is best suited to spiky or intermittent traffic. Sustained multi-turn
+> agent conversations benefit from ECS or App Runner, which keep the process
+> running between requests.
 
 ### Step 1 — generate artifacts
 

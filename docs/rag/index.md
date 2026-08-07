@@ -1,5 +1,3 @@
-(rag/index)=
-
 # Document search (RAG)
 
 Semantic search over a document corpus — load files or URLs, chunk and embed

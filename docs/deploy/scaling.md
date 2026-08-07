@@ -1,5 +1,3 @@
-(deploy/scaling)=
-
 # Horizontal Scaling
 
 A single replica of a served agent works correctly out of the box. Adding
@@ -54,14 +52,13 @@ pip install 'philharmonica-adk[a2a,a2a-postgres]'
 left non-terminal is marked FAILED before the server accepts requests, so
 clients receive a clean error and can resubmit.
 
-:::{note}
-`--task-dsn` wires the ADK's own executor task store (background task
-snapshots for restart recovery and shared state across replicas). The a2a-sdk
-request-handler's own task store is separate; for full A2A wire-protocol task
-lookups across replicas an operator may additionally supply a shared a2a-sdk
-store via `build_starlette_app`. REST sessions via `--session-dsn` are fully
-shared with no further configuration.
-:::
+> [!NOTE]
+> `--task-dsn` wires the ADK's own executor task store (background task
+> snapshots for restart recovery and shared state across replicas). The a2a-sdk
+> request-handler's own task store is separate; for full A2A wire-protocol task
+> lookups across replicas an operator may additionally supply a shared a2a-sdk
+> store via `build_starlette_app`. REST sessions via `--session-dsn` are fully
+> shared with no further configuration.
 
 `--task-db` (SQLite file) and `--task-dsn` (Postgres DSN) are mutually
 exclusive; choose one.

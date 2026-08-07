@@ -1,5 +1,3 @@
-(workflows/index)=
-
 # Durable Workflows
 
 Durable, replayable execution via Temporal — for long-running,

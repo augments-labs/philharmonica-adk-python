@@ -1,5 +1,3 @@
-(guides/tools)=
-
 # 🔧 Tools
 
 Tools give agents the ability to act — query databases, call APIs, run code,
@@ -277,11 +275,10 @@ FileSearchTool(
 )
 ```
 
-:::{note}
-Anthropic's code execution is in beta and not represented as a typed class.
-Use `LLMConfig.extra_body` to pass beta-format tool definitions for
-capabilities not yet covered by a typed `HostedTool` subclass.
-:::
+> [!NOTE]
+> Anthropic's code execution is in beta and not represented as a typed class.
+> Use `LLMConfig.extra_body` to pass beta-format tool definitions for
+> capabilities not yet covered by a typed `HostedTool` subclass.
 
 ---
 
@@ -320,12 +317,11 @@ wrappers works transparently:
 MCPToolset(server=server).prefixed("fetch").filtered(my_predicate)
 ```
 
-:::{tip}
-See the MCP guide (`guides/mcp`) for server types (`MCPServerStdio`,
-`MCPServerStreamableHttp`, `MCPServerSSE`), `HostedMCPTool` for
-Anthropic-hosted MCP servers, and the `MCPServerManager` for sharing a
-connection across agents.
-:::
+> [!TIP]
+> See the MCP guide (`guides/mcp`) for server types (`MCPServerStdio`,
+> `MCPServerStreamableHttp`, `MCPServerSSE`), `HostedMCPTool` for
+> Anthropic-hosted MCP servers, and the `MCPServerManager` for sharing a
+> connection across agents.
 
 ---
 
@@ -368,10 +364,9 @@ and behaviour controls as any other tool:
 Sub-agent intermediate steps never enter the parent context. The parent
 sees exactly two messages: the tool call and the final result string.
 
-:::{tip}
-See the Agents guide (`guides/agents`) for the full `as_tool()` parameter
-reference and the nested HITL pattern.
-:::
+> [!TIP]
+> See the Agents guide (`guides/agents`) for the full `as_tool()` parameter
+> reference and the nested HITL pattern.
 
 ---
 

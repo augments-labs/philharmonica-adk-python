@@ -1,5 +1,3 @@
-(guardrails/index)=
-
 # Guardrails
 
 Agent-level input and output guardrails — pure validators that can

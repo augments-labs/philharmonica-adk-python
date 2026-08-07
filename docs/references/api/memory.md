@@ -1,5 +1,3 @@
-(references/api/memory)=
-
 # Memory
 
 Extracted, searchable knowledge carried across sessions.

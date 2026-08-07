@@ -1,5 +1,3 @@
-(guides/tracing)=
-
 # 🔭 Tracing
 
 The Philharmonica ADK ships a provider-agnostic observability layer built on
@@ -330,14 +328,13 @@ tracer = setup_otel(
 The `tool_io_max_chars` parameter controls the per-attribute char cap when
 `record_tool_io_full` is `False`.
 
-```{admonition} Privacy note
-:class: warning
-
-Both `TracingConvention.DEFAULT` and `TracingConvention.OPENINFERENCE` apply
-the same redaction gate to tool I/O. Redaction is last-resort defence — it
-does not replace proper secret hygiene in tool code. Treat your configured
-observability backend as having visibility into prompt and response content.
-```
+> [!WARNING]
+> **Privacy note**
+>
+> Both `TracingConvention.DEFAULT` and `TracingConvention.OPENINFERENCE` apply
+> the same redaction gate to tool I/O. Redaction is last-resort defence — it
+> does not replace proper secret hygiene in tool code. Treat your configured
+> observability backend as having visibility into prompt and response content.
 
 ---
 
@@ -532,25 +529,24 @@ land on the same `tenant` dimension. The `variant` field in
 `philharmonica.metadata.variant` lets you split traces by agent version in the
 observability backend.
 
-```{admonition} Thread safety
-:class: note
-
-`set_tracer` installs a module-level tracer. For concurrent `Runner.arun()`
-calls sharing a process, install the tracer once at startup rather than
-swapping it per request. Per-run behaviour is controlled via `RunConfig`
-flags, not by swapping the tracer.
-```
+> [!NOTE]
+> **Thread safety**
+>
+> `set_tracer` installs a module-level tracer. For concurrent `Runner.arun()`
+> calls sharing a process, install the tracer once at startup rather than
+> swapping it per request. Per-run behaviour is controlled via `RunConfig`
+> flags, not by swapping the tracer.
 
 ---
 
 ## See also
 
-- {doc}`../architecture/governance` — cross-cutting invariants including the
+- [🛡️ Governance](../architecture/governance.md) — cross-cutting invariants including the
   opt-in philosophy and cost-conservative defaults.
-- {doc}`../observability/observability` — full observability reference:
+- [Observability](../observability/observability.md) — full observability reference:
   `TracingConvention`, metric instruments, exporter helpers, structured
   logging, and tenant tagging.
-- {doc}`../tracing/custom_span` — authoring developer-facing spans via
+- [Custom Spans](../tracing/custom_span.md) — authoring developer-facing spans via
   `custom_span`.
-- {doc}`../tracing/otel` — OpenTelemetry bridge detail, Jaeger / Honeycomb /
+- [OpenTelemetry Bridge](../tracing/otel.md) — OpenTelemetry bridge detail, Jaeger / Honeycomb /
   Datadog setup, and the full attribute-mapping table.

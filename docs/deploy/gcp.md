@@ -1,5 +1,3 @@
-(deploy/gcp)=
-
 # GCP Cloud Run
 
 `philharmonica deploy cloud-run` deploys an agent to Google Cloud Run using
@@ -103,11 +101,10 @@ philharmonica deploy cloud-run \
   --allow-unauthenticated
 ```
 
-:::{warning}
-A publicly accessible endpoint exposes your agent and the LLM calls it
-makes to the internet. Require authentication for any agent that accesses
-private data or consumes paid LLM tokens.
-:::
+> [!WARNING]
+> A publicly accessible endpoint exposes your agent and the LLM calls it
+> makes to the internet. Require authentication for any agent that accesses
+> private data or consumes paid LLM tokens.
 
 ## Minimum instances
 

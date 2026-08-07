@@ -1,5 +1,3 @@
-(guides/sandbox)=
-
 # 🪣 Sandbox
 
 A sandbox wraps every tool execution inside an isolated environment so that
@@ -118,7 +116,7 @@ config = SandboxRunConfig(
 )
 ```
 
-See {doc}`../sandbox/selection` for the full cost-aware selection
+See [Cost-Aware Sandbox Selection](../sandbox/selection.md) for the full cost-aware selection
 documentation.
 
 ---
@@ -201,12 +199,11 @@ applied at the namespace level; the pod itself is created with the
 Runs commands as child processes of the host Python process inside a
 temporary working directory.
 
-```{warning}
-`LocalSubprocessSandboxClient` provides **no isolation**. Commands run as
-the same user and with the same filesystem access as the framework process.
-Use only for local development and examples. Production deployments must
-use `DockerSandboxClient`, `K8sPodSandboxClient`, or a hosted bridge.
-```
+> [!WARNING]
+> `LocalSubprocessSandboxClient` provides **no isolation**. Commands run as
+> the same user and with the same filesystem access as the framework process.
+> Use only for local development and examples. Production deployments must
+> use `DockerSandboxClient`, `K8sPodSandboxClient`, or a hosted bridge.
 
 ```python
 from philharmonica.adk.sandbox.clients.local import (
@@ -333,13 +330,12 @@ Three concrete implementations ship out of the box:
 - **`GCSSnapshotStore`** — reads and writes snapshots from Google Cloud
   Storage. Requires the `[sandbox-gcs]` extra.
 
-```{note}
-Not all backends support `snapshot_store`. Docker, K8s, and the hosted
-bridges raise `UnsupportedSnapshotFeatureError` if you pass a non-`None`
-store today. The session-level `persist_workspace` / restore path works
-independently of the store; the store is the *persistence* layer for
-cross-run restore.
-```
+> [!NOTE]
+> Not all backends support `snapshot_store`. Docker, K8s, and the hosted
+> bridges raise `UnsupportedSnapshotFeatureError` if you pass a non-`None`
+> store today. The session-level `persist_workspace` / restore path works
+> independently of the store; the store is the *persistence* layer for
+> cross-run restore.
 
 Wire the store via `SandboxRunConfig`:
 
@@ -357,7 +353,7 @@ config = SandboxRunConfig(
 )
 ```
 
-See {doc}`../sandbox/snapshots` for the full snapshot documentation.
+See [Sandbox Snapshots](../sandbox/snapshots.md) for the full snapshot documentation.
 
 ---
 
@@ -439,7 +435,7 @@ tools on a development agent but confine them to an unnetworked Docker
 container, while a production agent has a tighter tool allowlist *and*
 a networked hosted bridge for the subset of commands that need it.
 
-See {doc}`../permissions/permissions` for the tool-permission model.
+See [Permissions Usage](../permissions/permissions.md) for the tool-permission model.
 
 ---
 
@@ -486,7 +482,7 @@ def make_sandbox_config(tenant_id: str) -> SandboxRunConfig:
 ```
 
 Pair this with the per-tenant task-queue routing documented in
-{doc}`../architecture/governance` when you need Temporal-level
+[🛡️ Governance](../architecture/governance.md) when you need Temporal-level
 tenant isolation alongside sandbox isolation.
 
 ### Cost-aware backend selection
@@ -522,11 +518,11 @@ Docker backend and heavy jobs to whichever hosted bridge has the lowest
 
 ## See also
 
-- {doc}`../architecture/governance` — per-tenant Temporal task queue
+- [🛡️ Governance](../architecture/governance.md) — per-tenant Temporal task queue
   routing and other cross-cutting governance invariants.
-- {doc}`../concepts/index` — the Guardrails vs Middleware vs Hooks vs Sandbox
+- [Concepts](../concepts/index.md) — the Guardrails vs Middleware vs Hooks vs Sandbox
   comparison table.
-- {doc}`../architecture/governance` — framework governance and the
+- [🛡️ Governance](../architecture/governance.md) — framework governance and the
   non-negotiable architectural invariants.
-- {doc}`../sandbox/selection` — full cost-aware selection documentation.
-- {doc}`../sandbox/snapshots` — full snapshot and `SnapshotStore` documentation.
+- [Cost-Aware Sandbox Selection](../sandbox/selection.md) — full cost-aware selection documentation.
+- [Sandbox Snapshots](../sandbox/snapshots.md) — full snapshot and `SnapshotStore` documentation.

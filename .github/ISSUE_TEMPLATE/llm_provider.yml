@@ -7,7 +7,7 @@ body:
       value: |
         Use this for issues tied to a specific provider or model — wrong wire
         conversion, a missing/mismapped parameter, streaming or tool-call
-        quirks, token/cost mismatches. See `docs/providers/` first.
+        quirks, token/cost mismatches. See `docs/llms/` first.
   - type: dropdown
     id: provider
     attributes:

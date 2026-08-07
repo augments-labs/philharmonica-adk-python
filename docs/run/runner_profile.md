@@ -1,5 +1,3 @@
-(run/runner-profile)=
-
 # Runner Profiles
 
 `Runner.configure()` creates an immutable `RunnerProfile` for defaults you

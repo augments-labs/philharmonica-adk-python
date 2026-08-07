@@ -1,5 +1,3 @@
-(topics/index)=
-
 # Topics
 
 Deep per-subsystem reference. [Guides](../guides/index.md) are the

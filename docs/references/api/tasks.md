@@ -1,5 +1,3 @@
-(references/api/tasks)=
-
 # Tasks
 
 Declarative units of work: an agent, a description, and per-call overrides

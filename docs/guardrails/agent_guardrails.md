@@ -1,5 +1,3 @@
-(guardrails/agent_guardrails)=
-
 # Agent-Level Guardrails
 
 > **Scope:** This document covers **agent-level** guardrails — validation
@@ -522,15 +520,14 @@ Key properties of the TRANSFORM action:
 - **`changed_spans` is observability.** The runner never splices spans; the
   guardrail is responsible for computing the entire replacement string itself.
 
-:::{admonition} Streaming caveat
-:class: warning
-
-When using streaming delivery, tokens may already have been emitted to a
-consumer before the output guardrail runs. The substitution lands on the
-persisted `RunResult` and session history, not on already-streamed tokens. Pair
-a `TRANSFORM`-mode guardrail with non-streaming delivery when hard guarantees
-are required.
-:::
+> [!WARNING]
+> **Streaming caveat**
+>
+> When using streaming delivery, tokens may already have been emitted to a
+> consumer before the output guardrail runs. The substitution lands on the
+> persisted `RunResult` and session history, not on already-streamed tokens. Pair
+> a `TRANSFORM`-mode guardrail with non-streaming delivery when hard guarantees
+> are required.
 
 The built-in `pii_guardrail(on_fail=GuardrailAction.TRANSFORM)` applies this
 pattern using `PatternScanner`. See [Guardrail hub](guardrail_hub.md) for the

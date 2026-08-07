@@ -1,5 +1,3 @@
-(tools/index)=
-
 # Tools
 
 The tool system in depth — toolsets, tool middleware, runtime

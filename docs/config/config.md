@@ -1,5 +1,3 @@
-(config/config)=
-
 # Declarative Agent Configuration
 
 The `philharmonica.adk.config` subsystem lets you define an `Agent` — or an entire
@@ -73,13 +71,12 @@ the `get_weather` symbol, and returns a ready-to-run `Agent`. References
 resolve **relative to the config file's directory**, so `weather.py` sitting
 next to `agent.json` is found no matter where you launch from.
 
-:::{note}
-If a tool lives in the script you run *directly*, its module is `__main__`, so
-the reference would read `__main__:get_weather`. That works for a throwaway
-script, but it is not portable — load the same `agent.json` from anywhere else
-and `__main__` is a different module. Put tools in their own module for any
-config you intend to reuse.
-:::
+> [!NOTE]
+> If a tool lives in the script you run *directly*, its module is `__main__`, so
+> the reference would read `__main__:get_weather`. That works for a throwaway
+> script, but it is not portable — load the same `agent.json` from anywhere else
+> and `__main__` is a different module. Put tools in their own module for any
+> config you intend to reuse.
 
 ### Multi-agent topology
 
@@ -246,10 +243,9 @@ The `provider` key is the discriminator. Accepted values:
 All provider blocks also accept `base_url` and `max_retries`. Secrets
 (`api_key`) fall back to the corresponding environment variable when unset.
 
-:::{important}
-A provider block's `config` and a top-level `llm_config` are mutually
-exclusive — validation rejects both at once. Use one source.
-:::
+> [!IMPORTANT]
+> A provider block's `config` and a top-level `llm_config` are mutually
+> exclusive — validation rejects both at once. Use one source.
 
 ### `llm_config`
 
@@ -593,9 +589,7 @@ over the same `agents` map; the caller picks which one to run. The
 Config files may carry an optional `"$schema"` key pointing at the committed
 generated schema:
 
-```{code-block} json
-:force:
-
+```json
 {
   "$schema": "../../src/philharmonica/adk/types/config/agent_config.schema.json",
   "name": "my_agent",
@@ -626,10 +620,9 @@ Run this command after changing any type in `src/philharmonica/adk/types/config/
 and commit both the source change and the updated schema files together. A
 drift-guard test verifies they stay in sync.
 
-:::{note}
-The JSON Schema validates YAML files too, because YAML is a superset of
-JSON. Point `$schema` at the same file when authoring YAML configs.
-:::
+> [!NOTE]
+> The JSON Schema validates YAML files too, because YAML is a superset of
+> JSON. Point `$schema` at the same file when authoring YAML configs.
 
 ---
 
@@ -724,19 +717,18 @@ The dump is **lossy by design**: code-only fields cannot be recovered.
 
 ## Security trust boundary
 
-:::{danger}
-Loading a config file imports and then calls the Python modules it
-references via dotted paths. This is equivalent to importing those modules
-directly — it executes Python code from them.
-
-**Load only config files you trust**, exactly as you would a Python entry
-point. A malicious config with a crafted `ref` value can execute arbitrary
-code in your process.
-
-The same trust requirement extends to every file a topology pulls in through
-`config_path` and to the Python modules in those files' directories: loading a
-topology trusts each referenced agent file as much as the topology itself.
-:::
+> [!CAUTION]
+> Loading a config file imports and then calls the Python modules it
+> references via dotted paths. This is equivalent to importing those modules
+> directly — it executes Python code from them.
+>
+> **Load only config files you trust**, exactly as you would a Python entry
+> point. A malicious config with a crafted `ref` value can execute arbitrary
+> code in your process.
+>
+> The same trust requirement extends to every file a topology pulls in through
+> `config_path` and to the Python modules in those files' directories: loading a
+> topology trusts each referenced agent file as much as the topology itself.
 
 This boundary is intentional: it is what gives dotted refs their power —
 referencing any Python function, guardrail, or output schema without

@@ -1,5 +1,3 @@
-(run/index)=
-
 # Run
 
 Runner entry-points and run-time controls — the interactive demo REPL,

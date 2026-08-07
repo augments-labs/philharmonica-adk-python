@@ -1,5 +1,3 @@
-(agents/index)=
-
 # Agents
 
 Deep dives into agent composition: multi-agent patterns, the per-agent

@@ -1,5 +1,3 @@
-(concepts/index)=
-
 # Concepts
 
 > Every concept in this ADK, what it does, and — critically — what it

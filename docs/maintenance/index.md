@@ -1,5 +1,3 @@
-(maintenance/index)=
-
 # Maintenance
 
 What to update in `docs/` when you ship code. The pages here are plain

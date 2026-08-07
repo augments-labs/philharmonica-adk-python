@@ -1,5 +1,3 @@
-(references/api/runner)=
-
 # `Runner`
 
 - `philharmonica.adk.run.Runner`

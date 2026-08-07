@@ -1,5 +1,3 @@
-(guides/skills)=
-
 # 🎒 Skills
 
 A skill is a **composable bundle** of instructions, tools, resources, and
@@ -99,14 +97,13 @@ prompt.
 
 ## Skill vs Tool
 
-```{admonition} Quick rule
-:class: tip
-
-Reach for a **tool** when you need to expose a single function.
-Reach for a **skill** when you need a full *capability stack* — instructions
-that teach the LLM *how* to use the tools, governance that constrains them,
-and guardrails that protect them.
-```
+> [!TIP]
+> **Quick rule**
+>
+> Reach for a **tool** when you need to expose a single function.
+> Reach for a **skill** when you need a full *capability stack* — instructions
+> that teach the LLM *how* to use the tools, governance that constrains them,
+> and guardrails that protect them.
 
 | Aspect | `Skill` | `Tool` (`FunctionTool`) |
 |---|---|---|
@@ -120,7 +117,7 @@ and guardrails that protect them.
 A tool is a primitive; a skill is a package. A skill may contain zero tools
 (instructions-only), many tools, or tools that a bare agent also carries.
 
-For the full treatment see the Concepts page: {doc}`../concepts/index`.
+For the full treatment see the Concepts page: [Concepts](../concepts/index.md).
 
 ---
 
@@ -255,7 +252,7 @@ billing_skill = Skill(
 Every tool inside `billing_skill` will have `billing_pii_check` prepended to
 its input guardrail chain. Per-skill governance and guardrails are the primary
 mechanism for the governance-bundling principle described in
-{doc}`../architecture/governance`.
+[🛡️ Governance](../architecture/governance.md).
 
 ---
 
@@ -431,7 +428,7 @@ single definition in a `finance` skill library.
 
 ## See also
 
-- {doc}`../concepts/index` — Skills vs Tools comparison table (§ "🎒 Skills vs 🔧 Tools")
-- {doc}`../architecture/governance` — Audit substrate and tool permissions
+- [Concepts](../concepts/index.md) — Skills vs Tools comparison table (§ "🎒 Skills vs 🔧 Tools")
+- [🛡️ Governance](../architecture/governance.md) — Audit substrate and tool permissions
 - `examples/skills/` — Runnable end-to-end examples (`skills_agent_with_skills.py`,
   `skills_customer_support.py`, `skills_directory.py`, `skills_discovery.py`)

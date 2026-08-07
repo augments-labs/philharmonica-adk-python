@@ -1,5 +1,3 @@
-(architecture/governance)=
-
 # 🛡️ Governance
 
 Cross-cutting concerns that apply at every stage of the pipeline:

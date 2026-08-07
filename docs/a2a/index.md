@@ -1,5 +1,3 @@
-(a2a/index)=
-
 # Agent-to-Agent (A2A)
 
 Invoke another ADK (or A2A-compatible) agent across a process boundary —

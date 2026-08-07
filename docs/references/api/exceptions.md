@@ -1,5 +1,3 @@
-(references/api/exceptions)=
-
 # Exceptions
 
 The framework exception hierarchy. Every exception derives from

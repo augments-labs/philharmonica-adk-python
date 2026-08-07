@@ -1,5 +1,3 @@
-(cost/index)=
-
 # Cost
 
 Cost governance and smart routing — estimators, ledgers, routers, and

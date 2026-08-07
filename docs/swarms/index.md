@@ -1,5 +1,3 @@
-(swarms/index)=
-
 # Swarms
 
 Iterative multi-agent collaboration in cycles — swarm policies,

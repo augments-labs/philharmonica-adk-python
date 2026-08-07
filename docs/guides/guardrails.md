@@ -1,5 +1,3 @@
-(guides/guardrails)=
-
 # 🛡️ Guardrails
 
 Guardrails are the input and output safety gates on either side of the
@@ -8,13 +6,12 @@ the prompt) and again at Stage 4 (after the loop produces its final
 reply), giving you deterministic, cost-free checkpoints for content
 policy, length limits, and any custom logic your application needs.
 
-```{admonition} Core contract
-:class: important
-
-A guardrail is a **sync or async pure function**. It takes a data object
-(prompt or output), inspects it, and returns a verdict. It never calls an
-LLM, never has side-effects on run state, and never fails silently.
-```
+> [!IMPORTANT]
+> **Core contract**
+>
+> A guardrail is a **sync or async pure function**. It takes a data object
+> (prompt or output), inspects it, and returns a verdict. It never calls an
+> LLM, never has side-effects on run state, and never fails silently.
 
 ## Where guardrails sit in the pipeline
 
@@ -338,17 +335,16 @@ Register tool guardrails directly on a `FunctionTool` via
 
 ## Guardrails are pure — no LLM calls
 
-```{admonition} Guardrails must not call an LLM
-:class: warning
-
-Guardrail functions **must not call an LLM**. The contract is a sync or
-async pure function: deterministic, bounded-latency, zero extra tokens.
-
-If you need a nuanced semantic check — context-dependent detection,
-entailment scoring, factuality grading — that belongs in the **evals**
-subsystem (graders), not in a guardrail. Evals run on test data;
-guardrails run on production traffic.
-```
+> [!WARNING]
+> **Guardrails must not call an LLM**
+>
+> Guardrail functions **must not call an LLM**. The contract is a sync or
+> async pure function: deterministic, bounded-latency, zero extra tokens.
+>
+> If you need a nuanced semantic check — context-dependent detection,
+> entailment scoring, factuality grading — that belongs in the **evals**
+> subsystem (graders), not in a guardrail. Evals run on test data;
+> guardrails run on production traffic.
 
 ## Common patterns
 

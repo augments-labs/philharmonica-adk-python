@@ -1,5 +1,3 @@
-(references/api/mcp)=
-
 # MCP
 
 Model Context Protocol integration: server transports, lifecycle

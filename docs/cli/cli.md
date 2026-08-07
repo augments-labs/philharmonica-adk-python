@@ -1,5 +1,3 @@
-(cli/cli)=
-
 # `philharmonica` CLI Reference
 
 The `philharmonica` console script is the primary command-line interface for the
@@ -407,13 +405,12 @@ Serve a single `Agent` as an A2A endpoint.
 philharmonica serve [OPTIONS] [CONFIG]
 ```
 
-:::{important}
-`philharmonica serve` requires the `serve` extra:
-
-```bash
-pip install 'philharmonica-adk[serve]'
-```
-:::
+> [!IMPORTANT]
+> `philharmonica serve` requires the `serve` extra:
+>
+> ```bash
+> pip install 'philharmonica-adk[serve]'
+> ```
 
 The `--card` option is **required**. The AgentCard must be a
 developer-authored JSON file in protobuf JSON form (camelCase field names).
@@ -431,12 +428,11 @@ The CLI never synthesises a card. The card is published at
 | `--max-turns INTEGER` | Per-task agent loop turn limit (framework default when omitted) |
 | `--env-file FILE` | Load `KEY=VALUE` pairs from this file (never auto-discovered) |
 
-:::{warning}
-`philharmonica serve` uses an **in-memory task store** by default. Tasks are lost
-on process restart. For production deployments, use
-`build_starlette_app` directly and supply a persistent task store — see
-[A2A guide](../a2a/a2a.md#production-warning-persistent-task-store).
-:::
+> [!WARNING]
+> `philharmonica serve` uses an **in-memory task store** by default. Tasks are lost
+> on process restart. For production deployments, use
+> `build_starlette_app` directly and supply a persistent task store — see
+> [A2A guide](../a2a/a2a.md#production-warning-persistent-task-store).
 
 **Example**
 

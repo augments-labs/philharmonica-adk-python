@@ -2,7 +2,7 @@
 # setuptools>=70.0 closes CVE-2024-6345 (RCE via crafted URL in
 # package_index.py's download_url flow). Zero-cost bump — no breaking
 # changes between 68 and 70 for setuptools.build_meta consumers.
-requires = ["setuptools>=70.0", "wheel"]
+requires = ["setuptools>=83.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -107,7 +107,7 @@ gemini = ["google-genai>=1.0.0"]
 
 # Model Context Protocol client. Enables MCPServer integration.
 # See src/philharmonica/adk/mcp/.
-mcp = ["mcp>=1.24.0,<2"]
+mcp = ["mcp>=2.0.0,<3"]
 
 # Agent-to-Agent (A2A) protocol — peer client + expose local Agents
 # as A2A servers. The [http-server] extra pulls in starlette and
@@ -115,7 +115,7 @@ mcp = ["mcp>=1.24.0,<2"]
 # work without a server runtime — the import guard surfaces missing
 # dependencies as a clear ImportError.
 # See src/philharmonica/adk/a2a/.
-a2a = ["a2a-sdk[http-server]>=1.0.0"]
+a2a = ["a2a-sdk[http-server]>=1.1.2"]
 
 # HTTP serving layer — the plain-REST surface (POST /run, POST /run_sse)
 # and health routes (GET /healthz, GET /readyz) built on Starlette +
@@ -233,9 +233,9 @@ sandbox-gcs = ["google-cloud-storage>=2.16.0"]
 
 # Checkpointer backends — each opt-in. Install the backend you need.
 # The in-memory reference backend is built-in (no extra required).
-checkpointer-postgres = ["psycopg[binary,pool]>=3.2"]
-cost-ledger-postgres = ["psycopg[binary,pool]>=3.2"]
-memory-pgvector = ["psycopg[binary,pool]>=3.2", "pgvector>=0.3"]
+checkpointer-postgres = ["psycopg[binary,pool]>=3.3.4"]
+cost-ledger-postgres = ["psycopg[binary,pool]>=3.3.4"]
+memory-pgvector = ["psycopg[binary,pool]>=3.3.4", "pgvector>=0.3"]
 memory-chroma = ["chromadb>=0.5"]
 memory-pinecone = ["pinecone>=8.0"]
 memory-qdrant = ["qdrant-client>=1.12"]
@@ -243,15 +243,15 @@ cost-ledger-redis = ["redis>=5.0"]
 checkpointer-redis = ["redis>=5.0"]
 checkpointer-s3 = ["boto3>=1.34.0"]
 audit-s3 = ["boto3>=1.34.0"]
-audit-postgres = ["psycopg[binary,pool]>=3.2"]
+audit-postgres = ["psycopg[binary,pool]>=3.3.4"]
 
 # Shared Postgres backends for horizontally-scaled (multi-replica) serving:
 # a durable A2A task store and a networked session store, so background
 # tasks and conversation sessions are shared across replicas instead of
 # living in per-pod SQLite. See src/philharmonica/adk/a2a/postgres_task_store.py
 # and src/philharmonica/adk/session/postgres_multi_sessions.py.
-a2a-postgres = ["psycopg[binary,pool]>=3.2"]
-session-postgres = ["psycopg[binary,pool]>=3.2"]
+a2a-postgres = ["psycopg[binary,pool]>=3.3.4"]
+session-postgres = ["psycopg[binary,pool]>=3.3.4"]
 
 # Temporal durable execution engine. Wraps agent/graph/swarm/flow runs
 # as Temporal workflows with crash-recovery, retry, and deterministic
@@ -276,10 +276,10 @@ test = [
     "pytest-timeout>=2.4.0",
     "pytest-xdist>=3.6.0",
     "pytest-rerunfailures>=14.0",  # CI reruns for known flaky tests (stopgap)
-    "coverage[toml]>=7.6.0",
+    "coverage[toml]>=7.15.3",
     "parameterized>=0.9.0",
     "inline-snapshot>=0.20.7",
-    "fakeredis[lua]>=2.21",
+    "fakeredis[lua]>=2.37.0",
     "moto>=5.0",
     "pytest-postgresql>=6.0",
 ]
@@ -291,7 +291,7 @@ dev = [
     # lock, the pre-commit rev, and the CI lint job must all agree or the
     # hygiene gate reports differently per environment. Bump all three
     # together.
-    "ruff==0.15.7",
+    "ruff==0.16.1",
     # Type checkers — mypy is canonical (pydantic.mypy
     # plugin + --warn-unused-ignores); pyright secondary (stricter
     # TypedDict narrowing + IDE/Pylance parity)
@@ -301,7 +301,7 @@ dev = [
 
     # Quality gates
     "pre-commit>=3.5.0",
-    "bandit[toml]>=1.7",
+    "bandit[toml]>=1.9.4",
     "pip-audit>=2.7",
     # Convenience
     "python-dotenv>=1.2.2",      # floor patches CVE-2026-28684

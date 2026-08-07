@@ -1,5 +1,3 @@
-(deploy/container)=
-
 # Container Contract
 
 Every container image the `philharmonica deploy` tooling generates satisfies a

@@ -1,5 +1,3 @@
-(verbose/index)=
-
 # Verbose
 
 Event-driven, human-readable rendering of agent runs (the `[verbose]`

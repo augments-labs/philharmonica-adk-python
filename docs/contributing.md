@@ -1,5 +1,3 @@
-(contributing)=
-
 # 🤝 Contributing
 
 The contributor guide is maintained as

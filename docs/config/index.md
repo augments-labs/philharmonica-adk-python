@@ -1,5 +1,3 @@
-(config/index)=
-
 # Declarative Configuration
 
 The `philharmonica.adk.config` subsystem lets you define agents and multi-agent

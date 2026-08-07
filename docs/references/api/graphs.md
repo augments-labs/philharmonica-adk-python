@@ -1,5 +1,3 @@
-(references/api/graphs)=
-
 # Graphs
 
 State-machine orchestration: a directed graph of nodes executed in

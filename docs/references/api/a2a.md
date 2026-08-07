@@ -1,5 +1,3 @@
-(references/api/a2a)=
-
 # A2A
 
 Agent-to-Agent protocol support: independent agents talking to each other

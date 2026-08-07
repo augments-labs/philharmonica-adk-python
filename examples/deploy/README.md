@@ -37,9 +37,9 @@ philharmonica deploy init --target k8s --agent app:agent --image my-agent:latest
   --env-key OPENAI_API_KEY
 ```
 
-Edit the generated `requirements.txt` so `philharmonica-adk` is installable in
-the image — the package is private, so point pip at a private index, a
-vendored wheel, or a VCS URL, then add your agent's own dependencies.
+The generated `requirements.txt` installs `philharmonica-adk` from PyPI. Add
+your agent's own dependencies there, and swap in a pin, a vendored wheel, or
+a VCS URL if the image build must not reach PyPI.
 
 ## 4. Build and ship
 

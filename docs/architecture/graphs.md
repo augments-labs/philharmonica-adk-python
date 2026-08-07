@@ -1,5 +1,3 @@
-(architecture/graphs)=
-
 # 🕸️ Graphs
 
 The third multi-agent axis: state-machine orchestration with explicit

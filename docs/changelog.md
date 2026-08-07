@@ -1,5 +1,3 @@
-(changelog)=
-
 # 📜 Changelog
 
 The changelog is maintained as

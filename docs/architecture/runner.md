@@ -1,5 +1,3 @@
-(architecture/runner)=
-
 # 🔁 The Runner
 
 The `Runner` executes an `Agent` configuration. Agent is **config**;
@@ -7,15 +5,9 @@ Runner is **execution**. There is no `agent.arun()` — every run path
 goes through `Runner.arun(...)`, `Runner.arun_graph(...)`,
 `Runner.arun_swarm(...)`, or their streaming variants.
 
-```{figure} ../images/architecture/runner-loop.svg
-:alt: The Runner agent loop with explicit budgets.
-:width: 80%
-:class: themed
-:align: center
+![The Runner agent loop with explicit budgets.](../images/architecture/runner-loop.svg)
 
-The agent loop with the `max_turns` / handoffs / retry boundaries
-made visible.
-```
+*The agent loop with the `max_turns` / handoffs / retry boundaries made visible.*
 
 ## The loop
 

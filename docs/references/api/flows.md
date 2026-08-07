@@ -1,5 +1,3 @@
-(references/api/flows)=
-
 # Flows
 
 Decorator-driven multi-step orchestration over typed shared state, with

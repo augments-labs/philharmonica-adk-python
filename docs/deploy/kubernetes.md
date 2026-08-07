@@ -1,5 +1,3 @@
-(deploy/kubernetes)=
-
 # Kubernetes and Helm
 
 Two targets ship to Kubernetes: `k8s` uses Kustomize and raw kubectl;

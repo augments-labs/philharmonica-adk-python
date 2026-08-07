@@ -1,5 +1,3 @@
-(flows/index)=
-
 # Flows
 
 Decorator-driven multi-step orchestration over typed shared state — a

@@ -1,5 +1,3 @@
-(references/api/types)=
-
 # Types
 
 Provider-agnostic wire and history types shared across the framework.

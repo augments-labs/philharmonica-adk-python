@@ -1,5 +1,3 @@
-(foundations/three-limits)=
-
 # 📐 Three Mathematical Limits That Shape This ADK
 
 > Every AI agent system bumps against three formal results. This page
@@ -7,16 +5,9 @@
 > it forced. We don't try to engineer past these limits; we engineer
 > **with** them.
 
-```{figure} ../images/foundations/three-limits-synthesis.svg
-:alt: The three theorems mapped to three engineering responses in the ADK.
-:width: 70%
-:class: themed
-:align: center
+![The three theorems mapped to three engineering responses in the ADK.](../images/foundations/three-limits-synthesis.svg)
 
-How the three theorems shape three engineering responses in the ADK.
-```
-
-(halting-problem)=
+*How the three theorems shape three engineering responses in the ADK.*
 
 ## ⏱️ Turing's Halting Problem (1936)
 
@@ -176,9 +167,8 @@ flowchart LR
 
 ## ⚠️ What these limits do *not* say
 
-:::{warning}
-Misquoted versions of these theorems do a lot of damage. Be precise.
-:::
+> [!WARNING]
+> Misquoted versions of these theorems do a lot of damage. Be precise.
 
 - **Halting and Rice are about *universal* deciders, not specific
   programs.** Most loops in practice terminate; budgets are a safety

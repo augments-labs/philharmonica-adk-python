@@ -1,18 +1,11 @@
-(architecture/type-layers)=
-
 # 🧩 The Three Type Layers
 
 The ADK uses three discrete type layers. Developer-facing APIs use
 Layer 1 or Layer 3 — never Layer 2.
 
-```{figure} ../images/architecture/type-layers.svg
-:alt: Three layers — Layer 1 LLMInputContentItem (in), Layer 2 ChatCompletion* (wire), Layer 3 RunItem (out).
-:width: 80%
-:class: themed
-:align: center
+![Three layers — Layer 1 LLMInputContentItem (in), Layer 2 ChatCompletion* (wire), Layer 3 RunItem (out).](../images/architecture/type-layers.svg)
 
-One conversion per direction, inside each provider.
-```
+*One conversion per direction, inside each provider.*
 
 ## Layer 1 — `LLMInputContentItem` (input, provider-agnostic)
 

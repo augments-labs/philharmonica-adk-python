@@ -1,5 +1,3 @@
-(architecture/overview)=
-
 # 🔭 Big-Picture Pipeline
 
 Every call to `Runner.arun(agent, prompt)` traverses the same shape:

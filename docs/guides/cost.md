@@ -1,5 +1,3 @@
-(guides/cost)=
-
 # 💰 Cost
 
 Every LLM call costs money. The ADK gives you four separable levers to
@@ -18,7 +16,7 @@ Rule: estimator predicts, ledger records, router selects, budget enforces.
 None of these is active unless you configure it — the framework never adds
 cost behavior you did not opt into.
 
-See {doc}`/concepts/index` for the architectural picture.
+See [Concepts](../concepts/index.md) for the architectural picture.
 
 ---
 
@@ -426,6 +424,6 @@ pass your instance as `RunConfig.cost_ledger`.
 
 ## See also
 
-- {doc}`/concepts/index` — Concepts: Cost mechanisms table
-- {doc}`/context/context_management` — full compaction configuration reference
+- [Concepts](../concepts/index.md) — Concepts: Cost mechanisms table
+- [Context Management Usage](../context/context_management.md) — full compaction configuration reference
 - `examples/cost/` — runnable demos (pre-call estimation, tenant budgets, smart routing, cost-aware compaction)

@@ -1,5 +1,3 @@
-(deploy/serving)=
-
 # Serving Layer
 
 The `philharmonica.adk.serving` module turns a local `Agent` into an ASGI app that
@@ -67,12 +65,11 @@ philharmonica serve --agent my_pkg.agents:assistant --card card.json
 The card is published at `GET /.well-known/agent-card.json`. The CLI never
 synthesises a card; every field is intentional.
 
-:::{warning}
-The default A2A task store is in-memory. Tasks are lost on process restart,
-which breaks the A2A continuation token resume contract for any task that
-outlives the process. Pass `--task-db tasks.sqlite` for a durable store
-that recovers non-terminal tasks from prior processes on startup.
-:::
+> [!WARNING]
+> The default A2A task store is in-memory. Tasks are lost on process restart,
+> which breaks the A2A continuation token resume contract for any task that
+> outlives the process. Pass `--task-db tasks.sqlite` for a durable store
+> that recovers non-terminal tasks from prior processes on startup.
 
 ### Container invocation
 

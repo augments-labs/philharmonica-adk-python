@@ -1,5 +1,3 @@
-(references/api/session)=
-
 # Session
 
 Conversation persistence for agent runs.

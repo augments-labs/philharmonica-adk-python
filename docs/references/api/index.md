@@ -1,5 +1,3 @@
-(references/api/index)=
-
 # API Reference
 
 The public surface of the framework's core modules, grouped by theme.
@@ -10,144 +8,30 @@ each page.
 
 ## Core
 
-::::{grid} 1 2 2 2
-:gutter: 3
-
-:::{grid-item-card} `Agent`
-:link: agent
-:link-type: doc
-
-Configuration-only object. Name, instructions, tools, handoffs,
-guardrails.
-:::
-
-:::{grid-item-card} `Runner`
-:link: runner
-:link-type: doc
-
-Execution entry-points: `arun`, `arun_streamed`, `arun_graph`,
-`arun_swarm`.
-:::
-
-:::{grid-item-card} `LLM`
-:link: llm
-:link-type: doc
-
-Framework-owned LLM abstract base class.
-:::
-
-:::{grid-item-card} `FunctionTool`
-:link: tool
-:link-type: doc
-
-The Tool ABC + decorator + types.
-:::
-
-::::
+- **[`Agent`](agent.md)** — Configuration-only object. Name, instructions, tools, handoffs, guardrails.
+- **[`Runner`](runner.md)** — Execution entry-points: `arun`, `arun_streamed`, `arun_graph`, `arun_swarm`.
+- **[`LLM`](llm.md)** — Framework-owned LLM abstract base class.
+- **[`FunctionTool`](tool.md)** — The Tool ABC + decorator + types.
 
 ## Orchestration
 
-::::{grid} 1 2 2 2
-:gutter: 3
-
-:::{grid-item-card} Swarms
-:link: swarms
-:link-type: doc
-
-Iterative multi-agent collaboration with explicit termination and
-pluggable routing.
-:::
-
-:::{grid-item-card} Graphs
-:link: graphs
-:link-type: doc
-
-State-machine orchestration with checkpointing, interrupts, and
-streaming events.
-:::
-
-:::{grid-item-card} Flows
-:link: flows
-:link-type: doc
-
-Decorator-driven multi-step orchestration over typed shared state.
-:::
-
-:::{grid-item-card} Tasks
-:link: tasks
-:link-type: doc
-
-Declarative units of work composed into pipelines and groups.
-:::
-
-::::
+- **[Swarms](swarms.md)** — Iterative multi-agent collaboration with explicit termination and pluggable routing.
+- **[Graphs](graphs.md)** — State-machine orchestration with checkpointing, interrupts, and streaming events.
+- **[Flows](flows.md)** — Decorator-driven multi-step orchestration over typed shared state.
+- **[Tasks](tasks.md)** — Declarative units of work composed into pipelines and groups.
 
 ## State and persistence
 
-::::{grid} 1 2 2 2
-:gutter: 3
-
-:::{grid-item-card} Memory
-:link: memory
-:link-type: doc
-
-Extracted, searchable knowledge carried across sessions.
-:::
-
-:::{grid-item-card} Session
-:link: session
-:link-type: doc
-
-Conversation persistence for agent runs.
-:::
-
-::::
+- **[Memory](memory.md)** — Extracted, searchable knowledge carried across sessions.
+- **[Session](session.md)** — Conversation persistence for agent runs.
 
 ## Safety and protocols
 
-::::{grid} 1 2 2 2
-:gutter: 3
-
-:::{grid-item-card} Guardrails
-:link: guardrails
-:link-type: doc
-
-Built-in PII, prompt-injection, and wrong-language guardrails.
-:::
-
-:::{grid-item-card} MCP
-:link: mcp
-:link-type: doc
-
-Model Context Protocol servers, lifecycle, and tool filters.
-:::
-
-:::{grid-item-card} A2A
-:link: a2a
-:link-type: doc
-
-Agent-to-Agent protocol client and server surfaces.
-:::
-
-::::
+- **[Guardrails](guardrails.md)** — Built-in PII, prompt-injection, and wrong-language guardrails.
+- **[MCP](mcp.md)** — Model Context Protocol servers, lifecycle, and tool filters.
+- **[A2A](a2a.md)** — Agent-to-Agent protocol client and server surfaces.
 
 ## Foundations
 
-::::{grid} 1 2 2 2
-:gutter: 3
-
-:::{grid-item-card} Exceptions
-:link: exceptions
-:link-type: doc
-
-The framework exception hierarchy rooted at `PhilharmonicaError`.
-:::
-
-:::{grid-item-card} Types
-:link: types
-:link-type: doc
-
-Provider-agnostic wire and history types.
-:::
-
-::::
+- **[Exceptions](exceptions.md)** — The framework exception hierarchy rooted at `PhilharmonicaError`.
+- **[Types](types.md)** — Provider-agnostic wire and history types.

@@ -1,5 +1,3 @@
-(guides/a2a)=
-
 # 🤝 A2A
 
 The **Agent-to-Agent (A2A) protocol** is an open standard for autonomous
@@ -7,14 +5,13 @@ agents to communicate with each other as peers over HTTP + Server-Sent
 Events. In the ADK, A2A is the answer to one specific question: *how does
 one ADK process delegate work to a completely separate process?*
 
-```{admonition} When to reach for A2A
-:class: tip
-
-A2A is appropriate when the agent you need to call lives in a different
-process, a different service, or belongs to a different team or framework.
-For agents that share the same Python process, `Agent.as_tool()` or
-handoffs are cheaper and simpler.
-```
+> [!TIP]
+> **When to reach for A2A**
+>
+> A2A is appropriate when the agent you need to call lives in a different
+> process, a different service, or belongs to a different team or framework.
+> For agents that share the same Python process, `Agent.as_tool()` or
+> handoffs are cheaper and simpler.
 
 The A2A support is an **optional extra**. Install it before using any
 symbol from `philharmonica.adk.a2a`:
@@ -45,13 +42,13 @@ The key distinction between A2A and MCP is the shape of what lives at the
 other end. MCP standardises *tool surfaces* — the far end is a collection of
 callable functions. A2A standardises *agent surfaces* — the far end is a
 full agent loop with its own LLM, tools, guardrails, and reasoning. See
-{doc}`../concepts/index` (§ A2A vs MCP) for the one-sentence rule.
+[Concepts](../concepts/index.md) (§ A2A vs MCP) for the one-sentence rule.
 
 **Handoffs** are an intra-process mechanism. When a handoff fires, the
 `Runner` routes execution from one local `Agent` to another within the same
 Python process — no HTTP, no serialisation, shared tool registry and
 context window. Once the work crosses a network boundary, handoffs no longer
-apply; that is where A2A steps in. See {doc}`handoffs` for the full handoff
+apply; that is where A2A steps in. See [🔀 Handoffs](handoffs.md) for the full handoff
 guide.
 
 ---
@@ -116,26 +113,25 @@ There is no auto-derivation from the `Agent` object. This matches the
 upstream A2A spec's recommendation: the card is the public contract the LLM
 on the other side reads, so it must be deliberate.
 
-```{warning}
-`A2AServer.task_store` defaults to `None`, which causes `build_starlette_app`
-to install an `InMemoryTaskStore`. This works for development but **loses
-every task on process restart**, breaking the `A2AContinuationToken` resume
-contract for any task that outlives the process. Supply a persistent store
-for production:
-
-```python
-from a2a.server.tasks import DatabaseTaskStore
-
-server = A2AServer(
-    agent=local_agent,
-    agent_card=card,
-    task_store=DatabaseTaskStore(...),
-)
-```
-
-`build_starlette_app` logs a `WARNING` when falling back to the in-memory
-default so the gap is visible in deployment logs.
-```
+> [!WARNING]
+> `A2AServer.task_store` defaults to `None`, which causes `build_starlette_app`
+> to install an `InMemoryTaskStore`. This works for development but **loses
+> every task on process restart**, breaking the `A2AContinuationToken` resume
+> contract for any task that outlives the process. Supply a persistent store
+> for production:
+>
+> ```python
+> from a2a.server.tasks import DatabaseTaskStore
+>
+> server = A2AServer(
+>     agent=local_agent,
+>     agent_card=card,
+>     task_store=DatabaseTaskStore(...),
+> )
+> ```
+>
+> `build_starlette_app` logs a `WARNING` when falling back to the in-memory
+> default so the gap is visible in deployment logs.
 
 See `examples/a2a/server_basic.py` for a complete runnable server.
 
@@ -357,12 +353,11 @@ All A2A failures surface as typed exceptions under `philharmonica.adk.a2a`:
 
 All extend `A2AError`, which extends the root `PhilharmonicaError`.
 
-```{warning}
-`A2ATaskError.remote_message` is **untrusted input** sourced from the peer
-agent. It may contain prompt-injection bait or escape sequences. Sanitise or
-escape before rendering to end-users, downstream LLMs, or log aggregators
-that might re-interpret it.
-```
+> [!WARNING]
+> `A2ATaskError.remote_message` is **untrusted input** sourced from the peer
+> agent. It may contain prompt-injection bait or escape sequences. Sanitise or
+> escape before rendering to end-users, downstream LLMs, or log aggregators
+> that might re-interpret it.
 
 ```python
 from philharmonica.adk.a2a import A2ATaskError, A2ATransportError
@@ -395,7 +390,7 @@ trace UI.
 The same secret-redaction that runs on tool I/O runs on `a2a_data` span
 attributes — embedded credentials are masked before leaving the process.
 
-Enable OTel: `pip install 'philharmonica-adk[otel]'`. See {doc}`tracing` for the
+Enable OTel: `pip install 'philharmonica-adk[otel]'`. See [🔭 Tracing](tracing.md) for the
 full tracing guide.
 
 ---
@@ -431,9 +426,9 @@ scope:
 
 ## See also
 
-- {doc}`../concepts/index` — § A2A vs MCP for the one-sentence rule
-- {doc}`mcp` — MCP guide (tool-level remote calls)
-- {doc}`handoffs` — intra-process agent routing
-- {doc}`tracing` — OpenTelemetry integration
+- [Concepts](../concepts/index.md) — § A2A vs MCP for the one-sentence rule
+- [🔌 MCP (Model Context Protocol)](mcp.md) — MCP guide (tool-level remote calls)
+- [🔀 Handoffs](handoffs.md) — intra-process agent routing
+- [🔭 Tracing](tracing.md) — OpenTelemetry integration
 - `examples/a2a/` — runnable client and server examples
 - A2A specification: <https://a2a-protocol.org/>

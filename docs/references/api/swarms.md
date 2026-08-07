@@ -1,5 +1,3 @@
-(references/api/swarms)=
-
 # Swarms
 
 Multi-agent iterative collaboration: a roster of agents taking turns on a

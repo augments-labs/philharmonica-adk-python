@@ -1,5 +1,3 @@
-(guides/handoffs)=
-
 # 🔀 Handoffs
 
 A **handoff** is directed routing from one agent to another. When a handoff

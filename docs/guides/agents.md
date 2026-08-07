@@ -1,5 +1,3 @@
-(guides/agents)=
-
 # 🤖 Agents
 
 An `Agent` is **configuration** — name, instructions, tools, handoffs,
@@ -63,11 +61,10 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-:::{note}
-`Runner.arun()` is the only entry point. `Agent` has no `run()` or `arun()`
-method — invoking execution via the agent class would break concurrent reuse
-and scatter execution policy across instances.
-:::
+> [!NOTE]
+> `Runner.arun()` is the only entry point. `Agent` has no `run()` or `arun()`
+> method — invoking execution via the agent class would break concurrent reuse
+> and scatter execution policy across instances.
 
 ## Instructions: static vs dynamic
 
@@ -142,11 +139,10 @@ async def build_prompt_async(data: DynamicSystemPromptData) -> str:
     return f"Follow this policy:\n{policy}"
 ```
 
-:::{tip}
-Dynamic instructions are resolved once per agent turn, just before the LLM
-call. The callable is invoked with the current `RunContext`, so it sees any
-context values you passed to `Runner.arun(..., context=...)`.
-:::
+> [!TIP]
+> Dynamic instructions are resolved once per agent turn, just before the LLM
+> call. The callable is invoked with the current `RunContext`, so it sees any
+> context values you passed to `Runner.arun(..., context=...)`.
 
 ## Tools
 
@@ -292,11 +288,10 @@ Key governance parameters on `as_tool()`:
 | `input_schema` | Custom Pydantic model for structured tool input (default: single `input: str` field). |
 | `on_stream` | Callback receiving each `StreamEvent` from the sub-agent in real time. |
 
-:::{tip}
-Use `agent.get_agent_graph()` to introspect the full agent topology —
-it returns a nested dict of delegate agents and handoff targets, handling
-cycles. `agent.get_delegate_tools()` returns just the `FunctionTool` wrappers.
-:::
+> [!TIP]
+> Use `agent.get_agent_graph()` to introspect the full agent topology —
+> it returns a nested dict of delegate agents and handoff targets, handling
+> cycles. `agent.get_delegate_tools()` returns just the `FunctionTool` wrappers.
 
 ## Non-mutating agent copies with `dataclasses.replace`
 

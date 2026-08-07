@@ -1,5 +1,3 @@
-(architecture/handoffs-and-swarms)=
-
 # 🔀 Handoffs & Swarms
 
 Two of the three multi-agent composition axes. Use **handoffs** for

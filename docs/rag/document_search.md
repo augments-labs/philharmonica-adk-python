@@ -1,5 +1,3 @@
-(rag/document_search)=
-
 # Document search
 
 `DocumentSearchTool` gives an agent a `search(query)` capability over a corpus
@@ -8,8 +6,8 @@ embeds them, and retrieves the most relevant passages — grounding the agent's
 answers in your documents.
 
 The whole pipeline is built on the framework's existing
-{class}`~philharmonica.adk.llms.embedder.Embedder` and
-{class}`~philharmonica.adk.memory.vector_store.VectorStore` abstractions, so any vector
+`Embedder` and
+`VectorStore` abstractions, so any vector
 backend (in-memory, pgvector, Chroma, Pinecone, Qdrant) works unchanged.
 
 ## Quick start
@@ -84,7 +82,7 @@ tool = DocumentSearchTool(
 
 ## Using the index directly
 
-For retrieval without an agent, use {class}`~philharmonica.adk.rag.index.DocumentIndex`
+For retrieval without an agent, use `DocumentIndex`
 with the loaders directly:
 
 ```python

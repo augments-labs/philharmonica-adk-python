@@ -1,5 +1,3 @@
-(llms/index)=
-
 # LLM Providers
 
 The native and LiteLLM providers, reasoning / extended thinking, the LLM

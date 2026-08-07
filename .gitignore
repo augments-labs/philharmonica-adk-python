@@ -125,3 +125,6 @@ examples/translations/out/
 .augments/
 .sdlc-skills/
 .superpowers/
+
+# mypy cache
+.mypy_cache/

@@ -1,5 +1,3 @@
-(deploy/index)=
-
 # Deployment
 
 Take a local agent to production: package it into a container, expose it over

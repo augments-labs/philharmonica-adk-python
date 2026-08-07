@@ -9,9 +9,10 @@ and the project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/v
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-08-07
+
 ### Added
 
 - Initial public release of Philharmonica ADK as `philharmonica-adk`: the
   `philharmonica.adk` Python namespace, the `philharmonica` command-line interface, and
-  the full agent development toolkit, produced by the parity rename
-  migration.
+  the full agent development toolkit.

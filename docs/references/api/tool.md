@@ -1,5 +1,3 @@
-(references/api/tool)=
-
 # Function tools
 
 - `philharmonica.adk.tools.FunctionTool`

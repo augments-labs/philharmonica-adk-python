@@ -1,5 +1,3 @@
-(guides/memory)=
-
 # 🧠 Memory
 
 Agents that matter across conversations need memory. This guide walks through

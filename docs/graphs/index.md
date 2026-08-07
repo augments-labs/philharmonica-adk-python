@@ -1,5 +1,3 @@
-(graphs/index)=
-
 # Graphs
 
 State-machine orchestration — nodes and edges, checkpointing and resume,

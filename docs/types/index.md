@@ -1,5 +1,3 @@
-(types/index)=
-
 # Types
 
 The framework type system in use — Layer 1 input types, Layer 3 history

@@ -1,5 +1,3 @@
-(references/api/guardrails)=
-
 # Guardrails
 
 Built-in, language-agnostic guardrails — PII, prompt-injection, and

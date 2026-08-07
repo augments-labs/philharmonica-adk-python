@@ -1,5 +1,3 @@
-(observability/index)=
-
 # Observability
 
 The cross-cutting observability surface — how logging, verbose

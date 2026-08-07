@@ -1,15 +1,16 @@
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)"
+            srcset="https://raw.githubusercontent.com/augments-labs/philharmonica-adk-python/main/docs/images/logo-dark.png">
+    <img src="https://raw.githubusercontent.com/augments-labs/philharmonica-adk-python/main/docs/images/logo-light.png"
+         alt="Philharmonica" width="132" height="132">
+  </picture>
+</div>
+
 # Philharmonica Agent Development Kit (ADK)
 
-**Where language becomes action.**
-
-[![CI](https://github.com/augments-labs/philharmonica-adk-python/actions/workflows/ci.yml/badge.svg)](https://github.com/augments-labs/philharmonica-adk-python/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/augments-labs/philharmonica-adk-python/branch/main/graph/badge.svg)](https://codecov.io/gh/augments-labs/philharmonica-adk-python)
-
-A lightweight, provider-agnostic Python framework for orchestrating complex
+A provider-agnostic Python framework to orchestrate complex
 systems of agents that perform real-world actions, across 100+ LLMs via litellm.
-
-> [!NOTE]
-> The JavaScript/TypeScript version of this ADK will be released soon. Stay tuned!
 
 ## The concept
 
@@ -182,9 +183,9 @@ philharmonica deploy ecs        --agent my_agent.app:agent --image ACCT.dkr.ecr.
 `ecs`, `app-runner`, and `lambda`. The generated image satisfies the
 universal container contract (binds `0.0.0.0:$PORT`, config from env,
 non-root, `/healthz` + `/readyz` probes), so the same image runs
-everywhere. Because the package is private, the generated
-`requirements.txt` must make `philharmonica-adk` installable in your image
-(private index, vendored wheel, or VCS URL).
+everywhere. The generated `requirements.txt` installs `philharmonica-adk`
+from PyPI; edit it if you need a pin, a vendored wheel, or a VCS URL
+instead.
 
 A single replica works out of the box on the default per-pod SQLite
 stores. For multi-replica (horizontally-scaled) deployments, back A2A

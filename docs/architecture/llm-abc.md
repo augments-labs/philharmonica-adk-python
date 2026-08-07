@@ -1,5 +1,3 @@
-(architecture/llm-abc)=
-
 # 🔌 The `LLM` ABC
 
 All provider traffic flows through a framework-owned `LLM` abstract

@@ -1,71 +1,17 @@
-(landing)=
-
 # Philharmonica ADK
 
-A lightweight, provider-agnostic Python framework for multi-agent workflows
-with 100+ LLMs via [LiteLLM](https://github.com/BerriAI/litellm).
+A provider-agnostic Python framework to orchestrate complex systems of agents
+that perform real-world actions, across 100+ LLMs via
+[LiteLLM](https://github.com/BerriAI/litellm).
 
-::::{grid} 1 2 3 3
-:gutter: 3
-:class-container: sd-text-center
-
-:::{grid-item-card} Foundations
-:link: foundations/index
-:link-type: doc
-
-The mathematical limits that shape every decision in this ADK.
-:::
-
-:::{grid-item-card} Architecture
-:link: architecture/index
-:link-type: doc
-
-Layer 1/2/3 types, Runner loop, LLM ABC, handoffs, swarms, graphs.
-:::
-
-:::{grid-item-card} Concepts
-:link: concepts/index
-:link-type: doc
-
-Every concept and how it differs from its neighbours.
-:::
-
-:::{grid-item-card} Guides
-:link: guides/index
-:link-type: doc
-
-Practical how-tos: agents, tools, memory, guardrails, tracing.
-:::
-
-:::{grid-item-card} Topics
-:link: topics/index
-:link-type: doc
-
-Deep per-module reference: graphs, swarms, tools, llms, sandbox, and more.
-:::
-
-:::{grid-item-card} CLI
-:link: cli/index
-:link-type: doc
-
-Run, chat, validate, scaffold, and serve agents from the terminal.
-:::
-
-:::{grid-item-card} Deployment
-:link: deploy/index
-:link-type: doc
-
-Package, containerise, and ship agents to Kubernetes, Cloud Run, and AWS.
-:::
-
-:::{grid-item-card} References
-:link: references/index
-:link-type: doc
-
-API reference, contributing, changelog, maintenance.
-:::
-
-::::
+- **[Foundations](foundations/index.md)** — The mathematical limits that shape every decision in this ADK.
+- **[Architecture](architecture/index.md)** — Layer 1/2/3 types, Runner loop, LLM ABC, handoffs, swarms, graphs.
+- **[Concepts](concepts/index.md)** — Every concept and how it differs from its neighbours.
+- **[Guides](guides/index.md)** — Practical how-tos: agents, tools, memory, guardrails, tracing.
+- **[Topics](topics/index.md)** — Deep per-module reference: graphs, swarms, tools, llms, sandbox, and more.
+- **[CLI](cli/index.md)** — Run, chat, validate, scaffold, and serve agents from the terminal.
+- **[Deployment](deploy/index.md)** — Package, containerise, and ship agents to Kubernetes, Cloud Run, and AWS.
+- **[References](references/index.md)** — API reference, contributing, changelog, maintenance.
 
 ## Quickstart
 

@@ -160,7 +160,7 @@ highest tier reached by any change in it decides.
 ## Who bumps, and when
 
 Nobody bumps in a contribution PR. The version is decided once per release,
-by the maintainer, through the release workflow. A PR that edits the
+by the maintainer, on the release branch. A PR that edits the
 `version` in `pyproject.toml` / `src/philharmonica/adk/__init__.py`, or adds a
 dated `CHANGELOG.md` heading, will be asked to drop it — two parallel PRs
 cannot both own the next number.
@@ -169,16 +169,17 @@ Contributors *do* add `CHANGELOG.md` entries under `[Unreleased]`.
 
 ## How a release is cut
 
-The flow is workflow-driven. [Commitizen](https://commitizen-tools.github.io/commitizen/)
-performs the atomic version bump, keeping `pyproject.toml:version` and
-`src/philharmonica/adk/__init__.py:__version__` in lockstep, and three GitHub
-Actions workflows orchestrate the rest.
+The maintainer cuts the release branch;
+[Commitizen](https://commitizen-tools.github.io/commitizen/) performs the
+atomic version bump, keeping `pyproject.toml:version` and
+`src/philharmonica/adk/__init__.py:__version__` in lockstep, and two GitHub
+Actions workflows take over once the release PR merges.
 
 There is a third place the version appears: `uv.lock` records the workspace
 root's own version alongside every dependency pin. Commitizen does not know
-about it — it rewrites only `version_files` — so the release workflow runs
-`uv lock` straight after the bump. Should those ever disagree, `uv lock --check`
-in CI fails the PR; the repair is `uv lock`, never a hand edit.
+about it — it rewrites only `version_files` — so the bump is always followed by
+`uv lock`. Should those ever disagree, `uv lock --check` in CI fails the PR; the
+repair is `uv lock`, never a hand edit.
 
 `update_changelog_on_bump` is off, because the CHANGELOG is hand-maintained in
 Keep a Changelog form. Commitizen therefore does **not** touch `CHANGELOG.md`
@@ -188,10 +189,22 @@ Keep a Changelog form. Commitizen therefore does **not** touch `CHANGELOG.md`
    and merge that first, so the release PR bumps a changelog that is already
    correct.
 2. Decide the tier (above) for everything on `main` since the last tag.
-3. Run the **"Release — open PR"** workflow (Actions → that workflow → *Run
-   workflow*) and choose the increment (`patch` / `minor` / `major`). It runs
-   `cz bump --files-only --increment <tier>`, pushes a `release/vX.Y.Z`
-   branch, and opens a PR against `main`.
+3. Cut the release branch from an up-to-date `main`, bumping both version
+   files and the lock in one commit:
+
+   ```bash
+   git switch main && git pull
+   cz bump --yes --files-only --increment <tier>   # patch / minor / major
+   uv lock                                         # carries the bump into uv.lock
+   version="$(cz version --project)"
+   git switch -c "release/v${version}"
+   git commit -am "chore(release): v${version}"
+   git push -u origin HEAD
+   ```
+
+   Then open a PR from that branch against `main`. The branch name must keep
+   its `release/v` prefix and its suffix must match the bumped version —
+   step 5 verifies both and refuses to tag if they disagree.
 4. Review the PR: confirm the version and that CI is green.
 5. Merging it as a normal merge commit fires the **"Release — tag & GitHub
    Release"** workflow, which verifies the merged `pyproject.toml` version

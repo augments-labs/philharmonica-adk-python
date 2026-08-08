@@ -161,6 +161,13 @@ class TestPayloadCoercion:
         assert len(out) == 2
         assert out[1].path == "b.txt"
 
+    @pytest.mark.parametrize("op_type", ["create_file", "update_file", "delete_file"])
+    def test_coerce_operations_accepts_every_declared_type(self, op_type: str) -> None:
+        # The accepted set is derived from ApplyPatchOperationType, so every
+        # member of that alias must survive coercion from a raw mapping.
+        out = coerce_operations({"type": op_type, "path": "x.txt"})
+        assert [op.type for op in out] == [op_type]
+
     def test_coerce_operations_invalid_type(self) -> None:
         with pytest.raises(ApplyPatchError, match="Invalid"):
             coerce_operations({"type": "wat", "path": "x.txt"})

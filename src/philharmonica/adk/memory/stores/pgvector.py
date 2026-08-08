@@ -118,8 +118,12 @@ def _row_to_record(row: tuple[object, ...]) -> VectorRecord:
     meta_dict = cast("dict[str, object]", row[3])
     raw_embedding = row[4]
     # pgvector >= 0.5 returns a non-iterable Vector (use to_list()); 0.4 returns
-    # an iterable one (or a plain list). Normalize across both.
-    embedding = raw_embedding.to_list() if hasattr(raw_embedding, "to_list") else cast("list[float]", raw_embedding)
+    # an iterable one (or a plain list). Probe for the method rather than
+    # isinstance-ing Vector, which both versions satisfy but only one answers.
+    # getattr keeps that probe expressible to static checkers, which cannot
+    # attach an attribute to a bare `object` the way hasattr implies.
+    to_list = getattr(raw_embedding, "to_list", None)
+    embedding: list[float] = to_list() if to_list is not None else cast("list[float]", raw_embedding)
     return VectorRecord(
         id=str(row[0]),
         vector=tuple(float(x) for x in embedding),

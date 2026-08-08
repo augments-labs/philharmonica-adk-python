@@ -16,7 +16,7 @@ from __future__ import annotations
 import io
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Literal, Protocol, cast, get_args, runtime_checkable
 
 from philharmonica.adk.exceptions.exceptions import (
     ApplyPatchError,
@@ -25,6 +25,7 @@ from philharmonica.adk.exceptions.exceptions import (
 from philharmonica.adk.sandbox.apply_diff import ApplyDiffMode, apply_diff
 from philharmonica.adk.sandbox.editor import (
     ApplyPatchOperation,
+    ApplyPatchOperationType,
     ApplyPatchResult,
 )
 
@@ -268,7 +269,10 @@ def coerce_operation_mapping(operation: dict[str, object]) -> ApplyPatchOperatio
     raw_diff = operation.get("diff")
     raw_move_to = operation.get("move_to")
 
-    if raw_type not in {"create_file", "update_file", "delete_file"}:
+    # Deriving the accepted values from the alias keeps them from drifting: the
+    # cast below trusts this check, so a hand-written copy of the literals could
+    # silently widen what reaches ApplyPatchOperation.
+    if raw_type not in get_args(ApplyPatchOperationType):
         raise ApplyPatchError(f"Invalid apply_patch operation type: {raw_type!r}")
     if not isinstance(raw_path, str):
         raise ApplyPatchError(f"Invalid apply_patch path type: {type(raw_path).__name__}")
@@ -277,7 +281,8 @@ def coerce_operation_mapping(operation: dict[str, object]) -> ApplyPatchOperatio
     if raw_move_to is not None and not isinstance(raw_move_to, str):
         raise ApplyPatchError(f"Invalid apply_patch move_to type: {type(raw_move_to).__name__}")
     return ApplyPatchOperation(
-        type=raw_type,
+        # Proven by the membership check above; no checker narrows `object` through `in`.
+        type=cast("ApplyPatchOperationType", raw_type),
         path=raw_path,
         diff=raw_diff,
         move_to=raw_move_to,

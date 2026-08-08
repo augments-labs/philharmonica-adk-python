@@ -291,7 +291,7 @@ dev = [
     # lock, the pre-commit rev, and the CI lint job must all agree or the
     # hygiene gate reports differently per environment. Bump all three
     # together.
-    "ruff==0.15.7",
+    "ruff==0.16.1",
     # Type checkers — mypy is canonical (pydantic.mypy
     # plugin + --warn-unused-ignores); pyright secondary (stricter
     # TypedDict narrowing + IDE/Pylance parity)

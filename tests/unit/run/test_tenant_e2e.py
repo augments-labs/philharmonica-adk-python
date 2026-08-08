@@ -249,7 +249,7 @@ class _TenantCapturingHooks(GraphHooks[object]):
     """Observer that records the tenant_id seen on the RunContext at graph start."""
 
     def __init__(self) -> None:
-        self.seen_tenant_id: str | None | type[_MISSING] = _MISSING
+        self.seen_tenant_id: str | type[_MISSING] | None = _MISSING
 
     @override
     async def on_graph_start(

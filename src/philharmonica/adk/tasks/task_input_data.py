@@ -69,7 +69,7 @@ class TaskInputData:
     def clone(
         self,
         *,
-        forwarded: tuple[RunItem, ...] | None | object = _SENTINEL,
+        forwarded: tuple[RunItem, ...] | object | None = _SENTINEL,
     ) -> TaskInputData:
         """Return a copy with ``forwarded`` optionally replaced.
 

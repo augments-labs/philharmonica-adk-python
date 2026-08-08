@@ -31,9 +31,10 @@ else:
         from philharmonica.adk.tools.toolsets.mcp_toolset import MCPToolset
     except ImportError as _exc:
         # Same gate as ``philharmonica.adk.mcp.__init__`` — degrade to ``None``
-        # only when the underlying ``mcp`` package is missing. Any other
-        # ImportError (typo, transitive dep failure) surfaces.
-        if getattr(_exc, "name", None) != "mcp":
+        # only when the mcp extra is missing, which shows up under either of
+        # the two distributions it installs. Any other ImportError (typo,
+        # transitive dep failure) surfaces.
+        if getattr(_exc, "name", None) not in {"mcp", "httpx2"}:
             raise
         MCPToolset = None  # type: ignore[assignment,misc]
 

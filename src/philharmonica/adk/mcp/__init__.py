@@ -62,11 +62,15 @@ else:
         from philharmonica.adk.mcp.sse import MCPServerSse, MCPServerSseParams
         from philharmonica.adk.mcp.stdio import MCPServerStdio, MCPServerStdioParams
     except ImportError as _exc:
-        # Only swallow "top-level mcp package not installed". Any
-        # other ImportError (typo inside this package, transitive
-        # dep blowup) MUST surface so the failure is visible at
-        # development time.
-        if getattr(_exc, "name", None) != "mcp":
+        # Only swallow "the mcp extra is not installed". That extra pulls two
+        # distributions: the mcp client, and httpx2, which the streamable HTTP
+        # transport imports directly to build the client it hands over. Either
+        # name means the same thing — the extra is absent — and httpx2 is the
+        # one seen first, since it fails at the transport import above rather
+        # than at a deeper `import mcp`. Any other ImportError (typo inside
+        # this package, transitive dep blowup) MUST surface so the failure is
+        # visible at development time.
+        if getattr(_exc, "name", None) not in {"mcp", "httpx2"}:
             raise
         ElicitationHandler = None  # type: ignore[assignment,misc]
         HeaderProvider = None  # type: ignore[assignment,misc]

@@ -1,11 +1,15 @@
 """Streamable HTTP transport MCP server.
 
-Connects to an MCP server over HTTP using the modern
-``streamablehttp_client`` (HTTP POST + SSE for server-pushed
-messages). Per-request header injection is implemented via an httpx
-request event hook that reads from the
-``active_header_provider`` ``ContextVar`` — concurrent agent runs
+Connects to an MCP server over HTTP using ``streamable_http_client``
+(HTTP POST + SSE for server-pushed messages). Per-request header
+injection is implemented via an HTTP request event hook that reads from
+the ``active_header_provider`` ``ContextVar`` — concurrent agent runs
 each see their own headers without cross-contamination.
+
+The MCP client library builds on ``httpx2``, so every client, timeout,
+limit, and auth object on this transport is an ``httpx2`` one. That is a
+distribution distinct from ``httpx``; the two can coexist in one
+environment but their types are not interchangeable.
 
 Reference: https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#streamable-http
 """
@@ -20,8 +24,8 @@ from dataclasses import dataclass, field
 from datetime import timedelta
 from typing import Any, override
 
-import httpx
-from mcp.client.streamable_http import streamable_http_client, streamablehttp_client
+import httpx2
+from mcp.client.streamable_http import streamable_http_client
 
 from philharmonica.adk.mcp.auth import HeaderProvider, active_header_provider
 from philharmonica.adk.mcp.exceptions import MCPConnectionError
@@ -81,24 +85,24 @@ class MCPServerStreamableHttpParams:
 
     idle_timeout: timedelta | None = None
     """Maximum time an idle keep-alive connection may remain open before the
-    HTTP client closes it.  Wired via ``httpx.Limits.keepalive_expiry`` on
-    the underlying httpx client pool — the installed MCP SDK (1.27.2) has no
-    client-side idle-timeout parameter of its own.  ``None`` (default) leaves
-    httpx's built-in pool defaults unchanged, preserving existing behaviour."""
+    HTTP client closes it.  Wired via ``httpx2.Limits.keepalive_expiry`` on
+    the underlying client pool — the MCP client library exposes no
+    idle-timeout parameter of its own.  ``None`` (default) leaves the
+    built-in pool defaults unchanged, preserving existing behaviour."""
 
-    httpx_client: httpx.AsyncClient | None = field(default=None, repr=False)
-    """Pre-built ``httpx.AsyncClient`` to use for all HTTP requests.
+    httpx_client: httpx2.AsyncClient | None = field(default=None, repr=False)
+    """Pre-built ``httpx2.AsyncClient`` to use for all HTTP requests.
 
     Configure timeouts and pool limits on the client itself —
     ``timeout_seconds`` and the other client-construction fields do not
     apply on this path (``headers``/``idle_timeout`` are rejected
     outright when combined with a pre-built client).
 
-    When set, the server's ``connect()`` passes the client directly to
-    ``streamable_http_client(http_client=...)`` (the non-deprecated SDK
-    entry point) instead of constructing a new client via
-    ``_build_http_client``.  The caller is responsible for the client's
-    lifecycle — the SDK will close it as part of the transport context.
+    When set, the server's ``connect()`` forwards the client to
+    ``streamable_http_client(http_client=...)`` instead of constructing one
+    via ``_build_http_client``.  A client supplied here stays the caller's
+    to close: neither this transport nor the MCP client library enters or
+    closes a client it did not create.
 
     Mutually exclusive with ``httpx_client_factory``: setting both raises
     ``ValueError`` at construction time.
@@ -107,13 +111,16 @@ class MCPServerStreamableHttpParams:
     through ``str(params)`` or default logging."""
 
     httpx_client_factory: Any | None = None
-    """Optional factory callable used to construct the ``httpx.AsyncClient``.
+    """Optional factory callable used to construct the ``httpx2.AsyncClient``.
 
     Conforms to ``mcp.shared._httpx_utils.McpHttpClientFactory`` —
-    ``(headers, timeout, auth) -> httpx.AsyncClient``.  When ``None``
+    ``(headers, timeout, auth) -> httpx2.AsyncClient``.  When ``None``
     (the default), the server builds its own client via
     ``_build_http_client`` which installs the dynamic-header event hook
     for per-request token rotation.
+
+    A client the factory returns is closed with the transport, since this
+    server is the one that asked for it.
 
     Mutually exclusive with ``httpx_client``: setting both raises
     ``ValueError`` at construction time."""
@@ -204,22 +211,23 @@ class MCPServerStreamableHttp(MCPServerWithClientSession):
     async def connect(self) -> None:
         """Open the HTTP client and initialise the MCP session.
 
-        Three client-construction paths are available:
+        ``streamable_http_client`` takes a ready client rather than the
+        ingredients for one, so whatever ``headers`` / ``timeout_seconds`` /
+        ``sse_read_timeout_seconds`` / ``idle_timeout`` describe is composed
+        onto the client here, before the transport opens.
+
+        Two client-construction paths are available:
 
         1. ``params.httpx_client`` is set — the pre-built client is
-           forwarded directly to the non-deprecated
-           ``streamable_http_client(http_client=...)`` entry point.
-           The SDK manages the client's context; the caller owns its
-           lifecycle.
-        2. ``params.httpx_client_factory`` is set — the provided
-           factory is passed to the ``streamablehttp_client`` wrapper
-           (the SDK marks it deprecated; it remains the only entry
-           point that accepts a factory, so the factory path uses it).
-           Use this when client construction needs the SDK-composed
-           headers/timeout rather than a pre-built client.
-        3. Neither is set (default) — ``_build_http_client`` is used,
-           which installs the dynamic-header event hook for per-request
-           token rotation via ``active_header_provider``.
+           forwarded as-is and stays the caller's to close. Neither this
+           method nor the transport enters a client it did not create, so
+           the same client can outlive the session or serve several.
+        2. Neither field is set, or ``params.httpx_client_factory`` is —
+           the client is built here, by the factory when one is supplied
+           and otherwise by ``_build_http_client``, which installs the
+           dynamic-header event hook for per-request token rotation via
+           ``active_header_provider``. A client built here is entered on
+           the exit stack, so ``cleanup`` closes it.
         """
         async with self._connect_lock:
             if self._session is not None:
@@ -227,32 +235,28 @@ class MCPServerStreamableHttp(MCPServerWithClientSession):
             await fire_on_mcp_connect(self._name)
             stack = AsyncExitStack()
             try:
-                if self._params.httpx_client is not None:
-                    # Path 1: caller supplied a pre-built client.
-                    # Use the non-deprecated streamable_http_client which
-                    # accepts http_client= directly; the SDK manages the
-                    # context and closes the client on exit.
-                    streams = await stack.enter_async_context(
-                        streamable_http_client(
-                            self._params.url,
-                            http_client=self._params.httpx_client,
-                            terminate_on_close=self._params.terminate_on_close,
-                        )
-                    )
-                else:
-                    # Path 2 / 3: factory-based (deprecated wrapper keeps
-                    # timeout/headers/SSE params in one call site).
+                client = self._params.httpx_client
+                if client is None:
                     factory = self._params.httpx_client_factory or self._build_http_client
-                    streams = await stack.enter_async_context(
-                        streamablehttp_client(
-                            self._params.url,
-                            headers=self._params.headers,
-                            timeout=timedelta(seconds=self._params.timeout_seconds),
-                            sse_read_timeout=timedelta(seconds=self._params.sse_read_timeout_seconds),
-                            terminate_on_close=self._params.terminate_on_close,
-                            httpx_client_factory=factory,
-                        )
+                    client = factory(
+                        headers=self._params.headers,
+                        timeout=httpx2.Timeout(
+                            self._params.timeout_seconds,
+                            read=self._params.sse_read_timeout_seconds,
+                        ),
+                        auth=None,
                     )
+                    # Entered before the transport, so it is closed after it:
+                    # the transport still has a live client while it sends
+                    # the session-terminate signal on the way out.
+                    await stack.enter_async_context(client)
+                streams = await stack.enter_async_context(
+                    streamable_http_client(
+                        self._params.url,
+                        http_client=client,
+                        terminate_on_close=self._params.terminate_on_close,
+                    )
+                )
                 read, write, *_ = streams
                 session = await stack.enter_async_context(
                     self._make_client_session(
@@ -334,60 +338,55 @@ class MCPServerStreamableHttp(MCPServerWithClientSession):
     def _build_http_client(
         self,
         headers: dict[str, str] | None = None,
-        timeout: httpx.Timeout | None = None,
-        auth: httpx.Auth | None = None,
-    ) -> httpx.AsyncClient:
+        timeout: httpx2.Timeout | None = None,
+        auth: httpx2.Auth | None = None,
+    ) -> httpx2.AsyncClient:
         """``McpHttpClientFactory`` implementation.
 
-        The MCP SDK owns the client lifecycle and supplies composed
-        ``headers`` / ``timeout`` / ``auth`` derived from the
-        ``streamablehttp_client(...)`` call. We install the dynamic
-        header event hook so per-request headers from
-        ``active_header_provider`` apply on every outbound call —
-        a single client handles per-call token rotation without
-        forcing a reconnect.
+        Called from ``connect`` with the ``headers`` / ``timeout`` composed
+        from the transport params. We install the dynamic header event hook
+        so per-request headers from ``active_header_provider`` apply on
+        every outbound call — a single client handles per-call token
+        rotation without forcing a reconnect.
 
         When ``MCPServerStreamableHttpParams.idle_timeout`` is set,
-        an ``httpx.Limits`` object is passed with ``keepalive_expiry`` equal
+        an ``httpx2.Limits`` object is passed with ``keepalive_expiry`` equal
         to that duration.  When ``idle_timeout`` is ``None`` (the default),
-        the ``limits`` kwarg is omitted entirely so httpx applies its own
-        built-in pool defaults (``max_connections=100``,
+        the ``limits`` kwarg is omitted entirely so the built-in pool
+        defaults apply (``max_connections=100``,
         ``max_keepalive_connections=20``).
 
         Args:
-            headers: Static headers composed by the MCP SDK from the
-                ``streamablehttp_client`` call parameters.
-            timeout: Composed timeout object from the SDK; ``None``
-                lets httpx use its default.
-            auth: Composed auth object from the SDK; ``None`` for no
-                authentication.
+            headers: Static headers for every request on this client.
+            timeout: Composed timeout object; ``None`` uses the default.
+            auth: Composed auth object; ``None`` for no authentication.
 
         Returns:
-            An ``httpx.AsyncClient`` with the dynamic-header event
+            An ``httpx2.AsyncClient`` with the dynamic-header event
             hook installed.
         """
         # Only pass `limits` when idle_timeout is explicitly set.  Passing
-        # httpx.Limits() (even with all defaults) overrides httpx's built-in
+        # httpx2.Limits() (even with all defaults) overrides the built-in
         # pool limits (max_connections=100, max_keepalive_connections=20) with
         # unlimited values, which is a silent resource regression for callers
         # who do not set idle_timeout.
         if self._params.idle_timeout is not None:
-            # httpx.Limits defaults max_connections / max_keepalive_connections
+            # httpx2.Limits defaults max_connections / max_keepalive_connections
             # to None (unbounded) unless given explicitly, so we must restate
-            # httpx's own bounded defaults alongside keepalive_expiry — passing
+            # the bounded defaults alongside keepalive_expiry — passing
             # keepalive_expiry alone would silently uncap the pool.
-            return httpx.AsyncClient(
+            return httpx2.AsyncClient(
                 headers=headers or {},
                 timeout=timeout,
                 auth=auth,
-                limits=httpx.Limits(
+                limits=httpx2.Limits(
                     max_connections=100,
                     max_keepalive_connections=20,
                     keepalive_expiry=self._params.idle_timeout.total_seconds(),
                 ),
                 event_hooks={"request": [_inject_dynamic_headers]},
             )
-        return httpx.AsyncClient(
+        return httpx2.AsyncClient(
             headers=headers or {},
             timeout=timeout,
             auth=auth,
@@ -395,7 +394,7 @@ class MCPServerStreamableHttp(MCPServerWithClientSession):
         )
 
 
-async def _inject_dynamic_headers(request: httpx.Request) -> None:
+async def _inject_dynamic_headers(request: httpx2.Request) -> None:
     """Apply headers from the active ``HeaderProvider`` to ``request``.
 
     Sync providers are called inline; async providers are awaited.
@@ -404,7 +403,7 @@ async def _inject_dynamic_headers(request: httpx.Request) -> None:
     callers see the underlying server response (typically 401).
 
     Args:
-        request: The outbound ``httpx.Request`` whose headers will be
+        request: The outbound ``httpx2.Request`` whose headers will be
             mutated in place with values from the provider.
     """
     provider = active_header_provider.get()

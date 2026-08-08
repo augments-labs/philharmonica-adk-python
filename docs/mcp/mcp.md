@@ -15,8 +15,8 @@ This page covers the full MCP surface:
   LLM), MCP resources, prompts-as-tools, `$ref` schema resolution,
   HITL approval, ref-counted `MCPServerManager`, verbose event
   wiring.
-- **Additional transports** — WebSocket transport, SSE transport
-  (MCP-spec-deprecated), elicitation handler.
+- **Additional transports** — SSE transport (MCP-spec-deprecated),
+  elicitation handler.
 
 ## Install
 
@@ -176,7 +176,7 @@ async def fresh_headers() -> dict[str, str]:
     return {"Authorization": f"Bearer {token}"}
 ```
 
-The provider is invoked from an httpx request event hook reading
+The provider is invoked from an HTTP client request event hook reading
 from a `ContextVar`; concurrent agent runs each see their own
 provider with no shared state.
 
@@ -284,7 +284,7 @@ connection is opened. Anthropic / Gemini / Chat Completions raise
 toolset = MCPToolset(server=server, use_structured_content=True)
 ```
 
-Tools surface their `CallToolResult.structuredContent` via
+Tools surface their `CallToolResult.structured_content` via
 `FunctionToolCallResult.artifact` — the LLM still sees the textual
 content, but the application can read the structured dict.
 
@@ -343,17 +343,6 @@ await manager.release(server)  # -1; cleans up at zero
 entries — enable with `RunConfig(verbose=VerboseConfig())`.
 
 ## Additional transports
-
-### WebSocket transport
-
-```python
-server = MCPServerWebsocket(
-    name="ws-demo",
-    params=MCPServerWebsocketParams(url="wss://api.example.com/mcp"),
-)
-```
-
-Requires the optional `websockets` package.
 
 ### SSE transport (MCP-spec-deprecated)
 

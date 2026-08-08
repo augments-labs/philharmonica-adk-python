@@ -1,15 +1,13 @@
-"""Tests for ``philharmonica.adk.mcp.extras`` (resource + prompt builders)
-and ``philharmonica.adk.mcp.websocket`` (transport happy / sad paths).
-"""
+"""Tests for ``philharmonica.adk.mcp.extras`` (resource + prompt builders)."""
 
 from __future__ import annotations
 
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from philharmonica.adk.mcp.exceptions import MCPToolCallError, UnsupportedTransportError
+from philharmonica.adk.mcp.exceptions import MCPToolCallError
 from philharmonica.adk.mcp.extras import build_prompt_tools, build_resource_tool
 
 
@@ -43,9 +41,9 @@ async def test_resource_tool_returns_text_content() -> None:
 async def test_resource_tool_handles_binary_blob() -> None:
     server = _server("svc")
 
-    blob_entry = MagicMock(spec=["blob", "mimeType"])
+    blob_entry = MagicMock(spec=["blob", "mime_type"])
     blob_entry.blob = "BASE64=="
-    blob_entry.mimeType = "image/png"
+    blob_entry.mime_type = "image/png"
     server.read_resource.return_value = MagicMock(contents=[blob_entry])
 
     tool = build_resource_tool(server)
@@ -125,25 +123,6 @@ async def test_prompt_tool_invokes_get_prompt() -> None:
 
     assert out == "rendered prompt body"
     server.get_prompt.assert_awaited_once_with("free_form", {"topic": "ai"})
-
-
-# --------------------------------------------------------- WebSocket transport
-
-
-async def test_websocket_connect_raises_when_dependency_missing() -> None:
-    """When the ``mcp.client.websocket`` module is missing (no
-    ``websockets`` package), ``connect`` raises ``UnsupportedTransportError``
-    instead of an obscure ``ImportError``.
-    """
-    from philharmonica.adk.mcp.websocket import MCPServerWebsocket, MCPServerWebsocketParams
-
-    server = MCPServerWebsocket(
-        name="ws-test",
-        params=MCPServerWebsocketParams(url="ws://localhost:1/mcp"),
-    )
-
-    with patch.dict("sys.modules", {"mcp.client.websocket": None}), pytest.raises(UnsupportedTransportError):
-        await server.connect()
 
 
 # --------------------------------- _make_client_session explicit constructor

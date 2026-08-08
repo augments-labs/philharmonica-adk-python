@@ -25,6 +25,31 @@ and the project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/v
   suffix alone. Routing now compares the parsed hostname against a domain set
   by equality or subdomain.
 
+### Removed
+
+- **`MCPServerWebsocket` and `MCPServerWebsocketParams`.** The MCP client
+  library dropped its WebSocket client, so there is no transport left to wrap.
+  Use `MCPServerStreamableHttp`, which carries server-pushed messages over the
+  same connection.
+- **`UnsupportedTransportError`.** The WebSocket transport was its only
+  raiser; nothing in the framework raises it now.
+
+### Changed
+
+- **The `mcp` extra now requires `mcp>=2.0.0`.** The transports are built
+  against `streamable_http_client` and the `httpx2` client types, neither of
+  which the 1.x line provides.
+- **`MCPServerStreamableHttpParams.httpx_client` and `.httpx_client_factory`
+  now take `httpx2` objects** (`httpx2.AsyncClient`, `httpx2.Timeout`,
+  `httpx2.Auth`) rather than `httpx` ones. `httpx2` is a separate
+  distribution that installs alongside `httpx`; the two sets of types are not
+  interchangeable. A client you supply yourself stays yours to close; one built
+  by the factory is closed with the transport.
+- **`MCPServer.read_resource(uri)` forwards the URI string unchanged** instead
+  of parsing it into a `pydantic.AnyUrl` first. The protocol types this field
+  as an opaque string and leaves scheme interpretation to the server, so URIs
+  a strict URL parser rejects now reach the server.
+
 ## [0.1.1] - 2026-08-08
 
 ### Fixed

@@ -92,7 +92,7 @@ def mcp_tool_to_function_tool(
     server_name = server.name
     tool_name = mcp_tool.name
     description = mcp_tool.description or ""
-    raw_schema: dict[str, Any] = dict(mcp_tool.inputSchema or {})
+    raw_schema: dict[str, Any] = dict(mcp_tool.input_schema or {})
 
     # ``properties`` is required by most LLM providers' tool-schema
     # validators even when the tool takes no arguments. MCP servers
@@ -172,7 +172,7 @@ def call_tool_result_to_str(
             )
 
     body = "\n".join(text_parts)
-    if result.isError:
+    if result.is_error:
         raise MCPToolCallError(tool_name, server_name, body or "(no error message)")
     return body
 
@@ -190,8 +190,10 @@ def call_tool_result_to_artifact(
     if len(non_text_content) > 0:
         artifact["content"] = non_text_content
     if include_structured_content:
-        structured_content = getattr(result, "structuredContent", None)
+        structured_content = result.structured_content
         if structured_content is not None:
+            # The artifact key stays camelCase: it is this framework's
+            # published shape, not a passthrough of the model attribute.
             artifact["structuredContent"] = structured_content
     return artifact if len(artifact) > 0 else None
 

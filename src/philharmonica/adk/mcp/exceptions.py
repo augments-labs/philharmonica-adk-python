@@ -64,12 +64,3 @@ class MCPSchemaConversionError(MCPError):
     (missing ``type``, unparseable ``$defs``) surfaces here instead
     of failing later inside the LLM provider.
     """
-
-
-class UnsupportedTransportError(MCPError):
-    """Raised when an MCP transport is requested that the build does not support.
-
-    Reserved for transports added behind extras or feature flags. The
-    stdio + streamable-HTTP transports are always available when the
-    ``mcp`` extra is installed.
-    """

@@ -32,7 +32,7 @@ def _fake_mcp_tool(name: str) -> Any:
     tool = MagicMock()
     tool.name = name
     tool.description = f"Tool {name}"
-    tool.inputSchema = {"type": "object", "properties": {}}
+    tool.input_schema = {"type": "object", "properties": {}}
     return tool
 
 

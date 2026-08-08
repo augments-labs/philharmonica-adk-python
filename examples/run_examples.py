@@ -208,7 +208,7 @@ def _infra_prereqs(source: str) -> Prereq:
         prereqs |= Prereq.K8S
     if "MCPServerStdio" in source:
         prereqs |= Prereq.MCP_STDIO
-    if _contains_any(source, ("MCPServerStreamableHttp", "MCPServerSse", "MCPServerWebsocket")):
+    if _contains_any(source, ("MCPServerStreamableHttp", "MCPServerSse")):
         prereqs |= Prereq.MCP_SERVER
     if "localhost:8080" in source:
         prereqs |= Prereq.A2A_SERVER

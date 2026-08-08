@@ -1,7 +1,7 @@
-"""Tests for direct httpx client injection into MCPServerStreamableHttp.
+"""Tests for direct httpx2 client injection into MCPServerStreamableHttp.
 
 Feature: ``MCPServerStreamableHttpParams`` gains
-``httpx_client: httpx.AsyncClient | None = None``, mutually exclusive
+``httpx_client: httpx2.AsyncClient | None = None``, mutually exclusive
 with ``httpx_client_factory`` (raises ``ValueError`` when both are set).
 The pre-built client is forwarded to the non-deprecated
 ``streamable_http_client`` via its ``http_client`` parameter.
@@ -18,7 +18,7 @@ Covers:
 
 from __future__ import annotations
 
-import httpx
+import httpx2
 import pytest
 
 from philharmonica.adk.mcp.http import MCPServerStreamableHttpParams
@@ -34,14 +34,14 @@ def test_httpx_client_defaults_to_none() -> None:
 
 async def test_httpx_client_and_factory_mutually_exclusive() -> None:
     """Setting both httpx_client and httpx_client_factory raises ValueError."""
-    client = httpx.AsyncClient()
+    client = httpx2.AsyncClient()
 
     def factory(
         headers: dict[str, str] | None = None,
-        timeout: httpx.Timeout | None = None,
-        auth: httpx.Auth | None = None,
-    ) -> httpx.AsyncClient:
-        return httpx.AsyncClient()
+        timeout: httpx2.Timeout | None = None,
+        auth: httpx2.Auth | None = None,
+    ) -> httpx2.AsyncClient:
+        return httpx2.AsyncClient()
 
     with pytest.raises(ValueError, match="mutually exclusive"):
         MCPServerStreamableHttpParams(
@@ -55,7 +55,7 @@ async def test_httpx_client_and_factory_mutually_exclusive() -> None:
 
 async def test_httpx_client_alone_is_valid() -> None:
     """Setting only httpx_client (no factory) does not raise."""
-    client = httpx.AsyncClient()
+    client = httpx2.AsyncClient()
     params = MCPServerStreamableHttpParams(
         url="https://example.com/mcp",
         httpx_client=client,
@@ -69,10 +69,10 @@ def test_httpx_client_factory_alone_is_valid() -> None:
 
     def factory(
         headers: dict[str, str] | None = None,
-        timeout: httpx.Timeout | None = None,
-        auth: httpx.Auth | None = None,
-    ) -> httpx.AsyncClient:
-        return httpx.AsyncClient()
+        timeout: httpx2.Timeout | None = None,
+        auth: httpx2.Auth | None = None,
+    ) -> httpx2.AsyncClient:
+        return httpx2.AsyncClient()
 
     params = MCPServerStreamableHttpParams(
         url="https://example.com/mcp",
@@ -121,7 +121,7 @@ async def test_connect_uses_prebuilt_client_when_httpx_client_set(
     # Also mock _make_client_session and _attach_session to avoid real session creation
     from philharmonica.adk.mcp import http as http_module
 
-    fake_client = httpx.AsyncClient()
+    fake_client = httpx2.AsyncClient()
 
     params = MCPServerStreamableHttpParams(
         url="https://example.com/mcp",

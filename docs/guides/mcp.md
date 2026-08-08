@@ -165,7 +165,7 @@ server = MCPServerStreamableHttp(
 ```
 
 `header_provider` is called fresh on every outbound HTTP request via an
-httpx event hook reading from a `ContextVar`. Concurrent agent turns
+HTTP client event hook reading from a `ContextVar`. Concurrent agent turns
 each see their own provider with no cross-contamination. Async
 providers are supported:
 
@@ -176,19 +176,6 @@ async def fresh_token() -> dict[str, str]:
 
 params = MCPServerStreamableHttpParams(url="...", header_provider=fresh_token)
 ```
-
-### WebSocket
-
-```python
-from philharmonica.adk.mcp import MCPServerWebsocket, MCPServerWebsocketParams
-
-server = MCPServerWebsocket(
-    name="ws-server",
-    params=MCPServerWebsocketParams(url="wss://api.example.com/mcp"),
-)
-```
-
-Requires the optional `websockets` package.
 
 ### SSE (deprecated)
 
@@ -463,11 +450,9 @@ because they do not ship hosted MCP server-side.
   these Layer 3 items are defined and exported but not yet emitted by
   the runner's hosted-tool loop. Wiring is a runner-loop change; the
   type definitions are stable.
-- **Streamable HTTP transport** — the ADK imports
-  `mcp.client.streamable_http.streamablehttp_client`. This import
-  works correctly with `mcp` 1.x (current). An older memory note
-  referenced a rename issue on a pre-1.0 SDK snapshot; that breakage
-  no longer applies.
+- **WebSocket transport** — not available. The MCP client library
+  removed its WebSocket client, so there is no transport to wrap.
+  Use streamable HTTP.
 
 ---
 
@@ -478,5 +463,5 @@ because they do not ship hosted MCP server-side.
   including how `MCPListToolsItem`, `MCPApprovalRequestItem`, and
   `MCPApprovalResponseItem` fit into the Layer 3 `RunItem` contract.
 - `examples/mcp/` — runnable examples (stdio, streamable HTTP,
-  multi-server, auth headers, cached, SSE, WebSocket).
+  multi-server, auth headers, cached, SSE).
 - Upstream MCP spec: <https://modelcontextprotocol.io/>.

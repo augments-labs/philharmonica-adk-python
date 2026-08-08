@@ -3,9 +3,22 @@ name: Nightly (live-LLM e2e + full type-check)
 # Two nightly jobs too heavy or too credential-bound to block PRs:
 #   - e2e: provider tests against real APIs. Keys come from repo secrets; when a
 #     key is absent the matching tests skip, so a missing secret is a no-op.
-#   - pyright: the full type-check. pyright parses the entire litellm
-#     dependency graph (~30 min), so it runs here nightly rather than per-PR;
-#     mypy is the fast per-PR gate (see ci.yml).
+#   - pyright: the second type-check, kept off the PR path because mypy is the
+#     canonical blocking gate (see ci.yml) and pyright disagrees with it on a
+#     few narrowing rules.
+#     run/loop.py is excluded in pyrightconfig.json because pyright does not
+#     terminate on it. Measured: the whole package checks in ~17s with that
+#     exclusion, and every subpackage lands in <=5s (llms/, which pulls in the
+#     entire litellm graph, takes 5s) — the dependency graph was never the
+#     cost. Within loop.py, run_agent_block and run_agent_block_streamed are
+#     each independently non-convergent, while the other two large functions
+#     there check in ~2s; the difference is flow-graph size in a single body
+#     (23 and 27 `if`s plus try/except and a while loop across 442-505 lines).
+#     Splitting those two functions is what removes the exclusion; no checker
+#     flag helps, and pyright has no analysis-time bound.
+#     Excluding the file does not hide it from importers: run/runner.py
+#     imports it and still checks clean, since all four functions carry
+#     explicit return annotations.
 # Scheduled runs fire on the default branch only.
 
 on:
@@ -24,6 +37,11 @@ jobs:
   e2e:
     name: Live-LLM e2e
     runs-on: ubuntu-latest
+    # The suite is two live roundtrips and finishes in seconds; this bound only
+    # exists so a provider that accepts the connection and then never answers
+    # cannot hold the runner for GitHub's 6-hour default. It covers checkout
+    # and uv sync too, not just the test step.
+    timeout-minutes: 10
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -41,6 +59,12 @@ jobs:
   pyright:
     name: Full pyright
     runs-on: ubuntu-latest
+    # Without this the job inherits GitHub's 6-hour default, so a pyright that
+    # stops converging burns a full runner-day before anyone sees a result,
+    # and the downloadable log archive does not exist until the run ends. A
+    # healthy run is ~17s, so 10 minutes is ~35x headroom while still failing
+    # fast if a future change reintroduces a non-terminating file.
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v9.0.0

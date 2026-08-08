@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "philharmonica-adk"
-version = "0.2.1"
+version = "0.2.2"
 description = "Philharmonica ADK — orchestrate a complex system of agents that performs real-world actions, provider-agnostic across 100+ LLMs"
 readme = "README.md"
 license = { text = "MIT" }

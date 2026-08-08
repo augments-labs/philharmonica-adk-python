@@ -23,8 +23,11 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# UV_FROZEN makes every `uv sync` / `uv run` fail rather than silently
-# re-resolve, so CI always installs exactly what uv.lock pins.
+# UV_FROZEN makes every `uv sync` / `uv run` install exactly what uv.lock
+# pins, never re-resolving. It deliberately does NOT verify that the lock is
+# still current — that is `--locked` — so a lockfile that has drifted out of
+# step with pyproject.toml installs happily here. The lint job runs
+# `uv lock --check` for exactly that reason.
 env:
   UV_FROZEN: "1"
 
@@ -42,6 +45,21 @@ jobs:
       # the hygiene gate, and CI enforce the same rule set. Bump it alongside
       # the rev in .pre-commit-config.yaml.
       - run: uv sync --extra dev
+      # uv.lock records the workspace root's own version alongside every
+      # dependency pin, so a release bump that touches pyproject.toml without
+      # re-locking leaves the two disagreeing. Nothing else notices: every
+      # other step runs under UV_FROZEN, and a plain local `uv run` silently
+      # rewrites the file, handing contributors a dirty tree they did not
+      # cause. This is the one step that fails on that drift.
+      #
+      # UV_FROZEN must be off here, and not for tidiness: it outranks --check.
+      # With it set, uv validates the lock's syntax, prints "only checked for
+      # validity, not whether it is up-to-date", and exits 0 — so the step
+      # would pass while checking nothing at all.
+      - name: uv.lock is up to date with pyproject.toml
+        env:
+          UV_FROZEN: "0"
+        run: uv lock --check
       - run: uv run ruff check src tests examples
       - run: uv run ruff format --check src tests examples
 

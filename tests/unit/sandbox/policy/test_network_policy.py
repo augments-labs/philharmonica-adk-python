@@ -73,7 +73,9 @@ class TestK8sDenyDefaultEmitsCr:
         cr = apply_network_policy_to_k8s_pod(policy, "default", "pod-1")
         assert cr is not None
         annotation = cr["metadata"]["annotations"]["philharmonica.sandbox/allow-hosts"]
-        assert "api.example.com" in annotation
+        # Exactly the one allowed host — a containment check would also pass
+        # if the annotation had picked up a host the policy never listed.
+        assert annotation == "api.example.com"
 
 
 class TestDockerOpenPolicyNoLockdown:

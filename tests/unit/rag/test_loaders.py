@@ -183,3 +183,49 @@ def test_extract_video_id_unparseable_url_raises() -> None:
 
     with pytest.raises(DocumentLoadError):
         _extract_video_id("https://www.youtube.com/feed/subscriptions")
+
+
+class TestUrlRoutingMatchesHostNotSubstring:
+    """Routing must key on the parsed host, not a substring of the netloc.
+
+    ``netloc`` carries userinfo and port, so ``youtube.com@evil.com`` and
+    ``evil-youtube.com.attacker.net`` both contain the marker while being
+    served by someone else entirely. Routing those to the YouTube or GitHub
+    loader hands an attacker-chosen origin to a loader that trusts its host.
+    """
+
+    @pytest.mark.parametrize(
+        "source",
+        [
+            # Userinfo: the real host is evil.com.
+            "https://youtube.com@evil.com/watch?v=abc",
+            "https://github.com@evil.com/owner/repo",
+            # Suffix and infix look-alikes.
+            "https://evil-youtube.com.attacker.net/watch?v=abc",
+            "https://youtube.com.attacker.net/watch?v=abc",
+            "https://notgithub.com/owner/repo",
+            "https://github.com.evil.net/owner/repo",
+            "https://myyoutu.be.evil.net/abc",
+        ],
+    )
+    def test_lookalike_hosts_fall_through_to_website(self, source: str) -> None:
+        assert isinstance(resolve_loader(source), WebsiteLoader)
+
+    @pytest.mark.parametrize(
+        ("source", "expected"),
+        [
+            ("https://youtube.com/watch?v=abc", YoutubeVideoLoader),
+            ("https://www.youtube.com/watch?v=abc", YoutubeVideoLoader),
+            ("https://m.youtube.com/watch?v=abc", YoutubeVideoLoader),
+            ("https://music.youtube.com/watch?v=abc", YoutubeVideoLoader),
+            ("https://youtu.be/abc", YoutubeVideoLoader),
+            ("https://www.youtube.com/@chan", YoutubeChannelLoader),
+            ("https://github.com/owner/repo", GithubLoader),
+            ("https://www.github.com/owner/repo", GithubLoader),
+            # Uppercase host and an explicit port must not defeat the match.
+            ("https://WWW.YouTube.COM/watch?v=abc", YoutubeVideoLoader),
+            ("https://github.com:443/owner/repo", GithubLoader),
+        ],
+    )
+    def test_genuine_hosts_still_route(self, source: str, expected: type) -> None:
+        assert isinstance(resolve_loader(source), expected)

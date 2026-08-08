@@ -10,6 +10,7 @@ Three concerns:
 from __future__ import annotations
 
 import base64
+import time
 from pathlib import Path
 
 import pytest
@@ -283,3 +284,50 @@ class TestFunctionToolIntegration:
         assert len(captured) == 1
         assert isinstance(captured[0], Image)
         assert captured[0].url == "https://example.com/x.png"
+
+
+class TestDataUrlPatternIsLinear:
+    """The data-URL parameter group must not backtrack exponentially.
+
+    ``(?:;[^,]*)*`` lets the inner class consume ``;`` as well, so a run of
+    semicolons has 2^n valid partitions. A data URL missing its comma forces
+    the engine through every one of them before it can fail.
+    """
+
+    @pytest.mark.parametrize("semicolons", [40, 64])
+    def test_comma_less_data_url_fails_fast(self, semicolons: int) -> None:
+        from philharmonica.adk.types.multimodal.file import _DATA_URL_RE
+
+        hostile = "data:a/b" + ";" * semicolons
+        start = time.perf_counter()
+        assert _DATA_URL_RE.match(hostile) is None
+        # Linear matching lands in microseconds. The ambiguous pattern took
+        # ~0.5s at 24 semicolons and doubled with each one after, so neither
+        # size here finished at all; the bound is loose enough not to flake.
+        assert time.perf_counter() - start < 1.0
+
+    @pytest.mark.parametrize(
+        ("url", "mime", "params", "body"),
+        [
+            ("data:text/plain,hi", "text/plain", "", "hi"),
+            ("data:text/plain;base64,aGk=", "text/plain", ";base64", "aGk="),
+            (
+                "data:image/png;charset=utf-8;base64,iVBOR",
+                "image/png",
+                ";charset=utf-8;base64",
+                "iVBOR",
+            ),
+            ("data:,bare", None, "", "bare"),
+            ("data:text/plain;,empty-param", "text/plain", ";", "empty-param"),
+        ],
+    )
+    def test_capture_groups_unchanged(self, url: str, mime: str | None, params: str, body: str) -> None:
+        """The linear pattern must accept the same URLs and capture the same
+        groups as the ambiguous one it replaces."""
+        from philharmonica.adk.types.multimodal.file import _DATA_URL_RE
+
+        match = _DATA_URL_RE.match(url)
+        assert match is not None
+        assert match.group("mime") == mime
+        assert match.group("params") == params
+        assert match.group("body") == body

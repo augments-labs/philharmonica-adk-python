@@ -191,9 +191,12 @@ async def test_on_tool_start_redacts_secret_keys() -> None:
     # Secret values must be masked.
     assert "sk-abc123" not in out
     assert "Bearer xyz" not in out
-    assert "[REDACTED]" in out
-    # Non-secret fields survive.
-    assert "example.com" in out
+    # Pin the whole rendered payload rather than probing it for substrings:
+    # that fixes which keys were masked, which survived, and that nothing
+    # else was emitted alongside them.
+    payload = out.splitlines()[1].strip()
+    expected = "{'url': 'https://example.com', 'api_key': '[REDACTED]', 'Authorization': '[REDACTED]'}"
+    assert payload == expected
 
 
 @pytest.mark.asyncio

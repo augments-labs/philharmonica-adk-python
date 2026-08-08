@@ -27,7 +27,13 @@ _DATA_URL_RE = re.compile(
     # Parameters can appear in any order; ``;base64`` is detected
     # case-insensitively inside the captured ``params`` blob rather
     # than as a fixed position so callers can't fall through silently.
-    r"^data:(?P<mime>[\w.+\-]+/[\w.+\-]+)?(?P<params>(?:;[^,]*)*),(?P<body>.*)$",
+    #
+    # Excluding ``;`` from the parameter body is what keeps matching linear:
+    # it pins each repetition to exactly one parameter, so a run of
+    # semicolons has a single parse instead of one per composition. The
+    # accepted language is unchanged — every comma-free ``;``-led string
+    # still splits, just only one way.
+    r"^data:(?P<mime>[\w.+\-]+/[\w.+\-]+)?(?P<params>(?:;[^;,]*)*),(?P<body>.*)$",
     re.IGNORECASE | re.DOTALL,
 )
 

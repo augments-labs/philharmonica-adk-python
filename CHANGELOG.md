@@ -9,6 +9,22 @@ and the project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/v
 
 ## [Unreleased]
 
+### Security
+
+- The data-URL pattern behind the multimodal `File` / `Image` types matched in
+  exponential time. A `File` argument of the form `data:a/b` followed by a run
+  of semicolons and no comma forced the engine through every partition of that
+  run: 0.53s at 24 semicolons, and at 40 it does not finish. Since these types
+  parse LLM-supplied tool arguments, a single argument could hang the process.
+  The pattern is now unambiguous and matches in linear time, accepting exactly
+  the same URLs.
+- RAG loader routing selected the YouTube and GitHub loaders by testing whether
+  the URL's `netloc` *contained* their domain. A netloc carries userinfo, so
+  `https://youtube.com@evil.com/watch` routed to the YouTube loader while the
+  origin fetched was `evil.com`; `evil-youtube.com.attacker.net` matched on
+  suffix alone. Routing now compares the parsed hostname against a domain set
+  by equality or subdomain.
+
 ## [0.1.1] - 2026-08-08
 
 ### Fixed

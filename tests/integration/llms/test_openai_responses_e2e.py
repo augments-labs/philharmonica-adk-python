@@ -1,7 +1,7 @@
 """End-to-end live integration test for ``OpenAIResponsesLLM``.
 
-Skipped unless ``OPENAI_API_KEY`` is present in the environment. The
-test executes exactly one real roundtrip against the OpenAI Responses
+Skipped unless ``OPENAI_API_KEY`` holds a non-empty value. The test
+executes exactly one real roundtrip against the OpenAI Responses
 API and asserts on non-empty output plus non-zero usage.
 
 Run with::
@@ -19,8 +19,13 @@ from philharmonica.adk.agents.agent import Agent
 from philharmonica.adk.llms.openai import OpenAIResponsesLLM
 from philharmonica.adk.run.runner import Runner
 
+# Test truthiness, not `is None`. A workflow that forwards a secret with
+# `OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}` defines the variable even
+# when the secret does not exist — GitHub substitutes an empty string — so
+# `is None` reports "key present" on exactly the runner that has no key, and
+# the roundtrip fails on an empty credential instead of skipping.
 pytestmark = pytest.mark.skipif(
-    os.environ.get("OPENAI_API_KEY") is None,
+    not os.environ.get("OPENAI_API_KEY"),
     reason="Set OPENAI_API_KEY to run this integration test.",
 )
 

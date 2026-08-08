@@ -46,16 +46,15 @@ readable after the fact.
 4. **Benchmarks or it didn't happen.** Claims ship with eval evidence or not
    at all — including this framework's own.
 
-## Status
+## Core Concepts
 
-- **Today (v0.1.0 groundwork):** agents, `Runner` (sync/async/streaming),
-  swarms, graphs, flows, task pipelines, tools, handoffs, guardrails, memory
-  and sessions, MCP, A2A, sandboxed code execution, durable execution
-  (Temporal/Restate), OpenTelemetry tracing, deploy targets, and a strict
-  JSON/YAML config layer — all in this repository, MIT licensed.
-- **Next:** `philharmonica-evals-python` (benchmarks vs. other frameworks) and
-  `philharmonica-cookbook-python` (production-grade examples) — build with the ADK,
-  prove it with the evals, learn it from the cookbook.
+- [**Agents**](docs/agents/) — Autonomous entities with tools, guardrails, and handoffs
+- [**Tools**](docs/tools/) — Function wrappers with schema validation and guardrails
+- [**Handoffs**](docs/handoffs/) — Agent-to-agent routing (LLM-orchestrated or code-orchestrated)
+- [**Guardrails**](docs/guardrails/) — Pre/post execution validation at agent and tool level
+- [**Memory**](docs/memory/) — Persistent knowledge across sessions
+- [**Skills**](docs/skills/) — Reusable capability packages (instructions + tools + governance)
+- [**Tracing**](docs/tracing/) — OpenTelemetry observability
 
 ## Installation
 
@@ -204,16 +203,6 @@ python examples/agent_patterns/agents_as_tools.py
 python examples/handoffs/llm_orchestrated.py
 python examples/tools/tool_guardrails.py
 ```
-
-## Core Concepts
-
-- [**Agents**](docs/agents/) — Autonomous entities with tools, guardrails, and handoffs
-- [**Tools**](docs/tools/) — Function wrappers with schema validation and guardrails
-- [**Handoffs**](docs/handoffs/) — Agent-to-agent routing (LLM-orchestrated or code-orchestrated)
-- [**Guardrails**](docs/guardrails/) — Pre/post execution validation at agent and tool level
-- [**Memory**](docs/memory/) — Persistent knowledge across sessions
-- [**Skills**](docs/skills/) — Reusable capability packages (instructions + tools + governance)
-- [**Tracing**](docs/tracing/) — OpenTelemetry observability
 
 ## Project Structure
 

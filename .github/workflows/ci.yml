@@ -47,11 +47,19 @@ jobs:
       - run: uv sync --extra dev
       # uv.lock records the workspace root's own version alongside every
       # dependency pin, so a release bump that touches pyproject.toml without
-      # re-locking leaves the two disagreeing. Nothing else notices: the rest
-      # of CI runs under UV_FROZEN, and a plain local `uv run` silently
+      # re-locking leaves the two disagreeing. Nothing else notices: every
+      # other step runs under UV_FROZEN, and a plain local `uv run` silently
       # rewrites the file, handing contributors a dirty tree they did not
       # cause. This is the one step that fails on that drift.
-      - run: uv lock --check
+      #
+      # UV_FROZEN must be off here, and not for tidiness: it outranks --check.
+      # With it set, uv validates the lock's syntax, prints "only checked for
+      # validity, not whether it is up-to-date", and exits 0 — so the step
+      # would pass while checking nothing at all.
+      - name: uv.lock is up to date with pyproject.toml
+        env:
+          UV_FROZEN: "0"
+        run: uv lock --check
       - run: uv run ruff check src tests examples
       - run: uv run ruff format --check src tests examples
 

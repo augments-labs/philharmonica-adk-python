@@ -8,8 +8,8 @@ handling.
 Top-level surfaces:
 
 - ``MCPServer`` — abstract contract for a single server.
-- ``MCPServerStdio`` / ``MCPServerStreamableHttp`` /
-  ``MCPServerWebsocket`` / ``MCPServerSse`` — concrete transports.
+- ``MCPServerStdio`` / ``MCPServerStreamableHttp`` / ``MCPServerSse``
+  — concrete transports.
 - ``MCPServerManager`` — multi-server lifecycle holder with
   ref-counted ``acquire`` / ``release``.
 - ``ToolFilter`` / ``ToolFilterContext`` — per-tool predicate types.
@@ -34,7 +34,6 @@ if TYPE_CHECKING:
         MCPSchemaConversionError,
         MCPToolCallError,
         MCPToolNotFoundError,
-        UnsupportedTransportError,
     )
     from philharmonica.adk.mcp.filters import ToolFilter, ToolFilterContext
     from philharmonica.adk.mcp.http import MCPServerStreamableHttp, MCPServerStreamableHttpParams
@@ -45,7 +44,6 @@ if TYPE_CHECKING:
     )
     from philharmonica.adk.mcp.sse import MCPServerSse, MCPServerSseParams
     from philharmonica.adk.mcp.stdio import MCPServerStdio, MCPServerStdioParams
-    from philharmonica.adk.mcp.websocket import MCPServerWebsocket, MCPServerWebsocketParams
 else:
     try:
         from philharmonica.adk.mcp.auth import HeaderProvider
@@ -56,7 +54,6 @@ else:
             MCPSchemaConversionError,
             MCPToolCallError,
             MCPToolNotFoundError,
-            UnsupportedTransportError,
         )
         from philharmonica.adk.mcp.filters import ToolFilter, ToolFilterContext
         from philharmonica.adk.mcp.http import MCPServerStreamableHttp, MCPServerStreamableHttpParams
@@ -64,7 +61,6 @@ else:
         from philharmonica.adk.mcp.mcp_server import MCPServer, MCPServerWithClientSession
         from philharmonica.adk.mcp.sse import MCPServerSse, MCPServerSseParams
         from philharmonica.adk.mcp.stdio import MCPServerStdio, MCPServerStdioParams
-        from philharmonica.adk.mcp.websocket import MCPServerWebsocket, MCPServerWebsocketParams
     except ImportError as _exc:
         # Only swallow "top-level mcp package not installed". Any
         # other ImportError (typo inside this package, transitive
@@ -79,7 +75,6 @@ else:
         MCPSchemaConversionError = None  # type: ignore[assignment,misc]
         MCPToolCallError = None  # type: ignore[assignment,misc]
         MCPToolNotFoundError = None  # type: ignore[assignment,misc]
-        UnsupportedTransportError = None  # type: ignore[assignment,misc]
         ToolFilter = None  # type: ignore[assignment,misc]
         ToolFilterContext = None  # type: ignore[assignment,misc]
         MCPServerStreamableHttp = None  # type: ignore[assignment,misc]
@@ -91,8 +86,6 @@ else:
         MCPServerSseParams = None  # type: ignore[assignment,misc]
         MCPServerStdio = None  # type: ignore[assignment,misc]
         MCPServerStdioParams = None  # type: ignore[assignment,misc]
-        MCPServerWebsocket = None  # type: ignore[assignment,misc]
-        MCPServerWebsocketParams = None  # type: ignore[assignment,misc]
 
 
 __all__ = [
@@ -111,12 +104,9 @@ __all__ = [
     "MCPServerStdioParams",
     "MCPServerStreamableHttp",
     "MCPServerStreamableHttpParams",
-    "MCPServerWebsocket",
-    "MCPServerWebsocketParams",
     "MCPServerWithClientSession",
     "MCPToolCallError",
     "MCPToolNotFoundError",
     "ToolFilter",
     "ToolFilterContext",
-    "UnsupportedTransportError",
 ]

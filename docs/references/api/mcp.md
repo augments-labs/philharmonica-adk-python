@@ -16,8 +16,6 @@ name below is bound to `None` so callers can detect availability without
 - `philharmonica.adk.mcp.MCPServerStreamableHttpParams`
 - `philharmonica.adk.mcp.MCPServerSse`
 - `philharmonica.adk.mcp.MCPServerSseParams`
-- `philharmonica.adk.mcp.MCPServerWebsocket`
-- `philharmonica.adk.mcp.MCPServerWebsocketParams`
 
 ## Lifecycle
 
@@ -40,7 +38,6 @@ name below is bound to `None` so callers can detect availability without
 - `philharmonica.adk.mcp.MCPToolCallError`
 - `philharmonica.adk.mcp.MCPToolNotFoundError`
 - `philharmonica.adk.mcp.MCPSchemaConversionError`
-- `philharmonica.adk.mcp.UnsupportedTransportError`
 
 The agent-facing adapter `MCPToolset` is a `Toolset` subclass and lives
 under `philharmonica.adk.tools.toolsets.mcp_toolset`. Usage lives in the

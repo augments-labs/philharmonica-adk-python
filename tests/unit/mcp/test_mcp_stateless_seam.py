@@ -65,7 +65,7 @@ async def test_attach_session_clears_cache_on_reconnect() -> None:
     # Pre-populate cache
     from mcp import Tool as MCPTool
 
-    fake_tool = MCPTool(name="t", description="t", inputSchema={"type": "object"})
+    fake_tool = MCPTool(name="t", description="t", input_schema={"type": "object"})
     server._tools_cache = [fake_tool]
 
     await server._attach_session(session1)
@@ -81,7 +81,7 @@ async def test_no_op_handshake_server_passes_list_tools() -> None:
 
     from mcp import Tool as MCPTool
 
-    fake_tool = MCPTool(name="test_tool", description="A test", inputSchema={"type": "object"})
+    fake_tool = MCPTool(name="test_tool", description="A test", input_schema={"type": "object"})
     list_tools_result = MagicMock()
     list_tools_result.tools = [fake_tool]
     session.list_tools = AsyncMock(return_value=list_tools_result)

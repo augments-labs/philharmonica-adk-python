@@ -5,7 +5,7 @@ Covers:
   raw ``inputSchema`` (with ``"properties"`` filled when missing) and
   ``SchemaEnforcement.NONE``.
 - ``call_tool_result_to_str`` concatenates text parts and raises
-  ``MCPToolCallError`` when ``isError=True``.
+  ``MCPToolCallError`` when ``is_error=True``.
 - non-text MCP content is retained in the artifact channel.
 - Argument parsing rejects non-object JSON and surfaces decode errors
   as ``MCPToolCallError``.
@@ -36,7 +36,7 @@ def _make_mcp_tool(name: str = "lookup", schema: dict[str, Any] | None = None) -
     tool = MagicMock()
     tool.name = name
     tool.description = "Look up a record"
-    tool.inputSchema = schema if schema is not None else {"type": "object"}
+    tool.input_schema = schema if schema is not None else {"type": "object"}
     return tool
 
 
@@ -139,7 +139,7 @@ def test_result_to_str_concatenates_text_parts() -> None:
 def test_result_to_str_raises_on_iserror_true() -> None:
     result = CallToolResult(
         content=[TextContent(type="text", text="boom")],
-        isError=True,
+        is_error=True,
     )
     with pytest.raises(MCPToolCallError) as exc_info:
         call_tool_result_to_str(result, tool_name="t", server_name="s")
@@ -152,7 +152,7 @@ def test_result_to_artifact_preserves_non_text_parts() -> None:
     result = CallToolResult(
         content=[
             TextContent(type="text", text="text-part"),
-            ImageContent(type="image", data="base64data", mimeType="image/png"),
+            ImageContent(type="image", data="base64data", mime_type="image/png"),
         ]
     )
     out = call_tool_result_to_str(result, tool_name="t", server_name="s")
@@ -169,7 +169,7 @@ def test_result_to_str_ignores_structured_content_in_text_path() -> None:
     """
     result = CallToolResult(
         content=[TextContent(type="text", text="ok")],
-        structuredContent={"value": 42},
+        structured_content={"value": 42},
     )
     out = call_tool_result_to_str(result, tool_name="t", server_name="s")
     assert out == "ok"
@@ -203,7 +203,7 @@ async def test_structured_content_artifact_path_returns_tuple() -> None:
     server = _make_server("svc")
     server.call_tool.return_value = CallToolResult(
         content=[TextContent(type="text", text="ok")],
-        structuredContent={"value": 42},
+        structured_content={"value": 42},
     )
 
     ft = mcp_tool_to_function_tool(mcp_tool, server, use_structured_content=True)
@@ -220,9 +220,9 @@ async def test_non_text_content_artifact_path_returns_tuple_by_default() -> None
     server.call_tool.return_value = CallToolResult(
         content=[
             TextContent(type="text", text="preview"),
-            ImageContent(type="image", data="base64data", mimeType="image/png"),
+            ImageContent(type="image", data="base64data", mime_type="image/png"),
         ],
-        structuredContent={"ignored": True},
+        structured_content={"ignored": True},
     )
 
     ft = mcp_tool_to_function_tool(mcp_tool, server)

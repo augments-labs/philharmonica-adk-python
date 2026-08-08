@@ -95,7 +95,7 @@ def make_sampling_callback(llm: LLM) -> Any:
                     role="assistant",
                     content=content_blocks,
                     model=response.model,
-                    stopReason="toolUse",
+                    stop_reason="toolUse",
                 )
 
             if response.finish_reason in ("tool_calls", "tool_use"):
@@ -116,7 +116,7 @@ def make_sampling_callback(llm: LLM) -> Any:
                 role="assistant",
                 content=mcp_types_.TextContent(type="text", text=text),
                 model=response.model,
-                stopReason=_finish_reason_to_stop_reason(response.finish_reason),
+                stop_reason=_finish_reason_to_stop_reason(response.finish_reason),
             )
         except Exception as exc:
             # Log full exception locally; do NOT include the message
@@ -150,10 +150,10 @@ def _build_sampling_config(params: mcp_types.CreateMessageRequestParams) -> LLMC
     from philharmonica.adk.llms.llm_config import LLMConfig
 
     stop_sequences = (
-        list(params.stopSequences) if params.stopSequences is not None and len(params.stopSequences) > 0 else None
+        list(params.stop_sequences) if params.stop_sequences is not None and len(params.stop_sequences) > 0 else None
     )
     return LLMConfig(
-        max_output_tokens=params.maxTokens,
+        max_output_tokens=params.max_tokens,
         temperature=params.temperature,
         stop_sequences=stop_sequences,
     )
@@ -180,7 +180,7 @@ def _build_sampling_tools(params: mcp_types.CreateMessageRequestParams) -> list[
     if params.tools is None:
         return tools
     for mcp_tool in params.tools:
-        raw_schema: dict[str, Any] = dict(mcp_tool.inputSchema or {})
+        raw_schema: dict[str, Any] = dict(mcp_tool.input_schema or {})
         if "properties" not in raw_schema:
             raw_schema["properties"] = {}
 
@@ -258,11 +258,11 @@ def _mcp_messages_to_layer1(
     from philharmonica.adk.types.input.llm_input_easy_message import LLMInputEasyMessage
 
     items: list[LLMInputContentItem] = []
-    if params.systemPrompt is not None:
+    if params.system_prompt is not None:
         items.append(
             LLMInputEasyMessage(
                 role="user",
-                content=f"[MCP server hint]: {params.systemPrompt}",
+                content=f"[MCP server hint]: {params.system_prompt}",
             )
         )
 
@@ -313,11 +313,11 @@ def _content_block_to_layer1(content: Any, role: str) -> LLMInputContentItem | N
 
     if content_type == "tool_result":
         # User/assistant providing tool results — replay as function_call_output param
-        if getattr(content, "structuredContent", None) is not None:
+        if content.structured_content is not None:
             logger.debug(
                 "MCP sampling: tool_result %s carries structuredContent that is not "
                 "forwarded to the LLM; only its text parts are replayed",
-                content.toolUseId,
+                content.tool_use_id,
             )
         result_texts: list[str] = []
         for part in content.content:
@@ -326,7 +326,7 @@ def _content_block_to_layer1(content: Any, role: str) -> LLMInputContentItem | N
         output_str = "\n".join(result_texts)
         output_param: FunctionToolCallResultParam = {
             "type": "function_call_output",
-            "call_id": content.toolUseId,
+            "call_id": content.tool_use_id,
             "output": output_str,
         }
         return output_param

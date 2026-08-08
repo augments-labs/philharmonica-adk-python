@@ -2,12 +2,12 @@
 
 Feature: ``MCPServerWithClientSession`` must expose ``list_resources()``,
 ``list_resource_templates()``, and ``read_resource(uri)`` delegating
-to the installed mcp 1.27.2 ``ClientSession``.
+to the ``ClientSession`` it owns.
 
 Covers:
 - ``list_resources()`` delegates to ``session.list_resources()`` and returns result.
 - ``list_resource_templates()`` delegates to ``session.list_resource_templates()`` and returns result.
-- ``read_resource(uri)`` delegates to ``session.read_resource(AnyUrl(uri))`` and returns result.
+- ``read_resource(uri)`` forwards the URI string unchanged and returns result.
 - All three methods raise ``MCPConnectionError`` when the server is not connected.
 - ``build_resource_tool`` in ``extras.py`` still works on top of these methods.
 """
@@ -101,8 +101,8 @@ async def test_list_resource_templates_raises_when_not_connected() -> None:
 # -------------------------------------------------- read_resource
 
 
-async def test_read_resource_delegates_to_session_with_anyurl() -> None:
-    """read_resource(uri) passes a pydantic AnyUrl to ClientSession.read_resource()."""
+async def test_read_resource_forwards_the_uri_unchanged() -> None:
+    """read_resource(uri) hands ClientSession.read_resource() the exact string."""
     session = _make_session()
     fake_result = MagicMock()
     session.read_resource.return_value = fake_result
@@ -110,11 +110,19 @@ async def test_read_resource_delegates_to_session_with_anyurl() -> None:
     server = _make_server(session=session)
     result = await server.read_resource("file:///tmp/test.txt")
 
-    session.read_resource.assert_awaited_once()
-    # The argument must be a pydantic AnyUrl, not a plain string
-    call_arg = session.read_resource.call_args[0][0]
-    assert str(call_arg) in ("file:///tmp/test.txt", "file:///tmp/test.txt/")
+    session.read_resource.assert_awaited_once_with("file:///tmp/test.txt")
     assert result is fake_result
+
+
+async def test_read_resource_forwards_a_schemeless_uri() -> None:
+    """A URI a strict URL parser would reject is still the server's call to make."""
+    session = _make_session()
+    session.read_resource.return_value = MagicMock()
+
+    server = _make_server(session=session)
+    await server.read_resource("relative/path.txt")
+
+    session.read_resource.assert_awaited_once_with("relative/path.txt")
 
 
 async def test_read_resource_raises_when_not_connected() -> None:

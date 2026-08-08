@@ -41,7 +41,7 @@ def inline_intra_document_refs(
     """Return a new schema dict with intra-document ``$ref``s inlined.
 
     Args:
-        schema: A JSON Schema dict, typically ``mcp.types.Tool.inputSchema``.
+        schema: A JSON Schema dict, typically ``mcp.types.Tool.input_schema``.
         tool_name: For diagnostics in raised exceptions.
 
     Returns:

@@ -12,7 +12,6 @@ the underlying ``mcp`` package is missing.
 | `mcp_server.py` | `MCPServer` ABC + `MCPServerWithClientSession` shared base (cache, locks, ClientSession lifecycle, sampling/elicitation wiring). |
 | `stdio.py` | `MCPServerStdio` + `MCPServerStdioParams` — subprocess transport. |
 | `http.py` | `MCPServerStreamableHttp` + `MCPServerStreamableHttpParams` — modern streamable-HTTP transport with per-request header injection. |
-| `websocket.py` | `MCPServerWebsocket` + params — WebSocket transport. |
 | `sse.py` | `MCPServerSse` + params — SSE transport (MCP-spec-deprecated). |
 | `manager.py` | `MCPServerManager` — multi-server lifecycle holder with ref-counted `acquire` / `release`. |
 | `conversion.py` | `mcp_tool_to_function_tool`, `call_tool_result_to_str`. The only module that imports `mcp.types`. |

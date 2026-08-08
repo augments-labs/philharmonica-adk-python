@@ -176,7 +176,7 @@ def _resource_result_to_str(result: Any, *, uri: str, server_name: str) -> str:
             rendered.append(text)
             continue
         blob = getattr(entry, "blob", None)
-        mime = getattr(entry, "mimeType", "application/octet-stream")
+        mime = getattr(entry, "mime_type", "application/octet-stream")
         if blob is not None:
             rendered.append(json.dumps({"mimeType": mime, "blobBase64": blob}))
     return "\n".join(rendered)

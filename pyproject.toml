@@ -107,7 +107,12 @@ gemini = ["google-genai>=1.0.0"]
 
 # Model Context Protocol client. Enables MCPServer integration.
 # See src/philharmonica/adk/mcp/.
-mcp = ["mcp>=1.24.0,<2"]
+#
+# Floor is 2.0: the transports are built against `streamable_http_client`
+# and the `httpx2` client types, neither of which the 1.x line provides.
+# `httpx2` is listed even though `mcp` pulls it in, because the streamable
+# HTTP transport imports it directly to build the client it hands over.
+mcp = ["mcp>=2.0.0,<3", "httpx2>=2.5.0"]
 
 # Agent-to-Agent (A2A) protocol — peer client + expose local Agents
 # as A2A servers. The [http-server] extra pulls in starlette and

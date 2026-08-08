@@ -24,7 +24,7 @@ import abc
 import asyncio
 import logging
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, cast, override
 
 from philharmonica.adk.mcp.auth import HeaderProvider, active_header_provider
 from philharmonica.adk.mcp.exceptions import MCPConnectionError
@@ -40,6 +40,7 @@ try:
         ListResourcesResult,
         ListResourceTemplatesResult,
         ReadResourceResult,
+        RequestParamsMeta,
         ServerCapabilities,
     )
 except ImportError as ie:
@@ -112,7 +113,7 @@ class MCPServer(abc.ABC):
 
         Returns:
             The raw ``CallToolResult`` from the server, including
-            ``isError`` and ``content``.
+            ``is_error`` and ``content``.
         """
 
     @abc.abstractmethod
@@ -327,8 +328,8 @@ class MCPServerWithClientSession(MCPServer):
         The optional active ``HeaderProvider`` (set via the
         ``active_header_provider`` ContextVar) is consulted for
         per-call headers; HTTP transports read it on outbound
-        requests. ``isError=True`` is left intact in the returned
-        result; ``call_tool_result_to_str`` raises ``MCPToolCallError``
+        requests. An error result is left intact in the returned
+        value; ``call_tool_result_to_str`` raises ``MCPToolCallError``
         when the converter sees the flag.
 
         Args:
@@ -337,12 +338,15 @@ class MCPServerWithClientSession(MCPServer):
 
         Returns:
             The raw ``CallToolResult`` from the server. Callers inspect
-            ``isError`` and ``content`` rather than this layer raising
+            ``is_error`` and ``content`` rather than this layer raising
             on errors.
         """
         session = self._require_session()
         meta = build_mcp_meta()
-        meta_param = meta if len(meta) > 0 else None
+        # ``_meta`` is an open map keyed by strings, so the built dict already
+        # satisfies the shape; the cast only tells the checker so, since a
+        # plain dict is not assignable to a TypedDict.
+        meta_param = cast("RequestParamsMeta", meta) if len(meta) > 0 else None
         arguments = _args_dict_or_none(args)
 
         if self._header_provider is not None:
@@ -367,9 +371,10 @@ class MCPServerWithClientSession(MCPServer):
 
     @override
     async def read_resource(self, uri: str) -> ReadResourceResult:
-        from pydantic import AnyUrl
-
-        return await self._require_session().read_resource(AnyUrl(uri))
+        # Forwarded verbatim: the protocol types this field as an opaque
+        # string and lets the server decide how to interpret the scheme,
+        # so parsing it here would reject URIs the server accepts.
+        return await self._require_session().read_resource(uri)
 
     @override
     async def get_prompt(
@@ -385,7 +390,7 @@ class MCPServerWithClientSession(MCPServer):
     @override
     def capabilities(self) -> ServerCapabilities:
         session = self._require_session()
-        caps = session.get_server_capabilities()
+        caps = session.server_capabilities
         if caps is None:
             raise MCPConnectionError(f"MCP server '{self._name}' has no capabilities yet — session is not initialised.")
         return caps

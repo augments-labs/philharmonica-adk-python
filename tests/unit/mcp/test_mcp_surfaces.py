@@ -293,7 +293,7 @@ async def test_sampling_callback_calls_llm() -> None:
                 content=mcp_types.TextContent(type="text", text="hi"),
             )
         ],
-        maxTokens=100,
+        max_tokens=100,
     )
     result = await cb(None, params)
     assert isinstance(result, mcp_types.CreateMessageResult)
@@ -333,7 +333,7 @@ async def test_sampling_callback_warns_on_textless_response(
                 content=mcp_types.TextContent(type="text", text="hi"),
             )
         ],
-        maxTokens=100,
+        max_tokens=100,
     )
     with caplog.at_level("WARNING"):
         result = await cb(None, params)
@@ -358,7 +358,7 @@ async def test_sampling_callback_swallows_exceptions() -> None:
                 content=mcp_types.TextContent(type="text", text="hi"),
             )
         ],
-        maxTokens=10,
+        max_tokens=10,
     )
     result = await cb(None, params)
     assert isinstance(result, mcp_types.ErrorData)
@@ -441,7 +441,7 @@ async def test_call_tool_always_applies_server_header_provider() -> None:
         provider_seen_during_call.append(active_header_provider.get())
         result = MagicMock()
         result.content = []
-        result.isError = False
+        result.is_error = False
         return result
 
     session = MagicMock()
@@ -531,11 +531,11 @@ async def test_sampling_callback_maps_finish_reason_to_stop_reason(
                 content=mcp_types.TextContent(type="text", text="hi"),
             )
         ],
-        maxTokens=5,
+        max_tokens=5,
     )
     result = await cb(None, params)
     assert isinstance(result, mcp_types.CreateMessageResult)
-    assert result.stopReason == expected_stop_reason, (
+    assert result.stop_reason == expected_stop_reason, (
         f"stopReason MUST be {expected_stop_reason!r} for finish_reason={finish_reason!r}; "
         "was always 'endTurn' before fix"
     )
@@ -574,7 +574,7 @@ async def test_sampling_callback_forwards_tools_to_llm(
     tool = mcp_types.Tool(
         name="search",
         description="web search",
-        inputSchema={"type": "object", "properties": {}},
+        input_schema={"type": "object", "properties": {}},
     )
     params = mcp_types.CreateMessageRequestParams(
         messages=[
@@ -583,7 +583,7 @@ async def test_sampling_callback_forwards_tools_to_llm(
                 content=mcp_types.TextContent(type="text", text="find X"),
             )
         ],
-        maxTokens=100,
+        max_tokens=100,
         tools=[tool],
     )
     with caplog.at_level("WARNING"):
@@ -615,20 +615,12 @@ def test_sse_params_call_tool_timeout_defaults_to_none() -> None:
     assert params.call_tool_timeout_seconds is None  # type: ignore[attr-defined]  # new field, editable install lags
 
 
-def test_websocket_params_call_tool_timeout_defaults_to_none() -> None:
-    """call_tool_timeout_seconds MUST default to None (no timeout)."""
-    from philharmonica.adk.mcp.websocket import MCPServerWebsocketParams
-
-    params = MCPServerWebsocketParams(url="ws://localhost/mcp")
-    assert params.call_tool_timeout_seconds is None  # type: ignore[attr-defined]  # new field, editable install lags
-
-
 def test_make_client_session_passes_timeout_when_set() -> None:
     """When call_tool_timeout_seconds is set on params, the session MUST receive
     a read_timeout_seconds timedelta so session.call_tool does not hang forever.
 
     Before the fix, _make_client_session was always called without
-    read_timeout_seconds on stdio/SSE/WebSocket transports, leaving
+    read_timeout_seconds on the stdio and SSE transports, leaving
     anyio.fail_after(None) in effect — an infinite deadline.
     """
     from datetime import timedelta

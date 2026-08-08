@@ -15,7 +15,7 @@ from philharmonica.adk.types.responses.llm_response import LLMResponse, LLMRespo
 
 async def test_tool_call_response_returns_with_tools_result() -> None:
     """When the LLM responds with tool calls, the result must be CreateMessageResultWithTools
-    with stopReason='toolUse' and ToolUseContent blocks."""
+    with stop_reason='toolUse' and ToolUseContent blocks."""
     fake_llm = MagicMock()
     fake_response = LLMResponse(
         response_id="r1",
@@ -35,7 +35,7 @@ async def test_tool_call_response_returns_with_tools_result() -> None:
     tool = mcp_types.Tool(
         name="search",
         description="Search the web",
-        inputSchema={"type": "object", "properties": {"query": {"type": "string"}}},
+        input_schema={"type": "object", "properties": {"query": {"type": "string"}}},
     )
     params = mcp_types.CreateMessageRequestParams(
         messages=[
@@ -44,12 +44,12 @@ async def test_tool_call_response_returns_with_tools_result() -> None:
                 content=mcp_types.TextContent(type="text", text="find something"),
             )
         ],
-        maxTokens=100,
+        max_tokens=100,
         tools=[tool],
     )
     result = await cb(None, params)
     assert isinstance(result, mcp_types.CreateMessageResultWithTools)
-    assert result.stopReason == "toolUse"
+    assert result.stop_reason == "toolUse"
     # content_as_list property should return the list
     content_list = result.content_as_list
     assert len(content_list) == 1
@@ -82,12 +82,12 @@ async def test_tool_result_in_messages_forwarded_to_llm() -> None:
                 role="user",
                 content=mcp_types.ToolResultContent(
                     type="tool_result",
-                    toolUseId="call_abc",
+                    tool_use_id="call_abc",
                     content=[mcp_types.TextContent(type="text", text='{"result": "42"}')],
                 ),
             )
         ],
-        maxTokens=100,
+        max_tokens=100,
     )
     result = await cb(None, params)
     assert isinstance(result, mcp_types.CreateMessageResult)
@@ -129,7 +129,7 @@ async def test_tool_use_in_messages_forwarded_to_llm() -> None:
                 ),
             )
         ],
-        maxTokens=100,
+        max_tokens=100,
     )
     result = await cb(None, params)
     assert isinstance(result, mcp_types.CreateMessageResult)
@@ -141,7 +141,7 @@ async def test_tool_use_in_messages_forwarded_to_llm() -> None:
 
 
 async def test_finish_reason_tool_use_maps_to_stop_reason_tooluse() -> None:
-    """finish_reason='tool_use' (Anthropic style) must map to stopReason='toolUse'."""
+    """finish_reason='tool_use' (Anthropic style) must map to stop_reason='toolUse'."""
     fake_llm = MagicMock()
     fake_response = LLMResponse(
         response_id="r4",
@@ -161,7 +161,7 @@ async def test_finish_reason_tool_use_maps_to_stop_reason_tooluse() -> None:
     tool = mcp_types.Tool(
         name="tool_a",
         description="A tool",
-        inputSchema={"type": "object", "properties": {}},
+        input_schema={"type": "object", "properties": {}},
     )
     params = mcp_types.CreateMessageRequestParams(
         messages=[
@@ -170,12 +170,12 @@ async def test_finish_reason_tool_use_maps_to_stop_reason_tooluse() -> None:
                 content=mcp_types.TextContent(type="text", text="go"),
             )
         ],
-        maxTokens=50,
+        max_tokens=50,
         tools=[tool],
     )
     result = await cb(None, params)
     assert isinstance(result, mcp_types.CreateMessageResultWithTools)
-    assert result.stopReason == "toolUse"
+    assert result.stop_reason == "toolUse"
 
 
 async def test_text_only_path_unchanged_when_no_tools() -> None:
@@ -197,7 +197,7 @@ async def test_text_only_path_unchanged_when_no_tools() -> None:
                 content=mcp_types.TextContent(type="text", text="hi"),
             )
         ],
-        maxTokens=100,
+        max_tokens=100,
     )
     result = await cb(None, params)
     assert isinstance(result, mcp_types.CreateMessageResult)
@@ -221,7 +221,7 @@ async def test_no_warning_logged_when_tools_forwarded(
     tool = mcp_types.Tool(
         name="search",
         description="Search",
-        inputSchema={"type": "object", "properties": {}},
+        input_schema={"type": "object", "properties": {}},
     )
     params = mcp_types.CreateMessageRequestParams(
         messages=[
@@ -230,7 +230,7 @@ async def test_no_warning_logged_when_tools_forwarded(
                 content=mcp_types.TextContent(type="text", text="find X"),
             )
         ],
-        maxTokens=100,
+        max_tokens=100,
         tools=[tool],
     )
     with caplog.at_level("WARNING"):
@@ -242,7 +242,7 @@ async def test_no_warning_logged_when_tools_forwarded(
 async def test_tool_intent_without_calls_answers_as_end_turn() -> None:
     """finish_reason=tool_calls with an empty call list must not emit toolUse.
 
-    A text body paired with stopReason="toolUse" contradicts the protocol;
+    A text body paired with stop_reason="toolUse" contradicts the protocol;
     the degenerate response is answered as a plain endTurn completion.
     """
     fake_llm = MagicMock()
@@ -262,11 +262,11 @@ async def test_tool_intent_without_calls_answers_as_end_turn() -> None:
                 content=mcp_types.TextContent(type="text", text="hi"),
             )
         ],
-        maxTokens=100,
+        max_tokens=100,
     )
     result = await cb(None, params)
     assert isinstance(result, mcp_types.CreateMessageResult)
-    assert result.stopReason == "endTurn"
+    assert result.stop_reason == "endTurn"
     assert isinstance(result.content, mcp_types.TextContent)
     assert result.content.text == "partial thought"
 
@@ -298,7 +298,7 @@ async def test_tool_calls_detected_by_presence_not_finish_reason() -> None:
     tool = mcp_types.Tool(
         name="search",
         description="Search",
-        inputSchema={"type": "object", "properties": {"q": {"type": "string"}}},
+        input_schema={"type": "object", "properties": {"q": {"type": "string"}}},
     )
     params = mcp_types.CreateMessageRequestParams(
         messages=[
@@ -307,12 +307,12 @@ async def test_tool_calls_detected_by_presence_not_finish_reason() -> None:
                 content=mcp_types.TextContent(type="text", text="find x"),
             )
         ],
-        maxTokens=100,
+        max_tokens=100,
         tools=[tool],
     )
     result = await cb(None, params)
     assert isinstance(result, mcp_types.CreateMessageResultWithTools)
-    assert result.stopReason == "toolUse"
+    assert result.stop_reason == "toolUse"
     content_list = result.content_as_list
     assert len(content_list) == 1
     assert isinstance(content_list[0], mcp_types.ToolUseContent)
@@ -345,9 +345,9 @@ async def test_generation_controls_mapped_to_llm_config() -> None:
                 content=mcp_types.TextContent(type="text", text="hi"),
             )
         ],
-        maxTokens=256,
+        max_tokens=256,
         temperature=0.3,
-        stopSequences=["STOP", "END"],
+        stop_sequences=["STOP", "END"],
     )
     await cb(None, params)
 

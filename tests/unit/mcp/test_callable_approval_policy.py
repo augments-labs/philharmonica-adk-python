@@ -30,7 +30,7 @@ def _mcp_tool(name: str = "my_tool") -> Any:
     tool = MagicMock()
     tool.name = name
     tool.description = "A test tool"
-    tool.inputSchema = {"type": "object", "properties": {}}
+    tool.input_schema = {"type": "object", "properties": {}}
     return tool
 
 
@@ -40,7 +40,7 @@ def _server(name: str = "svc") -> Any:
     server.call_tool = AsyncMock(
         return_value=MagicMock(
             content=[MagicMock(type="text", text="ok", spec=["type", "text"])],
-            isError=False,
+            is_error=False,
         )
     )
     return server
@@ -58,7 +58,7 @@ def _fake_server(*, name: str = "fake", tools: list[Any] | None = None) -> Any:
     server.call_tool = AsyncMock(
         return_value=MagicMock(
             content=[TextContent(type="text", text="ok")],
-            isError=False,
+            is_error=False,
         )
     )
     return server

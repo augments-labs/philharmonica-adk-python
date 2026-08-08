@@ -78,7 +78,7 @@ repos:
   # rule set changes so local / CI / hook stay in lockstep.
   # -------------------------------------------------------------------
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.7
+    rev: v0.16.1
     hooks:
       - id: ruff-format
         types_or: [python, pyi]

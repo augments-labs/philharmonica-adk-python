@@ -67,7 +67,7 @@ class HandoffInputData:
     def clone(
         self,
         *,
-        forwarded: tuple[RunItem, ...] | None | EllipsisType = ...,
+        forwarded: tuple[RunItem, ...] | EllipsisType | None = ...,
     ) -> HandoffInputData:
         """Return a copy with the ``forwarded`` view replaced.
 

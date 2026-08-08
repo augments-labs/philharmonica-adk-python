@@ -74,9 +74,10 @@ jobs:
           python-version: "3.12"
       - run: uv sync --extra dev
       # mypy is the canonical, blocking gate: it skips third-party library
-      # internals (ignore_missing_imports) and stays fast. Full pyright parses
-      # the full litellm dependency graph (~30 min), so it runs full nightly
-      # (nightly.yml) rather than blocking every PR.
+      # internals (ignore_missing_imports) and stays fast. pyright runs
+      # nightly (nightly.yml) rather than blocking every PR, because it
+      # disagrees with mypy on a few narrowing rules and those disagreements
+      # should not gate a merge.
       - name: mypy (canonical)
         run: uv run mypy -p philharmonica.adk
       # Examples ship as the ADK's worked reference, so a broken attribute

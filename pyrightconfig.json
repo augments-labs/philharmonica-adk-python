@@ -10,7 +10,8 @@
     "dist",
     ".venv",
     "venv",
-    ".coverage"
+    ".coverage",
+    "src/philharmonica/adk/run/loop.py"
   ],
   "typeCheckingMode": "basic",
   "useLibraryCodeForTypes": true,

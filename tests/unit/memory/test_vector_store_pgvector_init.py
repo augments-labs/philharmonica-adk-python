@@ -10,7 +10,7 @@ pytest.importorskip("pgvector")
 pytest.importorskip("psycopg")
 
 from philharmonica.adk.memory import MemoryMetadata, MemorySource
-from philharmonica.adk.memory.stores.pgvector import PgVectorStore
+from philharmonica.adk.memory.stores.pgvector import PgVectorStore, _row_to_record
 from philharmonica.adk.memory.vector_store import VectorRecord
 
 
@@ -82,3 +82,41 @@ async def test_upsert_sql_refreshes_namespace_on_conflict(monkeypatch: pytest.Mo
     statement = conn.statements[0]
     assert "ON CONFLICT (id) DO UPDATE" in statement
     assert "namespace = EXCLUDED.namespace" in statement
+
+
+class _VectorWithToList:
+    """Stand-in for the pgvector >= 0.5 ``Vector``: exposes ``to_list()``, is not iterable."""
+
+    def __init__(self, values: list[float]) -> None:
+        self._values = values
+
+    def to_list(self) -> list[float]:
+        return self._values
+
+
+def _row(embedding: object) -> tuple[object, ...]:
+    # Column order is fixed by every SELECT in the store module:
+    # id, namespace, content, metadata, embedding, created_at, updated_at.
+    return ("m1", "u1", "hello", {}, embedding, 1.0, 2.0)
+
+
+def test_row_decodes_embedding_exposing_to_list() -> None:
+    # pgvector >= 0.5 hands back a Vector that cannot be iterated directly, so
+    # the decoder has to go through to_list() rather than tuple(...) it.
+    record = _row_to_record(_row(_VectorWithToList([1.0, 0.0])))
+
+    assert record.vector == (1.0, 0.0)
+
+
+def test_row_decodes_embedding_already_a_sequence() -> None:
+    # pgvector 0.4 (and a plain list column) yield something already iterable.
+    record = _row_to_record(_row([0.5, 0.25]))
+
+    assert record.vector == (0.5, 0.25)
+
+
+def test_row_decodes_remaining_columns_by_position() -> None:
+    record = _row_to_record(_row([1.0, 0.0]))
+
+    assert (record.id, record.namespace, record.content) == ("m1", "u1", "hello")
+    assert (record.created_at, record.updated_at) == (1.0, 2.0)

@@ -7,6 +7,39 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/)
 and the project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-08-08
+
+### Fixed
+
+- Two values that reach the type checker as a bare `object` are now narrowed
+  where they are proven rather than left to inference. Decoding a pgvector row
+  probed for `to_list` with `hasattr`, which cannot attach an attribute to
+  `object`; the method is looked up with `getattr` instead. The duck-typing it
+  guards is deliberate and stays — pgvector 0.4 and 0.5 both expose `Vector`,
+  but only the later one answers `to_list()`, so an `isinstance` check would
+  send 0.4 down the wrong branch. Coercing an `apply_patch` operation mapping
+  validated the operation kind against a hand-written set of literals, which
+  does not narrow to the declared union; the accepted values are now derived
+  from that type alias, so the check and the type it proves cannot drift apart.
+  Neither change alters what these functions accept or return. Both paths also
+  gained the offline tests they were missing: the row decoder had none at all,
+  its only suite being gated on live Postgres, and operation coercion exercised
+  one of the three declared kinds.
+
+- The nightly `pyright` job had never produced a result. Its cost was attributed
+  to parsing the whole litellm dependency graph; measuring showed the opposite —
+  the package checks in seconds, and the subpackage that imports litellm is
+  among the fastest. Two functions in the run loop are each independently
+  non-convergent for pyright, and with no timeout on the job, a run could hold a
+  runner for six hours and leave no downloadable log behind. That one file is
+  excluded from the check until those functions are split, and both nightly jobs
+  now carry a timeout, so the gate terminates and reports.
+
+- The live-LLM end-to-end tests raised `Missing credentials` instead of skipping
+  when no API key was available. GitHub Actions substitutes an empty string for
+  an absent secret, so the environment variable existed and a presence check
+  passed. An empty value now counts as absent, and the tests skip as intended.
+
 ## [0.2.1] - 2026-08-08
 
 ### Added

@@ -56,9 +56,10 @@ siblings in this directory and load only when you touch matching files.
 ## Upstream References
 
 ALWAYS consult the closest upstream reference before designing a subsystem or
-chasing a hard bug — cite a fresh read, then adapt; never guess. The
-`consult-upstream-references` skill carries the subsystem→source map and how
-to fetch + cite (context7 MCP, the installed SDK, WebFetch).
+chasing a hard bug — never guess from memory. Prefer the SDK installed in
+site-packages: it is the only source that matches the versions this repo pins.
+Cite what you read (repo path or URL) in the design, PR, or commit, then adapt
+the idea to the invariants above. Never adopt an upstream's types wholesale.
 
 ## Terminology
 

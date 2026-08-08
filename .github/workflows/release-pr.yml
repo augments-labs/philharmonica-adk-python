@@ -2,9 +2,10 @@ name: Release — open PR
 
 # Step 1 of the release flow (see RELEASING.md). A maintainer triggers this
 # and picks the SemVer increment; commitizen rewrites both version locations
-# (pyproject.toml + src/philharmonica/adk/__init__.py), then this opens a
-# release PR. update_changelog_on_bump is off, so CHANGELOG.md is NOT touched
-# here — fold [Unreleased] into its dated heading on main first (RELEASING.md).
+# (pyproject.toml + src/philharmonica/adk/__init__.py), the workspace is
+# re-locked so uv.lock's own version follows, then this opens a release PR.
+# update_changelog_on_bump is off, so CHANGELOG.md is NOT touched here — fold
+# [Unreleased] into its dated heading on main first (RELEASING.md).
 # Merging that PR fires release-tag.yml, which tags and builds; its success
 # then chains into release-publish.yml, which uploads to PyPI. This workflow
 # itself publishes nothing.
@@ -44,6 +45,15 @@ jobs:
         run: |
           uvx --from "commitizen>=4.4.0" cz bump --yes --files-only --increment "${{ inputs.increment }}"
           echo "version=$(uvx --from "commitizen>=4.4.0" cz version --project)" >> "$GITHUB_OUTPUT"
+      # uv.lock pins the workspace root's own version, but commitizen only
+      # rewrites the locations in version_files, so the bump above leaves the
+      # lock a version behind. Re-lock so the release branch is self-consistent
+      # and the `uv lock --check` gate in ci.yml passes on the release PR.
+      # Plain `uv lock` cannot smuggle a dependency upgrade into a release
+      # commit: it holds every existing pin and rewrites only what the changed
+      # version forces. Moving a pin requires --upgrade, which is not used here.
+      - name: Re-lock the workspace at the new version
+        run: uv lock
       - name: Create release branch + PR
         env:
           GH_TOKEN: ${{ github.token }}
@@ -57,7 +67,7 @@ jobs:
           body=$(cat <<EOF
           Automated release PR for **v${version}**.
 
-          - Version bumped in \`pyproject.toml\` and \`src/philharmonica/adk/__init__.py\`.
+          - Version bumped in \`pyproject.toml\`, \`src/philharmonica/adk/__init__.py\`, and \`uv.lock\`.
           - \`CHANGELOG.md\` is untouched by this workflow; confirm \`main\` already carries the \`[${version}]\` heading.
 
           Review the version and changelog, confirm CI is green, then **merge as a merge commit**.

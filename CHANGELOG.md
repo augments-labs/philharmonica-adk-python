@@ -9,6 +9,17 @@ and the project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/v
 
 ## [0.2.1] - 2026-08-08
 
+### Added
+
+- `uv.lock` is verified against `pyproject.toml` on every pull request. The lock
+  records the workspace root's own version, and nothing checked it: the rest of
+  CI runs under `UV_FROZEN`, which installs the lock as-is rather than asserting
+  it is current. A release bump rewrote only the two locations commitizen is
+  told about, so the lock quietly fell a version behind — while a plain local
+  `uv run` re-locked it, handing contributors a modified file they had not
+  touched. The release workflow now re-locks straight after the bump, and
+  `uv lock --check` fails the pull request if the two ever disagree.
+
 ### Fixed
 
 - `import philharmonica.adk.mcp` raised `ModuleNotFoundError: No module named

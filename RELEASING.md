@@ -174,6 +174,12 @@ performs the atomic version bump, keeping `pyproject.toml:version` and
 `src/philharmonica/adk/__init__.py:__version__` in lockstep, and three GitHub
 Actions workflows orchestrate the rest.
 
+There is a third place the version appears: `uv.lock` records the workspace
+root's own version alongside every dependency pin. Commitizen does not know
+about it — it rewrites only `version_files` — so the release workflow runs
+`uv lock` straight after the bump. Should those ever disagree, `uv lock --check`
+in CI fails the PR; the repair is `uv lock`, never a hand edit.
+
 `update_changelog_on_bump` is off, because the CHANGELOG is hand-maintained in
 Keep a Changelog form. Commitizen therefore does **not** touch `CHANGELOG.md`
 — step 1 below is not optional, and skipping it ships a release with no entry.

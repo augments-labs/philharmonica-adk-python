@@ -22,6 +22,13 @@ Claude's path-scoped rule front matter; when working as Codex, read
 match the files you will edit. Do not copy these instruction rules into
 `.codex/rules/`, which is for command permission policy.
 
+Kimi Code compatibility: like Codex, Kimi Code reads the root `AGENTS.md`
+but does not interpret Claude's path-scoped rule front matter; when working
+as Kimi Code, read `.claude/rules/architecture.md` plus any
+`.claude/rules/*.md` whose `paths` match the files you will edit.
+`.kimi-code/skills/` symlinks into `.claude/skills/`, so edits through
+either path affect both agents.
+
 ## Architecture Overview
 
 ```
@@ -72,6 +79,19 @@ carries its own `CLAUDE.md` with module-specific decisions.
   wrappers for command-style prompts.
 - `.codex/agents/` — Codex custom-agent wrappers that delegate to
   `.claude/agents/*.md` as the source of truth.
+
+## Kimi Code layout
+
+- `.kimi-code/skills/` — symlinks to `.claude/skills/` plus a Kimi-native
+  `list-capabilities` skill (Kimi Code has no user-defined slash commands;
+  skills are the equivalent and shadow the Codex-flavored wrapper in
+  `.agents/skills/`).
+- `.kimi-code/agents/` — Kimi-native custom-agent wrappers (same pattern as
+  `.codex/agents/`): Kimi frontmatter (`tools` list, `model_preference`
+  instead of Claude's `model`; `color`/`skills` have no equivalent) with a
+  body delegating to `.claude/agents/*.md` as the source of truth.
+- `.kimi-code/local.toml` — machine-local workspace state (gitignored;
+  written by `/add-dir`).
 
 ## Cost Optimization
 
